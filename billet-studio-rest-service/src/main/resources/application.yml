@@ -1,0 +1,183 @@
+# =============================================================================
+# billet-studio backend configuration
+# =============================================================================
+# Every environment-specific value comes from an environment variable with a local development
+# default. The schema is maintained by hand from sql/, so ddl-auto stays none.
+# =============================================================================
+
+spring:
+  application:
+    name: billet-studio-rest-service
+
+  # Local values for a backend started outside Docker (./mvnw spring-boot:run). .env.local lives in
+  # the repository root and is gitignored; ../ is the path from this module, where mvnw runs.
+  config:
+    import:
+      - optional:file:.env.local[.properties]
+      - optional:file:../.env.local[.properties]
+
+  messages:
+    # A mail's language comes from its recipient, never from the locale of the machine rendering it.
+    fallback-to-system-locale: false
+
+  # ---------------------------------------------------------------------------
+  # Database
+  # ---------------------------------------------------------------------------
+  datasource:
+    # serverTimezone only tells the driver what to assume; what a stored value means is decided by
+    # hibernate.jdbc.time_zone below (DATETIME columns hold UTC).
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/db_billet_studio?useSSL=false&serverTimezone=UTC}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:none}
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        # MariaDB reports "5.5.5-10.x-MariaDB", which Hibernate would mis-detect as MySQL 5.5 (HHH000511).
+        dialect: org.hibernate.dialect.MariaDBDialect
+    open-in-view: false
+
+  # JWT only; no in-memory user from Boot's UserDetailsService default.
+  autoconfigure:
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+
+  # ---------------------------------------------------------------------------
+  # Email (SMTP) - only used when app.mail.enabled=true
+  # ---------------------------------------------------------------------------
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: ${MAIL_DEBUG:false}
+
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 5
+
+  # ---------------------------------------------------------------------------
+  # File upload (avatars)
+  # ---------------------------------------------------------------------------
+  servlet:
+    multipart:
+      enabled: true
+      # One avatar per request; the request limit leaves room for the multipart envelope.
+      max-file-size: 20MB
+      max-request-size: 21MB
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# ---------------------------------------------------------------------------
+# App configuration
+# ---------------------------------------------------------------------------
+app:
+  # Filtered by Maven at build time (spring-boot-starter-parent uses @...@ delimiters).
+  version: "@project.version@"
+  build-time: "@maven.build.timestamp@"
+  site-name: billet-studio
+  jwt:
+    # JwtUtil refuses exactly this literal when app.security.enforce-strong-secrets is true; keep both in sync.
+    secret: ${JWT_SECRET:dev-only-secret-change-in-production-hs512-needs-64-bytes-minimum}
+    # 15 minutes: the session lives in tbl_auth_sessions, the access token only has to outlive a request.
+    expiration-ms: ${JWT_EXPIRATION_MS:900000}
+  auth:
+    session:
+      # Product decisions, so no dedicated env var; relaxed binding (APP_AUTH_SESSION_ADMIN_IDLE, ...)
+      # still overrides them, which is how e2e runs shorten them.
+      admin:
+        idle: 30m
+        absolute: 12h
+      user:
+        idle: 14d
+        absolute: 90d
+    cookie:
+      # Browsers ignore the https requirement for cookies set by localhost, so true is right everywhere
+      # except plain-http tests from a LAN host. Explicit placeholder: .env.local is imported as a
+      # .properties file, where relaxed env-var binding does not apply.
+      secure: ${APP_AUTH_COOKIE_SECURE:true}
+      same-site: Strict
+    register-rate-limit:
+      # Registrations per client IP within the window.
+      limit: ${REGISTER_RATE_LIMIT:3}
+      window: ${REGISTER_RATE_LIMIT_WINDOW:7d}
+  root:
+    # Break-glass admin, bootstrapped on every boot. Dev defaults for local; set real values in prod.
+    email: ${ROOT_EMAIL:root@local.dev}
+    password: ${ROOT_PASSWORD:local-dev-root-password-change-in-production}
+    name: ${ROOT_NAME:Root}
+  security:
+    # Production sets ENFORCE_STRONG_SECRETS=true so the boot guards reject the dev defaults above.
+    enforce-strong-secrets: ${ENFORCE_STRONG_SECRETS:false}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: Authorization,Content-Type,Accept,Origin,X-Requested-With
+    exposed-headers: Authorization
+    allow-credentials: true
+  frontend-url: ${FRONTEND_URL:http://localhost:4200}
+  from-email: ${FROM_EMAIL:kontakt@andreas-web.dev}
+  contact-email: ${CONTACT_EMAIL:kontakt@andreas-web.dev}
+  # Blank = mails render without a logo.
+  logo-url: ${LOGO_URL:}
+  mail:
+    # false: nothing is sent; the mail's link (e.g. password reset) is written to the log instead.
+    enabled: ${MAIL_ENABLED:false}
+  upload:
+    directory: ${UPLOAD_DIRECTORY:./uploads}
+  log:
+    directory: ${LOG_DIRECTORY:./logs}
+  rate-limit:
+    # Off only for the e2e suite; a real deployment always runs with every limit in place.
+    enabled: ${RATE_LIMIT_ENABLED:true}
+  billet:
+    max-per-user: ${BILLET_MAX_PER_USER:50}
+    # Upper bound for one serialized billet document (draft or published snapshot).
+    max-document-bytes: ${BILLET_MAX_DOCUMENT_BYTES:262144}
+  models:
+    # tbl_models stores relative file paths; the API resolves them against this base. Moving the
+    # models from the Angular public/ folder to the backend host is a change of this value only.
+    base-url: ${MODELS_BASE_URL:http://localhost:4200/}
+
+# ---------------------------------------------------------------------------
+# Swagger / OpenAPI - production sets SWAGGER_ENABLED=false (spec and UI both off)
+# ---------------------------------------------------------------------------
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  show-actuator: false
+
+# ---------------------------------------------------------------------------
+# Actuator (health check only)
+# ---------------------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

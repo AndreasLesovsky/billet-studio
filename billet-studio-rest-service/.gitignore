@@ -1,0 +1,16 @@
+# Build output
+target/
+build/
+out/
+
+# Runtime output of a local run (app.log.directory, app.upload.directory)
+logs/
+uploads/
+*.log
+
+# Local secrets
+.env.local
+
+# The wrapper cannot run without its properties; never let a broader ignore rule swallow them.
+!.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/maven-wrapper.jar

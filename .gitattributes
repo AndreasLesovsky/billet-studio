@@ -1,0 +1,28 @@
+# Line endings are decided here, in the repository, not by a machine-local core.autocrlf.
+* text=auto eol=lf
+
+# The one tracked env file. It is the template everyone copies, so a stray CR here becomes a
+# stray CR in a real secret.
+.env.example text eol=lf
+
+# Windows batch wrappers do not start with LF endings.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary, never converted and never diffed as text.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.avif  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.pdf   binary
+*.jar   binary
+*.glb   binary
+*.hdr   binary
+*.ktx2  binary

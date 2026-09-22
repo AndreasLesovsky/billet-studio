@@ -1,0 +1,35 @@
+# Editor configuration, see https://editorconfig.org
+# This is the single source for indentation and whitespace across the whole repository, backend
+# included. It works on file paths, not on git tracking, so it also covers the gitignored .env
+# files that .gitattributes cannot reach.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.java]
+indent_size = 4
+
+[*.scss]
+indent_size = 4
+
+[*.ts]
+quote_type = single
+
+[*.{yml,yaml,sql,json}]
+indent_size = 2
+
+# A CR inside a secret survives into the value Spring reads. These files are gitignored, so this is
+# the only place that can enforce LF on them.
+[.env*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
