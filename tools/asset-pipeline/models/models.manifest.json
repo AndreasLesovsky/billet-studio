@@ -1,0 +1,261 @@
+{
+  "sourceDir": "../../../../digital-card-template/models",
+  "outputDir": "../../../billet-studio-frontend/public/models",
+  "textureQuality": 88,
+  "previewRotationY": -0.35,
+  "models": [
+    {
+      "slug": "flower-bouquet",
+      "version": 1,
+      "source": "flower_bouquet.glb",
+      "name_de": "Blumenstrauß",
+      "name_en": "Flower bouquet",
+      "occasion": "mothers_day",
+      "active": true,
+      "position": 10,
+      "maxTextureSize": 1024,
+      "sizeLimitMB": 8,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "heart-emoji",
+      "version": 1,
+      "source": "heart_emoji.glb",
+      "name_de": "Herz",
+      "name_en": "Heart",
+      "occasion": "valentines",
+      "active": true,
+      "position": 20,
+      "maxTextureSize": 1024,
+      "scene": {
+        "fitSize": 1.5,
+        "yOffset": -0.05,
+        "exposure": 0.65,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.55
+      }
+    },
+    {
+      "slug": "beating-heart",
+      "version": 1,
+      "source": "pumping_heart_model.glb",
+      "name_de": "Schlagendes Herz",
+      "name_en": "Beating heart",
+      "occasion": "valentines",
+      "active": true,
+      "position": 30,
+      "maxTextureSize": 1024,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "neon-heart",
+      "version": 1,
+      "source": "neon_heart_wall_decoration.glb",
+      "name_de": "Neon-Herz",
+      "name_en": "Neon heart",
+      "occasion": "valentines",
+      "active": false,
+      "position": 40,
+      "maxTextureSize": 1024,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "birthday-cake",
+      "version": 1,
+      "source": "birthday_cake.glb",
+      "name_de": "Geburtstagstorte",
+      "name_en": "Birthday cake",
+      "occasion": "birthday",
+      "active": true,
+      "position": 50,
+      "maxTextureSize": 2048,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "carrot-cake",
+      "version": 1,
+      "source": "carrot_cake.glb",
+      "name_de": "Karottenkuchen",
+      "name_en": "Carrot cake",
+      "occasion": "birthday",
+      "active": false,
+      "position": 60,
+      "maxTextureSize": 2048,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "gift-box",
+      "version": 1,
+      "source": "gift_box.glb",
+      "name_de": "Geschenk",
+      "name_en": "Gift box",
+      "occasion": "general",
+      "active": true,
+      "position": 70,
+      "maxTextureSize": 1024,
+      "scene": {
+        "fitSize": 1.3,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "champagne-bottle",
+      "version": 1,
+      "source": "champagne_bottle.glb",
+      "name_de": "Champagnerflasche",
+      "name_en": "Champagne bottle",
+      "occasion": "celebration",
+      "active": true,
+      "position": 80,
+      "maxTextureSize": 2048,
+      "losslessNormals": true,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "champagne-bottle-gold",
+      "version": 1,
+      "source": "champagne.glb",
+      "name_de": "Champagner mit Goldfolie",
+      "name_en": "Champagne with gold foil",
+      "occasion": "celebration",
+      "active": false,
+      "position": 90,
+      "maxTextureSize": 2048,
+      "previewRotationY": 1.22,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "champagne-bottle-classic",
+      "version": 1,
+      "source": "bottle_of_champagne.glb",
+      "name_de": "Champagner klassisch",
+      "name_en": "Classic champagne",
+      "occasion": "celebration",
+      "active": false,
+      "position": 100,
+      "maxTextureSize": 2048,
+      "previewRotationY": 1.22,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "snow-globe",
+      "version": 1,
+      "source": "christmas_ball.glb",
+      "name_de": "Schneekugel",
+      "name_en": "Snow globe",
+      "occasion": "christmas",
+      "active": true,
+      "position": 110,
+      "maxTextureSize": 2048,
+      "scene": {
+        "fitSize": 1.45,
+        "yOffset": 0,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "christmas-baubles",
+      "version": 1,
+      "source": "christmas_tree_balls.glb",
+      "name_de": "Christbaumkugeln",
+      "name_en": "Christmas baubles",
+      "occasion": "christmas",
+      "active": false,
+      "position": 120,
+      "maxTextureSize": 1024,
+      "losslessNormals": true,
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "slug": "christmas-tree",
+      "version": 1,
+      "source": "xmas-tree-cell-shaded.glb",
+      "name_de": "Weihnachtsbaum",
+      "name_en": "Christmas tree",
+      "occasion": "christmas",
+      "active": false,
+      "position": 130,
+      "maxTextureSize": 1024,
+      "excludeMaterials": ["Material.010"],
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    }
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "google": {
+    "Alex Brush": {
+      "query": "Alex+Brush:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/alexbrush/v23/SZc83FzrJKuqFbwMKk6EhUvz7QtO.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "alex-brush/alex-brush-latin-ext-400.woff2",
+          "sha256": "88678971347ba5b81af034e60f0720ef7b40b62185666f19ed582ea2d59e68b8",
+          "bytes": 27328
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/alexbrush/v23/SZc83FzrJKuqFbwMKk6EhUXz7Q.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "alex-brush/alex-brush-latin-400.woff2",
+          "sha256": "461b4c649c372f274cbea95758990e3a6e98524fe7fcbab22dcd9809a1715c49",
+          "bytes": 33288
+        }
+      ]
+    },
+    "Allura": {
+      "query": "Allura:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/allura/v23/9oRPNYsQpS4zjuA_hQgWDto.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "allura/allura-latin-ext-400.woff2",
+          "sha256": "5094d993e86782ac258413fa155652988924bb25ed83d26f61bf6d7f10fdb403",
+          "bytes": 21472
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/allura/v23/9oRPNYsQpS4zjuA_iwgW.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "allura/allura-latin-400.woff2",
+          "sha256": "203583457d9c8cc90309f580dbf27a5fa9ed2893f06b8404ebb4c05e909c18e5",
+          "bytes": 26488
+        }
+      ]
+    },
+    "Cormorant Garamond": {
+      "query": "Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700",
+      "faces": [
+        {
+          "style": "italic",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtGmSq17w.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 700
+          },
+          "file": "cormorant-garamond/cormorant-garamond-latin-ext-300-700italic.woff2",
+          "sha256": "cd5bf126b2c84ab41b254a6a9a1ffb5c326a0f9f82c22fb4704daa31c9aaa415",
+          "bytes": 34392
+        },
+        {
+          "style": "italic",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtImSo.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 700
+          },
+          "file": "cormorant-garamond/cormorant-garamond-latin-300-700italic.woff2",
+          "sha256": "6f2f5c3b1abc3d0bb035a927f66a90ca873f94fc31c4966c8d024142c2036e55",
+          "bytes": 39260
+        },
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYp3tKgS4.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 700
+          },
+          "file": "cormorant-garamond/cormorant-garamond-latin-ext-300-700.woff2",
+          "sha256": "cfa9a397d86f66c5c51775a2500a712d5f632a04f0c5eca6930dfaf612d4566d",
+          "bytes": 33736
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtK.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 700
+          },
+          "file": "cormorant-garamond/cormorant-garamond-latin-300-700.woff2",
+          "sha256": "d80df8ff5aecd299a61549f9e29ab1ed0b9b05f4ea71d50fe978e07d5240b235",
+          "bytes": 37640
+        }
+      ]
+    },
+    "Great Vibes": {
+      "query": "Great+Vibes:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/greatvibes/v21/RWmMoKWR9v4ksMfaWd_JN9XLiaQ6DQ.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "great-vibes/great-vibes-latin-ext-400.woff2",
+          "sha256": "b63469c752efac950ef0497a345e3823d70211b70f60d61887066a87bc3b62f3",
+          "bytes": 66480
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/greatvibes/v21/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "great-vibes/great-vibes-latin-400.woff2",
+          "sha256": "c59dc73d29daf142ef2431f455d21464172374aa750d793a79d608735db2d856",
+          "bytes": 42800
+        }
+      ]
+    },
+    "Italianno": {
+      "query": "Italianno:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/italianno/v18/dg4n_p3sv6gCJkwzT6RXhpwocwM.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "italianno/italianno-latin-ext-400.woff2",
+          "sha256": "d04a57cca66ff5a51551d562c57fc2848e043788a8957a7ad82320e5d5af4c41",
+          "bytes": 17872
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/italianno/v18/dg4n_p3sv6gCJkwzT6RXiJwo.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "italianno/italianno-latin-400.woff2",
+          "sha256": "518325fe367d195cd5e8e120a219f5d83440eddd4c9b6be9321a8c44f7450a9b",
+          "bytes": 36948
+        }
+      ]
+    },
+    "Jost": {
+      "query": "Jost:ital,wght@0,300;0,400;0,500;1,300;1,400",
+      "faces": [
+        {
+          "style": "italic",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/jost/v20/92zUtBhPNqw73oHt7j4hTxM.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 400
+          },
+          "file": "jost/jost-latin-ext-300-400italic.woff2",
+          "sha256": "11391200629cbca418e8725426a9b8b3487de41079ad0425597b7ef6a34e3d27",
+          "bytes": 19436
+        },
+        {
+          "style": "italic",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/jost/v20/92zUtBhPNqw73oHt4D4h.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 400
+          },
+          "file": "jost/jost-latin-300-400italic.woff2",
+          "sha256": "0cadc07f42c10553256ae8fd50fe5eb8b09afe79443f68f50a977fdfc8d25ea8",
+          "bytes": 30700
+        },
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/jost/v20/92zatBhPNqw73ord4iYl.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 500
+          },
+          "file": "jost/jost-latin-ext-300-500.woff2",
+          "sha256": "312ef2b80cefd8d6fd0e8553536862e7103f80be117a5aeba333dac68e4c0a6a",
+          "bytes": 17104
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/jost/v20/92zatBhPNqw73oTd4g.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 500
+          },
+          "file": "jost/jost-latin-300-500.woff2",
+          "sha256": "7726a5cd6f3c0e876c028ea2a643d45f7aad4b0f164b70966c669f4a4668f4b9",
+          "bytes": 26576
+        }
+      ]
+    },
+    "Open Sans": {
+      "query": "Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800",
+      "faces": [
+        {
+          "style": "italic",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/opensans/v44/memtYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWqWt06F15M.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 800
+          },
+          "file": "open-sans/open-sans-latin-ext-300-800italic.woff2",
+          "sha256": "a6fa0e8ac2a665c121a19c2e2434fb286e3afdef7b9288739a73c7cb6849108c",
+          "bytes": 37752
+        },
+        {
+          "style": "italic",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/opensans/v44/memtYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWqWuU6F.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 800
+          },
+          "file": "open-sans/open-sans-latin-300-800italic.woff2",
+          "sha256": "186836b74ceac07b2764c07c0379420e3014efb30fe918461c235e0ef6cbc4a2",
+          "bytes": 50216
+        },
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSGmu1aB.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 300,
+            "max": 800
+          },
+          "file": "open-sans/open-sans-latin-ext-300-800.woff2",
+          "sha256": "d5bab8e28732fe3d10dcef4f77b9c248605bbb2a87d289a2539251ceafab536a",
+          "bytes": 35156
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 300,
+            "max": 800
+          },
+          "file": "open-sans/open-sans-latin-300-800.woff2",
+          "sha256": "d8e4fe0452aa2076429a9bb5d8757d00a994dd95986cf950e9a1a371b9a072a0",
+          "bytes": 48320
+        }
+      ]
+    },
+    "Parisienne": {
+      "query": "Parisienne:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/parisienne/v14/E21i_d3kivvAkxhLEVZpQyZwD9Ku.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "parisienne/parisienne-latin-ext-400.woff2",
+          "sha256": "652fa5786f9ca3be5718cfeba62261ae745ef0ea5efdc264e2b727fafb3d2a11",
+          "bytes": 14232
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/parisienne/v14/E21i_d3kivvAkxhLEVZpQyhwDw.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "parisienne/parisienne-latin-400.woff2",
+          "sha256": "cf3c285d1ec1ee935746c475ca71e20d9f1fc3b5d62166e2523acdd0737e239c",
+          "bytes": 22600
+        }
+      ]
+    },
+    "Pinyon Script": {
+      "query": "Pinyon+Script:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/pinyonscript/v24/6xKpdSJbL9-e9LuoeQiDRQR8WOvaOrbh.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "pinyon-script/pinyon-script-latin-ext-400.woff2",
+          "sha256": "c208ba67b4eff57e673bb188faeca3a51a6d928f8d94aca268b0a41a5deb6932",
+          "bytes": 36152
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/pinyonscript/v24/6xKpdSJbL9-e9LuoeQiDRQR8WOXaOg.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "pinyon-script/pinyon-script-latin-400.woff2",
+          "sha256": "3e1f69a201572cad4aabea7ccf720f093a7dbc005380b2a1b89e0b94476d3e42",
+          "bytes": 39044
+        }
+      ]
+    },
+    "Sacramento": {
+      "query": "Sacramento:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin-ext",
+          "url": "https://fonts.gstatic.com/s/sacramento/v17/buEzpo6gcdjy0EiZMBUG4CMf_exL.woff2",
+          "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "sacramento/sacramento-latin-ext-400.woff2",
+          "sha256": "3b06ffc2dd2edc31fd3f8e301c92a91557c9d8846594486507c5f31b05cf781e",
+          "bytes": 14352
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/sacramento/v17/buEzpo6gcdjy0EiZMBUG4C0f_Q.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "sacramento/sacramento-latin-400.woff2",
+          "sha256": "2fcd867d2812578d001b0eca921848e24de91d01986f26e038be374ec7c5cfd2",
+          "bytes": 23708
+        }
+      ]
+    },
+    "Satisfy": {
+      "query": "Satisfy:wght@400",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/satisfy/v22/rP2Hp2yn6lkG50LoCZOIHQ.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "satisfy/satisfy-latin-400.woff2",
+          "sha256": "efed75fb59ebfac3006c1a815cef791a300d1a4f7e75b0bf0654fa4f6884098e",
+          "bytes": 22724
+        }
+      ]
+    },
+    "Tangerine": {
+      "query": "Tangerine:wght@400;700",
+      "faces": [
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/tangerine/v18/IurY6Y5j_oScZZow4VOxCZZM.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 400,
+            "max": 400
+          },
+          "file": "tangerine/tangerine-latin-400.woff2",
+          "sha256": "cb4e7c0a159ec0cc2bdab8e3cd4b5541cf77748e1f07d4719eb5835c3afcabce",
+          "bytes": 23304
+        },
+        {
+          "style": "normal",
+          "subset": "latin",
+          "url": "https://fonts.gstatic.com/s/tangerine/v18/Iurd6Y5j_oScZZow4VO5srNZi5FN.woff2",
+          "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+          "weight": {
+            "min": 700,
+            "max": 700
+          },
+          "file": "tangerine/tangerine-latin-700.woff2",
+          "sha256": "5019ea2503742cacaa0ed1dadad465785a1157b7f0a95e5ddabdaa0da57644c0",
+          "bytes": 24804
+        }
+      ]
+    }
+  }
+}

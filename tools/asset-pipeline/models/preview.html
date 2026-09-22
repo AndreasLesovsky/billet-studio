@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Model preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <!-- Paths resolve against the render-previews.mjs static server (root = tools/asset-pipeline). -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="preview"></canvas>
+    <script type="module">
+      // Renders one model with the billet scene look. Query parameters:
+      // model (URL), size (CSS px), pixelRatio, fit, y, exposure, distance, height,
+      // rotation (rad, y axis); compare mode only: exclude (material names removed before the
+      // auto-fit, comma-separated) and fitBox (cx,cy,cz,maxDim).
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+      import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+      const params = new URLSearchParams(location.search);
+      const num = (key, fallback) => (params.has(key) ? Number(params.get(key)) : fallback);
+      const size = num('size', 512);
+      const fitSize = num('fit', 1.6);
+      const yOffset = num('y', -0.08);
+
+      try {
+        const canvas = document.getElementById('preview');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+        renderer.setPixelRatio(num('pixelRatio', 1));
+        renderer.setSize(size, size);
+        renderer.setClearColor(0x000000, 0);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = num('exposure', 0.6);
+
+        const scene = new THREE.Scene();
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+        pmrem.dispose();
+
+        const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 100);
+        camera.position.set(0, num('height', 0.1), num('distance', 2.8));
+        camera.lookAt(0, 0, 0);
+
+        scene.add(new THREE.AmbientLight(0xfff8f4, 0.15));
+        const keyLight = new THREE.DirectionalLight(0xfff0e8, 0.4);
+        keyLight.position.set(1.5, 3, 2.5);
+        scene.add(keyLight);
+        const fillLight = new THREE.DirectionalLight(0xf0e8e0, 0.08);
+        fillLight.position.set(-2, 1, 1);
+        scene.add(fillLight);
+
+        const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+        const gltf = await loader.loadAsync(params.get('model'));
+        const model = gltf.scene;
+
+        // Compare mode renders the unoptimized source, so it drops the excludeMaterials here.
+        const excluded = new Set((params.get('exclude') ?? '').split(',').filter(Boolean));
+        const dropped = [];
+        model.traverse((object) => {
+          const materials = [object.material ?? []].flat();
+          if (object.isMesh && materials.some((m) => excluded.has(m.name))) dropped.push(object);
+        });
+        dropped.forEach((object) => object.removeFromParent());
+
+        // Same auto-fit as the billet scene: largest edge = fitSize, centered, then shifted by yOffset.
+        const box = new THREE.Box3().setFromObject(model);
+        let center = box.getCenter(new THREE.Vector3());
+        let maxDim = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+        window.__fitBox = [...center.toArray(), maxDim].join(',');
+        // Compare mode passes the source's fit box so both renders line up pixel for pixel.
+        if (params.has('fitBox')) {
+          const [cx, cy, cz, dim] = params.get('fitBox').split(',').map(Number);
+          center = new THREE.Vector3(cx, cy, cz);
+          maxDim = dim;
+        }
+        const scale = fitSize / maxDim;
+        model.scale.setScalar(scale);
+        model.position.sub(center.multiplyScalar(scale));
+
+        // The pivot turns the model about its own center for a 3/4 view.
+        const pivot = new THREE.Group();
+        pivot.add(model);
+        pivot.rotation.y = num('rotation', -0.35);
+        pivot.position.y = yOffset;
+        scene.add(pivot);
+
+        if (gltf.animations.length) {
+          const mixer = new THREE.AnimationMixer(model);
+          gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+          mixer.update(0);
+        }
+
+        renderer.compile(scene, camera);
+        renderer.render(scene, camera);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        renderer.render(scene, camera);
+        window.__ready = true;
+      } catch (error) {
+        window.__error = String(error?.stack ?? error);
+      }
+    </script>
+  </body>
+</html>

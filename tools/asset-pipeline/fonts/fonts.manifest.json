@@ -1,0 +1,116 @@
+{
+  "outputs": {
+    "fontsDir": "billet-studio-frontend/public/fonts",
+    "catalog": "billet-studio-frontend/src/app/billet/fonts/font-catalog.generated.ts",
+    "preview": "tools/asset-pipeline/fonts/preview.html",
+    "lock": "tools/asset-pipeline/fonts/fonts.lock.json"
+  },
+  "sampleText": "Für Mama — Danke für alles, ÄÖÜ äöüß €",
+  "latinExtSample": "Łódź · Ćwierć · Şişli · Čeština · Ångström",
+  "requiredChars": "ÄÖÜäöüß",
+  "subsets": ["latin-ext", "latin"],
+  "unicodeRanges": {
+    "latin": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "latin-ext": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  "google": {
+    "label": "Google Fonts",
+    "cssUrl": "https://fonts.googleapis.com/css2",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+  },
+  "sources": [
+    {
+      "id": "window-three",
+      "label": "window_three_prototype",
+      "dir": "../window_three_prototype/fonts",
+      "families": ["Inter", "Roboto"]
+    },
+    {
+      "id": "commercex",
+      "label": "CommerceX",
+      "dir": "../commerce-x/commercex-frontend/public/fonts"
+    },
+    {
+      "id": "basisrezept",
+      "label": "Basisrezept",
+      "dir": "../../Basisrezept/fonts"
+    }
+  ],
+  "fallbacks": {
+    "serif": "Georgia, 'Times New Roman', serif",
+    "sans": "'Helvetica Neue', Arial, sans-serif",
+    "display": "'Arial Narrow', Arial, sans-serif",
+    "script": "'Snell Roundhand', 'Segoe Script', cursive",
+    "handwriting": "'Bradley Hand', 'Segoe Print', cursive"
+  },
+  "families": {
+    "Abril Fatface": { "category": "display", "fallback": "Georgia, 'Times New Roman', serif" },
+    "Alex Brush": { "category": "script", "download": { "weights": [400] } },
+    "Allura": { "category": "script", "download": { "weights": [400] } },
+    "Anta": { "category": "display", "fallback": "Arial, sans-serif" },
+    "Baloo 2": { "category": "display", "fallback": "Arial, sans-serif" },
+    "Barlow": { "category": "sans" },
+    "Barlow Condensed": { "category": "sans", "fallback": "'Arial Narrow', Arial, sans-serif" },
+    "Bebas Neue": { "category": "display", "fallback": "Impact, 'Arial Narrow', sans-serif" },
+    "Chewy": { "category": "display", "license": "Apache-2.0", "fallback": "Arial, sans-serif" },
+    "Cormorant Garamond": {
+      "id": "cormorant-garamond",
+      "category": "serif",
+      "download": {
+        "weights": [300, 400, 500, 600, 700],
+        "italicWeights": [300, 400, 500, 600, 700]
+      }
+    },
+    "Dancing Script": { "category": "handwriting" },
+    "DM Sans": { "category": "sans" },
+    "Edu QLD Beginner": {
+      "exclude": "the font has no German umlauts or ß (checked against Google Fonts v5 as well)"
+    },
+    "Genos": { "category": "display" },
+    "Great Vibes": { "category": "script", "download": { "weights": [400] } },
+    "Inter": { "category": "sans" },
+    "Italianno": { "category": "script", "download": { "weights": [400] } },
+    "Jost": {
+      "category": "sans",
+      "download": { "weights": [300, 400, 500], "italicWeights": [300, 400] }
+    },
+    "Jura": { "category": "sans" },
+    "Lato": { "category": "sans" },
+    "League Gothic": { "category": "display", "fallback": "Impact, 'Arial Narrow', sans-serif" },
+    "Libre Baskerville": { "category": "serif" },
+    "Manrope": { "category": "sans" },
+    "Merriweather": { "category": "serif" },
+    "Montserrat": { "category": "sans" },
+    "Nunito": { "category": "sans" },
+    "Open Sans": {
+      "category": "sans",
+      "note": "both local copies are mislabelled subsets (latin-ext and cyrillic-ext) without unicode-range, so the family is downloaded again",
+      "download": {
+        "weights": [300, 400, 500, 600, 700, 800],
+        "italicWeights": [300, 400, 500, 600, 700, 800]
+      }
+    },
+    "Oswald": { "category": "display" },
+    "Outfit": { "category": "sans" },
+    "Parisienne": { "category": "script", "download": { "weights": [400] } },
+    "Pinyon Script": { "category": "script", "download": { "weights": [400] } },
+    "Play": { "category": "sans" },
+    "Playfair Display": { "category": "serif" },
+    "Poppins": { "category": "sans" },
+    "Quicksand": { "category": "sans" },
+    "Raleway": { "category": "sans" },
+    "REM": { "category": "sans" },
+    "Roboto": { "category": "sans" },
+    "Rye": { "category": "display", "fallback": "Georgia, 'Times New Roman', serif" },
+    "Sacramento": { "category": "script", "download": { "weights": [400] } },
+    "Satisfy": {
+      "category": "handwriting",
+      "license": "Apache-2.0",
+      "download": { "weights": [400] }
+    },
+    "Space Grotesk": { "category": "sans" },
+    "Tangerine": { "category": "script", "download": { "weights": [400, 700] } },
+    "Work Sans": { "category": "sans" },
+    "Yanone Kaffeesatz": { "category": "display" }
+  }
+}
