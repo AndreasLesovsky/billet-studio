@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head th:replace="~{email/_fragments :: head}"></head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+<div class="email-container" style="max-width: 600px; margin: 0 auto; padding: 16px;">
+
+  <th:block th:replace="~{email/_fragments :: header}"></th:block>
+
+  <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #333;">Willkommen zurück!</h2>
+
+  <th:block th:replace="~{email/_fragments :: greeting('Hallo', ${greetingName})}"></th:block>
+  <p>du hast dich gerade wieder angemeldet. Dein Konto ist damit reaktiviert und die geplante Löschung abgebrochen.</p>
+  <p>Deine Billets und die Links, über die du sie geteilt hast, sind unverändert erhalten.</p>
+  <p>Schön, dass du wieder da bist!</p>
+
+  <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 16px; margin: 24px 0;">
+    <p style="margin: 0;">Du warst das nicht? Dann ändere bitte sofort dein Passwort in deinem Konto.</p>
+  </div>
+
+  <th:block th:replace="~{email/_fragments :: footer}"></th:block>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{email/_fragments :: head}"></head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+<div class="email-container" style="max-width: 600px; margin: 0 auto; padding: 16px;">
+
+  <th:block th:replace="~{email/_fragments :: header}"></th:block>
+
+  <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #333;" th:text="|Welcome to ${siteName}!|">Welcome to billet-studio!</h2>
+
+  <th:block th:replace="~{email/_fragments :: greeting('Hello', ${greetingName})}"></th:block>
+  <p>Great to have you on board! Your account is set up: your billets are now stored safely online, and you can keep working on them at any time.</p>
+  <p>Design digital greeting cards with your own words, colours and fonts, add a 3D model to the scene and share your billet by link with the people who matter to you.</p>
+
+  <th:block th:replace="~{email/_fragments :: button(${frontendUrl}, 'Get started')}"></th:block>
+
+  <p>Enjoy creating!</p>
+
+  <th:block th:replace="~{email/_fragments :: footer}"></th:block>
+
+</div>
+</body>
+</html>

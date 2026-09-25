@@ -92,7 +92,8 @@ app:
   build-time: "@maven.build.timestamp@"
   site-name: billet-studio
   jwt:
-    # JwtUtil refuses exactly this literal when app.security.enforce-strong-secrets is true; keep both in sync.
+    # JwtUtil refuses this literal and the .env.example value when app.security.enforce-strong-secrets is true
+    # (IN_REPO_SECRETS); JwtUtilTest fails when one of them changes without the other.
     secret: ${JWT_SECRET:dev-only-secret-change-in-production-hs512-needs-64-bytes-minimum}
     # 15 minutes: the session lives in tbl_auth_sessions, the access token only has to outlive a request.
     expiration-ms: ${JWT_EXPIRATION_MS:900000}
@@ -118,6 +119,7 @@ app:
       window: ${REGISTER_RATE_LIMIT_WINDOW:7d}
   root:
     # Break-glass admin, bootstrapped on every boot. Dev defaults for local; set real values in prod.
+    # RootUserBootstrap refuses this password and the .env.example one under enforce-strong-secrets.
     email: ${ROOT_EMAIL:root@local.dev}
     password: ${ROOT_PASSWORD:local-dev-root-password-change-in-production}
     name: ${ROOT_NAME:Root}
@@ -136,15 +138,29 @@ app:
   # Blank = mails render without a logo.
   logo-url: ${LOGO_URL:}
   mail:
-    # false: nothing is sent; the mail's link (e.g. password reset) is written to the log instead.
+    # false: nothing is sent; the mail's link (e.g. password reset) is written to the log instead, except under
+    # enforce-strong-secrets, where that combination is logged as an ERROR at startup.
     enabled: ${MAIL_ENABLED:false}
   upload:
     directory: ${UPLOAD_DIRECTORY:./uploads}
+    # CLI decoders for WebP / AVIF uploads (libwebp-tools / libavif-apps), a command on the PATH or a full
+    # path. Without them those uploads answer 400 INVALID_FILE_TYPE.
+    dwebp: ${UPLOAD_DWEBP:dwebp}
+    avifdec: ${UPLOAD_AVIFDEC:avifdec}
   log:
     directory: ${LOG_DIRECTORY:./logs}
   rate-limit:
     # Off only for the e2e suite; a real deployment always runs with every limit in place.
     enabled: ${RATE_LIMIT_ENABLED:true}
+  scheduler:
+    # Spring cron (second minute hour day month weekday), evaluated in UTC. No dedicated env vars;
+    # relaxed binding (APP_SCHEDULER_ACCOUNTDELETION_CRON, ...) still overrides them.
+    account-deletion:
+      cron: "0 0 3 * * *"
+    purge-expired-auth-sessions:
+      cron: "0 30 3 * * *"
+    expired-reset-token-cleanup:
+      cron: "0 0 4 * * *"
   billet:
     max-per-user: ${BILLET_MAX_PER_USER:50}
     # Upper bound for one serialized billet document (draft or published snapshot).
@@ -181,3 +197,8 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    mail:
+      # An unreachable or unconfigured SMTP server must not mark the backend DOWN (a container healthcheck would
+      # take it out of service); a failed send is logged per mail.
+      enabled: false

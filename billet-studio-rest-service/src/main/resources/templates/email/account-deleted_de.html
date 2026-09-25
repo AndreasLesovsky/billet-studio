@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head th:replace="~{email/_fragments :: head}"></head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+<div class="email-container" style="max-width: 600px; margin: 0 auto; padding: 16px;">
+
+  <th:block th:replace="~{email/_fragments :: header}"></th:block>
+
+  <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #333;">Dein Konto wurde gelöscht</h2>
+
+  <th:block th:replace="~{email/_fragments :: greeting('Hallo', ${greetingName})}"></th:block>
+  <!--/* "30 Tage" = UserService.DELETION_GRACE_PERIOD_DAYS. */-->
+  <p>die 30 Tage seit der Deaktivierung deines Kontos sind vorbei. Wir haben dein Konto deshalb endgültig gelöscht.</p>
+  <p>Gelöscht sind deine Kontodaten, dein Profilbild und alle deine Billets. Links, über die du Billets geteilt hast, funktionieren nicht mehr.</p>
+  <p th:text="|Danke, dass du ${siteName} genutzt hast. Du bist jederzeit herzlich willkommen, ein neues Konto anzulegen.|">Danke, dass du billet-studio genutzt hast.</p>
+
+  <th:block th:replace="~{email/_fragments :: footer}"></th:block>
+
+</div>
+</body>
+</html>

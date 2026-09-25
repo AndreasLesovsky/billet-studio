@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head th:replace="~{email/_fragments :: head}"></head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+<div class="email-container" style="max-width: 600px; margin: 0 auto; padding: 16px;">
+
+  <th:block th:replace="~{email/_fragments :: header}"></th:block>
+
+  <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #333;">Dein Konto ist deaktiviert</h2>
+
+  <th:block th:replace="~{email/_fragments :: greeting('Hallo', ${greetingName})}"></th:block>
+  <!--/* "30 Tage" = UserService.DELETION_GRACE_PERIOD_DAYS. */-->
+  <p>du hast dein Konto gerade deaktiviert und wurdest auf allen Geräten abgemeldet. In den nächsten 30 Tagen kannst du es dir noch anders überlegen.</p>
+
+  <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 16px; margin: 24px 0;">
+    <p style="margin: 0;"><strong>Endgültige Löschung am:</strong> <span th:text="${deletionDate}">22.10.2026</span></p>
+  </div>
+
+  <p>Melde dich bis dahin einfach wieder mit deinen bisherigen Zugangsdaten an: Dein Konto wird dann automatisch reaktiviert, und deine Billets bleiben erhalten.</p>
+
+  <th:block th:replace="~{email/_fragments :: button(${loginUrl}, 'Jetzt anmelden')}"></th:block>
+
+  <p>Danach löschen wir dein Konto endgültig, zusammen mit all deinen Billets. Links, über die du Billets geteilt hast, funktionieren dann nicht mehr. Das lässt sich nicht rückgängig machen.</p>
+
+  <th:block th:replace="~{email/_fragments :: footer}"></th:block>
+
+</div>
+</body>
+</html>

@@ -665,6 +665,25 @@ BCrypt compare (timing). Distinct codes are fine on already-authorized endpoints
 `ACCOUNT_ALREADY_DEACTIVATED`). When in doubt, collapse to the generic failure and log the real
 reason server-side only.
 
+Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), limited per IP via
+`app.auth.register-rate-limit`.
+
+### Backend security invariants (from the P1 review)
+- With `ENFORCE_STRONG_SECRETS=true` the backend refuses to boot on any value that ships in the repo
+  (`JwtUtil.IN_REPO_SECRETS`, `RootUserBootstrap.IN_REPO_PASSWORDS` / `IN_REPO_EMAIL`). Changing a
+  placeholder in `application.yml` or `.env.example` means updating those sets in the same commit.
+- Reset links/tokens are logged only when mail is disabled AND enforcement is off (dev). Never log a
+  raw token anywhere else.
+- Session expiry = min(idle, absolute_expires_at, created_at + the CURRENT role's absolute cap).
+- `deletionScheduledAt != null` means self-deactivation (login within 30 days reactivates); an admin
+  lock never has one. A plain admin edit of a self-deactivated account sends `deactivationReason: null`.
+- URL-level denials answer `ApiError ACCESS_DENIED 403`; real-container behaviour is covered by
+  `ServletContainerTest` because MockMvc never performs the `/error` forward.
+- Image uploads: header-read size cap (100 MP), decoded-raster cap (16 MP), max 2 concurrent decodes;
+  dwebp/avifdec run only after the header check.
+- `docker info` is not a reliable Docker check on this machine; judge IT runs by Testcontainers'
+  "Found Docker environment" log line and `Skipped: 0` on `*IT` classes.
+
 ### Application rules
 - No HTML-string sinks (section 11). User content is text, always.
 - Share tokens are 128-bit random (22 chars base64url); the public endpoint is rate-limited and
@@ -742,6 +761,17 @@ are excluded in `loadingInterceptor` so the two never show at once.
 ## 21. Testing standards
 
 **Every feature ships with tests in the same phase.** No "tests later".
+
+**No unnecessary tests (user rule).** A test must guard behaviour that can realistically break and
+would hurt: business rules, security/auth paths, state machines, data mapping, pure logic with edge
+cases, regressions. Do NOT write tests that restate the code, re-test framework behaviour, cover
+getters/DTOs/constants, duplicate a case another test already pins, or exist only to raise counts.
+Prefer one well-chosen integration test over five mock-heavy unit tests of the same path. When in
+doubt, leave it out and say so in the report.
+
+**Databases in tests:** integration tests use Testcontainers MariaDB (Docker). The user's local
+`db_billet_studio` is for running the app (manual smoke tests via the app's own API with clearly
+named test accounts), never a test fixture and never touched with SQL.
 
 ### Frontend (Vitest)
 - Spec next to the code: `foo.ts` → `foo.spec.ts`. Run `npm test -- --no-watch`
@@ -848,3 +878,78 @@ Before a phase is committed:
 - [ ] Tests added and green by exit code (frontend + backend); `npx fallow audit` clean for changed files
 - [ ] Schema changes delivered as `sql/migrations/<date>_<name>.sql` + folded into `schema.sql`; no SQL executed
 - [ ] New env variables documented in `.env.example`
+
+---
+
+## Design system reference
+
+The editor chrome (`--ui-*`) in one place. Live preview of every class in the current theme: the
+`UiKit` page (`features/dev/ui-kit`, route `dev/ui`).
+
+### Theme workflow
+1. Edit seeds in `billet-studio-frontend/src/styles/themes/themes.json`: per theme `id`, `fontBody`,
+   `fontHeading`, optional `headingWeight` (default 600) / `headingScale` (default 1), `radius`
+   (factor on the base radii), `shadowTint`; per `light` / `dark` only `bg`, `surface`, `text`,
+   `accent`, optional `accent2`. Theme names are i18n keys `THEMES.<ID>`.
+2. `npm run themes:gen` (also runs in prestart / prebuild / pretest) runs
+   `scripts/generate-themes.mjs`. It derives every other token in OKLCH (this supersedes the
+   `color-mix()` / `light-dark()` idea in section 9: the derivation needs contrast-driven searches
+   CSS cannot do), checks WCAG AA for every pair the UI uses, and exits 1 without writing when one
+   fails. It writes `src/styles/_themes.generated.scss`, `src/app/core/theme/theme-registry.generated.ts`
+   and `public/theme-boot.js`.
+3. `theme-contrast.spec.ts` re-checks the generated values and that `theme-boot.js` knows exactly
+   `THEME_IDS`.
+
+Selectors are `[data-theme='x']` (fonts, radii) and `[data-theme='x'][data-mode='light|dark']`
+(colours, shadows, `color-scheme`), never `:root`-only, so any element carrying both attributes
+renders in that theme. localStorage: `billet-studio.theme`, `billet-studio.color-mode` (absent =
+follow the system). `ThemeService` (`core/theme/theme-service.ts`): `theme()`, `mode()`
+(`system | light | dark`), `resolvedMode()`, `setTheme(id)` (unknown ids ignored), `setMode(mode)`;
+it follows `prefers-color-scheme` live and other tabs via the `storage` event.
+
+### Tokens
+| Group | Tokens |
+|---|---|
+| Surfaces | `--ui-bg`, `--ui-surface`, `--ui-surface-raised` (menus, dialogs, toasts), `--ui-surface-sunken` (hover, table head, disabled) |
+| Text | `--ui-text`, `--ui-text-muted` (≥ 4.5:1, placeholders too), `--ui-text-subtle` (≥ 3:1, icons/decoration only, never text) |
+| Lines | `--ui-border` (decorative hairline), `--ui-border-strong` (≥ 3:1, control boundaries) |
+| Accent | `--ui-accent` (fills, ≥ 3:1 on bg), `--ui-accent-hover`, `--ui-accent-soft` (tinted bg), `--ui-on-accent` (label on accent), `--ui-accent-ink` (accent as text/icon, ≥ 4.5:1), `--ui-accent-2` (decorative), `--ui-focus-ring` |
+| Status | `--ui-{danger,success,warning,info}` (fill), `-soft` (tinted bg), `-ink` (text/icon), `--ui-on-{status}` (label on the fill), `--ui-danger-hover` |
+| Misc colour | `--ui-overlay` (dialog backdrop), `--ui-shadow-sm/md/lg` |
+| Type | `--ui-font-body`, `--ui-font-heading`, `--ui-font-heading-weight`, `--ui-font-heading-scale`, `--ui-font-mono`, `--ui-font-weight-strong`, `--ui-text-xs/sm/md/lg/xl/2xl/3xl`, `--ui-leading-tight/normal` |
+| Shape | `--ui-radius-sm/md/lg/xl` (per theme), `--ui-radius-pill` |
+| Space | `--ui-space-1..12` = .25 .5 .75 1 1.25 1.5 2 2.5 3 4 5 6 rem |
+| Motion | `--ui-duration-fast/base/slow` (0 under reduced motion), `--ui-ease` |
+| Layout | `--ui-control-height`, `--ui-header-height`, `--ui-content-max`; breakpoints `sm 36 / md 48 / lg 64 / xl 80 rem` via `@use '…/styles/breakpoints' as bp; @include bp.up(md)` |
+
+Pairing rule: text on a plane uses `--ui-text` / `--ui-text-muted`; accent-coloured text uses
+`--ui-accent-ink`, never `--ui-accent`; text on a fill uses the matching `--ui-on-*`; status text
+uses `-ink` on `-soft`.
+
+### Component classes (`src/styles/components/`)
+- **Layout:** `ui-container`, `ui-page` (+ `__header __title __lead`), `ui-stack` (+ `--sm --lg`),
+  `ui-cluster`, `ui-grid` (column minimum via `--ui-grid-min`), `ui-visually-hidden`.
+- **Buttons:** `ui-btn` + `--primary | --secondary | --ghost | --danger`, `--sm | --lg`, `--icon`
+  (needs `aria-label`), `--block`. Disabled via `disabled` or `aria-disabled="true"`.
+- **Forms:** `ui-field` > `ui-label` + control + `ui-hint`; controls `ui-input`, `ui-textarea`,
+  `ui-select`; `ui-invalid` / `aria-invalid="true"` set the danger border (never by hand, section 7);
+  `ui-field-error` is rendered only by `app-field-error`. `ui-check` = label around a native
+  checkbox/radio; `ui-switch` on `<input type="checkbox" role="switch">`; `ui-range` (fill via
+  `[style.--ui-range-progress]="pct + '%'"`); `ui-segmented` > `ui-segmented__option` (label around a
+  radio, or a button with `aria-pressed` / `aria-checked`).
+- **Surfaces:** `ui-card` (+ `__header __title __body __footer`, `--interactive` for a stretched-link
+  card), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`, `--lg`),
+  `ui-menu` / `ui-menu__item` (+ `--danger`) / `ui-menu__separator` / `ui-menu__label` and
+  `ui-popover` for CDK overlay panels (`cdk.overlay()` is included globally), `ui-table-wrap` >
+  `ui-table` (+ `__actions` cell).
+- **Feedback:** `ui-alert` (+ `--info --success --warning --danger`, `__title`), `ui-badge`
+  (+ `--accent --muted --success --warning --danger`), `ui-spinner` (+ `--sm --lg`, pair with a
+  `role="status"` text), `ui-skeleton`, `ui-avatar` (+ `--sm --lg --xl`), `ui-toast-region` >
+  `ui-toast` (+ variants, `__body`).
+- **Navigation:** `ui-tabs` > `ui-tab` (`aria-selected` or `aria-current="page"`), `ui-breadcrumb`
+  (the `<ol>` inside a labelled `<nav>`), `ui-link`.
+- **Theme preview:** `ui-theme-option` / `__frame` / `__name` / `__check` and `ui-theme-card`
+  (+ `__bar __dot __body __title __line __actions __button __chip`), used by `app-theme-picker`.
+
+Use a class as-is; a missing variant is added to `src/styles/components/`, never as colour in
+component SCSS.
