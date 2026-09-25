@@ -15,6 +15,12 @@ Rules:
   breaks (a blank line = paragraph gap inside a block). Never HTML; the renderer never uses
   innerHTML. Emoji are allowed everywhere.
 - Colours are `#rrggbb` (lowercase written by the frontend; backend accepts either case).
+- Themes vs. site: the website itself has ONE fixed design (site theme "studio", light + dark by
+  system). The 16 editor themes never touch the site; they are scoped to the editor root and flow
+  into the billet through `theme` + the preset values it writes into `palette`, `typography` and
+  `particles.colors`. The renderer only reads the concrete values, never the theme id, so a later
+  change to a theme preset never alters an existing billet. The `rose` preset equals the original
+  Mother's Day card exactly.
 - Limits are enforced by both sides (backend = source of truth, frontend = `billet-limits.ts`).
 
 ## TypeScript shape
@@ -28,6 +34,10 @@ type ParticleShape = 'petal' | 'snowflake' | 'leaf' | 'confetti' | 'heart';
 
 interface BilletDocument {
   schemaVersion: 1;
+  theme: string;                 // ^[a-z0-9-]{1,40}$ editor theme id (THEME_IDS). Styles the editor chrome
+                                 // while this billet is open; picking a theme (re)initialises palette,
+                                 // typography and particles.colors from that theme's billet preset, which
+                                 // the user may then customise. Unknown ids fall back to the default theme.
   title: string;                 // 1..120  internal name (lists); also tbl_billets.title
   pageTitle: string;             // 0..120  <title> of the public page ('' = use hero text)
   lang: 'de' | 'en';             // lang attribute of the public page
@@ -142,6 +152,7 @@ Parity fixture (`muttertag_threejs/index.html`). Used by the Playwright parity t
 ```json
 {
   "schemaVersion": 1,
+  "theme": "rose",
   "title": "Muttertag 2026 – Mama",
   "pageTitle": "Für Mama · Muttertag 2026",
   "lang": "de",
