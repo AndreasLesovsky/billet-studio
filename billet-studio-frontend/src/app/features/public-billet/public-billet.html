@@ -1,0 +1,68 @@
+@if (shown(); as billet) {
+  <app-billet-view
+    [document]="billet.document"
+    [model]="billet.model"
+    fill="page"
+  />
+  @if (credit(); as credit) {
+    <footer
+      class="ui-container ui-hint credit"
+      [attr.lang]="uiLang()"
+    >
+      {{ 'PUBLIC_BILLET.MODEL_CREDIT' | translate }}
+      @if (credit.url) {
+        <a
+          [href]="credit.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ credit.text }}</a
+        >
+      } @else {
+        {{ credit.text }}
+      }
+    </footer>
+  }
+} @else if (missing()) {
+  <div class="ui-container">
+    <div class="ui-page message">
+      <header class="ui-page__header">
+        <h1 class="ui-page__title">{{ 'PUBLIC_BILLET.NOT_FOUND_TITLE' | translate }}</h1>
+        <p class="ui-page__lead">{{ 'PUBLIC_BILLET.NOT_FOUND_TEXT' | translate }}</p>
+      </header>
+      <div class="ui-cluster">
+        <a
+          class="ui-btn ui-btn--primary"
+          routerLink="/"
+          >{{ 'NOT_FOUND.HOME_LINK' | translate }}</a
+        >
+      </div>
+    </div>
+  </div>
+} @else if (failed()) {
+  <div class="ui-container">
+    <div class="ui-page message">
+      <header class="ui-page__header">
+        <h1 class="ui-page__title">{{ 'PUBLIC_BILLET.FAILED_TITLE' | translate }}</h1>
+        <p class="ui-page__lead">{{ 'PUBLIC_BILLET.FAILED_TEXT' | translate }}</p>
+      </header>
+      <div class="ui-cluster">
+        <button
+          type="button"
+          class="ui-btn ui-btn--primary"
+          (click)="retry()"
+        >
+          <i
+            class="bi bi-arrow-clockwise"
+            aria-hidden="true"
+          ></i>
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+        <a
+          class="ui-btn"
+          routerLink="/"
+          >{{ 'NOT_FOUND.HOME_LINK' | translate }}</a
+        >
+      </div>
+    </div>
+  </div>
+}

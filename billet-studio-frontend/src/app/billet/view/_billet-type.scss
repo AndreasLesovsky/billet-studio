@@ -1,0 +1,19 @@
+// Billet typography helpers, shared by the renderer's stylesheets.
+
+// A typography role at its base size: family, weight, style and the size multiplier from the
+// document (typography.ts, roleCss).
+@mixin role($role, $base) {
+    font-family: var(--billet-font-#{$role});
+    font-weight: var(--billet-weight-#{$role});
+    font-style: var(--billet-style-#{$role});
+    font-size: calc(#{$base} * var(--billet-size-#{$role}));
+}
+
+// h1/h2 carry the site's heading rules (src/styles/_base.scss): every one of them is set here.
+@mixin heading {
+    margin: 0;
+    font-synthesis: inherit;
+    letter-spacing: normal;
+    text-wrap: balance;
+    color: var(--billet-ink);
+}

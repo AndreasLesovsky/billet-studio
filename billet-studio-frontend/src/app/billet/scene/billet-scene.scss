@@ -1,0 +1,144 @@
+// Billet renderer styles: colours come from the billet's own --billet-* tokens only.
+
+:host {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.billet-scene__stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.billet-scene__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    // Horizontal drags rotate, vertical swipes scroll the page (the stage re-applies it inline,
+    // because OrbitControls overwrites it).
+    touch-action: pan-y;
+}
+
+:host(.billet-scene--static) .billet-scene__canvas {
+    pointer-events: none;
+}
+
+// The preview was rendered square with the scene's vertical field of view: a full-height square,
+// centred, puts the model where the canvas draws it at any width.
+.billet-scene__preview {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    aspect-ratio: 1;
+    object-fit: contain;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
+    transition:
+        opacity 0.4s ease,
+        visibility 0.4s;
+}
+
+.billet-scene__preview--hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.billet-scene__progress {
+    position: absolute;
+    bottom: 2.25rem;
+    left: 50%;
+    width: min(7.5rem, 40%);
+    height: 0.125rem;
+    overflow: hidden;
+    border-radius: 0.125rem;
+    background: color-mix(in srgb, var(--billet-accent) 20%, transparent);
+    transform: translateX(-50%);
+    // A fast (cached) load finishes before the bar shows.
+    animation: billet-scene-appear 0.3s 0.3s both;
+}
+
+.billet-scene__progress-bar {
+    display: block;
+    height: 100%;
+    background: var(--billet-accent);
+    transform: scaleX(var(--_progress, 0));
+    transform-origin: left;
+    transition: transform 0.2s linear;
+}
+
+.billet-scene__progress-bar--indeterminate {
+    width: 40%;
+    transform: none;
+    animation: billet-scene-sweep 1.2s ease-in-out infinite;
+}
+
+.billet-scene__load {
+    position: absolute;
+    bottom: 2.25rem;
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.125rem;
+    border: 1px solid var(--billet-border);
+    border-radius: 1.5rem;
+    background: var(--billet-surface);
+    color: var(--billet-ink);
+    font-family: var(--billet-font-ui);
+    font-weight: var(--billet-weight-ui);
+    font-size: calc(0.6875rem * var(--billet-size-ui, 1));
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 0.125rem solid var(--billet-accent);
+        outline-offset: 0.125rem;
+    }
+}
+
+.billet-scene__size {
+    color: var(--billet-ink-soft);
+}
+
+@keyframes billet-scene-appear {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes billet-scene-sweep {
+    from {
+        translate: -100% 0;
+    }
+    to {
+        translate: 250% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .billet-scene__preview,
+    .billet-scene__progress-bar {
+        transition: none;
+    }
+
+    .billet-scene__progress {
+        animation: none;
+    }
+
+    .billet-scene__progress-bar--indeterminate {
+        width: 100%;
+        opacity: 0.5;
+        animation: none;
+    }
+}

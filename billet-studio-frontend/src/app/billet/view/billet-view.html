@@ -1,0 +1,99 @@
+@let hero = document().hero;
+@let scene = document().scene;
+@let signature = document().signature;
+
+<!-- An empty title line, hint or signature name renders as a zero-height box. -->
+<div class="page">
+  <header class="hero">
+    @if (hero.label) {
+      <p
+        class="hero-label"
+        [appReveal]="reveal.heroLabel"
+      >
+        {{ hero.label }}
+      </p>
+    }
+    @if (hero.titleLine1 || hero.titleLine2) {
+      <h1
+        class="hero-title"
+        [appReveal]="reveal.heroTitle"
+      >
+        <span
+          class="title-line"
+          [appFitText]="hero.titleLine1"
+          [fitTypography]="document().typography"
+          >{{ hero.titleLine1 }}</span
+        >
+        <span
+          class="title-accent"
+          [appFitText]="hero.titleLine2"
+          [fitTypography]="document().typography"
+          >{{ hero.titleLine2 }}</span
+        >
+      </h1>
+    }
+    @if (hero.sub) {
+      <p
+        class="hero-sub"
+        [appReveal]="reveal.heroSub"
+      >
+        {{ hero.sub }}
+      </p>
+    }
+  </header>
+
+  <!-- The scene labels its own canvas with scene.ariaLabel; a label here would be read twice.
+       In the editor frame the author's own model loads even on a data-saver connection. -->
+  @if (scene.enabled) {
+    <div
+      class="scene"
+      [appReveal]="reveal.scene"
+      [style.block-size.rem]="scene.height"
+    >
+      <app-billet-scene
+        [scene]="scene"
+        [model]="model()"
+        [mode]="resolvedMode()"
+        [eager]="fill() === 'frame'"
+      />
+      <p
+        class="scene-hint"
+        aria-hidden="true"
+      >
+        {{ scene.hint }}
+      </p>
+    </div>
+  }
+
+  <app-billet-divider
+    class="divider"
+    [class.divider--none]="document().divider.style === 'none'"
+    [variant]="document().divider.style"
+    [appReveal]="reveal.divider"
+  />
+
+  @for (item of blocks(); track item.block.id) {
+    <app-billet-block
+      class="block"
+      [block]="item.block"
+      [appReveal]="item.reveal"
+      [style.margin-block-start]="item.space"
+    />
+  }
+
+  @if (signature.name || signature.sub) {
+    <div
+      class="signature"
+      [appReveal]="reveal.signature"
+    >
+      <p class="signature-name">{{ signature.name }}</p>
+      @if (signature.sub) {
+        <p class="signature-sub">{{ signature.sub }}</p>
+      }
+    </div>
+  }
+</div>
+
+@if (showParticles()) {
+  <app-billet-particles [config]="document().particles" />
+}

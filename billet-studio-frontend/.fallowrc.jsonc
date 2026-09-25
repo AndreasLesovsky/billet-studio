@@ -6,7 +6,7 @@
   "entry": ["public/env.js", "public/theme-boot.js", "public/fonts/fonts.css"],
   "ignoreUnresolvedImports": ["./env.js", "./theme-boot.js", "./fonts/fonts.css"],
 
-  // Generated data: the font catalog is consumed from the renderer phase on.
+  // Generated data: FONT_CATALOG feeds the editor's font picker; the renderer reads FONT_BY_ID.
   "ignoreFindings": ["src/app/billet/fonts/font-catalog.generated.ts"],
 
   // Class members fallow's static analysis cannot see as "used":
@@ -28,8 +28,8 @@
 
   // bootstrap-icons ships only the font and its codepoint map, read by scripts/generate-icons.mjs and
   // referenced by url() from the generated _icons.generated.scss - there is never a TS import for
-  // fallow to find. three is imported lazily by the scene, from the renderer phase on.
-  "ignoreDependencies": ["bootstrap-icons", "three"],
+  // fallow to find.
+  "ignoreDependencies": ["bootstrap-icons"],
 
   // Generated files (never edited by hand, see CLAUDE.md "Theme workflow"): the per-theme blocks and
   // the per-icon rules repeat by construction, and theme-boot.js is the generator's output. Import declaration blocks

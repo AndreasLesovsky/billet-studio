@@ -1,0 +1,13 @@
+:host {
+    display: block;
+}
+
+.credit {
+    padding-block: var(--ui-space-3);
+    font-size: var(--ui-text-xs);
+    text-align: center;
+}
+
+.message {
+    align-items: flex-start;
+}

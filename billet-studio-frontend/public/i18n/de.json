@@ -306,6 +306,17 @@
     "TEXT": "Diese Seite gibt es nicht oder nicht mehr. Vielleicht hat sich in der Adresse ein Tippfehler eingeschlichen.",
     "HOME_LINK": "Zur Startseite"
   },
+  "PUBLIC_BILLET": {
+    "NOT_FOUND_TITLE": "Dieses Billet gibt es hier nicht",
+    "NOT_FOUND_TEXT": "Vielleicht ist der Link unvollständig, oder das Billet wurde zurückgezogen. Frag am besten die Person, die es dir geschickt hat.",
+    "FAILED_TITLE": "Das Billet lässt sich gerade nicht öffnen",
+    "FAILED_TEXT": "Da ist etwas schiefgegangen. Versuch es in einem Moment noch einmal.",
+    "MODEL_CREDIT": "3D-Modell:"
+  },
+  "BILLET_SCENE": {
+    "LOAD_3D": "3D-Modell laden",
+    "LOADING": "3D-Modell wird geladen"
+  },
   "FOOTER": {
     "TAGLINE": "Billets gestalten und per Link teilen."
   },
@@ -393,6 +404,15 @@
     "PRESET_SAMPLE_TITLE": "Mama",
     "PRESET_SAMPLE_EMPHASIS": "Danke",
     "PRESET_SAMPLE_BODY": "für alles, was kein Buch lehrt – und für deine Geduld."
+  },
+  "BILLET_PREVIEW": {
+    "TOOLBAR": "Billet-Vorschau",
+    "TEMPLATE": "Vorlage",
+    "PARITY": "Parität (Live-Karte)",
+    "BLANK": "Leer",
+    "LANGUAGE": "Sprache des Billets",
+    "MODE": "Farbmodus des Billets",
+    "REPLAY": "Einblendung wiederholen"
   },
   "MESSAGES": {
     "ERROR": {

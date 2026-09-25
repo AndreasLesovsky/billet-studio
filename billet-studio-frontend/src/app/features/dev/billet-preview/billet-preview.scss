@@ -1,0 +1,22 @@
+// Layout only; every visual comes from the ui-* classes.
+
+:host {
+    display: block;
+}
+
+.toolbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-3) var(--ui-space-4);
+    padding: var(--ui-space-3) var(--ui-space-4);
+}
+
+.toolbar__field {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+}

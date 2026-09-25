@@ -1,0 +1,80 @@
+<div
+  class="ui-app-header toolbar"
+  role="toolbar"
+  [attr.aria-label]="'BILLET_PREVIEW.TOOLBAR' | translate"
+>
+  <label class="toolbar__field">
+    <span class="ui-label">{{ 'BILLET_PREVIEW.TEMPLATE' | translate }}</span>
+    <select
+      class="ui-select"
+      (change)="selectPreview($event)"
+    >
+      @for (preview of previews; track preview.id) {
+        <option
+          [value]="preview.id"
+          [selected]="preview.id === previewId()"
+        >
+          {{ preview.labelKey | translate }}
+        </option>
+      }
+    </select>
+  </label>
+
+  <fieldset
+    class="ui-segmented"
+    [disabled]="previewId() === 'parity'"
+  >
+    <legend class="ui-visually-hidden">{{ 'BILLET_PREVIEW.LANGUAGE' | translate }}</legend>
+    @for (option of langs; track option.lang) {
+      <label
+        class="ui-segmented__option"
+        [lang]="option.lang"
+      >
+        <input
+          type="radio"
+          name="billet-preview-lang"
+          [value]="option.lang"
+          [checked]="lang() === option.lang"
+          (change)="lang.set(option.lang)"
+        />
+        <span aria-hidden="true">{{ option.code }}</span>
+        <span class="ui-visually-hidden">{{ option.nameKey | translate }}</span>
+      </label>
+    }
+  </fieldset>
+
+  <fieldset class="ui-segmented">
+    <legend class="ui-visually-hidden">{{ 'BILLET_PREVIEW.MODE' | translate }}</legend>
+    @for (option of modes; track option.mode) {
+      <label class="ui-segmented__option">
+        <input
+          type="radio"
+          name="billet-preview-mode"
+          [value]="option.mode"
+          [checked]="mode() === option.mode"
+          (change)="mode.set(option.mode)"
+        />
+        {{ option.labelKey | translate }}
+      </label>
+    }
+  </fieldset>
+
+  <button
+    type="button"
+    class="ui-btn ui-btn--neutral"
+    (click)="replay()"
+  >
+    <i
+      class="bi bi-arrow-repeat"
+      aria-hidden="true"
+    ></i>
+    {{ 'BILLET_PREVIEW.REPLAY' | translate }}
+  </button>
+</div>
+
+<app-billet-view
+  [document]="document()"
+  [model]="model()"
+  [mode]="mode()"
+  fill="page"
+/>

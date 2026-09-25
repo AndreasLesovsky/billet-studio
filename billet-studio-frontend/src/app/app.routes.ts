@@ -17,6 +17,23 @@ const devRoutes: Routes = isDevMode()
     ]
   : [];
 
+// Visual QA of the billet renderer (templates, the parity fixture), chrome-less like /b/:shareToken.
+const devBareRoutes: Routes = isDevMode()
+  ? [
+      {
+        path: 'dev/billet/:templateId',
+        loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/dev/billet-preview/billet-preview').then((m) => m.BilletPreview),
+          },
+        ],
+      },
+    ]
+  : [];
+
 /**
  * Every page is lazy, the layouts too: the shared billet page must not pay for the app chrome.
  *
@@ -25,18 +42,20 @@ const devRoutes: Routes = isDevMode()
  * trail and the mobile back link follow the URL.
  */
 export const routes: Routes = [
-  // The recipient's view of a shared billet: no chrome. It stays a 404 until the public page (P5)
-  // replaces the child, which is also the answer for an unknown or unpublished token.
+  // The recipient's view of a shared billet: no chrome. The page itself answers a link that leads
+  // nowhere (unknown, unpublished, owner inactive).
   {
-    path: 'b/:token',
+    path: 'b/:shareToken',
     loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
+        loadComponent: () =>
+          import('./features/public-billet/public-billet').then((m) => m.PublicBillet),
       },
     ],
   },
+  ...devBareRoutes,
   {
     path: '',
     loadComponent: () => import('./layout/app-shell/app-shell').then((m) => m.AppShell),

@@ -1,0 +1,58 @@
+<div
+  #container
+  class="billet-scene__stage"
+>
+  <canvas
+    #canvas
+    class="billet-scene__canvas"
+    [attr.role]="scene().ariaLabel ? 'img' : null"
+    [attr.aria-label]="scene().ariaLabel || null"
+    [attr.aria-hidden]="scene().ariaLabel ? null : 'true'"
+  ></canvas>
+  @if (previewUrl(); as src) {
+    <img
+      class="billet-scene__preview"
+      [class.billet-scene__preview--hidden]="status() === 'ready'"
+      [src]="src"
+      alt=""
+      decoding="async"
+      draggable="false"
+    />
+  }
+</div>
+@switch (status()) {
+  @case ('loading') {
+    <div
+      class="billet-scene__progress"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-valuenow]="percent()"
+      [attr.aria-label]="'BILLET_SCENE.LOADING' | translate"
+      [attr.lang]="uiLang()"
+    >
+      <span
+        class="billet-scene__progress-bar"
+        [class.billet-scene__progress-bar--indeterminate]="progress() === null"
+        [style.--_progress]="progress()"
+      ></span>
+    </div>
+  }
+  @case ('gated') {
+    <button
+      type="button"
+      class="billet-scene__load"
+      [attr.lang]="uiLang()"
+      (click)="loadNow()"
+    >
+      <i
+        class="bi bi-badge-3d"
+        aria-hidden="true"
+      ></i>
+      {{ 'BILLET_SCENE.LOAD_3D' | translate }}
+      @if (sizeLabel(); as size) {
+        <span class="billet-scene__size">{{ size }}</span>
+      }
+    </button>
+  }
+}

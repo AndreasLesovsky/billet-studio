@@ -306,6 +306,17 @@
     "TEXT": "This page does not exist, or no longer does. Perhaps there is a typo in the address.",
     "HOME_LINK": "Go to the home page"
   },
+  "PUBLIC_BILLET": {
+    "NOT_FOUND_TITLE": "This billet is not here",
+    "NOT_FOUND_TEXT": "The link may be incomplete, or the billet has been withdrawn. It is best to ask the person who sent it to you.",
+    "FAILED_TITLE": "This billet cannot be opened right now",
+    "FAILED_TEXT": "Something went wrong. Please try again in a moment.",
+    "MODEL_CREDIT": "3D model:"
+  },
+  "BILLET_SCENE": {
+    "LOAD_3D": "Load 3D model",
+    "LOADING": "Loading 3D model"
+  },
   "FOOTER": {
     "TAGLINE": "Design billets and share them with a link."
   },
@@ -393,6 +404,15 @@
     "PRESET_SAMPLE_TITLE": "Mom",
     "PRESET_SAMPLE_EMPHASIS": "Thank you",
     "PRESET_SAMPLE_BODY": "for everything no book could teach me – and for all your patience."
+  },
+  "BILLET_PREVIEW": {
+    "TOOLBAR": "Billet preview",
+    "TEMPLATE": "Template",
+    "PARITY": "Parity (live card)",
+    "BLANK": "Blank",
+    "LANGUAGE": "Billet language",
+    "MODE": "Billet colour mode",
+    "REPLAY": "Replay the reveal"
   },
   "MESSAGES": {
     "ERROR": {

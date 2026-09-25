@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Route, Router, Routes } from '@angular/router';
+import { provideRouter, Route, Router, Routes, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -10,6 +10,7 @@ import { routes } from './app.routes';
 import { AccessToken } from './core/services/access-token';
 import { AuthApi } from './core/services/auth-api';
 import { LanguageService } from './core/services/language-service';
+import { PublicBilletApi } from './core/services/public-billet-api';
 import {
   createMockAccessToken,
   createMockAuthApi,
@@ -48,7 +49,7 @@ describe('app routes', () => {
     TestBed.configureTestingModule({
       imports: [translateTestingModule()],
       providers: [
-        provideRouter(routes),
+        provideRouter(routes, withComponentInputBinding()),
         { provide: AuthApi, useValue: auth },
         { provide: AccessToken, useValue: createMockAccessToken() },
         {
@@ -59,6 +60,7 @@ describe('app routes', () => {
             setLanguage: vi.fn(),
           },
         },
+        { provide: PublicBilletApi, useValue: { get: vi.fn(async () => null) } },
       ],
     });
   }
@@ -77,11 +79,14 @@ describe('app routes', () => {
 
   it('renders a share link without any app chrome', async () => {
     const harness = await RouterTestingHarness.create('/b/AbCdEfGhIjKlMnOpQrStUv');
+    await harness.fixture.whenStable();
 
     const page = harness.routeNativeElement!;
     expect(page.tagName).toBe('APP-BARE-LAYOUT');
     expect(page.querySelector('.ui-app-header, app-breadcrumb, .ui-app-footer')).toBeNull();
-    expect(page.querySelector('app-not-found')).not.toBeNull();
+    expect(page.querySelector('app-public-billet h1')?.textContent).toContain(
+      'PUBLIC_BILLET.NOT_FOUND_TITLE',
+    );
   });
 
   it('keeps My billets open to guests', async () => {
