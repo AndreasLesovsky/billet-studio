@@ -3,7 +3,8 @@ import { RouterOutlet } from '@angular/router';
 
 /**
  * No chrome at all: the shared billet page (/b/:token) is the recipient's view of a billet, not the
- * app. Toasts, spinner and the confirmation dialog still come from the root component.
+ * app. Toasts and the confirmation dialog still come from the root component; the page shows its
+ * own loading state (it has no header, so no global activity bar).
  */
 @Component({
   selector: 'app-bare-layout',

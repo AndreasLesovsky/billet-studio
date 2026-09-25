@@ -1,0 +1,76 @@
+<div class="account__grid">
+  <div class="account__column">
+    <div class="ui-card">
+      <div class="ui-card__header">
+        <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <app-field-skeleton />
+        <app-field-skeleton
+          [hints]="1"
+          [errorSlot]="false"
+        />
+        <app-field-skeleton
+          [hints]="1"
+          [errorSlot]="false"
+        />
+        <span class="ui-hint ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+      </div>
+      <div class="ui-card__footer">
+        <span class="ui-skeleton ui-skeleton--button"></span>
+        <span class="ui-skeleton ui-skeleton--button"></span>
+      </div>
+    </div>
+
+    <div class="ui-card">
+      <div class="ui-card__header account__card-header">
+        <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+        <span class="ui-hint ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <app-field-skeleton />
+        <app-field-skeleton [hints]="1" />
+        <app-field-skeleton />
+      </div>
+      <div class="ui-card__footer">
+        <span class="ui-skeleton ui-skeleton--button"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="account__column">
+    <div class="ui-card">
+      <div class="ui-card__header">
+        <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+      </div>
+      <div class="ui-card__body ui-stack account__skeleton-avatar">
+        <span class="ui-skeleton ui-skeleton--circle account__skeleton-picture"></span>
+        <!-- The card's (empty) preview notice. -->
+        <span></span>
+        <span class="ui-hint ui-skeleton-lines account__skeleton-lines">
+          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+        </span>
+        <div class="ui-cluster account__skeleton-actions">
+          @for (action of pictureActions; track action) {
+            <span class="ui-skeleton ui-skeleton--button"></span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-card">
+      <div class="ui-card__header">
+        <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <span class="ui-hint ui-skeleton-lines">
+          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+        </span>
+        <span class="ui-skeleton ui-skeleton--button"></span>
+      </div>
+    </div>
+  </div>
+</div>

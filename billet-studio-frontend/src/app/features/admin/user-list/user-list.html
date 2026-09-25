@@ -269,10 +269,7 @@
         </div>
       </div>
     } @else {
-      <div
-        class="ui-skeleton user-list__skeleton"
-        aria-hidden="true"
-      ></div>
+      <app-user-list-skeleton [columns]="columnLabels" />
     }
   </div>
 </div>

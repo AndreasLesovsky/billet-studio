@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthApi } from '../../../core/services/auth-api';
+import { runPending } from '../../../core/utils/pending';
 import { FieldError } from '../../../shared/components/field-error/field-error';
 import {
   EMPTY_MODEL,
@@ -34,6 +35,7 @@ export class ForgotPassword {
   readonly forgotForm = form(this.model, forgotPasswordSchema);
 
   readonly submitted = signal(false);
+  readonly sending = signal(false);
 
   async onSubmit(event?: Event): Promise<void> {
     event?.preventDefault();
@@ -43,7 +45,7 @@ export class ForgotPassword {
     }
 
     try {
-      await this.authApi.forgotPassword(this.model().email);
+      await runPending(this.sending, () => this.authApi.forgotPassword(this.model().email));
     } catch {
       // errorInterceptor has said why.
     }

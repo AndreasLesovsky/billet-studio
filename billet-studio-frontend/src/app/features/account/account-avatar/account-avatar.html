@@ -60,7 +60,7 @@
         type="button"
         class="ui-btn ui-btn--secondary"
         aria-describedby="account-avatar-hint"
-        [disabled]="loading()"
+        [disabled]="busy()"
         (click)="picker.click()"
       >
         <i
@@ -73,18 +73,19 @@
         type="button"
         class="ui-btn ui-btn--primary"
         [disabled]="!canSave()"
+        [attr.aria-busy]="uploading()"
         (click)="save()"
       >
         <i
           class="bi bi-check-lg"
           aria-hidden="true"
         ></i>
-        {{ 'ACCOUNT.AVATAR_SAVE' | translate }}
+        {{ (uploading() ? 'COMMON.PENDING.UPLOADING' : 'ACCOUNT.AVATAR_SAVE') | translate }}
       </button>
       <button
         type="button"
         class="ui-btn ui-btn--ghost"
-        [disabled]="!hasStaged()"
+        [disabled]="!hasStaged() || busy()"
         (click)="discard()"
       >
         {{ 'ACCOUNT.AVATAR_DISCARD' | translate }}
@@ -93,13 +94,14 @@
         type="button"
         class="ui-btn ui-btn--ghost"
         [disabled]="!canRemove()"
+        [attr.aria-busy]="removing()"
         (click)="remove()"
       >
         <i
           class="bi bi-trash3"
           aria-hidden="true"
         ></i>
-        {{ 'ACCOUNT.AVATAR_REMOVE' | translate }}
+        {{ (removing() ? 'COMMON.PENDING.REMOVING' : 'ACCOUNT.AVATAR_REMOVE') | translate }}
       </button>
     </div>
   </div>

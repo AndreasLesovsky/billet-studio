@@ -43,7 +43,7 @@ function fontStyle(font: PresetFont, rem: number): Record<string, string> {
 }
 
 /**
- * Dev ui-kit only: the billet preset of one editor theme - both palettes as swatches, and hero
+ * Dev ui-kit only: the billet preset of one theme - both palettes as swatches, and hero
  * line 2 plus a paragraph in the preset's fonts and colours, in the site's current colour mode.
  * Preset colours are data, so they are bound inline here; the billet renderer binds them as
  * --billet-* tokens on its root instead.
@@ -57,7 +57,7 @@ function fontStyle(font: PresetFont, rem: number): Record<string, string> {
 export class BilletPresetSample {
   private readonly colorMode = inject(ColorModeService);
 
-  /** Editor theme id; an unknown id shows the default theme's preset. */
+  /** Theme id; an unknown id shows the default theme's preset. */
   readonly themeId = input.required<string>();
 
   private readonly preset = computed(() => billetPresetFor(this.themeId()));

@@ -1,5 +1,5 @@
 {
-  "$comment": "Seeds only: scripts/generate-themes.mjs derives every other --ui-* token and fails unless each theme x mode passes WCAG AA and every heading weight is a face the font catalog ships. \"site\" is the fixed website theme on <html> (never offered in the editor); \"themes\" are the editor themes, applied only inside ThemeScope elements (editor root, theme-picker cards). radius scales the base radii in _tokens.scss; shadowTint colours the light-mode shadows; headingWeight (default 600), displayWeight (h1/h2, page titles; default headingWeight) and headingScale (default 1) tune the heading face. Optional per mode: accent2 (decorative; default: accent hue + 40) and sunken (hover/table-head plane; default: derived from bg and text). Every editor theme also carries \"billet\": the starting preset picking the theme writes into a billet (docs/billet-document.md) - light/dark BilletPalette (accent, accentSoft, border, background, ink, inkSoft, surface), typography (six FontRef roles + emphasis; each fontId + weight/italic must be a face of the font catalog) and 4..7 particleColors; both palettes must pass the billet contrast rules, and every particle colour must reach 1.25:1 on the light and on the dark background (rose, the live card, is exempt). The rose preset is the original Mother's Day card (docs/fixtures/muttertag.billet.json) and must stay equal to it.",
+  "$comment": "Seeds only. \"site\" is the ONE design of the website and of the editor chrome (Studio, on <html>): scripts/generate-themes.mjs derives every other --ui-* token from it and fails unless both modes pass WCAG AA and every heading/body weight is a face the font catalog ships. radius scales the base radii in _tokens.scss; shadowTint colours the light-mode shadows; headingWeight (default 600), displayWeight (h1/h2, page titles; default headingWeight) and headingScale (default 1) tune the heading face. Optional per mode: accent2 (decorative; default: accent hue + 40) and sunken (hover/table-head plane; default: derived from bg and text). \"themes\" are the 16 billet design presets (name: i18n THEMES.<ID>): each holds only its id and \"billet\", the preset picking the theme writes into a billet (docs/billet-document.md) - light/dark BilletPalette (accent, accentSoft, border, background, ink, inkSoft, surface), typography (six FontRef roles + emphasis; each fontId + weight/italic must be a face of the font catalog) and 4..7 particleColors; both palettes must pass the billet contrast rules, and every particle colour must reach 1.25:1 on the light and on the dark background (rose, the live card, is exempt). A theme never styles any UI. The rose preset is the original Mother's Day card (docs/fixtures/muttertag.billet.json) and must stay equal to it.",
   "site": {
     "id": "studio",
     "fontBody": "Inter",
@@ -29,26 +29,6 @@
   "themes": [
     {
       "id": "rose",
-      "fontBody": "Jost",
-      "fontHeading": "Cormorant Garamond",
-      "headingWeight": 600,
-      "headingScale": 1.12,
-      "radius": 1.15,
-      "shadowTint": "#6b3a2e",
-      "light": {
-        "bg": "#fbf5ef",
-        "surface": "#fffcf9",
-        "text": "#3a2622",
-        "accent": "#b9573f",
-        "accent2": "#d99a7e"
-      },
-      "dark": {
-        "bg": "#1d1614",
-        "surface": "#271e1b",
-        "text": "#f4e9e3",
-        "accent": "#e88a72",
-        "accent2": "#c9a08f"
-      },
       "billet": {
         "light": {
           "accent": "#c8614a",
@@ -112,24 +92,6 @@
     },
     {
       "id": "sage",
-      "fontBody": "DM Sans",
-      "fontHeading": "Playfair Display",
-      "radius": 1,
-      "shadowTint": "#2f4a37",
-      "light": {
-        "bg": "#f4f6f1",
-        "surface": "#fbfcf9",
-        "text": "#1f2a22",
-        "accent": "#4d7358",
-        "accent2": "#a3b89a"
-      },
-      "dark": {
-        "bg": "#141a16",
-        "surface": "#1c241e",
-        "text": "#e5ece5",
-        "accent": "#93c0a0",
-        "accent2": "#6f8f78"
-      },
       "billet": {
         "light": {
           "accent": "#4d7358",
@@ -193,24 +155,6 @@
     },
     {
       "id": "midnight",
-      "fontBody": "Inter",
-      "fontHeading": "Space Grotesk",
-      "radius": 0.85,
-      "shadowTint": "#1b1f4d",
-      "light": {
-        "bg": "#f5f6fb",
-        "surface": "#ffffff",
-        "text": "#161a33",
-        "accent": "#4a4fd1",
-        "accent2": "#7c83f0"
-      },
-      "dark": {
-        "bg": "#0e1022",
-        "surface": "#161932",
-        "text": "#e6e8fa",
-        "accent": "#8b90ff",
-        "accent2": "#b3b6ff"
-      },
       "billet": {
         "light": {
           "accent": "#8a6a1c",
@@ -274,25 +218,6 @@
     },
     {
       "id": "paper",
-      "fontBody": "Work Sans",
-      "fontHeading": "Libre Baskerville",
-      "headingWeight": 700,
-      "radius": 0.6,
-      "shadowTint": "#3b352c",
-      "light": {
-        "bg": "#f7f4ee",
-        "surface": "#fdfbf7",
-        "text": "#1a1917",
-        "accent": "#2b2926",
-        "accent2": "#8a7f70"
-      },
-      "dark": {
-        "bg": "#181715",
-        "surface": "#21201d",
-        "text": "#efebe3",
-        "accent": "#ece6da",
-        "accent2": "#a89c8a"
-      },
       "billet": {
         "light": {
           "accent": "#8a3a2a",
@@ -356,24 +281,6 @@
     },
     {
       "id": "lavender",
-      "fontBody": "Quicksand",
-      "fontHeading": "Raleway",
-      "radius": 1.25,
-      "shadowTint": "#3c2f66",
-      "light": {
-        "bg": "#f7f5fc",
-        "surface": "#fdfcff",
-        "text": "#26213a",
-        "accent": "#7456c4",
-        "accent2": "#c3b1ec"
-      },
-      "dark": {
-        "bg": "#16131f",
-        "surface": "#1f1b2b",
-        "text": "#ebe6f7",
-        "accent": "#b9a2f5",
-        "accent2": "#8e7bc4"
-      },
       "billet": {
         "light": {
           "accent": "#7456c4",
@@ -437,24 +344,6 @@
     },
     {
       "id": "ocean",
-      "fontBody": "Open Sans",
-      "fontHeading": "Montserrat",
-      "radius": 0.9,
-      "shadowTint": "#0b3a52",
-      "light": {
-        "bg": "#f2f7f9",
-        "surface": "#fbfdfe",
-        "text": "#0f2733",
-        "accent": "#11709a",
-        "accent2": "#3fb4c9"
-      },
-      "dark": {
-        "bg": "#0a1820",
-        "surface": "#11222c",
-        "text": "#e2eff4",
-        "accent": "#5cc0e3",
-        "accent2": "#7ad9c9"
-      },
       "billet": {
         "light": {
           "accent": "#0f6f96",
@@ -518,25 +407,6 @@
     },
     {
       "id": "terracotta",
-      "fontBody": "Lato",
-      "fontHeading": "Merriweather",
-      "headingWeight": 700,
-      "radius": 0.75,
-      "shadowTint": "#5a2a18",
-      "light": {
-        "bg": "#f8f0e8",
-        "surface": "#fdf8f3",
-        "text": "#33201a",
-        "accent": "#a84a2a",
-        "accent2": "#d98e5f"
-      },
-      "dark": {
-        "bg": "#1c1411",
-        "surface": "#271c18",
-        "text": "#f3e6de",
-        "accent": "#e6906c",
-        "accent2": "#c77a52"
-      },
       "billet": {
         "light": {
           "accent": "#a8482a",
@@ -600,25 +470,6 @@
     },
     {
       "id": "graphite",
-      "fontBody": "Roboto",
-      "fontHeading": "Manrope",
-      "headingWeight": 800,
-      "radius": 0.7,
-      "shadowTint": "#1f2328",
-      "light": {
-        "bg": "#f5f6f7",
-        "surface": "#ffffff",
-        "text": "#1b1d21",
-        "accent": "#3b5b86",
-        "accent2": "#7c8795"
-      },
-      "dark": {
-        "bg": "#121315",
-        "surface": "#1a1c1f",
-        "text": "#e6e8eb",
-        "accent": "#8fb0dc",
-        "accent2": "#9aa3ad"
-      },
       "billet": {
         "light": {
           "accent": "#3b5b86",
@@ -682,25 +533,6 @@
     },
     {
       "id": "mint",
-      "fontBody": "Nunito",
-      "fontHeading": "Baloo 2",
-      "headingWeight": 800,
-      "radius": 1.3,
-      "shadowTint": "#0d4a3a",
-      "light": {
-        "bg": "#f1f9f6",
-        "surface": "#fbfefd",
-        "text": "#0f2a22",
-        "accent": "#0f7d63",
-        "accent2": "#6fd4b5"
-      },
-      "dark": {
-        "bg": "#0b1915",
-        "surface": "#12231e",
-        "text": "#e0f2ec",
-        "accent": "#5fd6b3",
-        "accent2": "#9be7cf"
-      },
       "billet": {
         "light": {
           "accent": "#0f7d63",
@@ -764,25 +596,6 @@
     },
     {
       "id": "peach",
-      "fontBody": "Outfit",
-      "fontHeading": "Abril Fatface",
-      "headingWeight": 400,
-      "radius": 1.2,
-      "shadowTint": "#7a3a1c",
-      "light": {
-        "bg": "#fff5ee",
-        "surface": "#fffbf8",
-        "text": "#3b2418",
-        "accent": "#b9532a",
-        "accent2": "#ffb38a"
-      },
-      "dark": {
-        "bg": "#1f1512",
-        "surface": "#2a1d18",
-        "text": "#fbe9df",
-        "accent": "#ffa47a",
-        "accent2": "#ffc9a8"
-      },
       "billet": {
         "light": {
           "accent": "#b9532a",
@@ -846,24 +659,6 @@
     },
     {
       "id": "aurora",
-      "fontBody": "Manrope",
-      "fontHeading": "Outfit",
-      "radius": 1,
-      "shadowTint": "#2a1f5c",
-      "light": {
-        "bg": "#f5f4fb",
-        "surface": "#ffffff",
-        "text": "#1d1a33",
-        "accent": "#6b3fd4",
-        "accent2": "#0f9488"
-      },
-      "dark": {
-        "bg": "#0f0d1c",
-        "surface": "#181530",
-        "text": "#ece9fb",
-        "accent": "#a98bff",
-        "accent2": "#3ed9c3"
-      },
       "billet": {
         "light": {
           "accent": "#6b3fd4",
@@ -927,26 +722,6 @@
     },
     {
       "id": "espresso",
-      "fontBody": "Barlow",
-      "fontHeading": "Oswald",
-      "headingWeight": 500,
-      "headingScale": 1.08,
-      "radius": 0.65,
-      "shadowTint": "#3b2518",
-      "light": {
-        "bg": "#f6f1ec",
-        "surface": "#fcf9f6",
-        "text": "#2a1d17",
-        "accent": "#6f4a33",
-        "accent2": "#c89b6d"
-      },
-      "dark": {
-        "bg": "#16110e",
-        "surface": "#211915",
-        "text": "#efe4da",
-        "accent": "#d4a57a",
-        "accent2": "#a57a55"
-      },
       "billet": {
         "light": {
           "accent": "#7a4a2e",
@@ -1010,26 +785,6 @@
     },
     {
       "id": "sakura",
-      "fontBody": "Poppins",
-      "fontHeading": "Cormorant Garamond",
-      "headingWeight": 600,
-      "headingScale": 1.12,
-      "radius": 1.35,
-      "shadowTint": "#7a2f4c",
-      "light": {
-        "bg": "#fdf6f8",
-        "surface": "#fffbfc",
-        "text": "#3a2330",
-        "accent": "#c2456f",
-        "accent2": "#f3b6c9"
-      },
-      "dark": {
-        "bg": "#1c1318",
-        "surface": "#271a21",
-        "text": "#f8e7ee",
-        "accent": "#f39bb8",
-        "accent2": "#d98aa6"
-      },
       "billet": {
         "light": {
           "accent": "#c2456f",
@@ -1093,25 +848,6 @@
     },
     {
       "id": "forest",
-      "fontBody": "Montserrat",
-      "fontHeading": "Merriweather",
-      "headingWeight": 700,
-      "radius": 0.8,
-      "shadowTint": "#183a22",
-      "light": {
-        "bg": "#f2f5f1",
-        "surface": "#fafcf9",
-        "text": "#16241a",
-        "accent": "#2f6b3f",
-        "accent2": "#8aa36b"
-      },
-      "dark": {
-        "bg": "#0d1510",
-        "surface": "#142019",
-        "text": "#dfeee2",
-        "accent": "#7fc28f",
-        "accent2": "#b3c98e"
-      },
       "billet": {
         "light": {
           "accent": "#2f6b3f",
@@ -1175,24 +911,6 @@
     },
     {
       "id": "dune",
-      "fontBody": "Raleway",
-      "fontHeading": "Playfair Display",
-      "radius": 0.9,
-      "shadowTint": "#5a4020",
-      "light": {
-        "bg": "#f8f3ea",
-        "surface": "#fdfaf4",
-        "text": "#2e261a",
-        "accent": "#94641f",
-        "accent2": "#d8b98a"
-      },
-      "dark": {
-        "bg": "#1a1610",
-        "surface": "#242017",
-        "text": "#f1e9d9",
-        "accent": "#e0b36e",
-        "accent2": "#c7a77a"
-      },
       "billet": {
         "light": {
           "accent": "#97661f",
@@ -1256,26 +974,6 @@
     },
     {
       "id": "neon",
-      "fontBody": "Space Grotesk",
-      "fontHeading": "Bebas Neue",
-      "headingWeight": 400,
-      "headingScale": 1.25,
-      "radius": 0.75,
-      "shadowTint": "#5c0a57",
-      "light": {
-        "bg": "#fbf7fd",
-        "surface": "#ffffff",
-        "text": "#1c1026",
-        "accent": "#c2159a",
-        "accent2": "#0094b8"
-      },
-      "dark": {
-        "bg": "#0c0714",
-        "surface": "#150d22",
-        "text": "#f5ecff",
-        "accent": "#ff4fd8",
-        "accent2": "#22e3ff"
-      },
       "billet": {
         "light": {
           "accent": "#c2159a",

@@ -36,8 +36,7 @@ $radius-base: (
     --ui-text-2xl: 1.75rem;
     --ui-text-3xl: 2.25rem;
     // Labels, buttons, badges (strong); tabs, menu items, secondary labels (medium). The site's body
-    // font ships both faces (generate-themes.mjs checks it); an editor theme font that lacks one
-    // renders its nearest face.
+    // font ships both faces (generate-themes.mjs checks it).
     --ui-font-weight-medium: 500;
     --ui-font-weight-strong: 600;
     --ui-leading-tight: 1.2;

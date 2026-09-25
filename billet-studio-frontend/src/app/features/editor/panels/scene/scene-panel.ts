@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { NUMBER_LIMITS } from '../../../../billet/billet-limits';
 import { AssetCatalogApi } from '../../../../core/services/asset-catalog-api';
 import { AssetPicker } from '../../../../shared/components/asset-picker/asset-picker';
+import { AssetPickerSkeleton } from '../../../../shared/components/asset-picker/asset-picker-skeleton';
 import { FieldError } from '../../../../shared/components/field-error/field-error';
 import { RangeSlider } from '../../../../shared/components/range-slider/range-slider';
 import { BilletText } from '../../billet-text';
@@ -36,7 +37,15 @@ const STAGE_LABELS: Readonly<Record<StageKey, string>> = {
  */
 @Component({
   selector: 'app-scene-panel',
-  imports: [AssetPicker, BilletText, FieldError, FormField, RangeSlider, TranslatePipe],
+  imports: [
+    AssetPicker,
+    AssetPickerSkeleton,
+    BilletText,
+    FieldError,
+    FormField,
+    RangeSlider,
+    TranslatePipe,
+  ],
   templateUrl: './scene-panel.html',
   styleUrl: './scene-panel.scss',
 })
@@ -47,6 +56,11 @@ export class ScenePanel extends EditorPanel {
   /** The active models; a failed load already showed its toast and can be retried. */
   protected readonly library = resource({ loader: () => this.catalog.list() });
   protected readonly assets = computed(() => (this.library.hasValue() ? this.library.value() : []));
+  /** The picker once the library is there; the retry alert after a failure; else its skeleton. */
+  protected readonly libraryView = computed<'picker' | 'failed' | 'loading'>(() => {
+    if (this.library.hasValue()) return 'picker';
+    return this.library.status() === 'error' ? 'failed' : 'loading';
+  });
 
   protected readonly scene = computed(() => this.document().scene);
   private readonly slug = computed(() => this.scene().modelSlug);
@@ -55,8 +69,16 @@ export class ScenePanel extends EditorPanel {
     params: () => this.slug() || undefined,
     loader: ({ params }) => this.catalog.get(params),
   });
-  protected readonly asset = computed(() =>
-    this.assetRequest.hasValue() ? this.assetRequest.value() : null,
+  // A model picked from the library is known at once, without waiting for its own request.
+  private readonly listedAsset = computed(
+    () => this.assets().find((a) => a.slug === this.slug()) ?? null,
+  );
+  protected readonly asset = computed(
+    () => this.listedAsset() ?? (this.assetRequest.hasValue() ? this.assetRequest.value() : null),
+  );
+  /** The model's defaults are on their way: the sliders hold the places of marks and resets. */
+  protected readonly assetLoading = computed(
+    () => this.asset() === null && this.assetRequest.isLoading(),
   );
   protected readonly retired = computed(
     () => this.library.hasValue() && !this.assets().some((a) => a.slug === this.slug()),

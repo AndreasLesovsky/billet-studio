@@ -20,9 +20,10 @@ Rules:
 - Text must be well-formed UTF-16: an unpaired surrogate (half an emoji) is a 400 `VALIDATION_ERROR`.
   The frontend shortens text only at code-point/grapheme boundaries (`Array.from` / `Intl.Segmenter`),
   never with `String.slice` on UTF-16 units.
-- Themes vs. site: the website itself has ONE fixed design (site theme "studio", light + dark by
-  system). The 16 editor themes never touch the site; they are scoped to the editor root and flow
-  into the billet through `theme` + the preset values it writes into `palette`, `typography` and
+- Themes vs. site: the whole UI - the website and the editor's chrome - has ONE fixed design (site
+  theme "studio", light + dark by system). A theme is a billet design preset and nothing else: it
+  applies only to the billet, i.e. the editor's live preview and the published page. It flows into
+  the billet through `theme` + the preset values it writes into `palette`, `typography` and
   `particles.colors`. The renderer only reads the concrete values, never the theme id, so a later
   change to a theme preset never alters an existing billet. The `rose` preset equals the original
   Mother's Day card exactly.
@@ -39,10 +40,10 @@ type ParticleShape = 'petal' | 'snowflake' | 'leaf' | 'confetti' | 'heart';
 
 interface BilletDocument {
   schemaVersion: 1;
-  theme: string;                 // ^[a-z0-9-]{1,40}$ editor theme id (THEME_IDS). Styles the editor chrome
-                                 // while this billet is open; picking a theme (re)initialises palette,
-                                 // typography and particles.colors from that theme's billet preset, which
-                                 // the user may then customise. Unknown ids fall back to the default theme.
+  theme: string;                 // ^[a-z0-9-]{1,40}$ theme id (THEME_IDS), a billet design preset. It never
+                                 // styles the editor; picking a theme (re)initialises palette, typography
+                                 // and particles.colors from that theme's billet preset, which the user
+                                 // may then customise. Unknown ids fall back to the default theme.
   title: string;                 // 1..120  internal name (lists); also tbl_billets.title
   pageTitle: string;             // 0..120  <title> of the public page ('' = use hero text)
   lang: 'de' | 'en';             // lang attribute of the public page

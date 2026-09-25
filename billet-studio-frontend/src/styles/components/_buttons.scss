@@ -149,3 +149,31 @@
     display: flex;
     inline-size: 100%;
 }
+
+// A running action (CLAUDE.md, "Loading states"): the template sets aria-busy, disables the button
+// (so it keeps its variant colour, muted) and swaps the label for the pending one; a small spinner
+// in the label's colour takes the leading icon's place.
+.ui-btn[aria-busy='true'] {
+    > .bi {
+        display: none;
+    }
+
+    &::before {
+        content: '';
+        flex: none;
+        inline-size: 1em;
+        block-size: 1em;
+        border: 0.125rem solid color-mix(in oklab, currentColor 30%, transparent);
+        border-block-start-color: currentColor;
+        border-radius: 50%;
+        animation: ui-spin 0.7s linear infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    // It carries state, so it keeps turning, slowly.
+    .ui-btn[aria-busy='true']::before {
+        animation-duration: 1.6s !important;
+        animation-iteration-count: infinite !important;
+    }
+}

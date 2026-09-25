@@ -11,3 +11,71 @@
 .message {
     align-items: flex-start;
 }
+
+// The loading skeleton, laid out like billet-view's page with the reference card's spacing
+// (docs/fixtures/muttertag.billet.json): 30rem column, 2rem gutter, hero 4.5 / 4rem, the scene
+// 23.75rem, divider gap 2.25rem, block gap 2.5rem.
+.loading {
+    min-block-size: 100dvh;
+}
+
+.loading__page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 30rem;
+    margin-inline: auto;
+    padding-block-end: 4.5rem;
+}
+
+.loading__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.125rem;
+    inline-size: 100%;
+    padding: 4.5rem 2rem 4rem;
+}
+
+.loading__label {
+    inline-size: 8rem;
+    min-block-size: 0;
+    block-size: 0.625rem;
+}
+
+.loading__title {
+    inline-size: 70%;
+    block-size: 3.75rem;
+}
+
+.loading__title--accent {
+    inline-size: 55%;
+}
+
+.loading__sub {
+    inline-size: 12rem;
+    min-block-size: 0;
+    block-size: 0.8125rem;
+}
+
+.loading__scene {
+    inline-size: calc(100% - 4rem);
+    block-size: 23.75rem;
+}
+
+.loading__divider {
+    inline-size: 6rem;
+    min-block-size: 0;
+    block-size: 0.25rem;
+    margin-block: 2.25rem;
+}
+
+.loading__text {
+    inline-size: calc(100% - 4rem);
+    line-height: 1.7;
+
+    & + & {
+        margin-block-start: 2.5rem;
+    }
+}

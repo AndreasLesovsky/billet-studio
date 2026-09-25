@@ -102,7 +102,7 @@
               <button
                 type="button"
                 class="ui-btn ui-btn--ghost"
-                [disabled]="!profileChanged()"
+                [disabled]="!profileChanged() || savingProfile()"
                 (click)="undoProfile()"
               >
                 <i
@@ -116,12 +116,15 @@
                 form="account-profile-form"
                 class="ui-btn ui-btn--primary"
                 [disabled]="!canSaveProfile()"
+                [attr.aria-busy]="savingProfile()"
               >
                 <i
                   class="bi bi-check-lg"
                   aria-hidden="true"
                 ></i>
-                {{ 'ACCOUNT.SAVE_PROFILE' | translate }}
+                {{
+                  (savingProfile() ? 'COMMON.PENDING.SAVING' : 'ACCOUNT.SAVE_PROFILE') | translate
+                }}
               </button>
             </div>
           </section>
@@ -206,12 +209,16 @@
                 form="account-password-form"
                 class="ui-btn ui-btn--primary"
                 [disabled]="!canChangePassword()"
+                [attr.aria-busy]="changingPassword()"
               >
                 <i
                   class="bi bi-key"
                   aria-hidden="true"
                 ></i>
-                {{ 'ACCOUNT.CHANGE_PASSWORD' | translate }}
+                {{
+                  (changingPassword() ? 'COMMON.PENDING.SAVING' : 'ACCOUNT.CHANGE_PASSWORD')
+                    | translate
+                }}
               </button>
             </div>
           </section>
@@ -252,11 +259,34 @@
           </section>
         </div>
       </div>
-    } @else {
+    } @else if (loadFailed()) {
       <div
-        class="ui-skeleton account__skeleton"
-        aria-hidden="true"
-      ></div>
+        class="ui-alert ui-alert--danger"
+        role="alert"
+      >
+        <i
+          class="bi bi-exclamation-octagon"
+          aria-hidden="true"
+        ></i>
+        <div class="ui-stack ui-stack--sm">
+          <p>{{ 'ACCOUNT.LOAD_FAILED' | translate }}</p>
+          <div>
+            <button
+              type="button"
+              class="ui-btn ui-btn--neutral ui-btn--sm"
+              (click)="retryLoad()"
+            >
+              <i
+                class="bi bi-arrow-clockwise"
+                aria-hidden="true"
+              ></i>
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <app-account-skeleton />
     }
   </div>
 </div>

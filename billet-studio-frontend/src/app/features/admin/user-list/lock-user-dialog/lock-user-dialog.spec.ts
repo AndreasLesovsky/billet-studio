@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { isLoading } from '../../../../core/interceptors/loading-interceptor';
 import { UserResponseDto } from '../../../../core/models/models';
 import { AdminUserApi } from '../../../../core/services/admin-user-api';
 import { translateTestingModule } from '../../../../../test-helpers';
@@ -26,8 +25,6 @@ function setup(toggle: () => Promise<unknown> = async () => ({ ...BERTA, active:
 }
 
 describe('LockUserDialog', () => {
-  afterEach(() => isLoading.set(false));
-
   it('locks with the chosen reason, closes and reports it', async () => {
     const { component, adminUserApi, locked } = setup();
     component.model.set({ reason: 'SPAM' });
@@ -59,11 +56,12 @@ describe('LockUserDialog', () => {
   });
 
   it('cannot be cancelled while the request runs', () => {
-    const { component } = setup();
-    isLoading.set(true);
+    const { component } = setup(() => new Promise(() => undefined));
+    void component.onSubmit();
 
     component.cancel();
 
+    expect(component.locking()).toBe(true);
     expect(component.user()).toBe(BERTA);
   });
 

@@ -3,11 +3,10 @@ import { computed, ElementRef, inject, OutputEmitterRef, Signal, signal } from '
 
 /**
  * Open state and focus rules of the pickers whose choices sit in a popover (colour, font, emoji).
- * The panel is a CDK connected overlay placed inline after the trigger (`usePopover: 'inline'`),
- * so an editor theme scope around the control reaches it. The template binds `expanded()` to
- * `cdkConnectedOverlayOpen`, `detached()` to `(detach)`, `close()` to `(overlayOutsideClick)` and
- * `focusOut()` to `(focusout)` of both the host and the panel. The trigger's id is `<id>-trigger`,
- * the panel's `<id>-panel`.
+ * The panel is a CDK connected overlay placed inline after the trigger (`usePopover: 'inline'`).
+ * The template binds `expanded()` to `cdkConnectedOverlayOpen`, `detached()` to `(detach)`,
+ * `close()` to `(overlayOutsideClick)` and `focusOut()` to `(focusout)` of both the host and the
+ * panel. The trigger's id is `<id>-trigger`, the panel's `<id>-panel`.
  */
 class PickerPopover {
   readonly positions = STANDARD_DROPDOWN_BELOW_POSITIONS;

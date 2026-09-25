@@ -17,7 +17,7 @@
       type="button"
       class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
       [attr.aria-label]="'COMMON.CLOSE' | translate"
-      [disabled]="loading()"
+      [disabled]="deactivating()"
       (click)="cancel()"
     >
       <i
@@ -95,7 +95,7 @@
     <button
       type="button"
       class="ui-btn ui-btn--neutral"
-      [disabled]="loading()"
+      [disabled]="deactivating()"
       (click)="cancel()"
     >
       {{ 'COMMON.CANCEL' | translate }}
@@ -104,13 +104,16 @@
       type="submit"
       form="deactivate-account-form"
       class="ui-btn ui-btn--danger"
-      [disabled]="!deactivateForm().valid() || loading()"
+      [disabled]="!deactivateForm().valid() || deactivating()"
+      [attr.aria-busy]="deactivating()"
     >
       <i
         class="bi bi-person-x"
         aria-hidden="true"
       ></i>
-      {{ 'ACCOUNT.DEACTIVATE_CONFIRM' | translate }}
+      {{
+        (deactivating() ? 'COMMON.PENDING.DEACTIVATING' : 'ACCOUNT.DEACTIVATE_CONFIRM') | translate
+      }}
     </button>
   </div>
 </dialog>

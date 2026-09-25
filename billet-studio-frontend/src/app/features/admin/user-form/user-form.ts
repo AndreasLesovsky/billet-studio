@@ -7,11 +7,15 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { createModelUndo } from '../../../core/forms/model-undo';
 import { PASSWORD_MIN_LENGTH } from '../../../core/forms/signal-validators';
 import { HasUnsavedChanges } from '../../../core/guards/unsaved-changes-guard';
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
-import { ADMIN_DEACTIVATION_REASONS, UserResponseDto } from '../../../core/models/models';
+import {
+  ADMIN_DEACTIVATION_REASONS,
+  UserRequestDto,
+  UserResponseDto,
+} from '../../../core/models/models';
 import { AdminUserApi } from '../../../core/services/admin-user-api';
 import { AuthApi } from '../../../core/services/auth-api';
 import { LanguageService } from '../../../core/services/language-service';
+import { runPending } from '../../../core/utils/pending';
 import { BreadcrumbService } from '../../../shared/components/breadcrumb/breadcrumb-service';
 import { FieldError } from '../../../shared/components/field-error/field-error';
 import { PasswordToggle } from '../../../shared/directives/password-toggle';
@@ -22,13 +26,14 @@ import {
   UserFormModel,
   userSchema,
 } from './user-form-schema';
+import { UserFormSkeleton } from './user-form-skeleton';
 
 const LIST_ROUTE = '/admin/users';
 
 /** Creates an account (`/admin/users/new`) or edits one (`/admin/users/:id`). */
 @Component({
   selector: 'app-user-form',
-  imports: [FieldError, FormField, PasswordToggle, RouterLink, TranslatePipe],
+  imports: [FieldError, FormField, PasswordToggle, RouterLink, TranslatePipe, UserFormSkeleton],
   templateUrl: './user-form.html',
   styleUrl: './user-form.scss',
 })
@@ -39,7 +44,6 @@ export class UserForm implements HasUnsavedChanges {
   private readonly breadcrumb = inject(BreadcrumbService);
   private readonly languageService = inject(LanguageService);
 
-  protected readonly loading = isLoading;
   protected readonly passwordMinLength = PASSWORD_MIN_LENGTH;
   protected readonly languages = this.languageService.availableLanguages;
   protected readonly reasons = ADMIN_DEACTIVATION_REASONS;
@@ -54,11 +58,18 @@ export class UserForm implements HasUnsavedChanges {
   protected readonly titleKey = this.isEditMode
     ? 'ADMIN_USERS.EDIT_TITLE'
     : 'ADMIN_USERS.CREATE_TITLE';
-  protected readonly submitKey = this.isEditMode ? 'COMMON.SAVE' : 'ADMIN_USERS.CREATE';
+  private readonly submitKey = this.isEditMode ? 'COMMON.SAVE' : 'ADMIN_USERS.CREATE';
+  private readonly pendingKey = this.isEditMode
+    ? 'COMMON.PENDING.SAVING'
+    : 'COMMON.PENDING.CREATING';
+  protected readonly submitLabel = computed(() =>
+    this.saving() ? this.pendingKey : this.submitKey,
+  );
   protected readonly submitIcon = this.isEditMode ? 'bi-check-lg' : 'bi-person-plus';
 
   /** The selects need their options before they can show a value, so the form waits for both. */
   readonly ready = signal(false);
+  readonly saving = signal(false);
 
   /** Locking yourself out is not offered (the backend refuses it too). */
   readonly editingSelf = computed(
@@ -88,7 +99,7 @@ export class UserForm implements HasUnsavedChanges {
   readonly canUndo = this.undoCtl.canUndo;
 
   protected readonly canSave = computed(
-    () => this.userForm().valid() && this.canUndo() && !this.loading(),
+    () => this.userForm().valid() && this.canUndo() && !this.saving(),
   );
 
   constructor() {
@@ -114,12 +125,7 @@ export class UserForm implements HasUnsavedChanges {
 
     const dto = toUserRequestDto(this.model());
     try {
-      if (this.isEditMode) {
-        const updated = await this.adminUserApi.update(Number(this.idParam()), dto);
-        if (this.editingSelf()) this.authApi.patchName(updated.name);
-      } else {
-        await this.adminUserApi.create(dto);
-      }
+      await runPending(this.saving, () => this.save(dto));
     } catch {
       // errorInterceptor has said why (e.g. EMAIL_ALREADY_EXISTS); the form stays as typed.
       return;
@@ -127,6 +133,15 @@ export class UserForm implements HasUnsavedChanges {
     // Saved, so nothing is unsaved: the guard lets the page go without asking.
     this.undoCtl.saveSnapshot();
     await this.router.navigateByUrl(LIST_ROUTE);
+  }
+
+  private async save(dto: UserRequestDto): Promise<void> {
+    if (!this.isEditMode) {
+      await this.adminUserApi.create(dto);
+      return;
+    }
+    const updated = await this.adminUserApi.update(Number(this.idParam()), dto);
+    if (this.editingSelf()) this.authApi.patchName(updated.name);
   }
 
   private async load(): Promise<void> {

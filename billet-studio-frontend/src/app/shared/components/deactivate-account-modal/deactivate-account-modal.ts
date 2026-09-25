@@ -3,9 +3,9 @@ import { Component, inject, model, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
 import { USER_DEACTIVATION_REASONS } from '../../../core/models/models';
 import { AccountApi } from '../../../core/services/account-api';
+import { runPending } from '../../../core/utils/pending';
 import { Modal } from '../../directives/modal';
 import { PasswordToggle } from '../../directives/password-toggle';
 import { FieldError } from '../field-error/field-error';
@@ -34,7 +34,6 @@ export class DeactivateAccountModal {
   /** Two-way: the owner opens it, the dialog closes itself on cancel. */
   readonly open = model(false);
 
-  protected readonly loading = isLoading;
   protected readonly reasons = USER_DEACTIVATION_REASONS;
 
   readonly model = signal<DeactivateAccountFormModel>({ ...EMPTY_MODEL });
@@ -42,9 +41,11 @@ export class DeactivateAccountModal {
 
   /** errorCode of the last failed attempt. */
   readonly failure = signal<string | null>(null);
+  /** The request runs: nothing closes the dialog meanwhile. */
+  readonly deactivating = signal(false);
 
   cancel(): void {
-    if (this.loading()) return;
+    if (this.deactivating()) return;
     this.open.set(false);
   }
 
@@ -63,7 +64,9 @@ export class DeactivateAccountModal {
 
     this.failure.set(null);
     try {
-      await this.accountApi.deactivate(toDeactivateDto(this.model()));
+      await runPending(this.deactivating, () =>
+        this.accountApi.deactivate(toDeactivateDto(this.model())),
+      );
     } catch (error) {
       this.failure.set(errorCodeOf(error));
       return;

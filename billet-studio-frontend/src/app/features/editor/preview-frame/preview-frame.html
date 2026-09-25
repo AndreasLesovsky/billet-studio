@@ -1,43 +1,103 @@
-<fieldset class="ui-segmented preview__devices">
-  <legend class="ui-visually-hidden">{{ 'EDITOR.PREVIEW.DEVICE' | translate }}</legend>
-  @for (option of devices; track option.device) {
-    <label class="ui-segmented__option">
-      <input
-        type="radio"
-        name="editor-preview-device"
-        [value]="option.device"
-        [checked]="device() === option.device"
-        (change)="device.set(option.device)"
-      />
+<div class="preview__bar">
+  <fieldset class="ui-segmented">
+    <legend class="ui-visually-hidden">{{ 'EDITOR.PREVIEW.DEVICE' | translate }}</legend>
+    @for (option of devices; track option.device) {
+      <label class="ui-segmented__option">
+        <input
+          type="radio"
+          name="editor-preview-device"
+          [value]="option.device"
+          [checked]="device() === option.device"
+          (change)="selectDevice(option.device)"
+        />
+        <i
+          class="bi"
+          [class]="option.icon"
+          aria-hidden="true"
+        ></i>
+        {{ option.labelKey | translate }}
+      </label>
+    }
+  </fieldset>
+
+  <div
+    class="ui-cluster preview__zoom"
+    role="group"
+    [attr.aria-label]="'EDITOR.PREVIEW.ZOOM' | translate"
+  >
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'EDITOR.PREVIEW.ZOOM_OUT' | translate"
+      [title]="'EDITOR.PREVIEW.ZOOM_OUT' | translate"
+      [disabled]="!canZoomOut()"
+      (click)="zoomOut()"
+    >
       <i
-        class="bi"
-        [class]="option.icon"
+        class="bi bi-zoom-out"
         aria-hidden="true"
       ></i>
-      {{ option.labelKey | translate }}
-    </label>
-  }
-</fieldset>
+    </button>
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--sm preview__zoom-level"
+      [attr.aria-label]="'EDITOR.PREVIEW.ZOOM_FIT_LABEL' | translate: { percent: percent() }"
+      [title]="'EDITOR.PREVIEW.ZOOM_FIT' | translate"
+      [disabled]="fitted()"
+      (click)="zoomToFit()"
+    >
+      {{ 'EDITOR.PREVIEW.ZOOM_LEVEL' | translate: { percent: percent() } }}
+    </button>
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'EDITOR.PREVIEW.ZOOM_IN' | translate"
+      [title]="'EDITOR.PREVIEW.ZOOM_IN' | translate"
+      [disabled]="!canZoomIn()"
+      (click)="zoomIn()"
+    >
+      <i
+        class="bi bi-zoom-in"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+  <p
+    class="ui-visually-hidden"
+    role="status"
+  >
+    @if (announcedPercent(); as announced) {
+      {{ 'EDITOR.PREVIEW.ZOOM_STATUS' | translate: { percent: announced } }}
+    }
+  </p>
+</div>
 
 <div
   #stage
   class="preview__stage"
-  [style.--preview-scale]="scale()"
 >
   <div
-    #frame
-    class="ui-device preview__frame"
-    [class.ui-device--desktop]="device() === 'desktop'"
-    [class.preview__frame--desktop]="device() === 'desktop'"
+    class="preview__sizer"
+    [style.inline-size.px]="sizer()?.width"
+    [style.block-size.px]="sizer()?.height"
   >
-    <div class="ui-device__screen">
-      <app-billet-view
-        [document]="document()"
-        [model]="asset()"
-        [mode]="mode()"
-        [animate]="animate()"
-        fill="frame"
-      />
+    <div
+      #frame
+      class="ui-device preview__frame"
+      [class.ui-device--desktop]="device() === 'desktop'"
+      [class.preview__frame--desktop]="device() === 'desktop'"
+      [style.--preview-zoom]="zoom()"
+    >
+      <div class="ui-device__screen">
+        <app-billet-view
+          [document]="document()"
+          [model]="asset()"
+          [mode]="mode()"
+          [animate]="animate()"
+          [magnification]="zoom()"
+          fill="frame"
+        />
+      </div>
     </div>
   </div>
 </div>

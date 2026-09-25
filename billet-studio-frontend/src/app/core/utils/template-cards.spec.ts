@@ -1,30 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
 import { TEMPLATES } from '../../billet/templates/templates';
-import type { ModelAssetDto } from '../models/models';
+import type { CatalogPreviews } from './model-previews';
 import { templateCards } from './template-cards';
 
 describe('templateCards', () => {
-  it('shows the model preview only once the catalog has one for the template model', () => {
+  it('shimmers while the catalog loads, then shows the preview, and the emoji only without one', () => {
     const slug = TEMPLATES.muttertag.modelSlug;
-    const model = (modelSlug: string, previewUrl: string): ModelAssetDto =>
-      ({ slug: modelSlug, previewUrl }) as ModelAssetDto;
-    const cases: [string, readonly ModelAssetDto[] | null, string | null][] = [
-      ['catalog loading or unreachable', null, null],
-      ['model not in the catalog', [model('some-other-model', 'https://cdn/other.webp')], null],
-      ['model without a preview', [model(slug, '')], null],
-      [
-        'model with a preview',
-        [model(slug, 'https://cdn/preview.webp')],
-        'https://cdn/preview.webp',
-      ],
+    const cases: [string, CatalogPreviews, string][] = [
+      ['catalog loading', 'loading', 'shimmer'],
+      ['catalog failed', 'failed', 'emoji'],
+      ['model not in the catalog', new Map([['some-other-model', 'https://cdn/o.webp']]), 'emoji'],
+      ['model without a preview', new Map([[slug, '']]), 'emoji'],
+      ['model with a preview', new Map([[slug, 'https://cdn/p.webp']]), 'https://cdn/p.webp'],
     ];
 
-    const previews = cases.map(([label, models]) => [
-      label,
-      templateCards(models).find((card) => card.id === 'muttertag')?.previewUrl,
-    ]);
+    const shown = cases.map(([label, catalog]) => {
+      const { preview } = templateCards(catalog).find((card) => card.id === 'muttertag')!;
+      return [label, preview.pending ? 'shimmer' : (preview.src ?? 'emoji')];
+    });
 
-    expect(previews).toEqual(cases.map(([label, , expected]) => [label, expected]));
+    expect(shown).toEqual(cases.map(([label, , expected]) => [label, expected]));
   });
 });

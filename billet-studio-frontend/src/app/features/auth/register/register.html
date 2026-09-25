@@ -121,13 +121,14 @@
         <button
           type="submit"
           class="ui-btn ui-btn--primary ui-btn--lg ui-btn--block"
-          [disabled]="!registerForm().valid() || loading()"
+          [disabled]="!registerForm().valid() || signingUp()"
+          [attr.aria-busy]="signingUp()"
         >
           <i
             class="bi bi-person-plus"
             aria-hidden="true"
           ></i>
-          {{ 'AUTH.REGISTER_SUBMIT' | translate }}
+          {{ (signingUp() ? 'COMMON.PENDING.SIGNING_UP' : 'AUTH.REGISTER_SUBMIT') | translate }}
         </button>
       </form>
 

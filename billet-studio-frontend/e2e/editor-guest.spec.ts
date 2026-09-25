@@ -65,7 +65,7 @@ test.describe('editor as a guest', () => {
     await expect(previewBlocks(page).first()).toHaveText('Danke, dass du immer für mich da bist.');
   });
 
-  test('picking another theme recolours the preview and the editor', async ({ page }) => {
+  test('picking another theme recolours the preview, never the editor', async ({ page }) => {
     await openMuttertag(page);
     const colours = () =>
       preview(page).evaluate((view) => {
@@ -75,15 +75,23 @@ test.describe('editor as a guest', () => {
           accent: style.getPropertyValue('--billet-accent'),
         };
       });
+    // The editor's chrome: its panels' plane and text, and the accent of its buttons.
+    const chrome = () =>
+      page.locator('app-editor').evaluate((editor) => {
+        const tab = getComputedStyle(editor.querySelector('[role="tab"][aria-selected="true"]')!);
+        const inspector = getComputedStyle(editor.querySelector('.editor__inspector .ui-card')!);
+        return [inspector.backgroundColor, inspector.color, inspector.fontFamily, tab.color];
+      });
     const rose = await colours();
 
     await page.getByRole('tab', { name: 'Design' }).click();
+    const studio = await chrome();
     await page.getByRole('button', { name: 'Theme wählen' }).click();
     await page.locator('label.ui-theme-option', { hasText: 'Mitternacht' }).click();
 
-    await expect(page.locator('app-editor .editor')).toHaveAttribute('data-theme', 'midnight');
     await expect.poll(async () => (await colours()).background).not.toBe(rose.background);
     await expect.poll(async () => (await colours()).accent).not.toBe(rose.accent);
+    expect(await chrome()).toEqual(studio);
   });
 
   test('a block moves down by keyboard and keeps the focus on its button', async ({ page }) => {

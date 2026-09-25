@@ -1,11 +1,15 @@
 import { computed, inject, Signal } from '@angular/core';
 
 import { TEMPLATE_IDS, TEMPLATES, type TemplateId } from '../../billet/templates/templates';
-import type { ModelAssetDto } from '../models/models';
-import { AssetCatalogApi } from '../services/asset-catalog-api';
 import { billetPresetFor } from '../theme/billet-theme-presets.generated';
 import { ColorModeService } from '../theme/color-mode-service';
 import { THEMES, type ColorMode } from '../theme/theme-registry.generated';
+import {
+  type CatalogPreviews,
+  injectCatalogPreviews,
+  type ModelPreview,
+  previewOf,
+} from './model-previews';
 
 /** A billet template as the template gallery and the home page show it. */
 export interface TemplateCard {
@@ -16,8 +20,8 @@ export interface TemplateCard {
   readonly themeNameKey: string;
   /** accent, accentSoft, background and ink of the theme's billet palette in the site's mode. */
   readonly swatches: readonly string[];
-  /** The model's preview; null while the catalog is unknown or has none for the model. */
-  readonly previewUrl: string | null;
+  /** The model's preview: shimmering while the catalog loads, the emoji where there is none. */
+  readonly preview: ModelPreview;
 }
 
 // Keyed by TemplateId: a new template does not compile without its description.
@@ -33,12 +37,8 @@ const THEME_NAME_KEYS: ReadonlyMap<string, string> = new Map(
   THEMES.map((theme) => [theme.id, theme.nameKey]),
 );
 
-/** Every template in picker order, with the preview of its model once `models` holds it. */
-export function templateCards(
-  models: readonly ModelAssetDto[] | null,
-  mode: ColorMode = 'light',
-): TemplateCard[] {
-  const previews = new Map(models?.map((model) => [model.slug, model.previewUrl]));
+/** Every template in picker order, with its model's preview as far as the catalog is known. */
+export function templateCards(catalog: CatalogPreviews, mode: ColorMode = 'light'): TemplateCard[] {
   return TEMPLATE_IDS.map((id) => {
     const { nameKey, emoji, themeId, modelSlug } = TEMPLATES[id];
     const { accent, accentSoft, background, ink } = billetPresetFor(themeId).palette[mode];
@@ -49,19 +49,14 @@ export function templateCards(
       emoji,
       themeNameKey: THEME_NAME_KEYS.get(themeId) ?? '',
       swatches: [accent, accentSoft, background, ink],
-      previewUrl: previews.get(modelSlug) || null,
+      preview: previewOf(catalog, modelSlug),
     };
   });
 }
 
-/**
- * The template cards, with previews once the model catalog has answered. The previews are
- * decoration: while the catalog loads, or when it cannot be reached, the cards show their emoji.
- * Call in an injection context.
- */
+/** The template cards, their previews following the model catalog. Call in an injection context. */
 export function injectTemplateCards(): Signal<TemplateCard[]> {
-  const catalog = inject(AssetCatalogApi);
+  const previews = injectCatalogPreviews();
   const colorMode = inject(ColorModeService);
-  void catalog.list().catch(() => undefined);
-  return computed(() => templateCards(catalog.models(), colorMode.resolvedMode()));
+  return computed(() => templateCards(previews(), colorMode.resolvedMode()));
 }

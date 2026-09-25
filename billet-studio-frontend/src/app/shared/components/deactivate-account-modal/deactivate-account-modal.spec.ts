@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
 import { AccountApi } from '../../../core/services/account-api';
 import { translateTestingModule } from '../../../../test-helpers';
 import { DeactivateAccountModal } from './deactivate-account-modal';
@@ -25,8 +24,6 @@ function setup(deactivate: () => Promise<void> = async () => undefined) {
 }
 
 describe('DeactivateAccountModal', () => {
-  afterEach(() => isLoading.set(false));
-
   it('deactivates with the password and the chosen reason, then closes', async () => {
     const { component, accountApi } = setup();
     component.model.set({ password: 'Secret123', reason: 'PRIVACY_CONCERNS' });
@@ -85,11 +82,13 @@ describe('DeactivateAccountModal', () => {
   });
 
   it('cannot be cancelled while the request runs', () => {
-    const { component } = setup();
-    isLoading.set(true);
+    const { component } = setup(() => new Promise<void>(() => undefined));
+    component.model.set({ password: 'Secret123', reason: '' });
+    void component.onSubmit();
 
     component.cancel();
 
+    expect(component.deactivating()).toBe(true);
     expect(component.open()).toBe(true);
   });
 

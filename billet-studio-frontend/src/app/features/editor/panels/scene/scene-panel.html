@@ -29,46 +29,52 @@
       </div>
 
       @if (scene().enabled) {
-        @if (library.hasValue()) {
-          <app-asset-picker
-            [value]="scene().modelSlug"
-            [assets]="assets()"
-            [label]="'EDITOR.SCENE.LIBRARY' | translate"
-            (valueChange)="pickAsset($event)"
-          />
-          <p class="ui-hint">{{ 'EDITOR.SCENE.MODEL_HINT' | translate }}</p>
-          @if (retired()) {
-            <p class="ui-alert ui-alert--info">
+        @switch (libraryView()) {
+          @case ('picker') {
+            <app-asset-picker
+              [value]="scene().modelSlug"
+              [assets]="assets()"
+              [label]="'EDITOR.SCENE.LIBRARY' | translate"
+              (valueChange)="pickAsset($event)"
+            />
+            <p class="ui-hint">{{ 'EDITOR.SCENE.MODEL_HINT' | translate }}</p>
+            @if (retired()) {
+              <p class="ui-alert ui-alert--info">
+                <i
+                  class="bi bi-info-circle"
+                  aria-hidden="true"
+                ></i>
+                {{ 'EDITOR.SCENE.RETIRED' | translate }}
+              </p>
+            }
+          }
+          @case ('failed') {
+            <div class="ui-alert ui-alert--danger">
               <i
-                class="bi bi-info-circle"
+                class="bi bi-exclamation-triangle"
                 aria-hidden="true"
               ></i>
-              {{ 'EDITOR.SCENE.RETIRED' | translate }}
-            </p>
-          }
-        } @else if (library.error()) {
-          <div class="ui-alert ui-alert--danger">
-            <i
-              class="bi bi-exclamation-triangle"
-              aria-hidden="true"
-            ></i>
-            <div class="ui-stack ui-stack--sm">
-              <p>{{ 'EDITOR.SCENE.LIBRARY_ERROR' | translate }}</p>
-              <div>
-                <button
-                  type="button"
-                  class="ui-btn ui-btn--neutral ui-btn--sm"
-                  (click)="reloadLibrary()"
-                >
-                  <i
-                    class="bi bi-arrow-repeat"
-                    aria-hidden="true"
-                  ></i>
-                  {{ 'COMMON.RETRY' | translate }}
-                </button>
+              <div class="ui-stack ui-stack--sm">
+                <p>{{ 'EDITOR.SCENE.LIBRARY_ERROR' | translate }}</p>
+                <div>
+                  <button
+                    type="button"
+                    class="ui-btn ui-btn--neutral ui-btn--sm"
+                    (click)="reloadLibrary()"
+                  >
+                    <i
+                      class="bi bi-arrow-repeat"
+                      aria-hidden="true"
+                    ></i>
+                    {{ 'COMMON.RETRY' | translate }}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          }
+          @default {
+            <app-asset-picker-skeleton [label]="'EDITOR.SCENE.LIBRARY' | translate" />
+          }
         }
         @if (asset()?.credit; as credit) {
           <p class="ui-hint">{{ 'EDITOR.SCENE.CREDIT' | translate: { credit } }}</p>
@@ -112,6 +118,7 @@
               [step]="slider.step"
               [marks]="slider.marks"
               [defaultValue]="slider.defaultValue"
+              [defaultLoading]="assetLoading()"
             />
             <app-field-error [field]="fields.scene[slider.key]" />
           </div>
@@ -133,6 +140,7 @@
               [step]="speed().step"
               [marks]="speed().marks"
               [defaultValue]="speed().defaultValue"
+              [defaultLoading]="assetLoading()"
             />
             <app-field-error [field]="fields.scene.autoRotateSpeed" />
           </div>

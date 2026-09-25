@@ -65,4 +65,35 @@
       </div>
     </div>
   </div>
+} @else {
+  <!-- Loading: a billet's shape in neutral site tones (its palette is not known yet): the hero
+       band with label, two title lines and the sub line, the scene, the divider, text. -->
+  <div class="loading">
+    <p
+      class="ui-visually-hidden"
+      role="status"
+    >
+      {{ 'COMMON.LOADING' | translate }}
+    </p>
+    <div
+      class="loading__page"
+      aria-hidden="true"
+    >
+      <div class="ui-skeleton-band loading__hero">
+        <span class="ui-skeleton loading__label"></span>
+        <span class="ui-skeleton loading__title"></span>
+        <span class="ui-skeleton loading__title loading__title--accent"></span>
+        <span class="ui-skeleton loading__sub"></span>
+      </div>
+      <span class="ui-skeleton loading__scene"></span>
+      <span class="ui-skeleton loading__divider"></span>
+      @for (paragraph of [1, 2]; track paragraph) {
+        <span class="ui-skeleton-lines loading__text">
+          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+        </span>
+      }
+    </div>
+  </div>
 }

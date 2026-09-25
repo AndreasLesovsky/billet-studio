@@ -5,7 +5,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TEXT_LIMITS } from '../../../billet/billet-limits';
 import { truncateGraphemes } from '../../../billet/text/text-sanitize';
 import { TEMPLATES } from '../../../billet/templates/templates';
-import { AssetCatalogApi } from '../../../core/services/asset-catalog-api';
 import { LanguageService } from '../../../core/services/language-service';
 import {
   LocalBilletError,
@@ -17,6 +16,7 @@ import { ConfirmationModalStore } from '../../../core/stores/confirmation-modal-
 import { MessageStore } from '../../../core/stores/message-store';
 import { billetPresetFor } from '../../../core/theme/billet-theme-presets.generated';
 import { ColorModeService } from '../../../core/theme/color-mode-service';
+import { injectCatalogPreviews, previewOf } from '../../../core/utils/model-previews';
 import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
 
 const cardLinkId = (entry: LocalBilletEntry) => `billet-list-edit-${entry.localId}`;
@@ -54,7 +54,6 @@ function editedAgo(updatedAt: string, now: number, locale: string): string {
 })
 export class BilletList {
   private readonly store = inject(LocalBilletStore);
-  private readonly catalog = inject(AssetCatalogApi);
   private readonly colorMode = inject(ColorModeService);
   private readonly language = inject(LanguageService);
   private readonly translate = inject(TranslateService);
@@ -67,8 +66,11 @@ export class BilletList {
   /** Every place is taken: a copy has no room (the count says so). */
   protected readonly full = computed(() => this.store.list().length >= MAX_LOCAL_BILLETS);
 
+  /** The billets are this device's; only their model previews come from the server. */
+  private readonly previews = injectCatalogPreviews();
+
   protected readonly cards = computed(() => {
-    const previews = new Map(this.catalog.models()?.map((model) => [model.slug, model.previewUrl]));
+    const previews = this.previews();
     const mode = this.colorMode.resolvedMode();
     const locale = this.language.locale();
     const now = Date.now();
@@ -78,17 +80,12 @@ export class BilletList {
         entry,
         emoji: entry.templateId ? TEMPLATES[entry.templateId].emoji : BLANK_EMOJI,
         linkId: cardLinkId(entry),
-        previewUrl: (entry.modelSlug && previews.get(entry.modelSlug)) || null,
+        preview: previewOf(previews, entry.modelSlug),
         swatches: [accent, accentSoft, background, ink],
         edited: editedAgo(entry.updatedAt, now, locale),
       };
     });
   });
-
-  constructor() {
-    // Previews are decoration: without the catalog the cards show their emoji.
-    void this.catalog.list().catch(() => undefined);
-  }
 
   protected duplicate(entry: LocalBilletEntry): void {
     const title = this.translate.instant('BILLETS.COPY_TITLE', { title: this.nameOf(entry) });

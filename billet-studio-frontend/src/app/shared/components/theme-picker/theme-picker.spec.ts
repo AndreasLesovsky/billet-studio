@@ -4,16 +4,18 @@ import { disabled, form, FormField } from '@angular/forms/signals';
 import { describe, expect, it } from 'vitest';
 
 import { translateTestingModule } from '../../../../test-helpers';
+import { billetPresetFor } from '../../../core/theme/billet-theme-presets.generated';
 import { ColorModeService } from '../../../core/theme/color-mode-service';
-import { THEME_IDS } from '../../../core/theme/theme-registry.generated';
+import { THEME_IDS, type ColorMode } from '../../../core/theme/theme-registry.generated';
 import { ThemePicker } from './theme-picker';
 
 @Component({
   imports: [ThemePicker],
-  template: `<app-theme-picker [(value)]="theme" />`,
+  template: `<app-theme-picker [(value)]="theme" [mode]="mode()" />`,
 })
 class StandaloneHost {
   readonly theme = signal('midnight');
+  readonly mode = signal<ColorMode | undefined>(undefined);
 }
 
 @Component({
@@ -31,7 +33,7 @@ class FormHost {
 function render<T>(host: new () => T) {
   TestBed.configureTestingModule({
     imports: [host, translateTestingModule()],
-    providers: [{ provide: ColorModeService, useValue: { resolvedMode: signal('light') } }],
+    providers: [{ provide: ColorModeService, useValue: { resolvedMode: signal('dark') } }],
   });
   const fixture = TestBed.createComponent(host);
   fixture.detectChanges();
@@ -51,13 +53,26 @@ function render<T>(host: new () => T) {
 }
 
 describe('ThemePicker', () => {
-  it('offers every editor theme, each card scoped to its own theme', () => {
-    const { element, radios } = render(StandaloneHost);
-    const cards = [...element.querySelectorAll<HTMLElement>('.ui-theme-card')];
+  it("previews every theme's billet preset, in the site's mode unless a mode is given", () => {
+    const { fixture, element, radios } = render(StandaloneHost);
+    const backgrounds = () =>
+      [...element.querySelectorAll<HTMLElement>('.ui-theme-card')].map(
+        (card) => card.style.backgroundColor,
+      );
+    // The browser's own spelling of a hex colour, as the style binding reports it.
+    const presetBackgrounds = (mode: ColorMode) =>
+      THEME_IDS.map((id) => {
+        const probe = document.createElement('i');
+        probe.style.backgroundColor = billetPresetFor(id).palette[mode].background;
+        return probe.style.backgroundColor;
+      });
 
     expect(radios().map((r) => r.value)).toEqual([...THEME_IDS]);
-    expect(cards.map((c) => c.dataset['theme'])).toEqual([...THEME_IDS]);
-    expect(new Set(cards.map((c) => c.dataset['mode']))).toEqual(new Set(['light']));
+    expect(backgrounds()).toEqual(presetBackgrounds('dark'));
+
+    fixture.componentInstance.mode.set('light');
+    fixture.detectChanges();
+    expect(backgrounds()).toEqual(presetBackgrounds('light'));
   });
 
   it('works standalone with [(value)] in both directions', () => {

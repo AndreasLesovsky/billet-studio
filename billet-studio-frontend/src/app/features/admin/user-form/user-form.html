@@ -162,7 +162,7 @@
           <button
             type="button"
             class="ui-btn ui-btn--neutral"
-            [disabled]="!canUndo()"
+            [disabled]="!canUndo() || saving()"
             (click)="undo()"
           >
             <i
@@ -176,21 +176,19 @@
             form="user-form"
             class="ui-btn ui-btn--primary"
             [disabled]="!canSave()"
+            [attr.aria-busy]="saving()"
           >
             <i
               class="bi"
               [class]="submitIcon"
               aria-hidden="true"
             ></i>
-            {{ submitKey | translate }}
+            {{ submitLabel() | translate }}
           </button>
         </div>
       </div>
     } @else {
-      <div
-        class="ui-skeleton user-form__card user-form__skeleton"
-        aria-hidden="true"
-      ></div>
+      <app-user-form-skeleton />
     }
   </div>
 </div>

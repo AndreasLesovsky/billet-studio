@@ -57,13 +57,14 @@
         <button
           type="submit"
           class="ui-btn ui-btn--primary ui-btn--lg ui-btn--block"
-          [disabled]="!loginForm().valid()"
+          [disabled]="!loginForm().valid() || signingIn()"
+          [attr.aria-busy]="signingIn()"
         >
           <i
             class="bi bi-box-arrow-in-right"
             aria-hidden="true"
           ></i>
-          {{ 'AUTH.LOGIN_SUBMIT' | translate }}
+          {{ (signingIn() ? 'COMMON.PENDING.SIGNING_IN' : 'AUTH.LOGIN_SUBMIT') | translate }}
         </button>
       </form>
 

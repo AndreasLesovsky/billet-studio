@@ -25,6 +25,11 @@
         aria-hidden="true"
       ></i>
     </button>
+  } @else if (defaultLoading()) {
+    <span
+      class="ui-skeleton ui-skeleton--button ui-skeleton--sm ui-skeleton--icon"
+      aria-hidden="true"
+    ></span>
   }
 </div>
 <div class="range-slider__track">
@@ -55,5 +60,10 @@
         ></span>
       }
     </div>
+  } @else if (defaultLoading()) {
+    <div
+      class="ui-range-marks"
+      aria-hidden="true"
+    ></div>
   }
 </div>

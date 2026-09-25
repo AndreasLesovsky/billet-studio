@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { PASSWORD_MIN_LENGTH } from '../../../core/forms/signal-validators';
 import { AuthApi } from '../../../core/services/auth-api';
+import { runPending } from '../../../core/utils/pending';
 import { FieldError } from '../../../shared/components/field-error/field-error';
 import { PasswordToggle } from '../../../shared/directives/password-toggle';
 import { EMPTY_MODEL, ResetPasswordFormModel, resetPasswordSchema } from './reset-password-schema';
@@ -26,6 +27,7 @@ export class ResetPassword {
 
   readonly model = signal<ResetPasswordFormModel>({ ...EMPTY_MODEL });
   readonly resetForm = form(this.model, resetPasswordSchema);
+  readonly saving = signal(false);
 
   async onSubmit(event?: Event): Promise<void> {
     event?.preventDefault();
@@ -38,7 +40,9 @@ export class ResetPassword {
 
     const m = this.model();
     try {
-      await this.authApi.resetPassword(token, m.newPassword, m.confirmPassword);
+      await runPending(this.saving, () =>
+        this.authApi.resetPassword(token, m.newPassword, m.confirmPassword),
+      );
     } catch {
       // errorInterceptor has said why (INVALID_TOKEN / TOKEN_EXPIRED point to a new link).
       return;

@@ -1,7 +1,7 @@
 // Document defaults. Every colour is a --ui-* token.
 
 html {
-    // Several theme fonts ship without a 600 face; the nearest real face beats a smeared fake bold.
+    // A weight a font does not ship renders in its nearest real face, never as a smeared fake bold.
     font-synthesis-weight: none;
     scrollbar-color: var(--ui-border-strong) transparent;
     hanging-punctuation: first last;
@@ -25,17 +25,6 @@ body {
 app-root {
     display: block;
     isolation: isolate;
-}
-
-// An editor-theme scope (ThemeScope: the editor root, theme-picker cards, the dev ui-kit) carries
-// data-theme + data-mode itself, so every --ui-* token inside it is its theme's. Inherited
-// properties were already computed from the site theme around it; the scope re-applies them from
-// its own tokens. color-scheme comes with the generated [data-theme][data-mode] block, and the
-// heading rules below resolve their tokens on the heading itself, so they follow the scope too.
-.ui-theme-scope {
-    background-color: var(--ui-bg);
-    color: var(--ui-text);
-    font-family: var(--ui-font-body);
 }
 
 h1,
@@ -134,8 +123,8 @@ hr {
     opacity: 1;
 }
 
-// Safety net for any motion outside the token durations. Spinners keep turning, slower
-// (_feedback.scss), because they carry state.
+// Safety net for any motion outside the token durations. What carries state keeps moving, calmer:
+// the pending button's spinner (_buttons.scss) and the activity bar (_feedback.scss).
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

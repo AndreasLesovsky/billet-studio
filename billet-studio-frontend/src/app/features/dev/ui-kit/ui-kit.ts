@@ -3,10 +3,13 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { DEFAULT_THEME, THEMES } from '../../../core/theme/theme-registry.generated';
+import {
+  DEFAULT_THEME,
+  THEMES,
+  type ColorMode,
+} from '../../../core/theme/theme-registry.generated';
 import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
 import { ThemePicker } from '../../../shared/components/theme-picker/theme-picker';
-import { ThemeScope } from '../../../shared/directives/theme-scope';
 import { BilletPresetSample } from './billet-preset-sample';
 import { EditorControlsSample } from './editor-controls-sample';
 
@@ -65,10 +68,26 @@ const BUTTON_VARIANTS = [
   { variant: 'ui-btn--danger', labelKey: 'COMMON.DELETE', icon: 'bi-trash3' },
 ] as const;
 
+/** The theme picker once per palette: the cards preview each preset in light and in dark. */
+const PICKER_MODES: readonly { readonly mode: ColorMode; readonly labelKey: string }[] = [
+  { mode: 'light', labelKey: 'COLOR_MODE.LIGHT' },
+  { mode: 'dark', labelKey: 'COLOR_MODE.DARK' },
+];
+
 const BUTTON_STATES = [
-  { disabled: false, labelKey: 'UI_KIT.BUTTONS_VARIANTS' },
-  { disabled: true, labelKey: 'UI_KIT.BUTTONS_DISABLED' },
+  { disabled: false, busy: false, labelKey: 'UI_KIT.BUTTONS_VARIANTS' },
+  { disabled: true, busy: false, labelKey: 'UI_KIT.BUTTONS_DISABLED' },
+  { disabled: true, busy: true, labelKey: 'UI_KIT.BUTTONS_PENDING' },
 ] as const;
+
+/** Every variant in every state; while an action runs, a button shows the pending label. */
+const BUTTON_ROWS = BUTTON_STATES.map((state) => ({
+  ...state,
+  buttons: BUTTON_VARIANTS.map((button) => ({
+    ...button,
+    labelKey: state.busy ? 'COMMON.PENDING.SAVING' : button.labelKey,
+  })),
+}));
 
 /** Index of the tab a key moves to (arrows wrap, Home/End jump), or null for other keys. */
 function targetTab(key: string, index: number, count: number): number | null {
@@ -88,9 +107,10 @@ function targetTab(key: string, index: number, count: number): number | null {
 
 /**
  * Kitchen sink for visual QA (route dev/ui): every ui-* component class in the site (Studio) theme,
- * then the theme picker and, per editor theme, a mini editor panel inside its own ThemeScope and
- * the theme's billet preset, then the editor's form controls in Studio and in the picked theme.
- * Sample content is static; nothing here talks to the backend.
+ * then the billet themes - the theme picker with its preset previews in light and in dark, and each
+ * theme's billet preset - then the editor's form controls, fed with the picked theme's preset.
+ * Everything is Studio; only the preset previews show a theme. Sample content is static; nothing
+ * here talks to the backend.
  */
 @Component({
   selector: 'app-ui-kit',
@@ -101,7 +121,6 @@ function targetTab(key: string, index: number, count: number): number | null {
     CdkMenuItem,
     CdkMenuTrigger,
     ThemePicker,
-    ThemeScope,
     BilletPresetSample,
     EditorControlsSample,
     AssetThumb,
@@ -112,14 +131,14 @@ function targetTab(key: string, index: number, count: number): number | null {
 export class UiKit {
   protected readonly tabs = TABS;
   protected readonly rows = SAMPLE_ROWS;
-  protected readonly buttonVariants = BUTTON_VARIANTS;
-  protected readonly buttonStates = BUTTON_STATES;
+  protected readonly buttonRows = BUTTON_ROWS;
   protected readonly activeTab = signal<KitTab>('content');
   protected readonly spacing = signal(40);
   protected readonly themes = THEMES;
-  protected readonly editorTheme = signal<string>(DEFAULT_THEME);
-  protected readonly editorThemeName = computed(
-    () => THEMES.find((t) => t.id === this.editorTheme())?.nameKey ?? '',
+  protected readonly pickerModes = PICKER_MODES;
+  protected readonly billetTheme = signal<string>(DEFAULT_THEME);
+  protected readonly billetThemeName = computed(
+    () => THEMES.find((t) => t.id === this.billetTheme())?.nameKey ?? '',
   );
 
   protected onSpacing(event: Event): void {

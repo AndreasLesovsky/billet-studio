@@ -11,6 +11,19 @@
     "RESET": "Zurücksetzen",
     "SEARCH": "Suchen",
     "LOADING": "Lädt …",
+    "PENDING": {
+      "SAVING": "Speichert …",
+      "CREATING": "Legt an …",
+      "UPLOADING": "Lädt hoch …",
+      "REMOVING": "Entfernt …",
+      "DELETING": "Löscht …",
+      "LOCKING": "Sperrt …",
+      "UNLOCKING": "Entsperrt …",
+      "DEACTIVATING": "Deaktiviert …",
+      "SIGNING_IN": "Meldet an …",
+      "SIGNING_UP": "Erstellt Konto …",
+      "SENDING": "Sendet …"
+    },
     "NO_RESULTS": "Keine Ergebnisse gefunden.",
     "YES": "Ja",
     "NO": "Nein",
@@ -58,7 +71,9 @@
     "DARK": "Dunkel"
   },
   "THEME_PICKER": {
-    "LABEL": "Theme"
+    "LABEL": "Theme",
+    "SAMPLE_TITLE": "Mama",
+    "SAMPLE_BODY": "Danke für alles."
   },
   "THEMES": {
     "ROSE": "Rosé",
@@ -174,7 +189,14 @@
     "PREVIEW": {
       "DEVICE": "Gerät der Vorschau",
       "PHONE": "Handy",
-      "DESKTOP": "Desktop"
+      "DESKTOP": "Desktop",
+      "ZOOM": "Zoom der Vorschau",
+      "ZOOM_OUT": "Verkleinern",
+      "ZOOM_IN": "Vergrößern",
+      "ZOOM_FIT": "Einpassen",
+      "ZOOM_LEVEL": "{{percent}} %",
+      "ZOOM_FIT_LABEL": "{{percent}} % – Einpassen",
+      "ZOOM_STATUS": "Zoom {{percent}} %"
     },
     "CONTENT": {
       "PAGE": "Seite",
@@ -231,7 +253,7 @@
     },
     "DESIGN": {
       "THEME_TITLE": "Theme und Farbmodus",
-      "THEME_HINT": "Ein Theme setzt Farben, Schriften und Partikelfarben deines Billets und färbt den Editor ein. Danach kannst du alles anpassen.",
+      "THEME_HINT": "Ein Theme setzt Farben, Schriften und Partikelfarben deines Billets. Danach kannst du alles anpassen.",
       "THEME_CHOOSE": "Theme wählen",
       "THEME_RESET": "Auf Theme zurücksetzen",
       "COLOR_MODE": "Farbmodus des Billets",
@@ -433,6 +455,7 @@
   "ACCOUNT": {
     "TITLE": "Mein Konto",
     "LEAD": "Verwalte dein Profil, dein Passwort und dein Konto.",
+    "LOAD_FAILED": "Dein Konto konnte nicht geladen werden.",
     "PROFILE_SECTION": "Profil",
     "NAME": "Name",
     "EMAIL": "E-Mail",
@@ -589,12 +612,11 @@
   },
   "UI_KIT": {
     "TITLE": "UI-Kit",
-    "LEAD": "Alle Bausteine des Design-Systems: oben die Website im festen Studio-Design, darunter die Editor-Themes – zum visuellen Prüfen in hell und dunkel.",
+    "LEAD": "Alle Bausteine des Design-Systems im festen Studio-Design, darunter die Billet-Themes – zum visuellen Prüfen in hell und dunkel.",
     "SITE_TITLE": "Website · Studio",
     "SITE_LEAD": "Das feste Design aller Seiten außerhalb des Editors. Hell und dunkel schaltest du oben im Header um.",
-    "EDITOR_THEMES_TITLE": "Editor-Themes",
-    "EDITOR_THEMES_LEAD": "Gelten nur im Editor und in der Theme-Auswahl. Jedes Panel steht in seinem eigenen Theme, im aktuellen Farbmodus; darunter die Billet-Voreinstellung, die das Theme beim Auswählen ins Billet schreibt.",
-    "SECTION_THEME_PICKER": "Theme-Auswahl",
+    "BILLET_THEMES_TITLE": "Billet-Themes",
+    "BILLET_THEMES_LEAD": "Ein Theme ist eine Design-Voreinstellung für das Billet: Es gilt nur in der Vorschau und auf der veröffentlichten Seite, nie in der Oberfläche. Die Theme-Auswahl zeigt jede Voreinstellung als kleines Billet, hier in hell und dunkel; darunter die Farben und Schriften, die ein Theme ins Billet schreibt.",
     "SECTION_TYPOGRAPHY": "Typografie",
     "SECTION_BUTTONS": "Buttons",
     "SECTION_FORMS": "Formularelemente",
@@ -612,7 +634,9 @@
     "KEY_CTRL": "Strg",
     "BUTTONS_VARIANTS": "Primär · Sekundär (tonal) · Neutral · Ghost · Danger",
     "BUTTONS_DISABLED": "Deaktiviert: behält die Farbe der Variante, gedämpft",
+    "BUTTONS_PENDING": "Aktion läuft: Spinner statt Symbol, Pending-Text, deaktiviert",
     "BUTTONS_SIZES": "Größen und Symbol-Buttons",
+    "PROGRESS": "Globale Aktivität: der Balken unter dem Header (läuft hier dauerhaft)",
     "BUTTON_MORE": "Mehr",
     "BUTTON_SMALL": "Klein",
     "BUTTON_LARGE": "Groß",
@@ -815,8 +839,7 @@
     },
     "KIT": {
       "TITLE": "Editor-Steuerelemente",
-      "LEAD": "Die eigenen Formular-Steuerelemente des Editors: links im Studio-Design, rechts im oben gewählten Editor-Theme. Beide sind per [formField] an ein Signal-Formular gebunden; darunter dieselben Steuerelemente frei mit [(value)].",
-      "STUDIO": "Studio",
+      "LEAD": "Die eigenen Formular-Steuerelemente des Editors, per [formField] an ein Signal-Formular gebunden; die Farbvorschläge kommen aus dem oben gewählten Billet-Theme. Darunter dieselben Steuerelemente frei mit [(value)].",
       "STANDALONE": "Ohne Formular: [(value)]",
       "LOCKED": "Alle Steuerelemente sperren",
       "ACCENT": "Akzentfarbe",

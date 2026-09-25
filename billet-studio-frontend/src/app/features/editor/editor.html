@@ -1,8 +1,5 @@
 @if (found()) {
-  <div
-    class="editor"
-    [appThemeScope]="model().theme"
-  >
+  <div class="editor">
     <app-editor-toolbar
       [billetForm]="billetForm"
       [canUndo]="canUndo()"
@@ -94,6 +91,7 @@
               <app-design-panel
                 [billetForm]="billetForm"
                 [document]="model()"
+                [previewColorMode]="previewColorMode()"
               />
             }
             @case ('spacing') {

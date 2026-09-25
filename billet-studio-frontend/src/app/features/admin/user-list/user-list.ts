@@ -15,13 +15,13 @@ import { form, FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
 import { PageDto, UserResponseDto } from '../../../core/models/models';
 import { AdminUserApi, UserListQuery, UserSortField } from '../../../core/services/admin-user-api';
 import { AuthApi } from '../../../core/services/auth-api';
 import { LanguageService } from '../../../core/services/language-service';
 import { ConfirmationModalStore } from '../../../core/stores/confirmation-modal-store';
 import { LockUserDialog } from './lock-user-dialog/lock-user-dialog';
+import { UserListSkeleton } from './user-list-skeleton';
 import { UserName } from './user-name/user-name';
 import { UserStatus } from './user-status/user-status';
 import {
@@ -68,7 +68,16 @@ const COLUMNS: readonly Column[] = [
  */
 @Component({
   selector: 'app-user-list',
-  imports: [DatePipe, FormField, LockUserDialog, RouterLink, TranslatePipe, UserName, UserStatus],
+  imports: [
+    DatePipe,
+    FormField,
+    LockUserDialog,
+    RouterLink,
+    TranslatePipe,
+    UserListSkeleton,
+    UserName,
+    UserStatus,
+  ],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',
 })
@@ -81,8 +90,8 @@ export class UserList {
   private readonly translate = inject(TranslateService);
 
   protected readonly locale = inject(LanguageService).locale;
-  protected readonly loading = isLoading;
   protected readonly columns = COLUMNS;
+  protected readonly columnLabels = COLUMNS.map((column) => column.label);
   protected readonly protectedHintId = PROTECTED_HINT_ID;
   protected readonly selfHintId = SELF_HINT_ID;
 
@@ -113,7 +122,7 @@ export class UserList {
     computation: (page, previous) => page ?? previous?.value ?? null,
   });
 
-  /** Nothing to show and the last request failed: the table offers a retry instead of a skeleton. */
+  /** Nothing to show and the last request failed: the page offers a retry instead of a skeleton. */
   readonly failed = computed(() => this.shown() === null && this.users.status() === 'error');
 
   readonly pageCount = computed(() => {
@@ -255,6 +264,7 @@ export class UserList {
       title: this.translate.instant('ADMIN_USERS.UNLOCK_TITLE'),
       message: this.translate.instant('ADMIN_USERS.UNLOCK_MESSAGE', { name: user.name }),
       confirmLabel: this.translate.instant('ADMIN_USERS.UNLOCK'),
+      pendingLabel: this.translate.instant('COMMON.PENDING.UNLOCKING'),
       cancelLabel: this.translate.instant('COMMON.CANCEL'),
       confirmVariant: 'primary',
       onConfirm: async () => {
@@ -270,6 +280,7 @@ export class UserList {
       title: this.translate.instant('ADMIN_USERS.DELETE_TITLE'),
       message: this.translate.instant('ADMIN_USERS.DELETE_MESSAGE', { name: user.name }),
       confirmLabel: this.translate.instant('COMMON.DELETE'),
+      pendingLabel: this.translate.instant('COMMON.PENDING.DELETING'),
       cancelLabel: this.translate.instant('COMMON.CANCEL'),
       confirmVariant: 'danger',
       onConfirm: async () => {

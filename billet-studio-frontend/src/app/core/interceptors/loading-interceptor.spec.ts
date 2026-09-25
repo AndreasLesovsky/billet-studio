@@ -7,8 +7,8 @@ import { isLoading, loadingInterceptor } from './loading-interceptor';
 import { SKIP_LOADING } from './http-context-tokens';
 
 /**
- * The global spinner is driven by the interceptor alone. Its timing (a show delay against flicker,
- * a minimum visible time once shown) and the requests it leaves alone are pinned here.
+ * The global progress bar is driven by the interceptor alone. Its timing (a show delay against
+ * flicker, a minimum visible time once shown) and the requests it leaves alone are pinned here.
  */
 describe('loadingInterceptor', () => {
   function fire(requestUrl: string, context = new HttpContext()) {
@@ -32,42 +32,42 @@ describe('loadingInterceptor', () => {
   afterEach(() => {
     vi.advanceTimersByTime(1000);
     vi.useRealTimers();
-    expect(isLoading()).toBe(false); // no test may leak a running spinner into the next one
+    expect(isLoading()).toBe(false); // no test may leak a running bar into the next one
   });
 
-  it('a normal request drives the global spinner after the show delay', () => {
+  it('a normal request drives the global bar after the show delay of 300 ms', () => {
     const req = fire('https://api.example.com/v1/billets/7');
 
-    vi.advanceTimersByTime(200);
+    vi.advanceTimersByTime(299);
     expect(isLoading()).toBe(false);
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(1);
     expect(isLoading()).toBe(true);
     req.finish();
   });
 
   it('a request that finishes before the delay never shows it', () => {
     const req = fire('https://api.example.com/v1/billets/7');
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(290);
     req.finish();
 
     vi.advanceTimersByTime(500);
     expect(isLoading()).toBe(false);
   });
 
-  it('once shown, it stays for the minimum time so it does not flash', () => {
+  it('once shown, it stays for 400 ms so it does not flash', () => {
     const req = fire('https://api.example.com/v1/billets/7');
     vi.advanceTimersByTime(300);
     req.finish();
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(399);
     expect(isLoading()).toBe(true);
 
-    vi.advanceTimersByTime(400);
+    vi.advanceTimersByTime(1);
     expect(isLoading()).toBe(false);
   });
 
-  it('overlapping requests share one spinner, which waits for the last of them', () => {
+  it('overlapping requests share one bar, which waits for the last of them', () => {
     const first = fire('https://api.example.com/v1/billets');
     const second = fire('https://api.example.com/v1/models');
     vi.advanceTimersByTime(300);

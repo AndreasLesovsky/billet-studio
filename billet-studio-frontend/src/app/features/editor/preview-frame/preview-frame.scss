@@ -8,31 +8,54 @@
     min-block-size: 0;
 }
 
-.preview__devices {
-    align-self: center;
+.preview__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ui-space-2) var(--ui-space-4);
 }
 
+.preview__zoom {
+    gap: var(--ui-space-1);
+}
+
+// Wide enough for "200 %", so the buttons around it never move.
+.preview__zoom-level {
+    min-inline-size: 4.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+// Scrolls a zoomed-in frame. A size container: the desktop frame takes its height from it (cqb).
 .preview__stage {
-    position: relative;
     flex: 1;
     min-block-size: 0;
-    overflow: hidden;
+    overflow: auto;
+    container-type: size;
 }
 
-// The frame keeps its real size - the billet inside is exactly 24.375rem (390 px) or 64rem wide -
-// and is scaled down to the stage from its top centre; its height fills the stage after scaling.
+// The frame's size after the zoom (preview-frame.ts measures it): the stage scrolls and centres
+// what the user sees, while the frame inside keeps its real size.
+.preview__sizer {
+    position: relative;
+    margin-inline: auto;
+}
+
+// The billet inside is exactly 24.375rem (390 px) or 64rem wide, whatever the zoom - its container
+// queries see the unscaled width. The zoom scales the frame from its top centre.
 .preview__frame {
     position: absolute;
     inset-block-start: 0;
     inset-inline-start: 50%;
     box-sizing: content-box;
     inline-size: 24.375rem;
-    block-size: min(52.75rem, calc(100% / var(--preview-scale) - 2 * var(--ui-device-bezel)));
-    transform: translateX(-50%) scale(var(--preview-scale));
+    block-size: 52.75rem;
+    transform: translateX(-50%) scale(var(--preview-zoom));
     transform-origin: top center;
 }
 
+// The desktop frame fills the stage's height at every zoom.
 .preview__frame--desktop {
     inline-size: 64rem;
-    block-size: calc(100% / var(--preview-scale) - 2 * var(--ui-device-bezel));
+    block-size: calc(100cqb / var(--preview-zoom) - 2 * var(--ui-device-bezel));
 }

@@ -10,10 +10,10 @@ export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 export const ANSWERED_INLINE = new HttpContextToken<string[]>(() => []);
 
 /**
- * Keeps this request away from the global spinner, for a request whose own indicator is already on
- * screen (the editor's save status during autosave). Set inside a core `*-api.ts` method that exists
- * for exactly that request, never by a component - loadingInterceptor stays the one place that
- * decides, and this is one of its inputs.
+ * Keeps this request away from the global progress bar, for a request whose own indicator is
+ * already on screen (the editor's save status during autosave). Set inside a core `*-api.ts` method
+ * that exists for exactly that request, never by a component - loadingInterceptor stays the one
+ * place that decides, and this is one of its inputs.
  */
 export const SKIP_LOADING = new HttpContextToken<boolean>(() => false);
 

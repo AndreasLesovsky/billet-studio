@@ -5,35 +5,49 @@
 >
   <legend class="ui-label theme-picker__legend">{{ 'THEME_PICKER.LABEL' | translate }}</legend>
   <div class="theme-picker__grid">
-    @for (t of themes; track t.id) {
+    @for (card of cards(); track card.id) {
       <label class="ui-theme-option">
         <input
           type="radio"
           class="ui-visually-hidden"
           [name]="group"
-          [value]="t.id"
-          [checked]="selected() === t.id"
-          (change)="select(t.id)"
+          [value]="card.id"
+          [checked]="selected() === card.id"
+          (change)="select(card.id)"
         />
         <span class="ui-theme-option__frame">
           <span
             class="ui-theme-card"
             aria-hidden="true"
-            [appThemeScope]="t.id"
+            [style.background-color]="card.background"
           >
-            <span class="ui-theme-card__bar">
-              <span class="ui-theme-card__swatch"></span>
-              <span class="ui-theme-card__swatch ui-theme-card__swatch--accent-2"></span>
-              <span class="ui-theme-card__swatch ui-theme-card__swatch--text"></span>
+            <span
+              class="theme-picker__hero"
+              [style.background-color]="card.hero"
+            >
+              <span
+                class="theme-picker__line"
+                [style]="card.title"
+                >Aa</span
+              >
+              <span
+                class="theme-picker__line"
+                [style]="card.titleAccent"
+                >{{ 'THEME_PICKER.SAMPLE_TITLE' | translate }}</span
+              >
             </span>
-            <span class="ui-theme-card__body">
-              <span class="ui-theme-card__title">Aa</span>
-              <span class="ui-theme-card__line"></span>
-              <span class="ui-theme-card__line ui-theme-card__line--short"></span>
-              <span class="ui-theme-card__actions">
-                <span class="ui-theme-card__button"></span>
-                <span class="ui-theme-card__chip"></span>
-              </span>
+            <span
+              class="theme-picker__line theme-picker__body"
+              [style]="card.body"
+              >{{ 'THEME_PICKER.SAMPLE_BODY' | translate }}</span
+            >
+            <span class="theme-picker__particles">
+              @for (color of card.particles; track $index) {
+                <span
+                  class="theme-picker__dot"
+                  [style.background-color]="color"
+                ></span>
+              }
             </span>
           </span>
         </span>
@@ -42,7 +56,7 @@
             class="bi bi-check-circle-fill ui-theme-option__check"
             aria-hidden="true"
           ></i>
-          {{ t.nameKey | translate }}
+          {{ card.nameKey | translate }}
         </span>
       </label>
     }

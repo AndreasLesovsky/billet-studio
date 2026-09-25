@@ -1,0 +1,34 @@
+<fieldset
+  class="asset-picker"
+  aria-busy="true"
+>
+  @if (label()) {
+    <legend class="ui-label asset-picker__legend">{{ label() }}</legend>
+  }
+  <div
+    class="ui-cluster"
+    aria-hidden="true"
+  >
+    @for (chip of chips; track chip) {
+      <span class="ui-skeleton ui-skeleton--pill asset-picker__skeleton-chip"></span>
+    }
+  </div>
+  <div
+    class="asset-picker__grid"
+    aria-hidden="true"
+  >
+    @for (tile of tiles; track tile) {
+      <span class="asset-picker__skeleton-tile">
+        <span class="ui-asset-option__frame">
+          <app-asset-thumb
+            emoji=""
+            [pending]="true"
+          />
+        </span>
+        <span class="ui-asset-option__name">
+          <span class="ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+        </span>
+      </span>
+    }
+  </div>
+</fieldset>

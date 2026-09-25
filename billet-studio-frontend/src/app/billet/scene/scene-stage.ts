@@ -64,6 +64,7 @@ export class SceneStage {
   private readonly visibilityObserver: IntersectionObserver;
   private settings: StageSettings;
   private reducedMotion: boolean;
+  private magnification = 1;
   private model: ShownAsset | null = null;
   private width = 0;
   private height = 0;
@@ -191,6 +192,16 @@ export class SceneStage {
     this.updateMotion();
   }
 
+  /**
+   * The canvas is shown magnified by a CSS transform (the editor's preview zoom): it renders that
+   * many more pixels, up to MAX_PIXEL_RATIO, so the model stays sharp. A shrunk canvas keeps its
+   * device pixel ratio.
+   */
+  setMagnification(magnification: number): void {
+    this.magnification = Math.max(1, magnification);
+    this.resize();
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
@@ -311,7 +322,7 @@ export class SceneStage {
   private resize(): void {
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-    const ratio = Math.min(devicePixelRatio, MAX_PIXEL_RATIO);
+    const ratio = Math.min(devicePixelRatio * this.magnification, MAX_PIXEL_RATIO);
     if (width === this.width && height === this.height && ratio === this.renderer.getPixelRatio()) {
       return;
     }

@@ -52,6 +52,8 @@ export class BilletScene {
   readonly interactive = input(true);
   /** Loads the 3D model even on a data-saver connection. */
   readonly eager = input(false);
+  /** How much a CSS transform magnifies the scene; the canvas renders sharper to match. */
+  readonly magnification = input(1);
   /** The model is drawn in 3D. */
   readonly loaded = output<void>();
 
@@ -118,6 +120,7 @@ export class BilletScene {
     effect(() => this.onStage((stage) => stage.applySettings(this.settings())));
     effect(() => this.onStage((stage) => stage.setInteractive(this.interactive())));
     effect(() => this.onStage((stage) => stage.setReducedMotion(this.reducedMotion())));
+    effect(() => this.onStage((stage) => stage.setMagnification(this.magnification())));
   }
 
   private onStage(apply: (stage: SceneStage) => void): void {

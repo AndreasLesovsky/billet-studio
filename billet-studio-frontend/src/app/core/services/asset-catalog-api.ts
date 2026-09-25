@@ -19,9 +19,6 @@ export class AssetCatalogApi {
   private listRequest: Promise<readonly ModelAssetDto[]> | null = null;
   private readonly slugRequests = new Map<string, Promise<ModelAssetDto | null>>();
 
-  /** The active models in library order; null until list() has answered. */
-  readonly models = this.listed.asReadonly();
-
   list(): Promise<readonly ModelAssetDto[]> {
     this.listRequest ??= firstValueFrom(this.http.get<ModelAssetDto[]>(this.api)).then(
       (models) => {

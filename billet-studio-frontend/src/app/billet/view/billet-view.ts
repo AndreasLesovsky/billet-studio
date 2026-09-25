@@ -19,7 +19,7 @@ import { blockReveal, Reveal, REVEAL, RevealTimeline } from './reveal';
 /**
  * The one renderer of a billet: the editor preview and the public page both show this, never a
  * fork (CLAUDE.md §11). Everything it draws comes from the document's concrete values as
- * --billet-* properties on the host; it never reads the site's or an editor theme's tokens.
+ * --billet-* properties on the host; it never reads the site's --ui-* tokens.
  */
 @Component({
   selector: 'app-billet-view',
@@ -45,6 +45,8 @@ export class BilletView {
   readonly particles = input(true);
   /** 'page' fills the viewport (public page), 'frame' its container (editor preview). */
   readonly fill = input<'page' | 'frame'>('page');
+  /** How much a CSS transform magnifies the billet (the editor's preview zoom), for the 3D canvas. */
+  readonly magnification = input(1);
 
   private readonly timeline = inject(RevealTimeline);
   private readonly systemDark = mediaQuery(PREFERS_DARK);

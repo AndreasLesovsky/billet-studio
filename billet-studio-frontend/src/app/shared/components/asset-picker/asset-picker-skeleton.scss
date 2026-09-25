@@ -1,0 +1,14 @@
+// Layout only; the skeleton also loads asset-picker.scss for the layout it shares with the picker.
+
+// A chip of .ui-chip's height, a tile laid out like .ui-asset-option.
+.asset-picker__skeleton-chip {
+    inline-size: 5rem;
+    block-size: 2rem;
+}
+
+.asset-picker__skeleton-tile {
+    display: grid;
+    align-content: start;
+    gap: var(--ui-space-2);
+    min-inline-size: 0;
+}

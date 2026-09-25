@@ -1,0 +1,20 @@
+// Layout only; the skeleton also loads user-list.scss for the layout it shares with the page.
+
+// Skeleton: a header cell as tall as the sort buttons (ui-btn--sm), and cell lines of one width.
+.user-list__skeleton-head {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2rem;
+}
+
+// A block (not inline) row of placeholders, so no baseline adds height to the row.
+.user-list__skeleton-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--ui-space-1);
+}
+
+.user-list__skeleton-cell {
+    inline-size: 6rem;
+    max-inline-size: 100%;
+}

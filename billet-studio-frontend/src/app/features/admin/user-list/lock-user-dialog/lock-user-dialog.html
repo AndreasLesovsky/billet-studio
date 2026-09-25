@@ -17,7 +17,7 @@
       type="button"
       class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
       [attr.aria-label]="'COMMON.CLOSE' | translate"
-      [disabled]="loading()"
+      [disabled]="locking()"
       (click)="cancel()"
     >
       <i
@@ -61,7 +61,7 @@
     <button
       type="button"
       class="ui-btn ui-btn--neutral"
-      [disabled]="loading()"
+      [disabled]="locking()"
       (click)="cancel()"
     >
       {{ 'COMMON.CANCEL' | translate }}
@@ -70,13 +70,14 @@
       type="submit"
       form="lock-user-form"
       class="ui-btn ui-btn--danger"
-      [disabled]="loading()"
+      [disabled]="locking()"
+      [attr.aria-busy]="locking()"
     >
       <i
         class="bi bi-lock"
         aria-hidden="true"
       ></i>
-      {{ 'ADMIN_USERS.LOCK' | translate }}
+      {{ (locking() ? 'COMMON.PENDING.LOCKING' : 'ADMIN_USERS.LOCK') | translate }}
     </button>
   </div>
 </dialog>

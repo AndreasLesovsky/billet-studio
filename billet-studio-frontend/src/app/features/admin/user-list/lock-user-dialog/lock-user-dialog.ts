@@ -2,9 +2,9 @@ import { Component, inject, linkedSignal, model, output, signal } from '@angular
 import { form, FormField } from '@angular/forms/signals';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { isLoading } from '../../../../core/interceptors/loading-interceptor';
 import { ADMIN_DEACTIVATION_REASONS, UserResponseDto } from '../../../../core/models/models';
 import { AdminUserApi } from '../../../../core/services/admin-user-api';
+import { runPending } from '../../../../core/utils/pending';
 import { Modal } from '../../../../shared/directives/modal';
 import { EMPTY_MODEL, LockUserFormModel, toLockReason } from './lock-user-dialog-schema';
 
@@ -26,8 +26,9 @@ export class LockUserDialog {
   /** The lock went through. */
   readonly locked = output<void>();
 
-  protected readonly loading = isLoading;
   protected readonly reasons = ADMIN_DEACTIVATION_REASONS;
+  /** The lock request runs: nothing closes the dialog meanwhile. */
+  readonly locking = signal(false);
 
   /** The name stays in the text while the dialog fades out, after `user` is already cleared. */
   protected readonly shownName = linkedSignal<UserResponseDto | null, string>({
@@ -39,7 +40,7 @@ export class LockUserDialog {
   readonly lockForm = form(this.model);
 
   cancel(): void {
-    if (this.loading()) return;
+    if (this.locking()) return;
     this.user.set(null);
   }
 
@@ -53,7 +54,9 @@ export class LockUserDialog {
     if (!user) return;
 
     try {
-      await this.adminUserApi.toggleActive(user.id, toLockReason(this.model()));
+      await runPending(this.locking, () =>
+        this.adminUserApi.toggleActive(user.id, toLockReason(this.model())),
+      );
     } catch {
       // errorInterceptor has said why; the dialog stays for another try or a cancel.
       return;

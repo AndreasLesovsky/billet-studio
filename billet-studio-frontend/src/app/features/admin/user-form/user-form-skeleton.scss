@@ -1,0 +1,12 @@
+// Layout only; the skeleton also loads user-form.scss for the layout it shares with the page.
+
+// Skeleton: the ui-switch's size, then its label's line.
+.user-form__skeleton-switch {
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 1.5rem;
+}
+
+.user-form__skeleton-label {
+    inline-size: 6rem;
+}

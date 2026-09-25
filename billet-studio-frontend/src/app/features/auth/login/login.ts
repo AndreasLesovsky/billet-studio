@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { UserWithTokenDto } from '../../../core/models/userWithTokenDto';
 import { AuthApi } from '../../../core/services/auth-api';
+import { runPending } from '../../../core/utils/pending';
 import { FieldError } from '../../../shared/components/field-error/field-error';
 import { PasswordToggle } from '../../../shared/directives/password-toggle';
 import { postLoginTarget } from '../post-login';
@@ -23,6 +24,7 @@ export class Login {
 
   readonly model = signal<LoginFormModel>({ ...EMPTY_MODEL });
   readonly loginForm = form(this.model, loginSchema);
+  readonly signingIn = signal(false);
 
   async onSubmit(event?: Event): Promise<void> {
     event?.preventDefault();
@@ -33,7 +35,7 @@ export class Login {
 
     let user: UserWithTokenDto | null;
     try {
-      user = await this.authApi.login(this.model());
+      user = await runPending(this.signingIn, () => this.authApi.login(this.model()));
     } catch {
       // errorInterceptor has said why; the form stays as typed.
       return;

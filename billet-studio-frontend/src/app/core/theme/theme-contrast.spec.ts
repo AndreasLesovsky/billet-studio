@@ -8,16 +8,14 @@ import {
   COLOR_MODE_STORAGE_KEY,
   SITE_COLOR_TOKENS,
   SITE_THEME,
-  THEME_COLOR_TOKENS,
   THEME_IDS,
-  THEMES,
   type ColorMode,
   type ThemeColorTokens,
 } from './theme-registry.generated';
 
 /**
- * Guard for section 9 of CLAUDE.md: the site theme and every editor theme pass WCAG AA in both
- * modes, and every editor theme's billet preset is readable and uses shipped font faces.
+ * Guard for section 9 of CLAUDE.md: the site theme (Studio, the one UI design) passes WCAG AA in
+ * both modes, and every theme's billet preset is readable and uses shipped font faces.
  * generate-themes.mjs already refuses to write a failing theme; this re-checks the generated
  * values independently, so a hand-edited or stale generated file fails the test run as well.
  */
@@ -110,29 +108,15 @@ describe('theme contrast and billet presets', () => {
     expect(contrast('#767676', '#ffffff')).toBeCloseTo(4.54, 2);
   });
 
-  it('has colour tokens and picker metadata for every theme id', () => {
-    expect(Object.keys(THEME_COLOR_TOKENS)).toEqual([...THEME_IDS]);
-    expect(THEMES.map((t) => t.id)).toEqual([...THEME_IDS]);
-  });
-
-  const tokenSets = [
-    [SITE_THEME, SITE_COLOR_TOKENS],
-    ...THEME_IDS.map((id) => [id, THEME_COLOR_TOKENS[id]] as const),
-  ] as const;
-
-  for (const [id, byMode] of tokenSets) {
-    for (const mode of MODES) {
-      it(`${id} / ${mode} passes every pair`, () => {
-        const tokens = byMode[mode];
-        const failures = PAIRS.filter(
-          ([fg, bg, min]) => contrast(tokens[fg], tokens[bg]) < min,
-        ).map(
-          ([fg, bg, min]) =>
-            `${fg} on ${bg}: ${contrast(tokens[fg], tokens[bg]).toFixed(2)} < ${min}`,
-        );
-        expect(failures).toEqual([]);
-      });
-    }
+  for (const mode of MODES) {
+    it(`${SITE_THEME} / ${mode} passes every pair`, () => {
+      const tokens = SITE_COLOR_TOKENS[mode];
+      const failures = PAIRS.filter(([fg, bg, min]) => contrast(tokens[fg], tokens[bg]) < min).map(
+        ([fg, bg, min]) =>
+          `${fg} on ${bg}: ${contrast(tokens[fg], tokens[bg]).toFixed(2)} < ${min}`,
+      );
+      expect(failures).toEqual([]);
+    });
   }
 
   it('theme-boot.js sets only the site theme and reads only the colour mode', () => {

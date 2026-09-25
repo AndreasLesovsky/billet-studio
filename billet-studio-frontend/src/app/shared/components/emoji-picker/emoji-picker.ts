@@ -59,7 +59,7 @@ function gridTarget(key: string, index: number, count: number, columns: number):
 /**
  * A card icon as a Signal Forms control (`value` = the icon text, usually one emoji, '' = none):
  * `[formField]` or standalone `[(value)]`. The trigger shows the icon; the popover (CDK overlay,
- * inline so an editor theme scope reaches it) holds a curated grid in five groups - one Tab stop,
+ * inline after the trigger) holds a curated grid in five groups - one Tab stop,
  * arrow keys move through it, Enter picks and closes - plus a free text field for any other emoji
  * or a short text, cleaned as the backend requires, and "no icon".
  */

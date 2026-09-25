@@ -1,0 +1,40 @@
+<div class="ui-stack">
+  <span class="ui-hint ui-skeleton ui-skeleton--text user-list__skeleton-cell"></span>
+  <div class="ui-table-wrap">
+    <table class="ui-table">
+      <thead>
+        <tr>
+          @for (label of columns(); track label) {
+            <th>
+              <span class="user-list__skeleton-head">{{ label | translate }}</span>
+            </th>
+          }
+          <th class="ui-table__actions">{{ 'ADMIN_USERS.COL_ACTIONS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row) {
+          <tr>
+            @for (label of columns(); track label) {
+              <td><span class="ui-skeleton ui-skeleton--text user-list__skeleton-cell"></span></td>
+            }
+            <td class="ui-table__actions">
+              <span class="user-list__skeleton-actions">
+                @for (action of actions; track action) {
+                  <span
+                    class="ui-skeleton ui-skeleton--button ui-skeleton--sm ui-skeleton--icon"
+                  ></span>
+                }
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="user-list__pager">
+    <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm"></span>
+    <span class="ui-hint ui-skeleton ui-skeleton--text user-list__skeleton-cell"></span>
+    <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm"></span>
+  </div>
+</div>

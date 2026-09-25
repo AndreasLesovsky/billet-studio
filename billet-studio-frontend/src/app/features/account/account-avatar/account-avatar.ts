@@ -1,10 +1,10 @@
 import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
 import { AccountDto } from '../../../core/models/models';
 import { AccountApi } from '../../../core/services/account-api';
 import { MessageStore } from '../../../core/stores/message-store';
+import { runPending } from '../../../core/utils/pending';
 import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
 import { AVATAR_TYPES, avatarFileProblem } from '../avatar-file';
 
@@ -24,7 +24,6 @@ export class AccountAvatar {
 
   readonly account = input.required<AccountDto>();
 
-  protected readonly loading = isLoading;
   protected readonly accept = AVATAR_TYPES.join(',');
 
   /** A picked picture waits here, with its preview, until it is saved or discarded. */
@@ -35,13 +34,18 @@ export class AccountAvatar {
   /** Read by the page's leave guard: a picked picture is unsaved work. */
   readonly hasStaged = computed(() => this.staged() !== null);
 
+  readonly uploading = signal(false);
+  readonly removing = signal(false);
+  /** One picture action at a time: while one runs, the others wait disabled. */
+  protected readonly busy = computed(() => this.uploading() || this.removing());
+
   protected readonly imageUrl = computed(() => this.preview() ?? this.account().avatarUrl);
   protected readonly pickLabel = computed(() =>
     this.account().avatarUrl ? 'ACCOUNT.AVATAR_CHANGE' : 'ACCOUNT.AVATAR_UPLOAD',
   );
-  protected readonly canSave = computed(() => this.hasStaged() && !this.loading());
+  protected readonly canSave = computed(() => this.hasStaged() && !this.busy());
   protected readonly canRemove = computed(
-    () => this.account().avatarUrl !== null && !this.hasStaged() && !this.loading(),
+    () => this.account().avatarUrl !== null && !this.hasStaged() && !this.busy(),
   );
 
   constructor() {
@@ -95,7 +99,7 @@ export class AccountAvatar {
     const file = this.staged();
     if (!file) return;
     try {
-      await this.accountApi.uploadAvatar(file);
+      await runPending(this.uploading, () => this.accountApi.uploadAvatar(file));
     } catch {
       return;
     }
@@ -104,7 +108,7 @@ export class AccountAvatar {
 
   async remove(): Promise<void> {
     try {
-      await this.accountApi.removeAvatar();
+      await runPending(this.removing, () => this.accountApi.removeAvatar());
     } catch {
       return;
     }

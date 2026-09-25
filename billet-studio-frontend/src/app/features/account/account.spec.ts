@@ -24,8 +24,6 @@ const CHANGE = {
   confirmPassword: 'Secret123',
 };
 
-const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
-
 /** A file drag as the browser fires it; jsdom has no DragEvent with a DataTransfer. */
 function fileDrag(type: 'dragover' | 'drop'): DragEvent {
   const event = new Event(type, { bubbles: true, cancelable: true });
@@ -35,7 +33,7 @@ function fileDrag(type: 'dragover' | 'drop'): DragEvent {
   return event as DragEvent;
 }
 
-function setup() {
+async function setup() {
   const accountApi = {
     account: signal<AccountDto | null>(null),
     get: vi.fn(async () => ACCOUNT),
@@ -59,13 +57,14 @@ function setup() {
   // Loads async and renders children (avatar, dialog): the logic is under test, not the template.
   TestBed.overrideComponent(Account, { set: { template: '<div></div>', imports: [] } });
   const fixture = TestBed.createComponent(Account);
+  // The account resource has loaded and seeded the profile.
+  await fixture.whenStable();
   return { fixture, component: fixture.componentInstance, accountApi, languageService };
 }
 
 describe('Account', () => {
   it('after loading, nothing is unsaved and saving the profile sends nothing', async () => {
-    const { component, accountApi } = setup();
-    await flush();
+    const { component, accountApi } = await setup();
 
     expect(component.profileModel()).toEqual({ name: 'Anna', preferredLanguage: 'de' });
     expect(component.canUndo()).toBe(false);
@@ -74,8 +73,7 @@ describe('Account', () => {
   });
 
   it('saves a changed profile and takes the saved one as the new baseline', async () => {
-    const { component, accountApi, languageService } = setup();
-    await flush();
+    const { component, accountApi, languageService } = await setup();
     component.profileModel.update((m) => ({ ...m, name: 'Anna Maria' }));
     expect(component.canUndo()).toBe(true);
 
@@ -87,8 +85,7 @@ describe('Account', () => {
   });
 
   it('a saved language change switches the interface too', async () => {
-    const { component, languageService } = setup();
-    await flush();
+    const { component, languageService } = await setup();
     component.profileModel.update((m) => ({ ...m, preferredLanguage: 'en' }));
 
     await component.onProfileSubmit();
@@ -97,8 +94,7 @@ describe('Account', () => {
   });
 
   it('undo brings back the loaded profile', async () => {
-    const { component } = setup();
-    await flush();
+    const { component } = await setup();
     component.profileModel.set({ name: 'Someone', preferredLanguage: 'en' });
 
     component.undoProfile();
@@ -108,8 +104,7 @@ describe('Account', () => {
   });
 
   it('a typed password is unsaved work for the leave guard', async () => {
-    const { component } = setup();
-    await flush();
+    const { component } = await setup();
 
     component.passwordModel.update((m) => ({ ...m, currentPassword: 'x' }));
 
@@ -117,8 +112,7 @@ describe('Account', () => {
   });
 
   it('changes the password and empties the form', async () => {
-    const { component, accountApi } = setup();
-    await flush();
+    const { component, accountApi } = await setup();
     component.passwordModel.set(CHANGE);
 
     await component.onPasswordSubmit(new Event('submit'));
@@ -134,8 +128,7 @@ describe('Account', () => {
   });
 
   it('keeps what was typed when the current password is refused', async () => {
-    const { component, accountApi } = setup();
-    await flush();
+    const { component, accountApi } = await setup();
     accountApi.changePassword.mockRejectedValueOnce(new Error('INVALID_PASSWORD'));
     component.passwordModel.set(CHANGE);
 
@@ -149,8 +142,7 @@ describe('Account', () => {
     [{ ...CHANGE, newPassword: 'secret123', confirmPassword: 'secret123' }],
     [{ ...CHANGE, currentPassword: '' }],
   ])('sends no password change that breaks a rule: %j', async (change) => {
-    const { component, accountApi } = setup();
-    await flush();
+    const { component, accountApi } = await setup();
     component.passwordModel.set(change);
 
     await component.onPasswordSubmit();
@@ -160,8 +152,7 @@ describe('Account', () => {
   });
 
   it('a file dropped beside the avatar card is refused instead of opening in the tab', async () => {
-    const { fixture } = setup();
-    await flush();
+    const { fixture } = await setup();
     const accept = (e: Event) => e.preventDefault();
     const accepted = fileDrag('dragover');
     const stray = fileDrag('dragover');

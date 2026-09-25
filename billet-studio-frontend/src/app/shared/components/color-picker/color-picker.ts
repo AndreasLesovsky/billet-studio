@@ -76,7 +76,7 @@ function uniqueHexes(colors: readonly string[]): string[] {
 /**
  * A billet colour as a Signal Forms control (`value` = '#rrggbb' lowercase): `[formField]` or
  * standalone `[(value)]`. The trigger shows the colour and its hex; the popover (CDK overlay, placed
- * inline so an editor theme scope reaches it) offers the billet's own colours, suggestions, recently
+ * inline after the trigger) offers the billet's own colours, suggestions, recently
  * used colours, a saturation/brightness plane with a hue slider (pointer and keyboard), a hex field,
  * the EyeDropper where the browser has one, and the contrast against `contrastAgainst`.
  *

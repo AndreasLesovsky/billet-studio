@@ -1,0 +1,25 @@
+// Layout only; the skeleton also loads account.scss for the layout it shares with the page.
+
+// The picture card centres its content (as account-avatar does).
+.account__skeleton-avatar {
+    align-items: center;
+}
+
+// Full-width lines; the shorter last one centred like the text above it.
+.account__skeleton-lines {
+    inline-size: 100%;
+
+    > .ui-skeleton--medium {
+        align-self: center;
+    }
+}
+
+// The size of ui-avatar--xl.
+.account__skeleton-picture {
+    inline-size: 6rem;
+    block-size: 6rem;
+}
+
+.account__skeleton-actions {
+    justify-content: center;
+}

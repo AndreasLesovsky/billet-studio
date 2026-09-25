@@ -1,14 +1,13 @@
-// Expands the seed colours in src/styles/themes/themes.json - the fixed site theme ("site") and the
-// editor themes ("themes") - into the full --ui-* token set and writes four files (never edit them
-// by hand):
-//   src/styles/_themes.generated.scss                    one block per theme and per theme x mode
-//   src/app/core/theme/theme-registry.generated.ts        ids, picker metadata, final colour tokens
-//   src/app/core/theme/billet-theme-presets.generated.ts  the billet preset of every editor theme
+// Reads src/styles/themes/themes.json - the seeds of the one UI design, Studio ("site"), and the
+// billet design presets ("themes") - and writes four files (never edit them by hand):
+//   src/styles/_themes.generated.scss                    Studio's full --ui-* token set, per mode
+//   src/app/core/theme/theme-registry.generated.ts        theme ids + names, Studio's final colours
+//   src/app/core/theme/billet-theme-presets.generated.ts  the billet preset of every theme
 //   public/theme-boot.js                                  sets the site theme + data-mode first
-// Runs via the prestart/prebuild/pretest npm hooks. Every theme x mode must pass WCAG AA, every
-// heading weight must be a face the font catalog ships, and every billet preset must use shipped
-// faces and pass the billet contrast rules, otherwise the script exits 1 and writes nothing. Pure
-// Node, no dependencies: the OKLCH math is below.
+// A theme is a billet preset only; it never styles any UI. Runs via the prestart/prebuild/pretest
+// npm hooks. Studio must pass WCAG AA in both modes with faces the font catalog ships, and every
+// billet preset must use shipped faces and pass the billet contrast rules, otherwise the script
+// exits 1 and writes nothing. Pure Node, no dependencies: the OKLCH math is below.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,8 +24,7 @@ const MODE_STORAGE_KEY = 'billet-studio.color-mode';
 const MODES = ['light', 'dark'];
 
 // The site's component layer sets running text at 400, medium UI text at 500 and labels/buttons at
-// 600 (--ui-font-weight-strong); its body font must ship all three. Editor themes take the nearest
-// face their body font has (font-synthesis-weight: none).
+// 600 (--ui-font-weight-strong); its body font must ship all three.
 const SITE_BODY_WEIGHTS = [400, 500, 600];
 const DEFAULT_HEADING_WEIGHT = 600;
 
@@ -408,9 +406,11 @@ const headingWeight = (theme) => theme.headingWeight ?? DEFAULT_HEADING_WEIGHT;
 /** h1/h2, page titles and the wordmark; defaults to the heading weight. */
 const displayWeight = (theme) => theme.displayWeight ?? headingWeight(theme);
 
-/** Per-field rules for one theme: [field, predicate, message]. */
-const THEME_RULES = [
-  ['id', (v) => /^[a-z][a-z0-9]*$/.test(v ?? ''), 'id must match [a-z][a-z0-9]*'],
+const ID = /^[a-z][a-z0-9]*$/;
+
+/** Per-field rules of the site theme: [field, predicate, message]. */
+const SITE_RULES = [
+  ['id', (v) => ID.test(v ?? ''), 'id must match [a-z][a-z0-9]*'],
   [
     'fontBody',
     (v) => v in FONTS && !HEADING_ONLY_FONTS.has(v),
@@ -425,8 +425,8 @@ const THEME_RULES = [
 ];
 const SEED_KEYS = ['bg', 'surface', 'text', 'accent'];
 
-function seedErrors(theme, mode) {
-  const seeds = theme[mode];
+function seedErrors(site, mode) {
+  const seeds = site[mode];
   if (!seeds) return [`missing "${mode}" seeds`];
   const bad = SEED_KEYS.filter((key) => !HEX.test(seeds[key] ?? ''));
   for (const key of ['accent2', 'sunken']) {
@@ -463,11 +463,11 @@ function readFontCatalog() {
 }
 
 /** A requested weight the catalog does not ship would render in the nearest face instead. */
-function weightErrors(theme, families, bodyWeights) {
+function weightErrors(site, families) {
   const wanted = [
-    [theme.fontHeading, headingWeight(theme), 'headingWeight'],
-    [theme.fontHeading, displayWeight(theme), 'displayWeight'],
-    ...bodyWeights.map((w) => [theme.fontBody, w, 'body weight']),
+    [site.fontHeading, headingWeight(site), 'headingWeight'],
+    [site.fontHeading, displayWeight(site), 'displayWeight'],
+    ...SITE_BODY_WEIGHTS.map((w) => [site.fontBody, w, 'body weight']),
   ];
   return wanted
     .filter(([family, weight]) => !(families.get(family) ?? []).includes(weight))
@@ -477,25 +477,21 @@ function weightErrors(theme, families, bodyWeights) {
     });
 }
 
-function themeErrors(theme, catalog, bodyWeights = []) {
-  const fieldErrors = THEME_RULES.filter(([field, ok]) => !ok(theme[field])).map(
+function siteErrors(site, themeIds, catalog) {
+  if (!site) return ['"site" (the fixed website theme) is missing'];
+  const fieldErrors = SITE_RULES.filter(([field, ok]) => !ok(site[field])).map(
     ([, , message]) => message,
   );
-  return [
+  const errors = [
     ...fieldErrors,
-    ...MODES.flatMap((mode) => seedErrors(theme, mode)),
-    ...(fieldErrors.length ? [] : weightErrors(theme, catalog.families, bodyWeights)),
+    ...MODES.flatMap((mode) => seedErrors(site, mode)),
+    ...(fieldErrors.length ? [] : weightErrors(site, catalog.families)),
   ];
-}
-
-function siteErrors(site, editorIds, catalog) {
-  if (!site) return ['"site" (the fixed website theme) is missing'];
-  const errors = themeErrors(site, catalog, SITE_BODY_WEIGHTS);
-  if (editorIds.includes(site.id)) errors.push('its id must differ from every editor theme id');
+  if (themeIds.includes(site.id)) errors.push('its id must differ from every theme id');
   return errors.map((e) => `site "${site.id}": ${e}`);
 }
 
-// --- The billet preset of an editor theme: the shapes of docs/billet-document.md ---
+// --- The billet preset of a theme: the shapes of docs/billet-document.md ---
 
 const BILLET_PALETTE_KEYS = [
   'accent',
@@ -627,13 +623,21 @@ function billetContrastFailures(themes) {
   return failures;
 }
 
+// A theme is its id and its billet preset; a leftover UI seed fails instead of lingering unused.
+const THEME_KEYS = ['id', 'billet'];
+const unknownThemeKeys = (theme) =>
+  Object.keys(theme)
+    .filter((key) => !THEME_KEYS.includes(key))
+    .map((key) => `${key} is not a known key (a theme holds only id and billet)`);
+
 function validate(source, catalog) {
   const themes = Array.isArray(source.themes) ? source.themes : [];
   const errors = themes.length ? [] : ['themes[] is empty'];
   const ids = themes.map((t) => t.id);
   for (const theme of themes) {
     const problems = [
-      ...themeErrors(theme, catalog),
+      ...unknownThemeKeys(theme),
+      ...(ID.test(theme.id ?? '') ? [] : ['id must match [a-z][a-z0-9]*']),
       ...billetErrors(theme.billet, catalog.faces),
       ...(ids.indexOf(theme.id) !== ids.lastIndexOf(theme.id) ? ['duplicate id'] : []),
     ];
@@ -731,12 +735,11 @@ const SITE_ROOT_FALLBACK = {
   dark: ":root:not([data-theme])[data-mode='dark']",
 };
 
-function renderScss(site, themes, derived) {
+function renderScss(site, derived) {
   const out = [
     `// ${HEADER}`,
-    `// The site theme ("${site.id}") is the one <html> carries (public/theme-boot.js). Editor themes`,
-    '// apply only to an element that carries data-theme + data-mode itself (ThemeScope: the editor',
-    '// root, theme-picker cards, the dev ui-kit), which is why no selector here is :root-only.',
+    `// The site theme ("${site.id}") is the one design of every UI, the editor's included; <html>`,
+    '// carries it (public/theme-boot.js). Themes are billet presets and have no --ui-* tokens.',
     "@use 'tokens';",
     '',
     ...themeBlock(site, SITE_ROOT_FALLBACK.fonts),
@@ -744,30 +747,18 @@ function renderScss(site, themes, derived) {
       modeBlock(site, mode, derived[site.id][mode], SITE_ROOT_FALLBACK[mode]),
     ),
   ];
-  for (const theme of themes) {
-    out.push(...themeBlock(theme, null));
-    for (const mode of MODES) out.push(...modeBlock(theme, mode, derived[theme.id][mode], null));
-  }
   return out.join('\n').trimEnd() + '\n';
 }
 
 const quote = (s) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 
-function colorTokenLines(colors, colorKeys, indent) {
-  return colorKeys.map((k) => `${indent}${k}: ${quote(colors[k])},`);
-}
-
 function renderRegistry(site, themes, defaultId, derived) {
-  const colorKeys = Object.keys(derived[themes[0].id].light);
-  const swatch = (mode, c) => [
-    `      ${mode}: {`,
-    ...['bg', 'surface', 'text', 'accent', 'accent2'].map((k) => `        ${k}: ${quote(c[k])},`),
-    '      },',
-  ];
-  const lines = [
+  const siteColors = derived[site.id];
+  const colorKeys = Object.keys(siteColors.light);
+  return [
     `// ${HEADER}`,
     '',
-    '/** The editor themes, in picker order. The site theme is not one of them. */',
+    '/** The themes (billet design presets), in picker order. The site theme is not one of them. */',
     'export const THEME_IDS = [',
     ...themes.map((t) => `  ${quote(t.id)},`),
     '] as const;',
@@ -778,45 +769,21 @@ function renderRegistry(site, themes, defaultId, derived) {
     '',
     `export const DEFAULT_THEME: ThemeId = ${quote(defaultId)};`,
     '',
-    '/** The fixed website theme on <html>; never offered as an editor theme. */',
+    '/** The one UI design, on <html>; never offered as a theme. */',
     `export const SITE_THEME = ${quote(site.id)};`,
     '',
     '// Shared with public/theme-boot.js, which reads it before the app bootstraps.',
     `export const COLOR_MODE_STORAGE_KEY = ${quote(MODE_STORAGE_KEY)};`,
     '',
-    'export interface ThemeSwatch {',
-    '  readonly bg: string;',
-    '  readonly surface: string;',
-    '  readonly text: string;',
-    '  readonly accent: string;',
-    '  readonly accent2: string;',
-    '}',
-    '',
     'export interface ThemeMeta {',
     '  readonly id: ThemeId;',
     '  readonly nameKey: string;',
-    '  readonly fontBody: string;',
-    '  readonly fontHeading: string;',
-    '  readonly swatch: Readonly<Record<ColorMode, ThemeSwatch>>;',
     '}',
     '',
     'export const THEMES: readonly ThemeMeta[] = [',
-  ];
-  for (const t of themes) {
-    lines.push(
-      '  {',
-      `    id: ${quote(t.id)},`,
-      `    nameKey: ${quote(`THEMES.${t.id.toUpperCase()}`)},`,
-      `    fontBody: ${quote(t.fontBody)},`,
-      `    fontHeading: ${quote(t.fontHeading)},`,
-      '    swatch: {',
-      ...swatch('light', derived[t.id].light),
-      ...swatch('dark', derived[t.id].dark),
-      '    },',
-      '  },',
-    );
-  }
-  lines.push(
+    ...themes.map(
+      (t) => `  { id: ${quote(t.id)}, nameKey: ${quote(`THEMES.${t.id.toUpperCase()}`)} },`,
+    ),
     '];',
     '',
     'export function isThemeId(value: unknown): value is ThemeId {',
@@ -828,36 +795,16 @@ function renderRegistry(site, themes, defaultId, derived) {
     ...colorKeys.map((k) => `  readonly ${k}: string;`),
     '}',
     '',
-    'type ModeTokens = Readonly<Record<ColorMode, ThemeColorTokens>>;',
-    '',
-    '/** Read by theme-contrast.spec.ts only; tree-shaken from the app bundle. */',
-    'export const THEME_COLOR_TOKENS: Readonly<Record<ThemeId, ModeTokens>> = {',
-  );
-  for (const t of themes) {
-    lines.push(`  ${t.id}: {`);
-    for (const mode of MODES) {
-      lines.push(
-        `    ${mode}: {`,
-        ...colorTokenLines(derived[t.id][mode], colorKeys, '      '),
-        '    },',
-      );
-    }
-    lines.push('  },');
-  }
-  lines.push(
-    '};',
-    '',
     "/** The site theme's final colour values; read by theme-contrast.spec.ts only. */",
-    'export const SITE_COLOR_TOKENS: ModeTokens = {',
+    'export const SITE_COLOR_TOKENS: Readonly<Record<ColorMode, ThemeColorTokens>> = {',
     ...MODES.flatMap((mode) => [
       `  ${mode}: {`,
-      ...colorTokenLines(derived[site.id][mode], colorKeys, '    '),
+      ...colorKeys.map((k) => `    ${k}: ${quote(siteColors[mode][k])},`),
       '  },',
     ]),
     '};',
     '',
-  );
-  return lines.join('\n');
+  ].join('\n');
 }
 
 /** `key: { a, b },` / `key: [a, b],` on one line when it fits Prettier's 100 columns, else wrapped. */
@@ -921,7 +868,7 @@ function renderBilletPresets(themes) {
     '}',
     '',
     '/**',
-    ' * What picking an editor theme writes into a billet: palette.light / palette.dark, typography and',
+    ' * What picking a theme writes into a billet: palette.light / palette.dark, typography and',
     ' * particles.colors. The objects are shared: copy them into a document, never alias them.',
     ' */',
     'export interface BilletThemePreset {',
@@ -937,7 +884,7 @@ function renderBilletPresets(themes) {
     ...themes.flatMap(presetLines),
     '};',
     '',
-    "/** The billet preset of an editor theme; an unknown id gets the default theme's preset. */",
+    "/** The billet preset of a theme; an unknown id gets the default theme's preset. */",
     'export function billetPresetFor(id: string): BilletThemePreset {',
     '  return BILLET_THEME_PRESETS[isThemeId(id) ? id : DEFAULT_THEME];',
     '}',
@@ -948,8 +895,9 @@ function renderBilletPresets(themes) {
 function renderBoot(site) {
   return `// ${HEADER}
 // Runs before the app bootstraps, so the first paint already carries the site theme and the colour
-// mode. The site always renders in its own theme; editor themes are element-scoped and never set
-// here. Plain ES5 on purpose: it must never throw, even with storage blocked or matchMedia missing.
+// mode. Every page, the editor included, renders in the site theme; themes are billet presets and
+// never set here. Plain ES5 on purpose: it must never throw, even with storage blocked or
+// matchMedia missing.
 (function () {
   var mode = null;
   try {
@@ -983,40 +931,37 @@ function fail(title, lines) {
   process.exit(1);
 }
 
-/** Derives every theme x mode; returns the token sets and every derivation or AA failure. */
-function deriveAll(themes) {
-  const derived = {};
+/** Derives the site theme in both modes; returns its token sets and every derivation or AA failure. */
+function deriveSite(site) {
+  const derived = { [site.id]: {} };
   const failures = [];
-  for (const theme of themes) {
-    derived[theme.id] = {};
-    for (const mode of MODES) {
-      const at = `${theme.id}/${mode}`;
-      try {
-        derived[theme.id][mode] = deriveColors(theme, mode);
-      } catch (error) {
-        failures.push(`${at}: ${error.message}`);
-        continue;
-      }
-      failures.push(
-        ...contrastPairs(derived[theme.id][mode])
-          .filter((p) => p.ratio < p.min)
-          .map((p) => `${at}: ${p.fg} on ${p.bg} = ${p.ratio.toFixed(2)} (< ${p.min})`),
-      );
+  for (const mode of MODES) {
+    const at = `${site.id}/${mode}`;
+    try {
+      derived[site.id][mode] = deriveColors(site, mode);
+    } catch (error) {
+      failures.push(`${at}: ${error.message}`);
+      continue;
     }
+    failures.push(
+      ...contrastPairs(derived[site.id][mode])
+        .filter((p) => p.ratio < p.min)
+        .map((p) => `${at}: ${p.fg} on ${p.bg} = ${p.ratio.toFixed(2)} (< ${p.min})`),
+    );
   }
   return { derived, failures };
 }
 
 function printTables(site, themes, derived) {
-  console.table(
-    [site, ...themes].map((t) => ({
-      id: t === site ? `${t.id} (site)` : t.id,
-      body: t.fontBody,
-      heading: `${t.fontHeading} ${headingWeight(t)}/${displayWeight(t)}`,
-      light: derived[t.id].light.accent,
-      dark: derived[t.id].dark.accent,
-    })),
-  );
+  console.table([
+    {
+      site: site.id,
+      body: site.fontBody,
+      heading: `${site.fontHeading} ${headingWeight(site)}/${displayWeight(site)}`,
+      light: derived[site.id].light.accent,
+      dark: derived[site.id].dark.accent,
+    },
+  ]);
   const face = ({ fontId, weight, italic }) => `${fontId} ${weight}${italic ? ' italic' : ''}`;
   console.table(
     themes.map(({ id, billet }) => ({
@@ -1035,14 +980,14 @@ function main() {
   if (errors.length) fail('themes.json is invalid', errors);
 
   const { site, themes } = source;
-  const { derived, failures } = deriveAll([site, ...themes]);
+  const { derived, failures } = deriveSite(site);
   failures.push(...billetContrastFailures(themes));
   if (failures.length) {
     fail('Contrast check failed (WCAG AA for the UI, readability rules for billets)', failures);
   }
 
   const outputs = [
-    [OUT_SCSS, renderScss(site, themes, derived)],
+    [OUT_SCSS, renderScss(site, derived)],
     [OUT_TS, renderRegistry(site, themes, source.default, derived)],
     [OUT_PRESETS, renderBilletPresets(themes)],
     [OUT_BOOT, renderBoot(site)],
@@ -1054,7 +999,7 @@ function main() {
     ? `wrote ${changed.map(([file]) => basename(file)).join(', ')}`
     : 'outputs unchanged';
   console.log(
-    `themes -> site "${site.id}" + ${themes.length} editor themes x ${MODES.length} modes pass WCAG AA, ${themes.length} billet presets pass; ${summary}`,
+    `themes -> site "${site.id}" x ${MODES.length} modes passes WCAG AA, ${themes.length} billet presets pass; ${summary}`,
   );
 }
 

@@ -31,7 +31,7 @@ interface BilletPresetTypography {
 }
 
 /**
- * What picking an editor theme writes into a billet: palette.light / palette.dark, typography and
+ * What picking a theme writes into a billet: palette.light / palette.dark, typography and
  * particles.colors. The objects are shared: copy them into a document, never alias them.
  */
 export interface BilletThemePreset {
@@ -558,7 +558,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
   },
 };
 
-/** The billet preset of an editor theme; an unknown id gets the default theme's preset. */
+/** The billet preset of a theme; an unknown id gets the default theme's preset. */
 export function billetPresetFor(id: string): BilletThemePreset {
   return BILLET_THEME_PRESETS[isThemeId(id) ? id : DEFAULT_THEME];
 }

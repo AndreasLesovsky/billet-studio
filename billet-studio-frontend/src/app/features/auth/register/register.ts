@@ -1,14 +1,14 @@
-import { Component, inject, linkedSignal } from '@angular/core';
+import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { PASSWORD_MIN_LENGTH } from '../../../core/forms/signal-validators';
-import { isLoading } from '../../../core/interceptors/loading-interceptor';
 import { UserWithTokenDto } from '../../../core/models/userWithTokenDto';
 import { AuthApi } from '../../../core/services/auth-api';
 import { isLanguage, Language, LanguageService } from '../../../core/services/language-service';
 import { UserApi } from '../../../core/services/user-api';
+import { runPending } from '../../../core/utils/pending';
 import { FieldError } from '../../../shared/components/field-error/field-error';
 import { PasswordToggle } from '../../../shared/directives/password-toggle';
 import { postLoginTarget } from '../post-login';
@@ -32,7 +32,6 @@ export class Register {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly loading = isLoading;
   protected readonly passwordMinLength = PASSWORD_MIN_LENGTH;
   protected readonly languages = this.languageService.availableLanguages;
 
@@ -41,6 +40,7 @@ export class Register {
     computation: withUiLanguage,
   });
   readonly registerForm = form(this.model, registerSchema);
+  readonly signingUp = signal(false);
 
   async onSubmit(event?: Event): Promise<void> {
     event?.preventDefault();
@@ -50,19 +50,12 @@ export class Register {
     }
 
     const m = this.model();
+    let user: UserWithTokenDto | null;
     try {
-      await this.userApi.register(toRegisterDto(m));
+      user = await runPending(this.signingUp, () => this.signUp(m));
     } catch {
       // errorInterceptor has said why (e.g. EMAIL_ALREADY_EXISTS); nothing was created.
       return;
-    }
-
-    // Signing up does not sign in: the same credentials do, and the login's redirect rule applies.
-    let user: UserWithTokenDto | null = null;
-    try {
-      user = await this.authApi.login({ email: m.email, password: m.password });
-    } catch {
-      // The account exists; only the automatic sign-in failed, so the login page takes over.
     }
 
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
@@ -76,5 +69,17 @@ export class Register {
       this.languageService.setLanguage(language);
     }
     await this.router.navigateByUrl(postLoginTarget(returnUrl, this.authApi, user.id));
+  }
+
+  /** Creates the account, then signs in with it; null when only the sign-in failed. */
+  private async signUp(m: RegisterFormModel): Promise<UserWithTokenDto | null> {
+    await this.userApi.register(toRegisterDto(m));
+    // Signing up does not sign in: the same credentials do, and the login's redirect rule applies.
+    try {
+      return await this.authApi.login({ email: m.email, password: m.password });
+    } catch {
+      // The account exists; only the automatic sign-in failed, so the login page takes over.
+      return null;
+    }
   }
 }

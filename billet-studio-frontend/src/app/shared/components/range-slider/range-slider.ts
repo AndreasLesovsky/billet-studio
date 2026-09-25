@@ -30,6 +30,7 @@ function decimalsOf(step: number): number {
  * `max()`); standalone they are plain inputs (default 0..100). The readout and aria-valuetext use
  * `valueText` (e.g. '2.25 rem · 36 px'), else the number in the UI locale. With a `defaultValue`,
  * a reset button returns to it; it stays visible and is disabled while the value is the default.
+ * `defaultLoading` holds the places of the reset button and the marks while their data still loads.
  */
 @Component({
   selector: 'app-range-slider',
@@ -55,6 +56,8 @@ export class RangeSlider implements FormValueControl<number> {
   /** Values to mark under the track. */
   readonly marks = input<readonly number[]>([]);
   readonly defaultValue = input<number | null>(null);
+  /** The default and the marks are still loading (the slider itself works meanwhile). */
+  readonly defaultLoading = input(false);
   /** Focus left the control: marks a bound field as touched. */
   readonly touch = output<void>();
 

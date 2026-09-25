@@ -12,12 +12,13 @@ import {
 } from '../../shared/components/breadcrumb/breadcrumb-service';
 import { ColorModeMenu } from '../../shared/components/color-mode-menu/color-mode-menu';
 import { LanguageSwitch } from '../../shared/components/language-switch/language-switch';
+import { LoadingBar } from '../../shared/components/loading-bar/loading-bar';
 
 /**
  * The chrome around every page except the shared billet (see BareLayout): header with wordmark,
- * main navigation, language switch, colour-mode menu and account menu; the breadcrumb above the
- * routed page; a minimal footer. The site has one fixed design (the Studio theme), so the header
- * offers the colour mode only, never a theme.
+ * main navigation, language switch, colour-mode menu and account menu, and the global activity bar
+ * on its bottom edge; the breadcrumb above the routed page; a minimal footer. The site has one
+ * fixed design (the Studio theme), so the header offers the colour mode only, never a theme.
  */
 @Component({
   selector: 'app-shell',
@@ -26,6 +27,7 @@ import { LanguageSwitch } from '../../shared/components/language-switch/language
     Breadcrumb,
     ColorModeMenu,
     LanguageSwitch,
+    LoadingBar,
     RouterLink,
     RouterLinkActive,
     RouterOutlet,

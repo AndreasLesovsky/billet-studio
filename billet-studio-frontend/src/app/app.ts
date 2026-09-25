@@ -3,16 +3,16 @@ import { RouterOutlet } from '@angular/router';
 
 import { ColorModeService } from './core/theme/color-mode-service';
 import { ConfirmationModal } from './shared/components/confirmation-modal/confirmation-modal';
-import { Spinner } from './shared/components/spinner/spinner';
 import { Toast } from './shared/components/toast/toast';
 
 /**
  * The layouts are routes (AppShell, BareLayout); what every page shares regardless of layout lives
- * here: toasts, the global spinner and the one confirmation dialog.
+ * here: toasts and the one confirmation dialog. The global activity bar belongs to the site header
+ * (AppShell).
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast, Spinner, ConfirmationModal],
+  imports: [RouterOutlet, Toast, ConfirmationModal],
   templateUrl: './app.html',
 })
 export class App {

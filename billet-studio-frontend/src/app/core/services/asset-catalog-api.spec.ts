@@ -52,7 +52,6 @@ describe('AssetCatalogApi', () => {
 
     expect(await api.list()).toEqual([model('gift-box')]);
     expect(await api.get('gift-box')).toEqual(model('gift-box'));
-    expect(api.models()).toEqual([model('gift-box')]);
   });
 
   it('a failed library read is retried by the next call', async () => {

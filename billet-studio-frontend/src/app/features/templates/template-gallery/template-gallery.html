@@ -24,7 +24,8 @@
       @for (card of cards(); track card.id) {
         <li class="ui-card">
           <app-asset-thumb
-            [src]="card.previewUrl"
+            [src]="card.preview.src"
+            [pending]="card.preview.pending"
             [emoji]="card.emoji"
           />
           <div class="ui-card__body template-gallery__body">

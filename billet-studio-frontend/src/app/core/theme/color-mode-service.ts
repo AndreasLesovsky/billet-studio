@@ -16,8 +16,8 @@ function isColorMode(value: unknown): value is ColorMode {
  * theme-boot.js sets data-mode (and the fixed site theme, data-theme) before the first paint, so
  * this service only takes over for switching and for following the system live.
  *
- * It never writes data-theme: the site has exactly one theme, and editor themes are scoped to their
- * own elements (ThemeScope), which read resolvedMode() as their default.
+ * It never writes data-theme: the site, the editor included, has exactly one design; themes are
+ * billet presets and style only the billet.
  */
 @Injectable({ providedIn: 'root' })
 export class ColorModeService {

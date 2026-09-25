@@ -70,7 +70,8 @@
         @for (card of templates(); track card.id) {
           <li class="ui-card ui-card--interactive">
             <app-asset-thumb
-              [src]="card.previewUrl"
+              [src]="card.preview.src"
+              [pending]="card.preview.pending"
               [emoji]="card.emoji"
             />
             <h3 class="ui-card__title home__template-title">

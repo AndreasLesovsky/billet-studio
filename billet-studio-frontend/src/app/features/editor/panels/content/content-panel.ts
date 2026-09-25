@@ -15,7 +15,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BILLET_LANGS, createBlock, type BlockType } from '../../../../billet/billet-document';
 import { MAX_BLOCKS } from '../../../../billet/billet-limits';
 import { FieldError } from '../../../../shared/components/field-error/field-error';
-import { ThemeScope } from '../../../../shared/directives/theme-scope';
 import { BilletText } from '../../billet-text';
 import { EditorCommands } from '../../editor-commands';
 import { EditorPanel } from '../editor-panel';
@@ -44,7 +43,6 @@ const BLOCK_FIRST_CONTROL = ':is(textarea, select, input)';
     CdkMenuTrigger,
     FieldError,
     FormField,
-    ThemeScope,
     TranslatePipe,
   ],
   templateUrl: './content-panel.html',

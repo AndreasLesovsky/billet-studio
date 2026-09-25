@@ -65,6 +65,7 @@
       >
         <app-theme-picker
           [value]="document().theme"
+          [mode]="previewColorMode()"
           (valueChange)="pickTheme($event)"
         />
       </div>

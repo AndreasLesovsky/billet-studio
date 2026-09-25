@@ -4,6 +4,8 @@ export interface ConfirmationModalConfig {
   title: string;
   message: string;
   confirmLabel: string;
+  /** The confirm label while onConfirm runs ("Deleting…"); without one, confirmLabel stays. */
+  pendingLabel?: string;
   cancelLabel: string;
   /** Maps to .ui-btn--primary / .ui-btn--danger on the confirm button. */
   confirmVariant: 'primary' | 'danger';

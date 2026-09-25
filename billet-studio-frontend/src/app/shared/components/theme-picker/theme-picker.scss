@@ -1,4 +1,5 @@
-// Layout only; the option and card visuals live in src/styles/components/_theme-card.scss.
+// Layout only: the option chrome lives in src/styles/components/_theme-card.scss, and the mini
+// billet's colours and fonts are preset data, bound inline.
 :host {
     display: block;
 }
@@ -11,4 +12,61 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(8.5rem, 100%), 1fr));
     gap: var(--ui-space-4) var(--ui-space-3);
+}
+
+// ---- The mini billet inside .ui-theme-card --------------------------------------------------
+
+.theme-picker__hero {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 0;
+    padding: var(--ui-space-2);
+}
+
+.theme-picker__line {
+    max-inline-size: 100%;
+    overflow: hidden;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.theme-picker__body {
+    padding: var(--ui-space-2) var(--ui-space-2) var(--ui-space-3);
+}
+
+// A few petals in the air over the whole card: fixed spots, colours from the preset's particles.
+.theme-picker__particles {
+    position: absolute;
+    inset: 0;
+}
+
+.theme-picker__dot {
+    position: absolute;
+    inline-size: 0.4375rem;
+    block-size: 0.4375rem;
+    border-radius: 50%;
+
+    &:nth-child(1) {
+        inset-block-start: 12%;
+        inset-inline-end: 12%;
+    }
+
+    &:nth-child(2) {
+        inset-block-start: 30%;
+        inset-inline-start: 10%;
+    }
+
+    &:nth-child(3) {
+        inset-block-start: 54%;
+        inset-inline-end: 18%;
+    }
+
+    &:nth-child(4) {
+        inset-block-start: 62%;
+        inset-inline-start: 20%;
+    }
 }

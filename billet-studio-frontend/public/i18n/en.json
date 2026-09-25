@@ -11,6 +11,19 @@
     "RESET": "Reset",
     "SEARCH": "Search",
     "LOADING": "Loading…",
+    "PENDING": {
+      "SAVING": "Saving…",
+      "CREATING": "Creating…",
+      "UPLOADING": "Uploading…",
+      "REMOVING": "Removing…",
+      "DELETING": "Deleting…",
+      "LOCKING": "Locking…",
+      "UNLOCKING": "Unlocking…",
+      "DEACTIVATING": "Deactivating…",
+      "SIGNING_IN": "Signing in…",
+      "SIGNING_UP": "Creating account…",
+      "SENDING": "Sending…"
+    },
     "NO_RESULTS": "No results found.",
     "YES": "Yes",
     "NO": "No",
@@ -58,7 +71,9 @@
     "DARK": "Dark"
   },
   "THEME_PICKER": {
-    "LABEL": "Theme"
+    "LABEL": "Theme",
+    "SAMPLE_TITLE": "Mom",
+    "SAMPLE_BODY": "Thank you for everything."
   },
   "THEMES": {
     "ROSE": "Rose",
@@ -174,7 +189,14 @@
     "PREVIEW": {
       "DEVICE": "Preview device",
       "PHONE": "Phone",
-      "DESKTOP": "Desktop"
+      "DESKTOP": "Desktop",
+      "ZOOM": "Preview zoom",
+      "ZOOM_OUT": "Zoom out",
+      "ZOOM_IN": "Zoom in",
+      "ZOOM_FIT": "Fit to view",
+      "ZOOM_LEVEL": "{{percent}}%",
+      "ZOOM_FIT_LABEL": "{{percent}}% – fit to view",
+      "ZOOM_STATUS": "Zoom {{percent}}%"
     },
     "CONTENT": {
       "PAGE": "Page",
@@ -231,7 +253,7 @@
     },
     "DESIGN": {
       "THEME_TITLE": "Theme and colour mode",
-      "THEME_HINT": "A theme sets your billet's colours, fonts and particle colours and tints the editor. You can adjust everything afterwards.",
+      "THEME_HINT": "A theme sets your billet's colours, fonts and particle colours. You can adjust everything afterwards.",
       "THEME_CHOOSE": "Choose theme",
       "THEME_RESET": "Reset to theme",
       "COLOR_MODE": "Colour mode of the billet",
@@ -433,6 +455,7 @@
   "ACCOUNT": {
     "TITLE": "My account",
     "LEAD": "Manage your profile, your password and your account.",
+    "LOAD_FAILED": "Your account could not be loaded.",
     "PROFILE_SECTION": "Profile",
     "NAME": "Name",
     "EMAIL": "Email",
@@ -589,12 +612,11 @@
   },
   "UI_KIT": {
     "TITLE": "UI kit",
-    "LEAD": "Every building block of the design system: the website in its fixed Studio design first, then the editor themes – for visual checks in light and dark.",
+    "LEAD": "Every building block of the design system in the fixed Studio design, then the billet themes – for visual checks in light and dark.",
     "SITE_TITLE": "Website · Studio",
     "SITE_LEAD": "The fixed design of every page outside the editor. Switch between light and dark in the header.",
-    "EDITOR_THEMES_TITLE": "Editor themes",
-    "EDITOR_THEMES_LEAD": "They apply only inside the editor and the theme picker. Each panel renders in its own theme, in the current colour mode; below it is the billet preset that picking the theme writes into a billet.",
-    "SECTION_THEME_PICKER": "Theme picker",
+    "BILLET_THEMES_TITLE": "Billet themes",
+    "BILLET_THEMES_LEAD": "A theme is a design preset for the billet: it applies only to the preview and the published page, never to the interface. The theme picker shows each preset as a small billet, here in light and dark; below are the colours and fonts a theme writes into a billet.",
     "SECTION_TYPOGRAPHY": "Typography",
     "SECTION_BUTTONS": "Buttons",
     "SECTION_FORMS": "Form controls",
@@ -612,7 +634,9 @@
     "KEY_CTRL": "Ctrl",
     "BUTTONS_VARIANTS": "Primary · Secondary (tonal) · Neutral · Ghost · Danger",
     "BUTTONS_DISABLED": "Disabled: keeps the variant colour, muted",
+    "BUTTONS_PENDING": "Action running: spinner instead of the icon, pending label, disabled",
     "BUTTONS_SIZES": "Sizes and icon buttons",
+    "PROGRESS": "Global activity: the bar under the header (running here all the time)",
     "BUTTON_MORE": "More",
     "BUTTON_SMALL": "Small",
     "BUTTON_LARGE": "Large",
@@ -815,8 +839,7 @@
     },
     "KIT": {
       "TITLE": "Editor controls",
-      "LEAD": "The editor's own form controls: on the left in the Studio design, on the right in the editor theme chosen above. Both are bound to a signal form with [formField]; below them the same controls work on their own with [(value)].",
-      "STUDIO": "Studio",
+      "LEAD": "The editor's own form controls, bound to a signal form with [formField]; the colour suggestions come from the billet theme chosen above. Below them the same controls work on their own with [(value)].",
       "STANDALONE": "Without a form: [(value)]",
       "LOCKED": "Disable all controls",
       "ACCENT": "Accent colour",

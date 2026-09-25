@@ -51,13 +51,7 @@
       [attr.aria-busy]="busy"
       (click)="confirm()"
     >
-      @if (busy) {
-        <span
-          class="ui-spinner ui-spinner--sm"
-          aria-hidden="true"
-        ></span>
-      }
-      {{ config?.confirmLabel }}
+      {{ busy ? (config?.pendingLabel ?? config?.confirmLabel) : config?.confirmLabel }}
     </button>
   </div>
 </dialog>

@@ -1,7 +1,6 @@
 // The editor's form controls (shared/components: color-picker, range-slider, font-picker,
-// asset-picker, emoji-picker). Tokens only, so each control renders in the site theme and inside
-// any editor theme scope; their popovers are CDK overlays placed inline next to the trigger, so a
-// scope's tokens reach them too. Layout of the parts lives in the components.
+// asset-picker, emoji-picker). Tokens only; their popovers are CDK overlays placed inline next to
+// the trigger. Layout of the parts lives in the components.
 @use 'forms';
 
 // ---- Trigger: a button that looks like a field and opens a picker popover -------------------

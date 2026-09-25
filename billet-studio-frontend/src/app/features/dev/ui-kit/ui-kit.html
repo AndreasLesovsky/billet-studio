@@ -62,16 +62,17 @@
             </h3>
           </div>
           <div class="ui-card__body ui-stack">
-            @for (state of buttonStates; track state.disabled) {
+            @for (state of buttonRows; track state.labelKey) {
               <div class="ui-stack ui-stack--sm">
                 <p class="ui-hint">{{ state.labelKey | translate }}</p>
                 <div class="ui-cluster">
-                  @for (b of buttonVariants; track b.variant) {
+                  @for (b of state.buttons; track b.variant) {
                     <button
                       type="button"
                       class="ui-btn"
                       [class]="b.variant"
                       [disabled]="state.disabled"
+                      [attr.aria-busy]="state.busy"
                     >
                       @if (b.icon) {
                         <i
@@ -406,15 +407,6 @@
           <div class="kit__row">
             <span
               class="ui-cluster"
-              role="status"
-            >
-              <span class="ui-spinner ui-spinner--sm"></span>
-              <span class="ui-spinner"></span>
-              <span class="ui-spinner ui-spinner--lg"></span>
-              <span class="ui-visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
-            </span>
-            <span
-              class="ui-cluster"
               aria-hidden="true"
             >
               <span class="ui-avatar ui-avatar--sm">am</span>
@@ -423,14 +415,44 @@
             </span>
           </div>
 
+          <!-- The global activity bar (app-loading-bar under the header), shown running. -->
+          <div class="ui-stack ui-stack--sm">
+            <p class="ui-hint">{{ 'UI_KIT.PROGRESS' | translate }}</p>
+            <div
+              class="ui-progress ui-progress--active"
+              role="progressbar"
+              aria-busy="true"
+              [attr.aria-label]="'COMMON.LOADING' | translate"
+            >
+              <span class="ui-progress__bar"></span>
+              <span class="ui-progress__bar ui-progress__bar--short"></span>
+            </div>
+          </div>
+
           <div
             class="kit__skeleton"
             aria-hidden="true"
           >
-            <span class="ui-skeleton kit__skeleton-media"></span>
+            <span class="ui-skeleton ui-skeleton--circle kit__skeleton-media"></span>
             <span class="ui-stack ui-stack--sm kit__skeleton-lines">
-              <span class="ui-skeleton"></span>
-              <span class="ui-skeleton kit__skeleton-short"></span>
+              <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+              <span class="ui-hint ui-skeleton ui-skeleton--text"></span>
+              <span class="ui-hint ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+            </span>
+          </div>
+          <div
+            class="ui-stack ui-stack--sm kit__skeleton-form"
+            aria-hidden="true"
+          >
+            <span class="ui-label ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+            <span class="ui-skeleton ui-skeleton--control"></span>
+            <span class="ui-cluster">
+              <span class="ui-skeleton ui-skeleton--pill kit__skeleton-chip"></span>
+              <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm"></span>
+              <span
+                class="ui-skeleton ui-skeleton--button ui-skeleton--sm ui-skeleton--icon"
+              ></span>
+              <span class="ui-skeleton ui-skeleton--button"></span>
             </span>
           </div>
 
@@ -734,21 +756,24 @@
               </h4>
             </div>
           </article>
-          <!-- A thumb without an image (catalog unknown, load failed): the emoji stays. -->
+          <!-- A thumb without an image (catalog failed, none for the model): the emoji stands in. -->
           <article class="ui-card">
             <app-asset-thumb emoji="🎂" />
             <div class="ui-card__body">
               <h4 class="ui-card__title">{{ 'TEMPLATES.GEBURTSTAG' | translate }}</h4>
             </div>
           </article>
+          <!-- While the catalog loads: the thumb shimmers, the card's text stands as lines. -->
           <article
             class="ui-card"
             aria-hidden="true"
           >
-            <div class="ui-card__body ui-stack">
-              <span class="ui-skeleton kit__skeleton-media"></span>
-              <span class="ui-skeleton"></span>
-              <span class="ui-skeleton kit__skeleton-short"></span>
+            <app-asset-thumb
+              emoji="🎂"
+              [pending]="true"
+            />
+            <div class="ui-card__body">
+              <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
             </div>
           </article>
         </div>
@@ -757,47 +782,44 @@
 
     <section
       class="ui-stack ui-stack--lg"
-      aria-labelledby="kit-editor-themes"
+      aria-labelledby="kit-billet-themes"
     >
       <header class="ui-page__header">
-        <h2 id="kit-editor-themes">{{ 'UI_KIT.EDITOR_THEMES_TITLE' | translate }}</h2>
-        <p class="ui-hint">{{ 'UI_KIT.EDITOR_THEMES_LEAD' | translate }}</p>
+        <h2 id="kit-billet-themes">{{ 'UI_KIT.BILLET_THEMES_TITLE' | translate }}</h2>
+        <p class="ui-hint">{{ 'UI_KIT.BILLET_THEMES_LEAD' | translate }}</p>
       </header>
 
-      <section
-        class="ui-card"
-        aria-labelledby="kit-theme-picker"
-      >
-        <div class="ui-card__header">
-          <h3
-            id="kit-theme-picker"
-            class="ui-card__title"
+      <div class="kit__columns">
+        @for (column of pickerModes; track column.mode) {
+          <section
+            class="ui-card"
+            [attr.aria-labelledby]="'kit-theme-picker-' + column.mode"
           >
-            {{ 'UI_KIT.SECTION_THEME_PICKER' | translate }}
-          </h3>
-          <output
-            class="ui-badge ui-badge--accent"
-            for="kit-theme-picker-control"
-            >{{ editorThemeName() | translate }}</output
-          >
-        </div>
-        <div class="ui-card__body">
-          <app-theme-picker
-            id="kit-theme-picker-control"
-            [(value)]="editorTheme"
-          />
-        </div>
-      </section>
+            <div class="ui-card__header">
+              <h3
+                class="ui-card__title"
+                [id]="'kit-theme-picker-' + column.mode"
+              >
+                {{ column.labelKey | translate }}
+              </h3>
+              <span class="ui-badge ui-badge--accent">{{ billetThemeName() | translate }}</span>
+            </div>
+            <div class="ui-card__body">
+              <app-theme-picker
+                [mode]="column.mode"
+                [(value)]="billetTheme"
+              />
+            </div>
+          </section>
+        }
+      </div>
 
       <ul
         class="kit__themes"
         role="list"
       >
         @for (t of themes; track t.id) {
-          <li
-            class="kit__theme"
-            [appThemeScope]="t.id"
-          >
+          <li>
             <article
               class="ui-card"
               [attr.aria-labelledby]="'kit-theme-' + t.id"
@@ -809,61 +831,16 @@
                 >
                   {{ t.nameKey | translate }}
                 </h3>
-                <span class="ui-badge ui-badge--accent">{{ 'UI_KIT.STATUS_NEW' | translate }}</span>
               </div>
-              <div class="ui-card__body ui-stack ui-stack--sm">
-                <p class="ui-hint">{{ 'UI_KIT.CARD_BODY' | translate }}</p>
-                <div class="ui-field">
-                  <label
-                    class="ui-label"
-                    [for]="'kit-theme-' + t.id + '-name'"
-                    >{{ 'UI_KIT.LABEL_NAME' | translate }}</label
-                  >
-                  <input
-                    class="ui-input"
-                    type="text"
-                    [id]="'kit-theme-' + t.id + '-name'"
-                    [placeholder]="'UI_KIT.PLACEHOLDER_NAME' | translate"
-                  />
-                </div>
-                <a
-                  class="ui-link"
-                  href="#kit-editor-themes"
-                  >{{ 'UI_KIT.LINK_SAMPLE' | translate }}</a
-                >
-              </div>
-              <div class="ui-card__footer">
-                <button
-                  type="button"
-                  class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
-                  [attr.aria-label]="'COMMON.UNDO' | translate"
-                >
-                  <i
-                    class="bi bi-arrow-counterclockwise"
-                    aria-hidden="true"
-                  ></i>
-                </button>
-                <button
-                  type="button"
-                  class="ui-btn ui-btn--secondary ui-btn--sm"
-                >
-                  {{ 'UI_KIT.BUTTON_SHARE' | translate }}
-                </button>
-                <button
-                  type="button"
-                  class="ui-btn ui-btn--primary ui-btn--sm"
-                >
-                  {{ 'COMMON.SAVE' | translate }}
-                </button>
+              <div class="ui-card__body">
+                <app-billet-preset-sample [themeId]="t.id" />
               </div>
             </article>
-            <app-billet-preset-sample [themeId]="t.id" />
           </li>
         }
       </ul>
     </section>
 
-    <!-- Editor controls: once in Studio, once in the editor theme picked above. -->
     <section
       class="ui-stack ui-stack--lg"
       aria-labelledby="kit-editor-controls"
@@ -873,46 +850,22 @@
         <p class="ui-hint">{{ 'CONTROLS.KIT.LEAD' | translate }}</p>
       </header>
 
-      <div class="kit__columns">
-        <section
-          class="ui-card"
-          aria-labelledby="kit-controls-studio"
-        >
-          <div class="ui-card__header">
-            <h3
-              id="kit-controls-studio"
-              class="ui-card__title"
-            >
-              {{ 'CONTROLS.KIT.STUDIO' | translate }}
-            </h3>
-          </div>
-          <div class="ui-card__body">
-            <app-editor-controls-sample />
-          </div>
-        </section>
-
-        <div
-          class="kit__theme"
-          [appThemeScope]="editorTheme()"
-        >
-          <section
-            class="ui-card"
-            aria-labelledby="kit-controls-theme"
+      <section
+        class="ui-card"
+        aria-labelledby="kit-controls-theme"
+      >
+        <div class="ui-card__header">
+          <h3
+            id="kit-controls-theme"
+            class="ui-card__title"
           >
-            <div class="ui-card__header">
-              <h3
-                id="kit-controls-theme"
-                class="ui-card__title"
-              >
-                {{ editorThemeName() | translate }}
-              </h3>
-            </div>
-            <div class="ui-card__body">
-              <app-editor-controls-sample [themeId]="editorTheme()" />
-            </div>
-          </section>
+            {{ billetThemeName() | translate }}
+          </h3>
         </div>
-      </div>
+        <div class="ui-card__body">
+          <app-editor-controls-sample [themeId]="billetTheme()" />
+        </div>
+      </section>
     </section>
   </div>
 </div>

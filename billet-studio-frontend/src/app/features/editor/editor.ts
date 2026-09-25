@@ -16,12 +16,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { createDocument, type BilletDocument } from '../../billet/billet-document';
-import { mediaQuery } from '../../billet/view/media-query';
+import { resolveBilletMode } from '../../billet/view/billet-view-style';
+import { mediaQuery, PREFERS_DARK } from '../../billet/view/media-query';
 import { AssetCatalogApi } from '../../core/services/asset-catalog-api';
 import { LocalBilletStore } from '../../core/services/local-billet-store';
 import { ConfirmationModalStore } from '../../core/stores/confirmation-modal-store';
 import { BreadcrumbService } from '../../shared/components/breadcrumb/breadcrumb-service';
-import { ThemeScope } from '../../shared/directives/theme-scope';
 import { createEditorAutosave } from './editor-autosave';
 import { EditorCommands } from './editor-commands';
 import { createEditorHistory, historyShortcut, type HistoryAction } from './editor-history';
@@ -76,10 +76,11 @@ function panelSemantics(tab: EditorTab, isTabPanel: boolean) {
 }
 
 /**
- * The billet editor, /billets/local/:localId/edit. Its root renders in the billet's editor theme
- * (ThemeScope); the site header above stays in the site theme. The form model IS the document:
- * every edit lands in `model`, the history takes it in, the autosave writes it to this device and
- * the preview shows it. Panels bind `billetForm` and ask for bigger steps through EditorCommands.
+ * The billet editor, /billets/local/:localId/edit. Its chrome is Studio like the rest of the site;
+ * the billet's theme shows only in the preview (and on the published page). The form model IS the
+ * document: every edit lands in `model`, the history takes it in, the autosave writes it to this
+ * device and the preview shows it. Panels bind `billetForm` and ask for bigger steps through
+ * EditorCommands. No <form> wraps them: the form spans every panel, autosaves and never submits.
  */
 @Component({
   selector: 'app-editor',
@@ -93,7 +94,6 @@ function panelSemantics(tab: EditorTab, isTabPanel: boolean) {
     RouterLink,
     ScenePanel,
     SpacingPanel,
-    ThemeScope,
     TranslatePipe,
   ],
   templateUrl: './editor.html',
@@ -192,6 +192,11 @@ export class Editor implements EditorCommands {
     const mode = this.previewMode();
     return mode === 'auto' ? undefined : mode;
   });
+  private readonly systemDark = mediaQuery(PREFERS_DARK);
+  /** The palette the preview shows; the design panel's theme cards show the same one. */
+  protected readonly previewColorMode = computed(() =>
+    resolveBilletMode(this.previewViewMode() ?? this.model().colorMode, this.systemDark()),
+  );
 
   /** The slug as a string, so the 3D model is fetched again only when it really changes. */
   private readonly modelSlug = computed(() => {

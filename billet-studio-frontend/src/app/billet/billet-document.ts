@@ -62,7 +62,7 @@ export interface BilletBlock {
 
 export interface BilletDocument {
   schemaVersion: typeof CURRENT_SCHEMA_VERSION;
-  /** Editor theme id; the renderer never reads it (docs/billet-document.md, "Themes vs. site"). */
+  /** Theme id (a billet design preset); the renderer never reads it (docs/billet-document.md). */
   theme: string;
   title: string;
   pageTitle: string;
@@ -191,7 +191,7 @@ function presetParts(themeId: string) {
 }
 
 /**
- * Picking an editor theme: (re)initialises palette, typography and particle colours from its
+ * Picking a theme: (re)initialises palette, typography and particle colours from its
  * preset and records the theme. Unknown ids fall back to the default theme.
  */
 export function applyThemePreset(document: BilletDocument, themeId: string): BilletDocument {
