@@ -34,6 +34,9 @@
     --ui-accent-soft: #f1f2ff;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #6246ea;
+    --ui-accent-tonal: #e2e4ff;
+    --ui-accent-tonal-hover: #d3d5ff;
+    --ui-on-accent-tonal: #5b3ce0;
     --ui-accent-2: #a395f7;
     --ui-focus-ring: #6246ea;
     --ui-danger: #d4003a;
@@ -80,6 +83,9 @@
     --ui-accent-soft: #211e39;
     --ui-on-accent: #000000;
     --ui-accent-ink: #9d8cff;
+    --ui-accent-tonal: #36305b;
+    --ui-accent-tonal-hover: #423c68;
+    --ui-on-accent-tonal: #afa5ff;
     --ui-accent-2: #6f5ce6;
     --ui-focus-ring: #9d8cff;
     --ui-danger: #ff616d;
@@ -135,6 +141,9 @@
     --ui-accent-soft: #ffe4dd;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #aa4a32;
+    --ui-accent-tonal: #ffdad1;
+    --ui-accent-tonal-hover: #fbc9bd;
+    --ui-on-accent-tonal: #9a3c24;
     --ui-accent-2: #d99a7e;
     --ui-focus-ring: #b9573f;
     --ui-danger: #c5372f;
@@ -181,6 +190,9 @@
     --ui-accent-soft: #3c221b;
     --ui-on-accent: #000000;
     --ui-accent-ink: #e88a72;
+    --ui-accent-tonal: #57342a;
+    --ui-accent-tonal-hover: #643f36;
+    --ui-on-accent-tonal: #ffa087;
     --ui-accent-2: #c9a08f;
     --ui-focus-ring: #e88a72;
     --ui-danger: #f37063;
@@ -236,6 +248,9 @@
     --ui-accent-soft: #e0eee3;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #4b7156;
+    --ui-accent-tonal: #d6e8da;
+    --ui-accent-tonal-hover: #c9dbcd;
+    --ui-on-accent-tonal: #3f644a;
     --ui-accent-2: #a3b89a;
     --ui-focus-ring: #4d7358;
     --ui-danger: #b15038;
@@ -281,6 +296,9 @@
     --ui-accent-soft: #212e25;
     --ui-on-accent: #000000;
     --ui-accent-ink: #93c0a0;
+    --ui-accent-tonal: #344539;
+    --ui-accent-tonal-hover: #405144;
+    --ui-on-accent-tonal: #9dcaaa;
     --ui-accent-2: #6f8f78;
     --ui-focus-ring: #93c0a0;
     --ui-danger: #e47e64;
@@ -336,6 +354,9 @@
     --ui-accent-soft: #e5eaff;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #4a4fd1;
+    --ui-accent-tonal: #dfe5ff;
+    --ui-accent-tonal-hover: #ced7ff;
+    --ui-on-accent-tonal: #484cce;
     --ui-accent-2: #7c83f0;
     --ui-focus-ring: #4a4fd1;
     --ui-danger: #d4003a;
@@ -381,6 +402,9 @@
     --ui-accent-soft: #1e203b;
     --ui-on-accent: #000000;
     --ui-accent-ink: #8b90ff;
+    --ui-accent-tonal: #32345e;
+    --ui-accent-tonal-hover: #3d406b;
+    --ui-on-accent-tonal: #a5acff;
     --ui-accent-2: #b3b6ff;
     --ui-focus-ring: #8b90ff;
     --ui-danger: #ff616d;
@@ -436,6 +460,9 @@
     --ui-accent-soft: #e9e8e7;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #2b2926;
+    --ui-accent-tonal: #e3e2e0;
+    --ui-accent-tonal-hover: #d6d5d3;
+    --ui-on-accent-tonal: #2b2926;
     --ui-accent-2: #8a7f70;
     --ui-focus-ring: #2b2926;
     --ui-danger: #b24f3d;
@@ -481,6 +508,9 @@
     --ui-accent-soft: #2a2926;
     --ui-on-accent: #000000;
     --ui-accent-ink: #ece6da;
+    --ui-accent-tonal: #403e39;
+    --ui-accent-tonal-hover: #4c4a45;
+    --ui-on-accent-tonal: #ece6da;
     --ui-accent-2: #a89c8a;
     --ui-focus-ring: #ece6da;
     --ui-danger: #e57d67;
@@ -536,6 +566,9 @@
     --ui-accent-soft: #ebe7ff;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #7254c1;
+    --ui-accent-tonal: #e4dfff;
+    --ui-accent-tonal-hover: #d7cfff;
+    --ui-on-accent-tonal: #6545b1;
     --ui-accent-2: #c3b1ec;
     --ui-focus-ring: #7456c4;
     --ui-danger: #d4003a;
@@ -582,6 +615,9 @@
     --ui-accent-soft: #292239;
     --ui-on-accent: #000000;
     --ui-accent-ink: #b9a2f5;
+    --ui-accent-tonal: #3e3655;
+    --ui-accent-tonal-hover: #4a4261;
+    --ui-on-accent-tonal: #c1aafd;
     --ui-accent-2: #8e7bc4;
     --ui-focus-ring: #b9a2f5;
     --ui-danger: #f26f76;
@@ -637,6 +673,9 @@
     --ui-accent-soft: #d5efff;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #11709a;
+    --ui-accent-tonal: #c7eaff;
+    --ui-accent-tonal-hover: #baddf2;
+    --ui-on-accent-tonal: #00638a;
     --ui-accent-2: #3fb4c9;
     --ui-focus-ring: #11709a;
     --ui-danger: #b54950;
@@ -682,6 +721,9 @@
     --ui-accent-soft: #112c35;
     --ui-on-accent: #000000;
     --ui-accent-ink: #5cc0e3;
+    --ui-accent-tonal: #1e4350;
+    --ui-accent-tonal-hover: #2b4f5d;
+    --ui-on-accent-tonal: #64c8eb;
     --ui-accent-2: #7ad9c9;
     --ui-focus-ring: #5cc0e3;
     --ui-danger: #ea767b;
@@ -737,6 +779,9 @@
     --ui-accent-soft: #ffded3;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #a54828;
+    --ui-accent-tonal: #ffd6c8;
+    --ui-accent-tonal-hover: #f7c7b7;
+    --ui-on-accent-tonal: #983c1b;
     --ui-accent-2: #d98e5f;
     --ui-focus-ring: #a84a2a;
     --ui-danger: #c5372e;
@@ -782,6 +827,9 @@
     --ui-accent-soft: #382117;
     --ui-on-accent: #000000;
     --ui-accent-ink: #e6906c;
+    --ui-accent-tonal: #543326;
+    --ui-accent-tonal-hover: #613f31;
+    --ui-on-accent-tonal: #f9a27d;
     --ui-accent-2: #c77a52;
     --ui-focus-ring: #e6906c;
     --ui-danger: #f07364;
@@ -837,6 +885,9 @@
     --ui-accent-soft: #dfecfe;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #3b5b86;
+    --ui-accent-tonal: #d7e8ff;
+    --ui-accent-tonal-hover: #cadbf1;
+    --ui-on-accent-tonal: #3b5b86;
     --ui-accent-2: #7c8795;
     --ui-focus-ring: #3b5b86;
     --ui-danger: #b24c52;
@@ -882,6 +933,9 @@
     --ui-accent-soft: #1c2531;
     --ui-on-accent: #000000;
     --ui-accent-ink: #8fb0dc;
+    --ui-accent-tonal: #2e3a4b;
+    --ui-accent-tonal-hover: #3a4657;
+    --ui-on-accent-tonal: #96b8e4;
     --ui-accent-2: #9aa3ad;
     --ui-focus-ring: #8fb0dc;
     --ui-danger: #e57a7d;
@@ -937,6 +991,9 @@
     --ui-accent-soft: #d5f3e8;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #02785e;
+    --ui-accent-tonal: #c8efe0;
+    --ui-accent-tonal-hover: #bbe1d3;
+    --ui-on-accent-tonal: #006a52;
     --ui-accent-2: #6fd4b5;
     --ui-focus-ring: #0f7d63;
     --ui-danger: #b24f37;
@@ -982,6 +1039,9 @@
     --ui-accent-soft: #0e2e25;
     --ui-on-accent: #000000;
     --ui-accent-ink: #5fd6b3;
+    --ui-accent-tonal: #1a4639;
+    --ui-accent-tonal-hover: #275245;
+    --ui-on-accent-tonal: #5fd6b3;
     --ui-accent-2: #9be7cf;
     --ui-focus-ring: #5fd6b3;
     --ui-danger: #f17354;
@@ -1037,6 +1097,9 @@
     --ui-accent-soft: #ffe5dc;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #ae491f;
+    --ui-accent-tonal: #ffdacc;
+    --ui-accent-tonal-hover: #fcc9b6;
+    --ui-on-accent-tonal: #9e3a0b;
     --ui-accent-2: #ffb38a;
     --ui-focus-ring: #b9532a;
     --ui-danger: #ca2e26;
@@ -1083,6 +1146,9 @@
     --ui-accent-soft: #3b2217;
     --ui-on-accent: #000000;
     --ui-accent-ink: #ffa47a;
+    --ui-accent-tonal: #573525;
+    --ui-accent-tonal-hover: #634131;
+    --ui-on-accent-tonal: #ffa47a;
     --ui-accent-2: #ffc9a8;
     --ui-focus-ring: #ffa47a;
     --ui-danger: #f47060;
@@ -1139,6 +1205,9 @@
     --ui-accent-soft: #e9e6ff;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #6b3fd4;
+    --ui-accent-tonal: #e5e2ff;
+    --ui-accent-tonal-hover: #d8d3ff;
+    --ui-on-accent-tonal: #693cd1;
     --ui-accent-2: #0f9488;
     --ui-focus-ring: #6b3fd4;
     --ui-danger: #d4003a;
@@ -1184,6 +1253,9 @@
     --ui-accent-soft: #221b36;
     --ui-on-accent: #000000;
     --ui-accent-ink: #a98bff;
+    --ui-accent-tonal: #392e59;
+    --ui-accent-tonal-hover: #453a66;
+    --ui-on-accent-tonal: #b6a0ff;
     --ui-accent-2: #3ed9c3;
     --ui-focus-ring: #a98bff;
     --ui-danger: #ff616d;
@@ -1239,6 +1311,9 @@
     --ui-accent-soft: #f3e3da;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #6f4a33;
+    --ui-accent-tonal: #f1dcd0;
+    --ui-accent-tonal-hover: #e3cfc3;
+    --ui-on-accent-tonal: #6f4a33;
     --ui-accent-2: #c89b6d;
     --ui-focus-ring: #6f4a33;
     --ui-danger: #b24e41;
@@ -1284,6 +1359,9 @@
     --ui-accent-soft: #2d2115;
     --ui-on-accent: #000000;
     --ui-accent-ink: #d4a57a;
+    --ui-accent-tonal: #463425;
+    --ui-accent-tonal-hover: #524030;
+    --ui-on-accent-tonal: #d8a97e;
     --ui-accent-2: #a57a55;
     --ui-focus-ring: #d4a57a;
     --ui-danger: #e57c6b;
@@ -1339,6 +1417,9 @@
     --ui-accent-soft: #ffe5ea;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #b73b66;
+    --ui-accent-tonal: #ffd8e0;
+    --ui-accent-tonal-hover: #ffc4d2;
+    --ui-on-accent-tonal: #a52957;
     --ui-accent-2: #f3b6c9;
     --ui-focus-ring: #c2456f;
     --ui-danger: #d40325;
@@ -1385,6 +1466,9 @@
     --ui-accent-soft: #372027;
     --ui-on-accent: #000000;
     --ui-accent-ink: #f39bb8;
+    --ui-accent-tonal: #52313c;
+    --ui-accent-tonal-hover: #5e3d48;
+    --ui-on-accent-tonal: #f49cb9;
     --ui-accent-2: #d98aa6;
     --ui-focus-ring: #f39bb8;
     --ui-danger: #ed756f;
@@ -1441,6 +1525,9 @@
     --ui-accent-soft: #daefdd;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #2f6b3f;
+    --ui-accent-tonal: #cfebd4;
+    --ui-accent-tonal-hover: #c3dec7;
+    --ui-on-accent-tonal: #2b683c;
     --ui-accent-2: #8aa36b;
     --ui-focus-ring: #2f6b3f;
     --ui-danger: #b15038;
@@ -1486,6 +1573,9 @@
     --ui-accent-soft: #17291b;
     --ui-on-accent: #000000;
     --ui-accent-ink: #7fc28f;
+    --ui-accent-tonal: #28412e;
+    --ui-accent-tonal-hover: #344d3a;
+    --ui-on-accent-tonal: #83c693;
     --ui-accent-2: #b3c98e;
     --ui-focus-ring: #7fc28f;
     --ui-danger: #e67d62;
@@ -1541,6 +1631,9 @@
     --ui-accent-soft: #f8e5cf;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #8d5d15;
+    --ui-accent-tonal: #f5ddc1;
+    --ui-accent-tonal-hover: #e8d0b4;
+    --ui-on-accent-tonal: #7e5000;
     --ui-accent-2: #d8b98a;
     --ui-focus-ring: #94641f;
     --ui-danger: #b44c3b;
@@ -1586,6 +1679,9 @@
     --ui-accent-soft: #322613;
     --ui-on-accent: #000000;
     --ui-accent-ink: #e0b36e;
+    --ui-accent-tonal: #4c3b22;
+    --ui-accent-tonal-hover: #58472e;
+    --ui-on-accent-tonal: #e0b36e;
     --ui-accent-2: #c7a77a;
     --ui-focus-ring: #e0b36e;
     --ui-danger: #e77b66;
@@ -1641,6 +1737,9 @@
     --ui-accent-soft: #ffe4f4;
     --ui-on-accent: #ffffff;
     --ui-accent-ink: #c11299;
+    --ui-accent-tonal: #ffdaf1;
+    --ui-accent-tonal-hover: #ffc5e9;
+    --ui-on-accent-tonal: #ad0088;
     --ui-accent-2: #0094b8;
     --ui-focus-ring: #c2159a;
     --ui-danger: #d4002e;
@@ -1686,6 +1785,9 @@
     --ui-accent-soft: #291022;
     --ui-on-accent: #000000;
     --ui-accent-ink: #ff4fd8;
+    --ui-accent-tonal: #481a3d;
+    --ui-accent-tonal-hover: #58234b;
+    --ui-on-accent-tonal: #ff66da;
     --ui-accent-2: #22e3ff;
     --ui-focus-ring: #ff4fd8;
     --ui-danger: #ff6266;

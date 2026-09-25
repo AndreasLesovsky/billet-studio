@@ -66,6 +66,8 @@ const PAIRS: readonly Pair[] = [
   ['accentInk', 'surface', TEXT],
   ['accentInk', 'surfaceRaised', TEXT],
   ['accentInk', 'accentSoft', TEXT],
+  ['onAccentTonal', 'accentTonal', TEXT],
+  ['onAccentTonal', 'accentTonalHover', TEXT],
   ['accent', 'bg', UI],
   ['accent', 'surface', UI],
   ['focusRing', 'bg', UI],

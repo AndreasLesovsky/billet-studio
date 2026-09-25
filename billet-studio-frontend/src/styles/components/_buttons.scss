@@ -1,12 +1,27 @@
 // Private --_* properties are resolved on the button itself, so modifiers only swap values.
-.ui-btn {
-    --_size: var(--ui-control-height);
+//
+// Variants: primary (the one main action of a view), secondary (tonal: a soft accent fill for real
+// secondary actions), neutral (the default look, grey outline: Cancel, pagination, dismiss), ghost
+// and danger. A disabled button keeps its variant's colour, muted towards the surface: each variant
+// names its --_*-disabled values and the one :disabled rule applies them. WCAG 1.4.3 exempts
+// disabled controls; the label still stays legible and reads as inactive.
+
+// Neutral is the default look; .ui-btn--neutral names it in templates.
+.ui-btn,
+.ui-btn--neutral {
     --_bg: var(--ui-surface);
     --_bg-hover: var(--ui-surface-sunken);
     --_fg: var(--ui-text);
     --_border: var(--ui-border);
-    --_border-hover: var(--_border);
+    --_border-hover: var(--ui-border-strong);
     --_shadow: var(--ui-shadow-sm);
+    --_bg-disabled: var(--ui-surface);
+    --_fg-disabled: var(--ui-text-subtle);
+    --_border-disabled: color-mix(in oklab, var(--ui-border) 60%, var(--ui-surface));
+}
+
+.ui-btn {
+    --_size: var(--ui-control-height);
 
     display: inline-flex;
     flex-shrink: 0;
@@ -45,15 +60,12 @@
         transform: translateY(0.0625rem);
     }
 
-    // A sunken plane with a muted label that stays readable (--ui-text-muted passes AA on every
-    // plane), instead of a faded brand colour. Ghost keeps no plane (below).
     &:disabled,
     &[aria-disabled='true'] {
-        --_bg: var(--ui-surface-sunken);
-        --_border: var(--ui-border);
-        --_fg: var(--ui-text-muted);
-
+        border-color: var(--_border-disabled);
+        background-color: var(--_bg-disabled);
         box-shadow: none;
+        color: var(--_fg-disabled);
         cursor: not-allowed;
     }
 
@@ -68,27 +80,33 @@
     --_bg-hover: var(--ui-accent-hover);
     --_fg: var(--ui-on-accent);
     --_border: transparent;
+    --_border-hover: transparent;
+    --_bg-disabled: color-mix(in oklab, var(--ui-accent) 50%, var(--ui-surface));
+    --_fg-disabled: color-mix(in oklab, var(--ui-on-accent) 90%, transparent);
+    --_border-disabled: transparent;
 }
 
+// Tonal: clearly weaker than primary, no shadow; hover one step stronger.
 .ui-btn--secondary {
-    --_bg: var(--ui-surface);
-    --_bg-hover: var(--ui-surface-sunken);
-    --_fg: var(--ui-text);
-    --_border: var(--ui-border);
-    --_border-hover: var(--ui-border-strong);
+    --_bg: var(--ui-accent-tonal);
+    --_bg-hover: var(--ui-accent-tonal-hover);
+    --_fg: var(--ui-on-accent-tonal);
+    --_border: transparent;
+    --_border-hover: transparent;
+    --_shadow: none;
+    --_bg-disabled: color-mix(in oklab, var(--ui-accent-tonal) 60%, var(--ui-surface));
+    --_fg-disabled: color-mix(in oklab, var(--ui-on-accent-tonal) 55%, var(--ui-surface));
+    --_border-disabled: transparent;
 }
 
 .ui-btn--ghost {
     --_bg: transparent;
     --_bg-hover: var(--ui-surface-sunken);
     --_border: transparent;
+    --_border-hover: transparent;
     --_shadow: none;
-
-    &:disabled,
-    &[aria-disabled='true'] {
-        --_bg: transparent;
-        --_border: transparent;
-    }
+    --_bg-disabled: transparent;
+    --_border-disabled: transparent;
 }
 
 .ui-btn--danger {
@@ -96,6 +114,10 @@
     --_bg-hover: var(--ui-danger-hover);
     --_fg: var(--ui-on-danger);
     --_border: transparent;
+    --_border-hover: transparent;
+    --_bg-disabled: color-mix(in oklab, var(--ui-danger) 50%, var(--ui-surface));
+    --_fg-disabled: color-mix(in oklab, var(--ui-on-danger) 90%, transparent);
+    --_border-disabled: transparent;
 }
 
 .ui-btn--sm {

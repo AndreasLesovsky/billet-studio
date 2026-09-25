@@ -305,22 +305,46 @@ function deriveNeutrals({ bg, surface, text, sunken }, dark) {
   };
 }
 
-function deriveAccent({ bg, accent, accent2 }, dark, planes) {
+/**
+ * The fill of a tonal (secondary) button and its hover: the accent hue a clear step off the surface,
+ * well above the soft tint and well below the solid accent. Hover is one step further.
+ */
+function tonalFills(surface, accent, dark) {
+  const { l } = hexToOklch(surface);
+  const { c, h } = hexToOklch(accent);
+  const step = (lightness, chroma) =>
+    oklchToHex({ l: dark ? l + lightness : l - lightness, c: Math.min(c * 0.45, chroma), h });
+  return dark
+    ? { accentTonal: step(0.12, 0.085), accentTonalHover: step(0.165, 0.095) }
+    : { accentTonal: step(0.075, 0.07), accentTonalHover: step(0.115, 0.085) };
+}
+
+function deriveAccent({ bg, surface, accent, accent2 }, dark, planes) {
   const accentLch = hexToOklch(accent);
   const onAccent = bestOn(accent);
   const accentSoft = softTint(bg, accent, dark);
   const direction = inkDirection(bg);
+  const accentInk = shiftUntil(
+    accent,
+    direction,
+    (x) => minContrast(x, [...planes, accentSoft]) >= TARGET_TEXT,
+    '--ui-accent-ink',
+  );
+  const tonal = tonalFills(surface, accent, dark);
   return {
     accent,
     // Hover moves away from the label colour, so the label only gains contrast.
     accentHover: addLightness(accent, onAccent === WHITE ? -0.055 : 0.055),
     accentSoft,
     onAccent,
-    accentInk: shiftUntil(
-      accent,
+    accentInk,
+    ...tonal,
+    // The accent ink pushed until it carries a label on the tonal fill and on its hover.
+    onAccentTonal: shiftUntil(
+      accentInk,
       direction,
-      (x) => minContrast(x, [...planes, accentSoft]) >= TARGET_TEXT,
-      '--ui-accent-ink',
+      (x) => minContrast(x, [tonal.accentTonal, tonal.accentTonalHover]) >= TARGET_TEXT,
+      '--ui-on-accent-tonal',
     ),
     accent2: accent2 ?? oklchToHex({ ...accentLch, h: (accentLch.h + 40) % 360 }),
     focusRing: shiftUntil(
@@ -358,6 +382,7 @@ function contrastPairs(t) {
   add('borderStrong', ['bg', 'surface', 'surfaceSunken'], AA_UI);
   add('onAccent', ['accent', 'accentHover'], AA_TEXT);
   add('accentInk', [...planes, 'accentSoft'], AA_TEXT);
+  add('onAccentTonal', ['accentTonal', 'accentTonalHover'], AA_TEXT);
   add('accent', ['bg', 'surface'], AA_UI);
   add('focusRing', planes, AA_UI);
   add('danger', ['bg', 'surface', 'surfaceRaised'], AA_UI);

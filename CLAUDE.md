@@ -783,6 +783,13 @@ applicable, those may be hidden instead - decide it explicitly and state it in t
 Conditional CONTENT (data blocks, optional cards) still uses `@if`; state-dependent input fields use
 a collapse, not a permanently disabled empty field.
 
+### Button variants
+- `--primary`: the one main action of a view. `--secondary` (tonal accent): a real secondary action
+  next to it. `--neutral` (grey outline, also the bare `ui-btn`): Cancel, pagination, undo,
+  dismiss. `--ghost`: toolbar / row icons. `--danger`: the destructive confirm.
+- **Disabled keeps the variant colour, muted** (a disabled primary still reads as the accent) - never
+  a generic grey plane, and never by hand: `ui-btn` does it for every variant.
+
 ### Back-navigation: breadcrumb only
 - The global `<app-breadcrumb />` in the app shell is the only back affordance: parent crumbs are
   links on desktop; on mobile it renders a back button to the parent crumb on the left.
@@ -1013,7 +1020,7 @@ scope too. localStorage: `billet-studio.color-mode` only (absent = follow the sy
 | Surfaces | `--ui-bg`, `--ui-surface`, `--ui-surface-raised` (menus, dialogs, toasts), `--ui-surface-sunken` (hover, table head, disabled) |
 | Text | `--ui-text`, `--ui-text-muted` (≥ 4.5:1, placeholders too), `--ui-text-subtle` (≥ 3:1, icons/decoration only, never text) |
 | Lines | `--ui-border` (decorative hairline), `--ui-border-strong` (≥ 3:1, control boundaries) |
-| Accent | `--ui-accent` (fills, ≥ 3:1 on bg), `--ui-accent-hover`, `--ui-accent-soft` (tinted bg), `--ui-on-accent` (label on accent), `--ui-accent-ink` (accent as text/icon, ≥ 4.5:1), `--ui-accent-2` (decorative), `--ui-focus-ring` |
+| Accent | `--ui-accent` (fills, ≥ 3:1 on bg), `--ui-accent-hover`, `--ui-accent-soft` (tinted bg), `--ui-on-accent` (label on accent), `--ui-accent-ink` (accent as text/icon, ≥ 4.5:1), `--ui-accent-tonal` / `--ui-accent-tonal-hover` (secondary-button fill), `--ui-on-accent-tonal` (accent ink, ≥ 4.5:1 on both tonal fills), `--ui-accent-2` (decorative), `--ui-focus-ring` |
 | Status | `--ui-{danger,success,warning,info}` (fill), `-soft` (tinted bg), `-ink` (text/icon), `--ui-on-{status}` (label on the fill), `--ui-danger-hover` |
 | Misc colour | `--ui-overlay` (dialog backdrop), `--ui-shadow-sm/md/lg` |
 | Type | `--ui-font-body`, `--ui-font-heading`, `--ui-font-heading-weight` (h3-h6, card/dialog titles), `--ui-font-display-weight` (h1/h2, page titles, wordmark), `--ui-font-heading-scale`, `--ui-font-mono`, `--ui-font-weight-medium` (500: tabs, secondary labels), `--ui-font-weight-strong` (600: labels, buttons, badges), `--ui-text-xs/sm/md/lg/xl/2xl/3xl`, `--ui-leading-tight/normal` |
@@ -1031,8 +1038,14 @@ uses `-ink` on `-soft`.
   `ui-cluster`, `ui-grid` (column minimum via `--ui-grid-min`), `ui-visually-hidden`.
 - **App:** `ui-app-header` (frosted when sticky), `ui-app-footer`, `ui-wordmark` (+ `__mark` accent
   tile with the billet icon, `__accent`), `ui-skip-link`.
-- **Buttons:** `ui-btn` + `--primary | --secondary | --ghost | --danger`, `--sm | --lg`, `--icon`
-  (needs `aria-label`), `--block`. Disabled via `disabled` or `aria-disabled="true"`.
+- **Buttons:** `ui-btn` + `--primary` (accent fill) `| --secondary` (tonal: `--ui-accent-tonal`
+  fill, `--ui-on-accent-tonal` label, no shadow) `| --neutral` (grey outline on the surface; the bare
+  `ui-btn` looks the same) `| --ghost | --danger`, `--sm | --lg`, `--icon` (needs `aria-label`),
+  `--block`. Disabled via `disabled` or `aria-disabled="true"`: each variant names
+  `--_bg-disabled / --_fg-disabled / --_border-disabled` and one `:disabled` rule applies them -
+  primary and danger mix their fill 50 % into the surface (label 90 % opaque), secondary a paler tonal
+  fill with the ink mixed towards the surface, neutral a lighter border with a `--ui-text-subtle`
+  label, ghost a subtle label. No shadow, `cursor: not-allowed`. A new variant sets all three.
 - **Forms:** `ui-field` > `ui-label` + control + `ui-hint`; controls `ui-input`, `ui-textarea`,
   `ui-select`; `ui-invalid` / `aria-invalid="true"` set the danger border (never by hand, section 7);
   `ui-field-error` is rendered only by `app-field-error`. `ui-check` = label around a native

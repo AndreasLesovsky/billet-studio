@@ -44,7 +44,10 @@
     }
 }
 
-.ui-wordmark__mark {
+// The brand mark (a standing, folded billet) is a monochrome SVG used as a mask, so its colour comes
+// from the tokens (on-accent on the accent tile) in every mode - never inline SVG, never an <img>.
+.ui-wordmark__mark,
+.ui-brand-mark {
     display: inline-grid;
     flex: none;
     place-items: center;
@@ -54,8 +57,20 @@
     background-color: var(--ui-accent);
     box-shadow: var(--ui-shadow-sm);
     color: var(--ui-on-accent);
-    font-size: 1rem;
-    letter-spacing: 0;
+
+    &::before {
+        content: '';
+        inline-size: 70%;
+        block-size: 70%;
+        background-color: currentColor;
+        mask: url('/brand/billet-mark.svg') center / contain no-repeat;
+    }
+}
+
+.ui-brand-mark--lg {
+    inline-size: 4rem;
+    block-size: 4rem;
+    border-radius: var(--ui-radius-xl);
 }
 
 .ui-wordmark__accent {

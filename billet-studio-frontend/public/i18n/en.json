@@ -78,6 +78,13 @@
     "DUNE": "Dune",
     "NEON": "Neon"
   },
+  "TEMPLATES": {
+    "MUTTERTAG": "Mother's Day",
+    "VALENTINSTAG": "Valentine's Day",
+    "GEBURTSTAG": "Birthday",
+    "WEIHNACHTEN": "Christmas",
+    "HOCHZEIT": "Wedding"
+  },
   "HOME": {
     "EYEBROW": "Digital billets with a 3D motif",
     "TITLE": "Design billets that spin",
@@ -308,10 +315,12 @@
     "LINK_SAMPLE": "Learn more about billets",
     "SHORTCUT_UNDO": "Undo:",
     "KEY_CTRL": "Ctrl",
+    "BUTTONS_VARIANTS": "Primary · Secondary (tonal) · Neutral · Ghost · Danger",
+    "BUTTONS_DISABLED": "Disabled: keeps the variant colour, muted",
+    "BUTTONS_SIZES": "Sizes and icon buttons",
     "BUTTON_MORE": "More",
     "BUTTON_SMALL": "Small",
     "BUTTON_LARGE": "Large",
-    "BUTTON_DISABLED": "Unavailable",
     "BUTTON_FULL_WIDTH": "Full width",
     "BUTTON_SHARE": "Share",
     "LABEL_NAME": "Name",

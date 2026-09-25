@@ -62,80 +62,76 @@
             </h3>
           </div>
           <div class="ui-card__body ui-stack">
-            <div class="ui-cluster">
-              <button
-                type="button"
-                class="ui-btn ui-btn--primary"
-              >
-                <i
-                  class="bi bi-check2"
-                  aria-hidden="true"
-                ></i>
-                {{ 'COMMON.SAVE' | translate }}
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--secondary"
-              >
-                {{ 'COMMON.CANCEL' | translate }}
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--ghost"
-              >
-                {{ 'UI_KIT.BUTTON_MORE' | translate }}
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--danger"
-              >
-                <i
-                  class="bi bi-trash3"
-                  aria-hidden="true"
-                ></i>
-                {{ 'COMMON.DELETE' | translate }}
-              </button>
-            </div>
-            <div class="ui-cluster">
-              <button
-                type="button"
-                class="ui-btn ui-btn--primary ui-btn--sm"
-              >
-                {{ 'UI_KIT.BUTTON_SMALL' | translate }}
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--primary ui-btn--lg"
-              >
-                {{ 'UI_KIT.BUTTON_LARGE' | translate }}
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--secondary ui-btn--icon"
-                [attr.aria-label]="'COMMON.EDIT' | translate"
-              >
-                <i
-                  class="bi bi-pencil"
-                  aria-hidden="true"
-                ></i>
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
-                [attr.aria-label]="'UI_KIT.BUTTON_SHARE' | translate"
-              >
-                <i
-                  class="bi bi-share"
-                  aria-hidden="true"
-                ></i>
-              </button>
-              <button
-                type="button"
-                class="ui-btn ui-btn--primary"
-                disabled
-              >
-                {{ 'UI_KIT.BUTTON_DISABLED' | translate }}
-              </button>
+            @for (state of buttonStates; track state.disabled) {
+              <div class="ui-stack ui-stack--sm">
+                <p class="ui-hint">{{ state.labelKey | translate }}</p>
+                <div class="ui-cluster">
+                  @for (b of buttonVariants; track b.variant) {
+                    <button
+                      type="button"
+                      class="ui-btn"
+                      [class]="b.variant"
+                      [disabled]="state.disabled"
+                    >
+                      @if (b.icon) {
+                        <i
+                          class="bi"
+                          [class]="b.icon"
+                          aria-hidden="true"
+                        ></i>
+                      }
+                      {{ b.labelKey | translate }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+            <div class="ui-stack ui-stack--sm">
+              <p class="ui-hint">{{ 'UI_KIT.BUTTONS_SIZES' | translate }}</p>
+              <div class="ui-cluster">
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--primary ui-btn--sm"
+                >
+                  {{ 'UI_KIT.BUTTON_SMALL' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--primary ui-btn--lg"
+                >
+                  {{ 'UI_KIT.BUTTON_LARGE' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--secondary ui-btn--icon"
+                  [attr.aria-label]="'COMMON.EDIT' | translate"
+                >
+                  <i
+                    class="bi bi-pencil"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--neutral ui-btn--icon"
+                  [attr.aria-label]="'COMMON.UNDO' | translate"
+                >
+                  <i
+                    class="bi bi-arrow-counterclockwise"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                  [attr.aria-label]="'UI_KIT.BUTTON_SHARE' | translate"
+                >
+                  <i
+                    class="bi bi-share"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </div>
             </div>
             <button
               type="button"
@@ -570,14 +566,14 @@
             <div class="ui-cluster">
               <button
                 type="button"
-                class="ui-btn ui-btn--secondary"
+                class="ui-btn ui-btn--neutral"
                 (click)="dialog.showModal()"
               >
                 {{ 'UI_KIT.OPEN_DIALOG' | translate }}
               </button>
               <button
                 type="button"
-                class="ui-btn ui-btn--secondary"
+                class="ui-btn ui-btn--neutral"
                 [cdkMenuTriggerFor]="menu"
               >
                 {{ 'NAV.OPEN_MENU' | translate }}
@@ -817,9 +813,19 @@
               <div class="ui-card__footer">
                 <button
                   type="button"
+                  class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
+                  [attr.aria-label]="'COMMON.UNDO' | translate"
+                >
+                  <i
+                    class="bi bi-arrow-counterclockwise"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+                <button
+                  type="button"
                   class="ui-btn ui-btn--secondary ui-btn--sm"
                 >
-                  {{ 'COMMON.CANCEL' | translate }}
+                  {{ 'UI_KIT.BUTTON_SHARE' | translate }}
                 </button>
                 <button
                   type="button"
@@ -868,7 +874,7 @@
     <div class="ui-dialog__footer">
       <button
         type="submit"
-        class="ui-btn ui-btn--secondary"
+        class="ui-btn ui-btn--neutral"
         value="cancel"
       >
         {{ 'COMMON.CANCEL' | translate }}

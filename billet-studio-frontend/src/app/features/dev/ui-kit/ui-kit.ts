@@ -54,6 +54,20 @@ const SAMPLE_ROWS = [
   },
 ] as const;
 
+/** Every button variant in hierarchy order, shown once enabled and once disabled. */
+const BUTTON_VARIANTS = [
+  { variant: 'ui-btn--primary', labelKey: 'COMMON.SAVE', icon: 'bi-check2' },
+  { variant: 'ui-btn--secondary', labelKey: 'UI_KIT.BUTTON_SHARE', icon: 'bi-share' },
+  { variant: 'ui-btn--neutral', labelKey: 'COMMON.CANCEL', icon: null },
+  { variant: 'ui-btn--ghost', labelKey: 'UI_KIT.BUTTON_MORE', icon: null },
+  { variant: 'ui-btn--danger', labelKey: 'COMMON.DELETE', icon: 'bi-trash3' },
+] as const;
+
+const BUTTON_STATES = [
+  { disabled: false, labelKey: 'UI_KIT.BUTTONS_VARIANTS' },
+  { disabled: true, labelKey: 'UI_KIT.BUTTONS_DISABLED' },
+] as const;
+
 /** Index of the tab a key moves to (arrows wrap, Home/End jump), or null for other keys. */
 function targetTab(key: string, index: number, count: number): number | null {
   switch (key) {
@@ -94,6 +108,8 @@ function targetTab(key: string, index: number, count: number): number | null {
 export class UiKit {
   protected readonly tabs = TABS;
   protected readonly rows = SAMPLE_ROWS;
+  protected readonly buttonVariants = BUTTON_VARIANTS;
+  protected readonly buttonStates = BUTTON_STATES;
   protected readonly activeTab = signal<KitTab>('content');
   protected readonly spacing = signal(40);
   protected readonly themes = THEMES;

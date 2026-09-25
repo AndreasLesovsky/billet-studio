@@ -78,6 +78,13 @@
     "DUNE": "Düne",
     "NEON": "Neon"
   },
+  "TEMPLATES": {
+    "MUTTERTAG": "Muttertag",
+    "VALENTINSTAG": "Valentinstag",
+    "GEBURTSTAG": "Geburtstag",
+    "WEIHNACHTEN": "Weihnachten",
+    "HOCHZEIT": "Hochzeit"
+  },
   "HOME": {
     "EYEBROW": "Digitale Billets mit 3D-Motiv",
     "TITLE": "Billets gestalten, die sich drehen",
@@ -308,10 +315,12 @@
     "LINK_SAMPLE": "Mehr über Billets erfahren",
     "SHORTCUT_UNDO": "Rückgängig machen:",
     "KEY_CTRL": "Strg",
+    "BUTTONS_VARIANTS": "Primär · Sekundär (tonal) · Neutral · Ghost · Danger",
+    "BUTTONS_DISABLED": "Deaktiviert: behält die Farbe der Variante, gedämpft",
+    "BUTTONS_SIZES": "Größen und Symbol-Buttons",
     "BUTTON_MORE": "Mehr",
     "BUTTON_SMALL": "Klein",
     "BUTTON_LARGE": "Groß",
-    "BUTTON_DISABLED": "Nicht verfügbar",
     "BUTTON_FULL_WIDTH": "Volle Breite",
     "BUTTON_SHARE": "Teilen",
     "LABEL_NAME": "Name",
