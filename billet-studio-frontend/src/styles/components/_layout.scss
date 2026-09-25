@@ -1,0 +1,93 @@
+@use '../breakpoints' as bp;
+
+.ui-container {
+    inline-size: 100%;
+    max-inline-size: var(--ui-content-max);
+    margin-inline: auto;
+    padding-inline: var(--ui-space-4);
+
+    @include bp.up(md) {
+        padding-inline: var(--ui-space-6);
+    }
+}
+
+.ui-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-6);
+    padding-block: var(--ui-space-6) var(--ui-space-10);
+
+    @include bp.up(md) {
+        gap: var(--ui-space-7);
+        padding-block: var(--ui-space-8) var(--ui-space-12);
+    }
+}
+
+.ui-page__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-2);
+}
+
+.ui-page__title {
+    font-family: var(--ui-font-heading);
+    font-size: calc(var(--ui-text-2xl) * var(--ui-font-heading-scale));
+    font-weight: var(--ui-font-heading-weight);
+    font-synthesis-weight: none;
+    line-height: var(--ui-leading-tight);
+    letter-spacing: -0.015em;
+
+    @include bp.up(md) {
+        font-size: calc(var(--ui-text-3xl) * var(--ui-font-heading-scale));
+    }
+}
+
+.ui-page__lead {
+    max-inline-size: 42rem;
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-md);
+
+    @include bp.up(md) {
+        font-size: var(--ui-text-lg);
+    }
+}
+
+.ui-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-4);
+}
+
+.ui-stack--sm {
+    gap: var(--ui-space-2);
+}
+
+.ui-stack--lg {
+    gap: var(--ui-space-6);
+}
+
+.ui-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2);
+}
+
+// --ui-grid-min is a per-use knob: set it in component SCSS or a style binding.
+.ui-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--ui-grid-min, 16rem), 100%), 1fr));
+    gap: var(--ui-space-4);
+}
+
+.ui-visually-hidden {
+    position: absolute !important;
+    inline-size: 1px !important;
+    block-size: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}

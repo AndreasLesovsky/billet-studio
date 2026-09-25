@@ -1,0 +1,52 @@
+<section
+  class="ui-toast-region toast-region"
+  popover="manual"
+  [attr.aria-label]="'COMMON.NOTIFICATIONS' | translate"
+>
+  @for (list of lists(); track list.live) {
+    <ol
+      class="toast-list"
+      role="list"
+      [attr.aria-live]="list.live"
+    >
+      @for (toast of list.toasts; track toast.id) {
+        <li
+          class="ui-toast"
+          [class]="'ui-toast--' + toast.variant"
+          (pointerenter)="hold(toast.id, 'pointer')"
+          (pointerleave)="release(toast.id, 'pointer')"
+          (focusin)="hold(toast.id, 'focus')"
+          (focusout)="release(toast.id, 'focus', $event)"
+        >
+          <i
+            class="bi"
+            [class]="toast.icon"
+            aria-hidden="true"
+          ></i>
+          <p class="ui-toast__body">
+            {{ toast.key | translate: toast.params }}
+            <!-- aria-hidden: the message is announced once; a ticking clock would be every second -->
+            @if (toast.countdownTo !== undefined) {
+              <span
+                class="toast__countdown"
+                aria-hidden="true"
+                >{{ remaining(toast) }}</span
+              >
+            }
+          </p>
+          <button
+            type="button"
+            class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm toast__close"
+            [attr.aria-label]="'COMMON.CLOSE' | translate"
+            (click)="dismiss(toast.id)"
+          >
+            <i
+              class="bi bi-x-lg"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </li>
+      }
+    </ol>
+  }
+</section>

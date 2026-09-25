@@ -1,0 +1,116 @@
+<dialog
+  class="ui-dialog"
+  aria-labelledby="deactivate-account-title"
+  aria-describedby="deactivate-account-text"
+  [appModal]="open()"
+  (dismissed)="cancel()"
+  (closed)="onClosed()"
+>
+  <div class="ui-dialog__header">
+    <h2
+      id="deactivate-account-title"
+      class="ui-dialog__title"
+    >
+      {{ 'ACCOUNT.DEACTIVATE_DIALOG_TITLE' | translate }}
+    </h2>
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      [disabled]="loading()"
+      (click)="cancel()"
+    >
+      <i
+        class="bi bi-x-lg"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+
+  <form
+    id="deactivate-account-form"
+    class="ui-dialog__body ui-stack"
+    novalidate
+    (submit)="onSubmit($event)"
+  >
+    <p id="deactivate-account-text">{{ 'ACCOUNT.DEACTIVATE_LEAD' | translate }}</p>
+
+    @if (failure(); as code) {
+      <div
+        class="ui-alert ui-alert--danger"
+        role="alert"
+      >
+        <i
+          class="bi bi-x-octagon-fill"
+          aria-hidden="true"
+        ></i>
+        <div>{{ 'MESSAGES.ERROR.' + code | translate }}</div>
+      </div>
+    }
+
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        for="deactivate-account-password"
+        >{{ 'AUTH.PASSWORD' | translate }}</label
+      >
+      <input
+        id="deactivate-account-password"
+        class="ui-input"
+        type="password"
+        autocomplete="current-password"
+        autofocus
+        aria-describedby="deactivate-account-password-hint"
+        [formField]="deactivateForm.password"
+      />
+      <p
+        id="deactivate-account-password-hint"
+        class="ui-hint"
+      >
+        {{ 'ACCOUNT.DEACTIVATE_PASSWORD_HINT' | translate }}
+      </p>
+      <app-field-error [field]="deactivateForm.password" />
+    </div>
+
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        for="deactivate-account-reason"
+        >{{ 'ACCOUNT.DEACTIVATE_REASON' | translate }}</label
+      >
+      <select
+        id="deactivate-account-reason"
+        class="ui-select"
+        [formField]="deactivateForm.reason"
+      >
+        <option value="">{{ 'ACCOUNT.DEACTIVATE_REASON_NONE' | translate }}</option>
+        @for (reason of reasons; track reason) {
+          <option [value]="reason">{{ 'DEACTIVATION_REASON.' + reason | translate }}</option>
+        }
+      </select>
+    </div>
+  </form>
+
+  <div class="ui-dialog__footer">
+    <button
+      type="button"
+      class="ui-btn ui-btn--secondary"
+      [disabled]="loading()"
+      (click)="cancel()"
+    >
+      {{ 'COMMON.CANCEL' | translate }}
+    </button>
+    <button
+      type="submit"
+      form="deactivate-account-form"
+      class="ui-btn ui-btn--danger"
+      [disabled]="!deactivateForm().valid() || loading()"
+    >
+      <i
+        class="bi bi-person-x"
+        aria-hidden="true"
+      ></i>
+      {{ 'ACCOUNT.DEACTIVATE_CONFIRM' | translate }}
+    </button>
+  </div>
+</dialog>

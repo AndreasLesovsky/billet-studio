@@ -1,0 +1,63 @@
+<dialog
+  class="ui-dialog"
+  role="alertdialog"
+  aria-labelledby="confirmation-modal-title"
+  aria-describedby="confirmation-modal-message"
+  [appModal]="store.isOpen()"
+  (dismissed)="cancel()"
+  (closed)="store.onHidden()"
+>
+  @let config = store.config();
+  @let busy = store.isExecuting();
+  <div class="ui-dialog__header">
+    <h2
+      id="confirmation-modal-title"
+      class="ui-dialog__title"
+    >
+      {{ config?.title }}
+    </h2>
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      [disabled]="busy"
+      (click)="cancel()"
+    >
+      <i
+        class="bi bi-x-lg"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+  <div class="ui-dialog__body">
+    <p id="confirmation-modal-message">{{ config?.message }}</p>
+  </div>
+  <div class="ui-dialog__footer">
+    <button
+      type="button"
+      class="ui-btn ui-btn--secondary"
+      autofocus
+      [disabled]="busy"
+      (click)="cancel()"
+    >
+      {{ config?.cancelLabel }}
+    </button>
+    <button
+      type="button"
+      class="ui-btn"
+      [class.ui-btn--primary]="config?.confirmVariant !== 'danger'"
+      [class.ui-btn--danger]="config?.confirmVariant === 'danger'"
+      [disabled]="busy"
+      [attr.aria-busy]="busy"
+      (click)="confirm()"
+    >
+      @if (busy) {
+        <span
+          class="ui-spinner ui-spinner--sm"
+          aria-hidden="true"
+        ></span>
+      }
+      {{ config?.confirmLabel }}
+    </button>
+  </div>
+</dialog>

@@ -1,0 +1,61 @@
+// Layout only; every visual comes from the ui-* classes.
+@use '../../../../styles/breakpoints' as bp;
+
+.user-list__header {
+    gap: var(--ui-space-4);
+
+    @include bp.up(sm) {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+}
+
+.user-list__filters {
+    display: grid;
+    gap: var(--ui-space-4);
+
+    @include bp.up(sm) {
+        grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem);
+        align-items: end;
+    }
+}
+
+.user-list__sort {
+    margin-inline: calc(var(--ui-space-2) * -1);
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+}
+
+.user-list__actions {
+    display: inline-flex;
+    gap: var(--ui-space-1);
+}
+
+.user-list__empty {
+    padding-block: var(--ui-space-8);
+    text-align: center;
+}
+
+.user-list__pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+}
+
+// Too narrow for all three in one row: the position gets its own row, previous and next stay
+// side by side under it.
+.user-list__page {
+    @include bp.down(sm) {
+        flex-basis: 100%;
+        order: -1;
+        text-align: center;
+    }
+}
+
+.user-list__skeleton {
+    block-size: 24rem;
+}

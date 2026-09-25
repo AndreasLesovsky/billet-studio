@@ -1,0 +1,31 @@
+// Layout only; the trail's look is .ui-breadcrumb.
+@use '../../../../styles/breakpoints' as bp;
+
+:host {
+    display: block;
+}
+
+.breadcrumb {
+    padding-block-start: var(--ui-space-4);
+}
+
+.breadcrumb--trail {
+    display: none;
+}
+
+.breadcrumb__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    min-block-size: 2.75rem;
+}
+
+@include bp.up(md) {
+    .breadcrumb--trail {
+        display: block;
+    }
+
+    .breadcrumb--back {
+        display: none;
+    }
+}

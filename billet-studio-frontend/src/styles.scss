@@ -1,5 +1,10 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+// Global styles, in cascade order. Colours live only in src/styles/themes/themes.json.
+@use '@angular/cdk' as cdk;
+@use 'styles/reset';
+@use 'styles/tokens';
+@use 'styles/themes.generated';
+@use 'styles/base';
+@use 'styles/components';
+
+// CDK overlay container + panes (menus, popovers); panels style themselves with .ui-menu / .ui-popover.
+@include cdk.overlay();

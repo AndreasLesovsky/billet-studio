@@ -1,0 +1,81 @@
+<div class="ui-container">
+  <div class="ui-page auth-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ 'AUTH.LOGIN_TITLE' | translate }}</h1>
+      <p class="ui-page__lead">{{ 'AUTH.LOGIN_LEAD' | translate }}</p>
+    </header>
+
+    <div class="ui-card">
+      <form
+        class="ui-card__body ui-stack"
+        novalidate
+        (submit)="onSubmit($event)"
+      >
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="login-email"
+            >{{ 'AUTH.EMAIL' | translate }}</label
+          >
+          <input
+            id="login-email"
+            class="ui-input"
+            type="email"
+            autocomplete="username"
+            autocapitalize="none"
+            spellcheck="false"
+            [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+            [formField]="loginForm.email"
+          />
+          <app-field-error [field]="loginForm.email" />
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="login-password"
+            >{{ 'AUTH.PASSWORD' | translate }}</label
+          >
+          <input
+            id="login-password"
+            class="ui-input"
+            type="password"
+            autocomplete="current-password"
+            [formField]="loginForm.password"
+          />
+          <app-field-error [field]="loginForm.password" />
+        </div>
+
+        <p class="auth-page__aside">
+          <a
+            class="ui-link ui-hint"
+            routerLink="/forgot-password"
+            >{{ 'AUTH.FORGOT_PASSWORD' | translate }}</a
+          >
+        </p>
+
+        <button
+          type="submit"
+          class="ui-btn ui-btn--primary ui-btn--lg ui-btn--block"
+          [disabled]="!loginForm().valid()"
+        >
+          <i
+            class="bi bi-box-arrow-in-right"
+            aria-hidden="true"
+          ></i>
+          {{ 'AUTH.LOGIN_SUBMIT' | translate }}
+        </button>
+      </form>
+
+      <p class="ui-card__footer auth-page__switch">
+        {{ 'AUTH.NO_ACCOUNT' | translate }}
+        <a
+          class="ui-link"
+          routerLink="/register"
+          queryParamsHandling="preserve"
+          >{{ 'NAV.REGISTER' | translate }}</a
+        >
+      </p>
+    </div>
+  </div>
+</div>

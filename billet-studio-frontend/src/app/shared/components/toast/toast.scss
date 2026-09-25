@@ -1,0 +1,27 @@
+// Placement only; every visual comes from .ui-toast-region / .ui-toast.
+@use '../../../../styles/breakpoints' as bp;
+
+// Phones: along the bottom edge, where the thumb is (.ui-toast-region's default). From sm up: top
+// right, under the header.
+.ui-toast-region.toast-region {
+    @include bp.up(sm) {
+        inset-block: calc(var(--ui-header-height) + var(--ui-space-3)) auto;
+    }
+}
+
+.toast-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-2);
+}
+
+.toast__countdown {
+    margin-inline-start: var(--ui-space-1);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--ui-font-weight-strong);
+    white-space: nowrap;
+}
+
+.toast__close {
+    margin-block: calc(-1 * var(--ui-space-1));
+}

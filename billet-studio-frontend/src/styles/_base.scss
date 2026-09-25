@@ -1,0 +1,138 @@
+// Document defaults. Every colour is a --ui-* token.
+
+// The root and every theme-preview element (theme-picker cards) resolve text and font from their
+// own tokens; a plain inherited font-family would keep the outer theme's font.
+[data-theme] {
+    color: var(--ui-text);
+    font-family: var(--ui-font-body);
+}
+
+html {
+    // Several theme fonts ship without a 600 face; the nearest real face beats a smeared fake bold.
+    font-synthesis-weight: none;
+    scrollbar-color: var(--ui-border-strong) transparent;
+    hanging-punctuation: first last;
+}
+
+body {
+    min-block-size: 100dvh;
+    background-color: var(--ui-bg);
+    color: var(--ui-text);
+    font-family: var(--ui-font-body);
+    font-size: var(--ui-text-md);
+    line-height: var(--ui-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    transition:
+        background-color var(--ui-duration-slow) var(--ui-ease),
+        color var(--ui-duration-slow) var(--ui-ease);
+}
+
+app-root {
+    display: block;
+    isolation: isolate;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--ui-font-heading);
+    font-weight: var(--ui-font-heading-weight);
+    font-synthesis-weight: none;
+    line-height: var(--ui-leading-tight);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+h1 {
+    font-size: calc(var(--ui-text-3xl) * var(--ui-font-heading-scale));
+}
+
+h2 {
+    font-size: calc(var(--ui-text-2xl) * var(--ui-font-heading-scale));
+}
+
+h3 {
+    font-size: calc(var(--ui-text-xl) * var(--ui-font-heading-scale));
+}
+
+h4 {
+    font-size: calc(var(--ui-text-lg) * var(--ui-font-heading-scale));
+}
+
+h5,
+h6 {
+    font-size: calc(var(--ui-text-md) * var(--ui-font-heading-scale));
+}
+
+p {
+    text-wrap: pretty;
+}
+
+a {
+    color: var(--ui-accent-ink);
+    text-decoration-thickness: 0.0625rem;
+    text-underline-offset: 0.2em;
+}
+
+strong,
+b {
+    font-weight: var(--ui-font-weight-strong);
+}
+
+small {
+    font-size: var(--ui-text-sm);
+}
+
+code,
+kbd,
+pre,
+samp {
+    font-family: var(--ui-font-mono);
+    font-size: 0.9em;
+}
+
+kbd {
+    padding: 0.0625rem var(--ui-space-1);
+    border: 1px solid var(--ui-border);
+    border-block-end-width: 0.125rem;
+    border-radius: var(--ui-radius-sm);
+    background-color: var(--ui-surface-sunken);
+}
+
+hr {
+    border: 0;
+    border-block-start: 1px solid var(--ui-border);
+}
+
+:focus-visible {
+    outline: 0.125rem solid var(--ui-focus-ring);
+    outline-offset: 0.125rem;
+}
+
+::selection {
+    background-color: var(--ui-accent-soft);
+    color: var(--ui-text);
+}
+
+::placeholder {
+    color: var(--ui-text-muted);
+    opacity: 1;
+}
+
+// Safety net for any motion outside the token durations. Spinners keep turning, slower
+// (_feedback.scss), because they carry state.
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

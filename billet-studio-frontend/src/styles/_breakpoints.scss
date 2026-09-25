@@ -1,0 +1,23 @@
+// App-chrome breakpoints, defined once. Component SCSS uses them via
+// `@use '<relative path>/styles/breakpoints' as bp;` + `@include bp.up(md) { ... }`.
+// The billet renderer uses container queries instead.
+@use 'sass:map';
+
+$breakpoints: (
+    sm: 36rem,
+    md: 48rem,
+    lg: 64rem,
+    xl: 80rem,
+);
+
+@mixin up($name) {
+    @media (width >= #{map.get($breakpoints, $name)}) {
+        @content;
+    }
+}
+
+@mixin down($name) {
+    @media (width < #{map.get($breakpoints, $name)}) {
+        @content;
+    }
+}

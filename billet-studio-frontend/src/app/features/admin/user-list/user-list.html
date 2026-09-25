@@ -1,0 +1,281 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header user-list__header">
+      <div class="ui-stack ui-stack--sm">
+        <h1 class="ui-page__title">{{ 'ADMIN_USERS.TITLE' | translate }}</h1>
+        <p class="ui-page__lead">{{ 'ADMIN_USERS.LEAD' | translate }}</p>
+      </div>
+      <a
+        class="ui-btn ui-btn--primary"
+        routerLink="/admin/users/new"
+      >
+        <i
+          class="bi bi-person-plus"
+          aria-hidden="true"
+        ></i>
+        {{ 'ADMIN_USERS.CREATE' | translate }}
+      </a>
+    </header>
+
+    <form
+      class="user-list__filters"
+      role="search"
+      novalidate
+      (submit)="onFilterSubmit($event)"
+    >
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="user-list-search"
+          >{{ 'ADMIN_USERS.SEARCH_LABEL' | translate }}</label
+        >
+        <input
+          id="user-list-search"
+          class="ui-input"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          [placeholder]="'ADMIN_USERS.SEARCH_PLACEHOLDER' | translate"
+          [formField]="filterForm.q"
+          (input)="onSearchInput()"
+        />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="user-list-status"
+          >{{ 'ADMIN_USERS.FILTER_STATUS' | translate }}</label
+        >
+        <select
+          id="user-list-status"
+          class="ui-select"
+          [formField]="filterForm.active"
+          (change)="onStatusChange()"
+        >
+          <option value="">{{ 'ADMIN_USERS.FILTER_ALL' | translate }}</option>
+          <option value="true">{{ 'ADMIN_USERS.FILTER_ACTIVE' | translate }}</option>
+          <option value="false">{{ 'ADMIN_USERS.FILTER_INACTIVE' | translate }}</option>
+        </select>
+      </div>
+    </form>
+
+    @if (shown(); as shown) {
+      <div class="ui-stack">
+        <p
+          class="ui-hint"
+          aria-live="polite"
+        >
+          {{ 'ADMIN_USERS.TOTAL' | translate: { count: shown.totalRows } }}
+        </p>
+
+        <div class="ui-table-wrap">
+          <table
+            class="ui-table"
+            [attr.aria-busy]="users.isLoading()"
+          >
+            <caption class="ui-visually-hidden">
+              {{
+                'ADMIN_USERS.TITLE' | translate
+              }}
+            </caption>
+            <thead>
+              <tr>
+                @for (column of columns; track column.label) {
+                  @if (column.field; as field) {
+                    <th
+                      scope="col"
+                      [attr.aria-sort]="ariaSort(field)"
+                    >
+                      <button
+                        type="button"
+                        class="ui-btn ui-btn--ghost ui-btn--sm user-list__sort"
+                        [attr.aria-label]="
+                          'ADMIN_USERS.SORT_BY' | translate: { column: (column.label | translate) }
+                        "
+                        (click)="sortBy(field)"
+                      >
+                        {{ column.label | translate }}
+                        <i
+                          class="bi"
+                          [class]="sortIcon(field)"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                    </th>
+                  } @else {
+                    <th scope="col">{{ column.label | translate }}</th>
+                  }
+                }
+                <th
+                  scope="col"
+                  class="ui-table__actions"
+                >
+                  {{ 'ADMIN_USERS.COL_ACTIONS' | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of shown.rows; track user.id) {
+                <tr>
+                  <td>
+                    <app-user-name
+                      [user]="user"
+                      [self]="isSelf(user)"
+                    />
+                  </td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ 'ADMIN_USERS.ROLES.' + user.role | translate }}</td>
+                  <td><app-user-status [user]="user" /></td>
+                  <td>{{ user.createdAt | date: 'mediumDate' : undefined : locale() }}</td>
+                  <td class="ui-table__actions">
+                    <div
+                      class="user-list__actions"
+                      role="group"
+                      [attr.aria-label]="'ADMIN_USERS.ROW_ACTIONS' | translate: { name: user.name }"
+                    >
+                      <a
+                        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                        [routerLink]="editLink(user)"
+                        [attr.aria-disabled]="!canEdit(user)"
+                        [attr.aria-label]="'COMMON.EDIT' | translate"
+                        [attr.title]="'COMMON.EDIT' | translate"
+                        [attr.aria-describedby]="editHint(user)"
+                      >
+                        <i
+                          class="bi bi-pencil"
+                          aria-hidden="true"
+                        ></i>
+                      </a>
+                      <button
+                        type="button"
+                        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                        aria-haspopup="dialog"
+                        [attr.aria-label]="lockLabel(user) | translate"
+                        [attr.title]="lockLabel(user) | translate"
+                        [attr.aria-describedby]="lockOrDeleteHint(user)"
+                        [disabled]="!canLockOrDelete(user)"
+                        (click)="toggleActive(user)"
+                      >
+                        <i
+                          class="bi"
+                          [class]="lockIcon(user)"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                        aria-haspopup="dialog"
+                        [attr.aria-label]="'COMMON.DELETE' | translate"
+                        [attr.title]="'COMMON.DELETE' | translate"
+                        [attr.aria-describedby]="lockOrDeleteHint(user)"
+                        [disabled]="!canLockOrDelete(user)"
+                        (click)="confirmDelete(user)"
+                      >
+                        <i
+                          class="bi bi-trash3"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td
+                    class="user-list__empty"
+                    [attr.colspan]="columns.length + 1"
+                  >
+                    {{ 'ADMIN_USERS.EMPTY' | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <nav
+          class="user-list__pager"
+          [attr.aria-label]="'COMMON.PAGINATION' | translate"
+        >
+          <button
+            type="button"
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            [disabled]="!hasPrevious()"
+            (click)="previousPage()"
+          >
+            <i
+              class="bi bi-chevron-left"
+              aria-hidden="true"
+            ></i>
+            {{ 'COMMON.PREVIOUS_PAGE' | translate }}
+          </button>
+          <span class="ui-hint user-list__page">{{
+            'COMMON.PAGE_OF' | translate: { page: pageNumber(), pages: pageCount() }
+          }}</span>
+          <button
+            type="button"
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            [disabled]="!hasNext()"
+            (click)="nextPage()"
+          >
+            {{ 'COMMON.NEXT_PAGE' | translate }}
+            <i
+              class="bi bi-chevron-right"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </nav>
+
+        <p
+          class="ui-visually-hidden"
+          [id]="protectedHintId"
+        >
+          {{ 'ADMIN_USERS.PROTECTED_HINT' | translate }}
+        </p>
+        <p
+          class="ui-visually-hidden"
+          [id]="selfHintId"
+        >
+          {{ 'ADMIN_USERS.SELF_HINT' | translate }}
+        </p>
+      </div>
+    } @else if (failed()) {
+      <div
+        class="ui-alert ui-alert--danger"
+        role="alert"
+      >
+        <i
+          class="bi bi-exclamation-octagon"
+          aria-hidden="true"
+        ></i>
+        <div class="ui-stack ui-stack--sm">
+          <p>{{ 'ADMIN_USERS.LOAD_FAILED' | translate }}</p>
+          <div>
+            <button
+              type="button"
+              class="ui-btn ui-btn--secondary ui-btn--sm"
+              (click)="retry()"
+            >
+              <i
+                class="bi bi-arrow-clockwise"
+                aria-hidden="true"
+              ></i>
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div
+        class="ui-skeleton user-list__skeleton"
+        aria-hidden="true"
+      ></div>
+    }
+  </div>
+</div>
+
+<app-lock-user-dialog
+  [(user)]="lockTarget"
+  (locked)="onLocked()"
+/>

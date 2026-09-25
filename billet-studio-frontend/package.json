@@ -4,9 +4,10 @@
   "scripts": {
     "ng": "ng",
     "version:gen": "node scripts/generate-version.mjs",
-    "prestart": "node scripts/generate-version.mjs",
-    "prebuild": "node scripts/generate-version.mjs",
-    "pretest": "node scripts/generate-version.mjs",
+    "themes:gen": "node scripts/generate-themes.mjs --table",
+    "prestart": "node scripts/generate-version.mjs && node scripts/generate-themes.mjs",
+    "prebuild": "node scripts/generate-version.mjs && node scripts/generate-themes.mjs",
+    "pretest": "node scripts/generate-version.mjs && node scripts/generate-themes.mjs",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

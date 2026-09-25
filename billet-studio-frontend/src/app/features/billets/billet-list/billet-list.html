@@ -1,0 +1,49 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header billet-list__header">
+      <div class="ui-stack ui-stack--sm">
+        <h1 class="ui-page__title">{{ 'BILLETS.TITLE' | translate }}</h1>
+        <p class="ui-page__lead">{{ 'BILLETS.LEAD' | translate }}</p>
+      </div>
+      <button
+        type="button"
+        class="ui-btn ui-btn--primary"
+        disabled
+        aria-describedby="billet-list-editor-soon"
+      >
+        <i
+          class="bi bi-plus-lg"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.NEW_BILLET' | translate }}
+      </button>
+    </header>
+
+    <section
+      class="ui-card"
+      aria-labelledby="billet-list-empty"
+    >
+      <div class="ui-card__body ui-stack billet-list__empty">
+        <span
+          class="ui-avatar ui-avatar--lg"
+          aria-hidden="true"
+        >
+          <i class="bi bi-envelope-paper-heart"></i>
+        </span>
+        <h2
+          id="billet-list-empty"
+          class="ui-card__title"
+        >
+          {{ 'BILLETS.EMPTY_TITLE' | translate }}
+        </h2>
+        <p class="ui-hint">{{ 'BILLETS.EMPTY_TEXT' | translate }}</p>
+        <p
+          id="billet-list-editor-soon"
+          class="ui-hint"
+        >
+          {{ 'BILLETS.EDITOR_SOON' | translate }}
+        </p>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,109 @@
+// Layout only; every visual comes from the ui-* classes.
+@use '../../../../styles/breakpoints' as bp;
+
+.kit__columns {
+    display: grid;
+    gap: var(--ui-space-6);
+
+    @include bp.up(lg) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+}
+
+.kit__section-title {
+    font-size: var(--ui-text-xl);
+}
+
+.kit__form-grid {
+    display: grid;
+    gap: var(--ui-space-5);
+
+    @include bp.up(md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.kit__span {
+    @include bp.up(md) {
+        grid-column: 1 / -1;
+    }
+}
+
+.kit__legend {
+    margin-block-end: var(--ui-space-2);
+}
+
+.kit__range {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+
+    > output {
+        min-inline-size: 2.75rem;
+        justify-content: center;
+    }
+}
+
+.kit__alerts {
+    display: grid;
+    gap: var(--ui-space-3);
+
+    @include bp.up(md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.kit__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-6);
+}
+
+.kit__skeleton {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-4);
+    max-inline-size: 28rem;
+}
+
+.kit__skeleton-media {
+    flex: none;
+    inline-size: 4rem;
+    block-size: 4rem;
+}
+
+.kit__skeleton-lines {
+    flex: 1;
+}
+
+.kit__skeleton-short {
+    inline-size: 60%;
+}
+
+.kit__toasts {
+    display: grid;
+    gap: var(--ui-space-2);
+    max-inline-size: 26rem;
+}
+
+.kit__panel {
+    padding-block: var(--ui-space-4);
+}
+
+.kit__popover {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-1);
+    // A static sample: it sits in the flow instead of an overlay pane.
+    animation: none;
+}
+
+// Stretched link: the whole interactive card (position: relative) is the click target.
+.kit__card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}

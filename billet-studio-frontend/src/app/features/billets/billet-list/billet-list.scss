@@ -1,0 +1,20 @@
+// Layout only; every visual comes from the ui-* classes.
+@use '../../../../styles/breakpoints' as bp;
+
+.billet-list__header {
+    gap: var(--ui-space-4);
+
+    @include bp.up(sm) {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+}
+
+.billet-list__empty {
+    align-items: center;
+    max-inline-size: 32rem;
+    margin-inline: auto;
+    padding-block: var(--ui-space-8);
+    text-align: center;
+}

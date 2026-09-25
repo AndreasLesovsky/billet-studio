@@ -1,0 +1,115 @@
+// Private --_* properties are resolved on the button itself, so modifiers only swap values.
+.ui-btn {
+    --_size: var(--ui-control-height);
+    --_bg: var(--ui-surface);
+    --_bg-hover: var(--ui-surface-sunken);
+    --_fg: var(--ui-text);
+    --_border: var(--ui-border);
+    --_shadow: var(--ui-shadow-sm);
+
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ui-space-2);
+    min-block-size: var(--_size);
+    padding: var(--ui-space-1) var(--ui-space-4);
+    border: 1px solid var(--_border);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--_bg);
+    box-shadow: var(--_shadow);
+    color: var(--_fg);
+    font-family: inherit;
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-strong);
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        background-color var(--ui-duration-fast) var(--ui-ease),
+        border-color var(--ui-duration-fast) var(--ui-ease),
+        box-shadow var(--ui-duration-fast) var(--ui-ease),
+        color var(--ui-duration-fast) var(--ui-ease),
+        transform var(--ui-duration-fast) var(--ui-ease);
+
+    &:hover:not(:disabled, [aria-disabled='true']) {
+        background-color: var(--_bg-hover);
+    }
+
+    &:active:not(:disabled, [aria-disabled='true']) {
+        transform: translateY(0.0625rem);
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    > .bi {
+        font-size: 1.125em;
+        line-height: 1;
+    }
+}
+
+.ui-btn--primary {
+    --_bg: var(--ui-accent);
+    --_bg-hover: var(--ui-accent-hover);
+    --_fg: var(--ui-on-accent);
+    --_border: transparent;
+}
+
+.ui-btn--secondary {
+    --_bg: var(--ui-surface);
+    --_bg-hover: var(--ui-surface-sunken);
+    --_fg: var(--ui-text);
+    --_border: var(--ui-border);
+}
+
+.ui-btn--ghost {
+    --_bg: transparent;
+    --_bg-hover: var(--ui-surface-sunken);
+    --_border: transparent;
+    --_shadow: none;
+}
+
+.ui-btn--danger {
+    --_bg: var(--ui-danger);
+    --_bg-hover: var(--ui-danger-hover);
+    --_fg: var(--ui-on-danger);
+    --_border: transparent;
+}
+
+.ui-btn--sm {
+    --_size: 2rem;
+
+    gap: var(--ui-space-1);
+    padding-inline: var(--ui-space-3);
+    border-radius: var(--ui-radius-sm);
+}
+
+.ui-btn--lg {
+    --_size: 3rem;
+
+    padding-inline: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    font-size: var(--ui-text-md);
+}
+
+.ui-btn--icon {
+    inline-size: var(--_size);
+    padding: 0;
+
+    > .bi {
+        font-size: 1.125rem;
+    }
+}
+
+.ui-btn--block {
+    display: flex;
+    inline-size: 100%;
+}

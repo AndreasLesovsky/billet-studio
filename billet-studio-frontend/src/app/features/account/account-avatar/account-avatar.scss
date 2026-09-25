@@ -1,0 +1,19 @@
+// Layout only; every visual comes from the ui-* classes.
+
+:host {
+    display: block;
+}
+
+.account-avatar {
+    align-items: center;
+    text-align: center;
+}
+
+.account-avatar__drop {
+    inline-size: 100%;
+    text-align: start;
+}
+
+.account-avatar__actions {
+    justify-content: center;
+}

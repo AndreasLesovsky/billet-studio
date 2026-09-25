@@ -1,0 +1,196 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ titleKey | translate }}</h1>
+    </header>
+
+    @if (ready()) {
+      <div class="ui-card user-form__card">
+        <form
+          id="user-form"
+          class="ui-card__body ui-stack"
+          novalidate
+          (submit)="onSubmit($event)"
+        >
+          <div class="ui-field">
+            <label
+              class="ui-label"
+              for="user-form-name"
+              >{{ 'ADMIN_USERS.NAME' | translate }}</label
+            >
+            <input
+              id="user-form-name"
+              class="ui-input"
+              type="text"
+              autocomplete="off"
+              [formField]="userForm.name"
+            />
+            <app-field-error [field]="userForm.name" />
+          </div>
+
+          <div class="ui-field">
+            <label
+              class="ui-label"
+              for="user-form-email"
+              >{{ 'ADMIN_USERS.EMAIL' | translate }}</label
+            >
+            <input
+              id="user-form-email"
+              class="ui-input"
+              type="email"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              [formField]="userForm.email"
+            />
+            <app-field-error [field]="userForm.email" />
+          </div>
+
+          <div class="ui-field">
+            <label
+              class="ui-label"
+              for="user-form-password"
+              >{{ 'ADMIN_USERS.PASSWORD' | translate }}</label
+            >
+            <input
+              id="user-form-password"
+              class="ui-input"
+              type="password"
+              autocomplete="new-password"
+              aria-describedby="user-form-password-hint"
+              [formField]="userForm.password"
+            />
+            <p
+              id="user-form-password-hint"
+              class="ui-hint"
+            >
+              @if (isEditMode) {
+                {{ 'ADMIN_USERS.PASSWORD_KEEP_HINT' | translate }}
+              }
+              {{ 'AUTH.PASSWORD_HINT' | translate: { min: passwordMinLength } }}
+            </p>
+            <app-field-error [field]="userForm.password" />
+          </div>
+
+          <div class="user-form__row">
+            <div class="ui-field">
+              <label
+                class="ui-label"
+                for="user-form-role"
+                >{{ 'ADMIN_USERS.ROLE' | translate }}</label
+              >
+              <select
+                id="user-form-role"
+                class="ui-select"
+                [formField]="userForm.role"
+              >
+                @for (role of roles(); track role) {
+                  <option [value]="role">{{ 'ADMIN_USERS.ROLES.' + role | translate }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="ui-field">
+              <label
+                class="ui-label"
+                for="user-form-language"
+                >{{ 'ADMIN_USERS.LANGUAGE' | translate }}</label
+              >
+              <select
+                id="user-form-language"
+                class="ui-select"
+                [formField]="userForm.preferredLanguage"
+              >
+                @for (language of languages; track language) {
+                  <option [value]="language">
+                    {{ 'NAV.LANGUAGE_' + language.toUpperCase() | translate }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="ui-field">
+            <label class="ui-check">
+              <input
+                id="user-form-active"
+                class="ui-switch"
+                type="checkbox"
+                role="switch"
+                aria-describedby="user-form-active-hint"
+                [formField]="userForm.active"
+              />
+              <span>{{ 'ADMIN_USERS.ACTIVE' | translate }}</span>
+            </label>
+            <p
+              id="user-form-active-hint"
+              class="ui-hint"
+            >
+              {{ activeHintKey() | translate }}
+            </p>
+          </div>
+
+          @if (!userForm.deactivationReason().hidden()) {
+            <div class="ui-field">
+              <label
+                class="ui-label"
+                for="user-form-reason"
+                >{{ 'ADMIN_USERS.DEACTIVATION_REASON' | translate }}</label
+              >
+              <select
+                id="user-form-reason"
+                class="ui-select"
+                [formField]="userForm.deactivationReason"
+              >
+                <option value="">{{ 'ADMIN_USERS.DEACTIVATION_REASON_NONE' | translate }}</option>
+                @for (reason of reasons; track reason) {
+                  <option [value]="reason">
+                    {{ 'DEACTIVATION_REASON.' + reason | translate }}
+                  </option>
+                }
+              </select>
+            </div>
+          }
+        </form>
+
+        <div class="ui-card__footer">
+          <a
+            class="ui-btn ui-btn--ghost"
+            routerLink="/admin/users"
+            >{{ 'COMMON.CANCEL' | translate }}</a
+          >
+          <button
+            type="button"
+            class="ui-btn ui-btn--secondary"
+            [disabled]="!canUndo()"
+            (click)="undo()"
+          >
+            <i
+              class="bi bi-arrow-counterclockwise"
+              aria-hidden="true"
+            ></i>
+            {{ 'COMMON.UNDO' | translate }}
+          </button>
+          <button
+            type="submit"
+            form="user-form"
+            class="ui-btn ui-btn--primary"
+            [disabled]="!canSave()"
+          >
+            <i
+              class="bi"
+              [class]="submitIcon"
+              aria-hidden="true"
+            ></i>
+            {{ submitKey | translate }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div
+        class="ui-skeleton user-form__card user-form__skeleton"
+        aria-hidden="true"
+      ></div>
+    }
+  </div>
+</div>

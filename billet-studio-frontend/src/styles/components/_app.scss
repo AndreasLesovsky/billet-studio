@@ -1,0 +1,105 @@
+@use '../breakpoints' as bp;
+
+// App-level pieces: the shell's header, footer and wordmark, the skip link, the toast region as a
+// top-layer popover, and the password-field toggle. The shell's own layout stays in layout/app-shell.
+
+// ---- Header / footer ------------------------------------------------------------------------
+
+.ui-app-header {
+    border-block-end: 1px solid var(--ui-border);
+    background-color: var(--ui-surface);
+}
+
+.ui-app-footer {
+    border-block-start: 1px solid var(--ui-border);
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+}
+
+// Typographic brand: the name in the heading font, its second half in the accent ink.
+.ui-wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    border-radius: var(--ui-radius-sm);
+    color: var(--ui-text);
+    font-family: var(--ui-font-heading);
+    font-size: calc(var(--ui-text-lg) * var(--ui-font-heading-scale));
+    font-weight: var(--ui-font-heading-weight);
+    font-synthesis-weight: none;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+
+    @include bp.up(sm) {
+        font-size: calc(var(--ui-text-xl) * var(--ui-font-heading-scale));
+    }
+}
+
+.ui-wordmark__accent {
+    color: var(--ui-accent-ink);
+}
+
+// ---- Skip link: above the viewport until it has focus ---------------------------------------
+
+.ui-skip-link {
+    position: absolute;
+    z-index: 1200;
+    inset-block-start: var(--ui-space-2);
+    inset-inline-start: var(--ui-space-2);
+    padding: var(--ui-space-2) var(--ui-space-4);
+    border: 1px solid var(--ui-border-strong);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface-raised);
+    color: var(--ui-text);
+    font-weight: var(--ui-font-weight-strong);
+    text-decoration: none;
+    transform: translateY(calc(-100% - var(--ui-space-4)));
+
+    // The shadow only once it is on screen, or it bleeds into the top edge while parked above.
+    &:focus {
+        box-shadow: var(--ui-shadow-md);
+        transform: none;
+    }
+}
+
+// ---- Toast region as a manual popover -------------------------------------------------------
+
+// In the top layer, so a toast raised while a modal <dialog> is open shows above it. These undo the
+// UA popover box; the placement stays .ui-toast-region's.
+.ui-toast-region[popover] {
+    inset-block-start: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: none;
+    color: inherit;
+
+    @include bp.down(sm) {
+        inline-size: auto;
+    }
+}
+
+// ---- Password toggle (shared/directives/password-toggle.ts) ---------------------------------
+
+// The directive inserts the button right after its input. Pulled up into the input's end with
+// negative margins, it leaves the field's flow as it was: whatever follows starts where it would.
+.ui-password-toggle {
+    position: relative;
+    display: flex;
+    margin-block: calc(-1 * (var(--ui-control-height) + var(--_size)) / 2)
+        calc((var(--ui-control-height) - var(--_size)) / 2);
+    margin-inline: auto calc((var(--ui-control-height) - var(--_size)) / 2);
+}
+
+// .ui-field stacks its children with a --ui-space-2 gap, which the pull-up has to cover as well.
+.ui-field > .ui-password-toggle {
+    margin-block-start: calc(
+        -1 * (var(--ui-control-height) + var(--_size)) / 2 - var(--ui-space-2)
+    );
+}
+
+.ui-input:has(+ .ui-password-toggle) {
+    padding-inline-end: calc(var(--ui-control-height) + var(--ui-space-1));
+}

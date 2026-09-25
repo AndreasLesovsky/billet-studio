@@ -1,0 +1,10 @@
+// The CSS component layer: every ui-* class, and the only place --ui-* colours are applied.
+// Reference: CLAUDE.md, "Design system reference"; live preview: /dev/ui.
+@use 'components/layout';
+@use 'components/buttons';
+@use 'components/forms';
+@use 'components/surfaces';
+@use 'components/feedback';
+@use 'components/navigation';
+@use 'components/theme-card';
+@use 'components/app';

@@ -1,0 +1,62 @@
+// Theme-independent tokens. Colours, fonts, radii and shadows are set per theme in
+// _themes.generated.scss, which multiplies the radius scale below by the theme's factor.
+@use 'sass:map';
+@use 'sass:math';
+
+$radius-base: (
+    sm: 0.375rem,
+    md: 0.5rem,
+    lg: 0.75rem,
+    xl: 1.125rem,
+);
+
+@function radius($step, $factor: 1) {
+    @return math.div(math.round(map.get($radius-base, $step) * $factor * 1000), 1000);
+}
+
+:root {
+    --ui-space-1: 0.25rem;
+    --ui-space-2: 0.5rem;
+    --ui-space-3: 0.75rem;
+    --ui-space-4: 1rem;
+    --ui-space-5: 1.25rem;
+    --ui-space-6: 1.5rem;
+    --ui-space-7: 2rem;
+    --ui-space-8: 2.5rem;
+    --ui-space-9: 3rem;
+    --ui-space-10: 4rem;
+    --ui-space-11: 5rem;
+    --ui-space-12: 6rem;
+
+    --ui-text-xs: 0.75rem;
+    --ui-text-sm: 0.875rem;
+    --ui-text-md: 1rem;
+    --ui-text-lg: 1.125rem;
+    --ui-text-xl: 1.375rem;
+    --ui-text-2xl: 1.75rem;
+    --ui-text-3xl: 2.25rem;
+    // Labels, buttons, tabs, badges. One knob, because theme fonts differ in which faces they ship.
+    --ui-font-weight-strong: 600;
+    --ui-leading-tight: 1.2;
+    --ui-leading-normal: 1.55;
+    --ui-font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+
+    --ui-radius-pill: 999rem;
+
+    --ui-duration-fast: 120ms;
+    --ui-duration-base: 200ms;
+    --ui-duration-slow: 320ms;
+    --ui-ease: cubic-bezier(0.2, 0, 0, 1);
+
+    --ui-control-height: 2.5rem;
+    --ui-header-height: 3.75rem;
+    --ui-content-max: 72rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --ui-duration-fast: 0ms;
+        --ui-duration-base: 0ms;
+        --ui-duration-slow: 0ms;
+    }
+}

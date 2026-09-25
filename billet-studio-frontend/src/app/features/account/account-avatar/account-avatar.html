@@ -1,0 +1,106 @@
+<section
+  class="ui-card"
+  aria-labelledby="account-avatar-title"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <div class="ui-card__header">
+    <h2
+      id="account-avatar-title"
+      class="ui-card__title"
+    >
+      {{ 'ACCOUNT.AVATAR_SECTION' | translate }}
+    </h2>
+  </div>
+  <div class="ui-card__body ui-stack account-avatar">
+    <app-user-avatar
+      size="xl"
+      [name]="account().name"
+      [email]="account().email"
+      [imageUrl]="imageUrl()"
+      [alt]="'ACCOUNT.AVATAR_ALT' | translate: { name: account().name }"
+    />
+    <p
+      class="ui-hint"
+      aria-live="polite"
+    >
+      @if (hasStaged()) {
+        {{ 'ACCOUNT.AVATAR_PREVIEW' | translate }}
+      }
+    </p>
+    <p
+      id="account-avatar-hint"
+      class="ui-hint"
+    >
+      {{ 'ACCOUNT.AVATAR_HINT' | translate }} {{ 'ACCOUNT.AVATAR_DROP' | translate }}
+    </p>
+    @if (dragActive()) {
+      <div
+        class="ui-alert ui-alert--info account-avatar__drop"
+        aria-hidden="true"
+      >
+        <i
+          class="bi bi-download"
+          aria-hidden="true"
+        ></i>
+        <div>{{ 'ACCOUNT.AVATAR_DROP_ACTIVE' | translate }}</div>
+      </div>
+    }
+
+    <input
+      #picker
+      type="file"
+      hidden
+      [accept]="accept"
+      (change)="onPicked($event)"
+    />
+    <div class="ui-cluster account-avatar__actions">
+      <button
+        type="button"
+        class="ui-btn ui-btn--secondary"
+        aria-describedby="account-avatar-hint"
+        [disabled]="loading()"
+        (click)="picker.click()"
+      >
+        <i
+          class="bi bi-image"
+          aria-hidden="true"
+        ></i>
+        {{ pickLabel() | translate }}
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--primary"
+        [disabled]="!canSave()"
+        (click)="save()"
+      >
+        <i
+          class="bi bi-check-lg"
+          aria-hidden="true"
+        ></i>
+        {{ 'ACCOUNT.AVATAR_SAVE' | translate }}
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost"
+        [disabled]="!hasStaged()"
+        (click)="discard()"
+      >
+        {{ 'ACCOUNT.AVATAR_DISCARD' | translate }}
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost"
+        [disabled]="!canRemove()"
+        (click)="remove()"
+      >
+        <i
+          class="bi bi-trash3"
+          aria-hidden="true"
+        ></i>
+        {{ 'ACCOUNT.AVATAR_REMOVE' | translate }}
+      </button>
+    </div>
+  </div>
+</section>

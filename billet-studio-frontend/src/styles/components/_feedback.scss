@@ -1,0 +1,293 @@
+@use '../breakpoints' as bp;
+
+// Leading icon of alerts and toasts, tinted by the variant's --_ink.
+%ui-status-icon {
+    flex: none;
+    color: var(--_ink);
+    font-size: 1.125rem;
+    line-height: 1.25;
+}
+
+// ---- Alert (inline, in the page flow) -------------------------------------------------------
+
+.ui-alert {
+    --_soft: var(--ui-info-soft);
+    --_ink: var(--ui-info-ink);
+
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-3);
+    padding: var(--ui-space-3) var(--ui-space-4);
+    border-radius: var(--ui-radius-lg);
+    background-color: var(--_soft);
+    color: var(--ui-text);
+    font-size: var(--ui-text-sm);
+    line-height: var(--ui-leading-normal);
+
+    > .bi {
+        @extend %ui-status-icon;
+    }
+}
+
+.ui-alert__title {
+    display: block;
+    font-weight: var(--ui-font-weight-strong);
+}
+
+.ui-alert--info {
+    --_soft: var(--ui-info-soft);
+    --_ink: var(--ui-info-ink);
+}
+
+.ui-alert--success {
+    --_soft: var(--ui-success-soft);
+    --_ink: var(--ui-success-ink);
+}
+
+.ui-alert--warning {
+    --_soft: var(--ui-warning-soft);
+    --_ink: var(--ui-warning-ink);
+}
+
+.ui-alert--danger {
+    --_soft: var(--ui-danger-soft);
+    --_ink: var(--ui-danger-ink);
+}
+
+// ---- Badge ----------------------------------------------------------------------------------
+
+.ui-badge {
+    --_bg: var(--ui-surface-sunken);
+    --_fg: var(--ui-text-muted);
+    --_border: var(--ui-border);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-1);
+    min-block-size: 1.375rem;
+    padding: 0.0625rem var(--ui-space-2);
+    border: 1px solid var(--_border);
+    border-radius: var(--ui-radius-pill);
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--ui-text-xs);
+    font-weight: var(--ui-font-weight-strong);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.ui-badge--muted {
+    --_bg: var(--ui-surface-sunken);
+    --_fg: var(--ui-text-muted);
+}
+
+.ui-badge--accent {
+    --_bg: var(--ui-accent-soft);
+    --_fg: var(--ui-accent-ink);
+    --_border: transparent;
+}
+
+.ui-badge--success {
+    --_bg: var(--ui-success-soft);
+    --_fg: var(--ui-success-ink);
+    --_border: transparent;
+}
+
+.ui-badge--warning {
+    --_bg: var(--ui-warning-soft);
+    --_fg: var(--ui-warning-ink);
+    --_border: transparent;
+}
+
+.ui-badge--danger {
+    --_bg: var(--ui-danger-soft);
+    --_fg: var(--ui-danger-ink);
+    --_border: transparent;
+}
+
+// ---- Spinner / skeleton ---------------------------------------------------------------------
+
+@keyframes ui-spin {
+    to {
+        rotate: 1turn;
+    }
+}
+
+@keyframes ui-shimmer {
+    from {
+        background-position: 150% 0;
+    }
+
+    to {
+        background-position: -50% 0;
+    }
+}
+
+.ui-spinner {
+    --_size: 1.25rem;
+    --_stroke: 0.1875rem;
+
+    display: inline-block;
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    border: var(--_stroke) solid var(--ui-border);
+    border-block-start-color: var(--ui-accent);
+    border-radius: 50%;
+    vertical-align: middle;
+    animation: ui-spin 0.7s linear infinite;
+}
+
+.ui-spinner--sm {
+    --_size: 1rem;
+    --_stroke: 0.125rem;
+}
+
+.ui-spinner--lg {
+    --_size: 2.5rem;
+    --_stroke: 0.25rem;
+}
+
+.ui-skeleton {
+    display: block;
+    min-block-size: 1em;
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface-sunken);
+    background-image: linear-gradient(
+        90deg,
+        transparent 0,
+        var(--ui-surface-raised) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: ui-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    // A spinner carries state, so it keeps turning, slowly; the shimmer is decoration.
+    .ui-spinner {
+        animation-duration: 1.6s !important;
+        animation-iteration-count: infinite !important;
+    }
+
+    .ui-skeleton {
+        animation: none !important;
+        background-image: none;
+    }
+}
+
+// ---- Avatar ---------------------------------------------------------------------------------
+
+.ui-avatar {
+    --_size: 2.5rem;
+
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    overflow: hidden;
+    border-radius: 50%;
+    background-color: var(--ui-accent-soft);
+    color: var(--ui-accent-ink);
+    font-size: calc(var(--_size) * 0.4);
+    font-weight: var(--ui-font-weight-strong);
+    line-height: 1;
+    text-transform: uppercase;
+    user-select: none;
+
+    > img {
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+    }
+}
+
+.ui-avatar--sm {
+    --_size: 2rem;
+}
+
+.ui-avatar--lg {
+    --_size: 4rem;
+}
+
+.ui-avatar--xl {
+    --_size: 6rem;
+}
+
+// ---- Toast ----------------------------------------------------------------------------------
+
+@keyframes ui-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem) scale(0.98);
+    }
+}
+
+.ui-toast-region {
+    position: fixed;
+    z-index: 1100;
+    inset-block-end: var(--ui-space-4);
+    inset-inline: var(--ui-space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--ui-space-2);
+    pointer-events: none;
+
+    @include bp.up(sm) {
+        inset-inline-start: auto;
+        inline-size: 24rem;
+    }
+}
+
+.ui-toast {
+    --_accent: var(--ui-info);
+    --_ink: var(--ui-info-ink);
+
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-3);
+    padding: var(--ui-space-3) var(--ui-space-3) var(--ui-space-3) var(--ui-space-4);
+    border: 1px solid var(--ui-border);
+    border-inline-start: 0.25rem solid var(--_accent);
+    border-radius: var(--ui-radius-lg);
+    background-color: var(--ui-surface-raised);
+    box-shadow: var(--ui-shadow-lg);
+    color: var(--ui-text);
+    font-size: var(--ui-text-sm);
+    line-height: var(--ui-leading-normal);
+    pointer-events: auto;
+    animation: ui-toast-in var(--ui-duration-slow) var(--ui-ease);
+
+    > .bi {
+        @extend %ui-status-icon;
+    }
+}
+
+.ui-toast__body {
+    flex: 1;
+    min-inline-size: 0;
+    padding-block: 0.0625rem;
+}
+
+.ui-toast--info {
+    --_accent: var(--ui-info);
+    --_ink: var(--ui-info-ink);
+}
+
+.ui-toast--success {
+    --_accent: var(--ui-success);
+    --_ink: var(--ui-success-ink);
+}
+
+.ui-toast--warning {
+    --_accent: var(--ui-warning);
+    --_ink: var(--ui-warning-ink);
+}
+
+.ui-toast--danger {
+    --_accent: var(--ui-danger);
+    --_ink: var(--ui-danger-ink);
+}

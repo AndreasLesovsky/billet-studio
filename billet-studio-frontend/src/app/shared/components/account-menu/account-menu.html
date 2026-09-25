@@ -1,0 +1,91 @@
+@let signedIn = user();
+<button
+  type="button"
+  class="ui-btn ui-btn--ghost ui-btn--icon"
+  [cdkMenuTriggerFor]="menu"
+  [cdkMenuPosition]="positions"
+  [attr.aria-label]="'NAV.ACCOUNT_MENU' | translate"
+>
+  <app-user-avatar
+    size="sm"
+    [name]="signedIn?.name"
+    [email]="signedIn?.email"
+    [imageUrl]="signedIn?.avatarUrl"
+  />
+</button>
+
+<ng-template #menu>
+  <div
+    class="ui-menu account-menu__panel"
+    cdkMenu
+  >
+    @if (signedIn) {
+      <a
+        class="ui-menu__item"
+        cdkMenuItem
+        routerLink="/account"
+      >
+        <i
+          class="bi bi-person-circle"
+          aria-hidden="true"
+        ></i>
+        <span class="account-menu__identity">
+          <span>{{ 'NAV.ACCOUNT' | translate }}</span>
+          <span class="ui-hint account-menu__email">{{ signedIn.email }}</span>
+        </span>
+      </a>
+      @if (isAdmin()) {
+        <a
+          class="ui-menu__item"
+          cdkMenuItem
+          routerLink="/admin/users"
+        >
+          <i
+            class="bi bi-people"
+            aria-hidden="true"
+          ></i>
+          {{ 'NAV.ADMIN_USERS' | translate }}
+        </a>
+      }
+      <div
+        class="ui-menu__separator"
+        role="separator"
+      ></div>
+      <button
+        type="button"
+        class="ui-menu__item"
+        cdkMenuItem
+        (cdkMenuItemTriggered)="logout()"
+      >
+        <i
+          class="bi bi-box-arrow-right"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.LOGOUT' | translate }}
+      </button>
+    } @else {
+      <a
+        class="ui-menu__item"
+        cdkMenuItem
+        routerLink="/login"
+      >
+        <i
+          class="bi bi-box-arrow-in-right"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.LOGIN' | translate }}
+      </a>
+      <a
+        class="ui-menu__item"
+        cdkMenuItem
+        routerLink="/register"
+      >
+        <i
+          class="bi bi-person-plus"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.REGISTER' | translate }}
+      </a>
+    }
+  </div>
+</ng-template>

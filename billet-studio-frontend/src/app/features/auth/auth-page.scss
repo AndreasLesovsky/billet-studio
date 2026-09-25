@@ -1,0 +1,27 @@
+// Layout only, shared by the four auth pages; every visual comes from the ui-* classes.
+
+.auth-page {
+    inline-size: 100%;
+    max-inline-size: 28rem;
+    margin-inline: auto;
+}
+
+.auth-page__aside {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.auth-page__switch {
+    justify-content: center;
+    text-align: center;
+}
+
+.auth-page__done {
+    align-items: center;
+    padding-block: var(--ui-space-4);
+    text-align: center;
+
+    > .bi {
+        font-size: var(--ui-text-3xl);
+    }
+}

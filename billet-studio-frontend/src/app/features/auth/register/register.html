@@ -1,0 +1,145 @@
+<div class="ui-container">
+  <div class="ui-page auth-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ 'AUTH.REGISTER_TITLE' | translate }}</h1>
+      <p class="ui-page__lead">{{ 'AUTH.REGISTER_LEAD' | translate }}</p>
+    </header>
+
+    <div class="ui-card">
+      <form
+        class="ui-card__body ui-stack"
+        novalidate
+        (submit)="onSubmit($event)"
+      >
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="register-name"
+            >{{ 'AUTH.NAME' | translate }}</label
+          >
+          <input
+            id="register-name"
+            class="ui-input"
+            type="text"
+            autocomplete="name"
+            aria-describedby="register-name-hint"
+            [formField]="registerForm.name"
+          />
+          <p
+            id="register-name-hint"
+            class="ui-hint"
+          >
+            {{ 'AUTH.NAME_HINT' | translate }}
+          </p>
+          <app-field-error [field]="registerForm.name" />
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="register-email"
+            >{{ 'AUTH.EMAIL' | translate }}</label
+          >
+          <input
+            id="register-email"
+            class="ui-input"
+            type="email"
+            autocomplete="email"
+            autocapitalize="none"
+            spellcheck="false"
+            [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+            [formField]="registerForm.email"
+          />
+          <app-field-error [field]="registerForm.email" />
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="register-password"
+            >{{ 'AUTH.PASSWORD' | translate }}</label
+          >
+          <input
+            id="register-password"
+            class="ui-input"
+            type="password"
+            autocomplete="new-password"
+            aria-describedby="register-password-hint"
+            [formField]="registerForm.password"
+          />
+          <p
+            id="register-password-hint"
+            class="ui-hint"
+          >
+            {{ 'AUTH.PASSWORD_HINT' | translate: { min: passwordMinLength } }}
+          </p>
+          <app-field-error [field]="registerForm.password" />
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="register-password-confirm"
+            >{{ 'AUTH.PASSWORD_CONFIRM' | translate }}</label
+          >
+          <input
+            id="register-password-confirm"
+            class="ui-input"
+            type="password"
+            autocomplete="new-password"
+            [formField]="registerForm.confirmPassword"
+          />
+          <app-field-error [field]="registerForm.confirmPassword" />
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="register-language"
+            >{{ 'ACCOUNT.LANGUAGE' | translate }}</label
+          >
+          <select
+            id="register-language"
+            class="ui-select"
+            aria-describedby="register-language-hint"
+            [formField]="registerForm.preferredLanguage"
+          >
+            @for (language of languages; track language) {
+              <option [value]="language">
+                {{ 'NAV.LANGUAGE_' + language.toUpperCase() | translate }}
+              </option>
+            }
+          </select>
+          <p
+            id="register-language-hint"
+            class="ui-hint"
+          >
+            {{ 'ACCOUNT.LANGUAGE_HINT' | translate }}
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          class="ui-btn ui-btn--primary ui-btn--lg ui-btn--block"
+          [disabled]="!registerForm().valid() || loading()"
+        >
+          <i
+            class="bi bi-person-plus"
+            aria-hidden="true"
+          ></i>
+          {{ 'AUTH.REGISTER_SUBMIT' | translate }}
+        </button>
+      </form>
+
+      <p class="ui-card__footer auth-page__switch">
+        {{ 'AUTH.HAVE_ACCOUNT' | translate }}
+        <a
+          class="ui-link"
+          routerLink="/login"
+          queryParamsHandling="preserve"
+          >{{ 'NAV.LOGIN' | translate }}</a
+        >
+      </p>
+    </div>
+  </div>
+</div>

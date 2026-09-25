@@ -1,0 +1,39 @@
+@if (parent(); as back) {
+  <nav
+    class="breadcrumb breadcrumb--trail"
+    [attr.aria-label]="'BREADCRUMB.LABEL' | translate"
+  >
+    <ol class="ui-breadcrumb">
+      @for (crumb of crumbs(); track crumb.url + crumb.name) {
+        <li>
+          @if (crumb.active) {
+            <span aria-current="page">{{ crumb.name }}</span>
+          } @else {
+            <a [routerLink]="crumb.url">{{ crumb.name }}</a>
+          }
+        </li>
+      }
+    </ol>
+  </nav>
+
+  <nav
+    class="breadcrumb breadcrumb--back"
+    [attr.aria-label]="'BREADCRUMB.LABEL' | translate"
+  >
+    <ol class="ui-breadcrumb">
+      <li>
+        <a
+          class="breadcrumb__back"
+          [routerLink]="back.url"
+          [attr.aria-label]="'BREADCRUMB.BACK_TO' | translate: { label: back.name }"
+        >
+          <i
+            class="bi bi-arrow-left"
+            aria-hidden="true"
+          ></i>
+          {{ back.name }}
+        </a>
+      </li>
+    </ol>
+  </nav>
+}

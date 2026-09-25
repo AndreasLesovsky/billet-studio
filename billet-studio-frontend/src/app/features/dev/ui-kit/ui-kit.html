@@ -1,0 +1,848 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ 'UI_KIT.TITLE' | translate }}</h1>
+      <p class="ui-page__lead">{{ 'UI_KIT.LEAD' | translate }}</p>
+    </header>
+
+    <section
+      class="ui-card"
+      aria-labelledby="kit-theme"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="kit-theme"
+          class="ui-card__title"
+        >
+          {{ 'UI_KIT.SECTION_THEME' | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body">
+        <app-theme-picker />
+      </div>
+    </section>
+
+    <div class="kit__columns">
+      <!-- Typography -->
+      <section
+        class="ui-card"
+        aria-labelledby="kit-typography"
+      >
+        <div class="ui-card__header">
+          <h2
+            id="kit-typography"
+            class="ui-card__title"
+          >
+            {{ 'UI_KIT.SECTION_TYPOGRAPHY' | translate }}
+          </h2>
+        </div>
+        <div class="ui-card__body ui-stack">
+          <h3>{{ 'UI_KIT.HEADING_SAMPLE' | translate }}</h3>
+          <h4>{{ 'UI_KIT.SUBHEADING_SAMPLE' | translate }}</h4>
+          <p>{{ 'UI_KIT.BODY_SAMPLE' | translate }}</p>
+          <p class="ui-hint">{{ 'UI_KIT.HINT_SAMPLE' | translate }}</p>
+          <p class="ui-cluster">
+            <a
+              class="ui-link"
+              href="#kit-typography"
+              >{{ 'UI_KIT.LINK_SAMPLE' | translate }}</a
+            >
+            <span>
+              {{ 'UI_KIT.SHORTCUT_UNDO' | translate }}
+              <kbd>{{ 'UI_KIT.KEY_CTRL' | translate }}</kbd> +
+              <kbd>Z</kbd>
+            </span>
+          </p>
+        </div>
+      </section>
+
+      <!-- Buttons -->
+      <section
+        class="ui-card"
+        aria-labelledby="kit-buttons"
+      >
+        <div class="ui-card__header">
+          <h2
+            id="kit-buttons"
+            class="ui-card__title"
+          >
+            {{ 'UI_KIT.SECTION_BUTTONS' | translate }}
+          </h2>
+        </div>
+        <div class="ui-card__body ui-stack">
+          <div class="ui-cluster">
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary"
+            >
+              <i
+                class="bi bi-check2"
+                aria-hidden="true"
+              ></i>
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--secondary"
+            >
+              {{ 'COMMON.CANCEL' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost"
+            >
+              {{ 'UI_KIT.BUTTON_MORE' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--danger"
+            >
+              <i
+                class="bi bi-trash3"
+                aria-hidden="true"
+              ></i>
+              {{ 'COMMON.DELETE' | translate }}
+            </button>
+          </div>
+          <div class="ui-cluster">
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary ui-btn--sm"
+            >
+              {{ 'UI_KIT.BUTTON_SMALL' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary ui-btn--lg"
+            >
+              {{ 'UI_KIT.BUTTON_LARGE' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--secondary ui-btn--icon"
+              [attr.aria-label]="'COMMON.EDIT' | translate"
+            >
+              <i
+                class="bi bi-pencil"
+                aria-hidden="true"
+              ></i>
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+              [attr.aria-label]="'UI_KIT.BUTTON_SHARE' | translate"
+            >
+              <i
+                class="bi bi-share"
+                aria-hidden="true"
+              ></i>
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary"
+              disabled
+            >
+              {{ 'UI_KIT.BUTTON_DISABLED' | translate }}
+            </button>
+          </div>
+          <button
+            type="button"
+            class="ui-btn ui-btn--secondary ui-btn--block"
+          >
+            {{ 'UI_KIT.BUTTON_FULL_WIDTH' | translate }}
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Form controls -->
+    <section
+      class="ui-card"
+      aria-labelledby="kit-forms"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="kit-forms"
+          class="ui-card__title"
+        >
+          {{ 'UI_KIT.SECTION_FORMS' | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body kit__form-grid">
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="kit-name"
+            >{{ 'UI_KIT.LABEL_NAME' | translate }}</label
+          >
+          <input
+            id="kit-name"
+            class="ui-input"
+            type="text"
+            aria-describedby="kit-name-hint"
+            [placeholder]="'UI_KIT.PLACEHOLDER_NAME' | translate"
+          />
+          <p
+            id="kit-name-hint"
+            class="ui-hint"
+          >
+            {{ 'UI_KIT.HINT_NAME' | translate }}
+          </p>
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="kit-email"
+            >{{ 'UI_KIT.LABEL_EMAIL' | translate }}</label
+          >
+          <input
+            id="kit-email"
+            class="ui-input"
+            type="email"
+            value="anna@"
+            aria-invalid="true"
+            aria-describedby="kit-email-hint"
+          />
+          <p
+            id="kit-email-hint"
+            class="ui-hint"
+          >
+            {{ 'UI_KIT.HINT_EMAIL_INVALID' | translate }}
+          </p>
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="kit-occasion"
+            >{{ 'UI_KIT.LABEL_OCCASION' | translate }}</label
+          >
+          <select
+            id="kit-occasion"
+            class="ui-select"
+          >
+            <option value="mothers-day">{{ 'UI_KIT.OCCASION_MOTHERS_DAY' | translate }}</option>
+            <option value="birthday">{{ 'UI_KIT.OCCASION_BIRTHDAY' | translate }}</option>
+            <option value="wedding">{{ 'UI_KIT.OCCASION_WEDDING' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="kit-disabled"
+            >{{ 'UI_KIT.LABEL_DISABLED' | translate }}</label
+          >
+          <input
+            id="kit-disabled"
+            class="ui-input"
+            type="text"
+            value="billet-studio"
+            disabled
+          />
+        </div>
+
+        <div class="ui-field kit__span">
+          <label
+            class="ui-label"
+            for="kit-message"
+            >{{ 'UI_KIT.LABEL_MESSAGE' | translate }}</label
+          >
+          <textarea
+            id="kit-message"
+            class="ui-textarea"
+            rows="3"
+            [placeholder]="'UI_KIT.PLACEHOLDER_MESSAGE' | translate"
+          ></textarea>
+        </div>
+
+        <div class="ui-stack ui-stack--sm">
+          <label class="ui-check">
+            <input
+              type="checkbox"
+              checked
+            />
+            {{ 'UI_KIT.CHECK_TIPS' | translate }}
+          </label>
+          <label class="ui-check">
+            <input
+              type="checkbox"
+              role="switch"
+              class="ui-switch"
+              checked
+            />
+            {{ 'UI_KIT.SWITCH_PARTICLES' | translate }}
+          </label>
+          <label class="ui-check">
+            <input
+              type="checkbox"
+              role="switch"
+              class="ui-switch"
+            />
+            {{ 'UI_KIT.CHECK_TIPS' | translate }}
+          </label>
+        </div>
+
+        <fieldset class="ui-stack ui-stack--sm">
+          <legend class="ui-label kit__legend">{{ 'UI_KIT.VISIBILITY' | translate }}</legend>
+          <label class="ui-check">
+            <input
+              type="radio"
+              name="kit-visibility"
+              checked
+            />
+            {{ 'UI_KIT.VISIBILITY_LINK' | translate }}
+          </label>
+          <label class="ui-check">
+            <input
+              type="radio"
+              name="kit-visibility"
+            />
+            {{ 'UI_KIT.STATUS_DRAFT' | translate }}
+          </label>
+        </fieldset>
+
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="kit-spacing"
+            >{{ 'UI_KIT.LABEL_SPACING' | translate }}</label
+          >
+          <div class="kit__range">
+            <input
+              id="kit-spacing"
+              class="ui-range"
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              [value]="spacing()"
+              [style.--ui-range-progress]="spacing() + '%'"
+              (input)="onSpacing($event)"
+            />
+            <output
+              class="ui-badge ui-badge--accent"
+              for="kit-spacing"
+              >{{ spacing() }}</output
+            >
+          </div>
+        </div>
+
+        <fieldset class="ui-field">
+          <legend class="ui-label kit__legend">{{ 'UI_KIT.TABS_LABEL' | translate }}</legend>
+          <div class="ui-segmented">
+            @for (tab of tabs; track tab.id) {
+              <label class="ui-segmented__option">
+                <input
+                  type="radio"
+                  name="kit-segmented"
+                  [value]="tab.id"
+                  [checked]="$first"
+                />
+                <i
+                  class="bi"
+                  [class]="tab.icon"
+                  aria-hidden="true"
+                ></i>
+                {{ tab.labelKey | translate }}
+              </label>
+            }
+          </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <!-- Feedback -->
+    <section
+      class="ui-card"
+      aria-labelledby="kit-feedback"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="kit-feedback"
+          class="ui-card__title"
+        >
+          {{ 'UI_KIT.SECTION_FEEDBACK' | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <div class="kit__alerts">
+          <div class="ui-alert ui-alert--info">
+            <i
+              class="bi bi-info-circle-fill"
+              aria-hidden="true"
+            ></i>
+            <div>
+              <strong class="ui-alert__title">{{ 'UI_KIT.ALERT_TITLE' | translate }}</strong>
+              {{ 'UI_KIT.ALERT_INFO' | translate }}
+            </div>
+          </div>
+          <div class="ui-alert ui-alert--success">
+            <i
+              class="bi bi-check-circle-fill"
+              aria-hidden="true"
+            ></i>
+            <div>{{ 'UI_KIT.ALERT_SUCCESS' | translate }}</div>
+          </div>
+          <div class="ui-alert ui-alert--warning">
+            <i
+              class="bi bi-exclamation-triangle-fill"
+              aria-hidden="true"
+            ></i>
+            <div>{{ 'UI_KIT.ALERT_WARNING' | translate }}</div>
+          </div>
+          <div class="ui-alert ui-alert--danger">
+            <i
+              class="bi bi-x-octagon-fill"
+              aria-hidden="true"
+            ></i>
+            <div>{{ 'UI_KIT.ALERT_DANGER' | translate }}</div>
+          </div>
+        </div>
+
+        <div class="ui-cluster">
+          <span class="ui-badge">{{ 'UI_KIT.STATUS_ARCHIVED' | translate }}</span>
+          <span class="ui-badge ui-badge--accent">{{ 'UI_KIT.STATUS_NEW' | translate }}</span>
+          <span class="ui-badge ui-badge--success">
+            <i
+              class="bi bi-globe2"
+              aria-hidden="true"
+            ></i>
+            {{ 'UI_KIT.STATUS_PUBLISHED' | translate }}
+          </span>
+          <span class="ui-badge ui-badge--warning">{{ 'UI_KIT.STATUS_REVIEW' | translate }}</span>
+          <span class="ui-badge ui-badge--danger">{{ 'UI_KIT.STATUS_FAILED' | translate }}</span>
+        </div>
+
+        <div class="kit__row">
+          <span
+            class="ui-cluster"
+            role="status"
+          >
+            <span class="ui-spinner ui-spinner--sm"></span>
+            <span class="ui-spinner"></span>
+            <span class="ui-spinner ui-spinner--lg"></span>
+            <span class="ui-visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
+          </span>
+          <span
+            class="ui-cluster"
+            aria-hidden="true"
+          >
+            <span class="ui-avatar ui-avatar--sm">am</span>
+            <span class="ui-avatar">bs</span>
+            <span class="ui-avatar ui-avatar--lg">jk</span>
+          </span>
+        </div>
+
+        <div
+          class="kit__skeleton"
+          aria-hidden="true"
+        >
+          <span class="ui-skeleton kit__skeleton-media"></span>
+          <span class="ui-stack ui-stack--sm kit__skeleton-lines">
+            <span class="ui-skeleton"></span>
+            <span class="ui-skeleton kit__skeleton-short"></span>
+          </span>
+        </div>
+
+        <div class="kit__toasts">
+          <div class="ui-toast ui-toast--success">
+            <i
+              class="bi bi-check-circle-fill"
+              aria-hidden="true"
+            ></i>
+            <div class="ui-toast__body">{{ 'UI_KIT.ALERT_SUCCESS' | translate }}</div>
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+              [attr.aria-label]="'COMMON.CLOSE' | translate"
+            >
+              <i
+                class="bi bi-x-lg"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+          <div class="ui-toast ui-toast--info">
+            <i
+              class="bi bi-info-circle-fill"
+              aria-hidden="true"
+            ></i>
+            <div class="ui-toast__body">{{ 'UI_KIT.ALERT_INFO' | translate }}</div>
+          </div>
+          <div class="ui-toast ui-toast--warning">
+            <i
+              class="bi bi-exclamation-triangle-fill"
+              aria-hidden="true"
+            ></i>
+            <div class="ui-toast__body">{{ 'UI_KIT.ALERT_WARNING' | translate }}</div>
+          </div>
+          <div class="ui-toast ui-toast--danger">
+            <i
+              class="bi bi-x-octagon-fill"
+              aria-hidden="true"
+            ></i>
+            <div class="ui-toast__body">{{ 'UI_KIT.ALERT_DANGER' | translate }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="kit__columns">
+      <!-- Navigation -->
+      <section
+        class="ui-card"
+        aria-labelledby="kit-navigation"
+      >
+        <div class="ui-card__header">
+          <h2
+            id="kit-navigation"
+            class="ui-card__title"
+          >
+            {{ 'UI_KIT.SECTION_NAVIGATION' | translate }}
+          </h2>
+        </div>
+        <div class="ui-card__body ui-stack">
+          <nav [attr.aria-label]="'BREADCRUMB.LABEL' | translate">
+            <ol class="ui-breadcrumb">
+              <li>
+                <a href="#kit-navigation">{{ 'NAV.HOME' | translate }}</a>
+              </li>
+              <li>
+                <a href="#kit-navigation">{{ 'NAV.BILLETS' | translate }}</a>
+              </li>
+              <li>
+                <span aria-current="page">{{ 'UI_KIT.OCCASION_MOTHERS_DAY' | translate }}</span>
+              </li>
+            </ol>
+          </nav>
+
+          <div>
+            <div
+              class="ui-tabs"
+              role="tablist"
+              [attr.aria-label]="'UI_KIT.TABS_LABEL' | translate"
+            >
+              @for (tab of tabs; track tab.id; let i = $index) {
+                <button
+                  type="button"
+                  class="ui-tab"
+                  role="tab"
+                  [id]="'kit-tab-' + tab.id"
+                  [attr.aria-controls]="'kit-panel-' + tab.id"
+                  [attr.aria-selected]="activeTab() === tab.id"
+                  [attr.tabindex]="activeTab() === tab.id ? 0 : -1"
+                  (click)="activeTab.set(tab.id)"
+                  (keydown)="onTabKeydown($event, i)"
+                >
+                  <i
+                    class="bi"
+                    [class]="tab.icon"
+                    aria-hidden="true"
+                  ></i>
+                  {{ tab.labelKey | translate }}
+                </button>
+              }
+            </div>
+            @for (tab of tabs; track tab.id) {
+              <div
+                class="kit__panel"
+                role="tabpanel"
+                tabindex="0"
+                [id]="'kit-panel-' + tab.id"
+                [attr.aria-labelledby]="'kit-tab-' + tab.id"
+                [hidden]="activeTab() !== tab.id"
+              >
+                {{ tab.panelKey | translate }}
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Overlays -->
+      <section
+        class="ui-card"
+        aria-labelledby="kit-overlays"
+      >
+        <div class="ui-card__header">
+          <h2
+            id="kit-overlays"
+            class="ui-card__title"
+          >
+            {{ 'UI_KIT.SECTION_OVERLAYS' | translate }}
+          </h2>
+        </div>
+        <div class="ui-card__body ui-stack">
+          <div class="ui-cluster">
+            <button
+              type="button"
+              class="ui-btn ui-btn--secondary"
+              (click)="dialog.showModal()"
+            >
+              {{ 'UI_KIT.OPEN_DIALOG' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--secondary"
+              [cdkMenuTriggerFor]="menu"
+            >
+              {{ 'NAV.OPEN_MENU' | translate }}
+              <i
+                class="bi bi-chevron-down"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+
+          <div class="ui-popover kit__popover">
+            <strong>{{ 'UI_KIT.POPOVER_TITLE' | translate }}</strong>
+            <p>{{ 'UI_KIT.POPOVER_BODY' | translate }}</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Table -->
+    <section
+      class="ui-stack ui-stack--sm"
+      aria-labelledby="kit-table"
+    >
+      <h2
+        id="kit-table"
+        class="kit__section-title"
+      >
+        {{ 'UI_KIT.SECTION_TABLE' | translate }}
+      </h2>
+      <div class="ui-table-wrap">
+        <table class="ui-table">
+          <caption>
+            {{
+              'UI_KIT.TABLE_CAPTION' | translate
+            }}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'UI_KIT.COLUMN_TITLE' | translate }}</th>
+              <th scope="col">{{ 'UI_KIT.COLUMN_STATUS' | translate }}</th>
+              <th scope="col">{{ 'UI_KIT.COLUMN_UPDATED' | translate }}</th>
+              <th
+                scope="col"
+                class="ui-table__actions"
+              >
+                {{ 'COMMON.ACTIONS' | translate }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows; track row.titleKey) {
+              <tr>
+                <td>{{ row.titleKey | translate }}</td>
+                <td>
+                  <span
+                    class="ui-badge"
+                    [class]="row.badge"
+                    >{{ row.statusKey | translate }}</span
+                  >
+                </td>
+                <td>{{ row.updatedAt | date: 'mediumDate' }}</td>
+                <td class="ui-table__actions">
+                  <button
+                    type="button"
+                    class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                    [attr.aria-label]="'COMMON.EDIT' | translate"
+                  >
+                    <i
+                      class="bi bi-pencil"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                    [attr.aria-label]="'COMMON.DELETE' | translate"
+                  >
+                    <i
+                      class="bi bi-trash3"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Cards -->
+    <section
+      class="ui-stack ui-stack--sm"
+      aria-labelledby="kit-cards"
+    >
+      <h2
+        id="kit-cards"
+        class="kit__section-title"
+      >
+        {{ 'UI_KIT.SECTION_CARDS' | translate }}
+      </h2>
+      <div class="ui-grid">
+        <article class="ui-card">
+          <div class="ui-card__header">
+            <h3 class="ui-card__title">{{ 'UI_KIT.CARD_TITLE' | translate }}</h3>
+            <span class="ui-badge ui-badge--success">{{
+              'UI_KIT.STATUS_PUBLISHED' | translate
+            }}</span>
+          </div>
+          <div class="ui-card__body">
+            <p class="ui-hint">{{ 'UI_KIT.CARD_BODY' | translate }}</p>
+          </div>
+          <div class="ui-card__footer">
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost ui-btn--sm"
+            >
+              {{ 'COMMON.EDIT' | translate }}
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary ui-btn--sm"
+            >
+              {{ 'UI_KIT.BUTTON_SHARE' | translate }}
+            </button>
+          </div>
+        </article>
+        <article class="ui-card ui-card--interactive">
+          <div class="ui-card__body ui-stack ui-stack--sm">
+            <span class="ui-avatar">
+              <i
+                class="bi bi-plus-lg"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <h3 class="ui-card__title">
+              <a
+                class="kit__card-link"
+                href="#kit-cards"
+                >{{ 'NAV.NEW_BILLET' | translate }}</a
+              >
+            </h3>
+            <p class="ui-hint">{{ 'UI_KIT.CARD_NEW_BODY' | translate }}</p>
+          </div>
+        </article>
+        <article
+          class="ui-card"
+          aria-hidden="true"
+        >
+          <div class="ui-card__body ui-stack">
+            <span class="ui-skeleton kit__skeleton-media"></span>
+            <span class="ui-skeleton"></span>
+            <span class="ui-skeleton kit__skeleton-short"></span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
+
+<dialog
+  #dialog
+  class="ui-dialog"
+  aria-labelledby="kit-dialog-title"
+>
+  <form method="dialog">
+    <div class="ui-dialog__header">
+      <h2
+        id="kit-dialog-title"
+        class="ui-dialog__title"
+      >
+        {{ 'UI_KIT.DIALOG_TITLE' | translate }}
+      </h2>
+      <button
+        type="submit"
+        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+        value="close"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <i
+          class="bi bi-x-lg"
+          aria-hidden="true"
+        ></i>
+      </button>
+    </div>
+    <div class="ui-dialog__body">
+      <p>{{ 'UI_KIT.DIALOG_BODY' | translate }}</p>
+    </div>
+    <div class="ui-dialog__footer">
+      <button
+        type="submit"
+        class="ui-btn ui-btn--secondary"
+        value="cancel"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        type="submit"
+        class="ui-btn ui-btn--danger"
+        value="delete"
+      >
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<ng-template #menu>
+  <div
+    class="ui-menu"
+    cdkMenu
+  >
+    <button
+      type="button"
+      class="ui-menu__item"
+      cdkMenuItem
+    >
+      <i
+        class="bi bi-pencil"
+        aria-hidden="true"
+      ></i>
+      {{ 'UI_KIT.MENU_RENAME' | translate }}
+    </button>
+    <button
+      type="button"
+      class="ui-menu__item"
+      cdkMenuItem
+    >
+      <i
+        class="bi bi-copy"
+        aria-hidden="true"
+      ></i>
+      {{ 'UI_KIT.MENU_DUPLICATE' | translate }}
+    </button>
+    <button
+      type="button"
+      class="ui-menu__item"
+      cdkMenuItem
+      [cdkMenuItemDisabled]="true"
+    >
+      <i
+        class="bi bi-share"
+        aria-hidden="true"
+      ></i>
+      {{ 'UI_KIT.BUTTON_SHARE' | translate }}
+    </button>
+    <hr class="ui-menu__separator" />
+    <button
+      type="button"
+      class="ui-menu__item ui-menu__item--danger"
+      cdkMenuItem
+    >
+      <i
+        class="bi bi-trash3"
+        aria-hidden="true"
+      ></i>
+      {{ 'COMMON.DELETE' | translate }}
+    </button>
+  </div>
+</ng-template>

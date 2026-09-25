@@ -1,0 +1,264 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ 'ACCOUNT.TITLE' | translate }}</h1>
+      <p class="ui-page__lead">{{ 'ACCOUNT.LEAD' | translate }}</p>
+    </header>
+
+    @if (account(); as account) {
+      <div class="account__grid">
+        <div class="account__column">
+          <section
+            class="ui-card"
+            aria-labelledby="account-profile-title"
+          >
+            <div class="ui-card__header">
+              <h2
+                id="account-profile-title"
+                class="ui-card__title"
+              >
+                {{ 'ACCOUNT.PROFILE_SECTION' | translate }}
+              </h2>
+            </div>
+            <form
+              id="account-profile-form"
+              class="ui-card__body ui-stack"
+              novalidate
+              (submit)="onProfileSubmit($event)"
+            >
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-name"
+                  >{{ 'ACCOUNT.NAME' | translate }}</label
+                >
+                <input
+                  id="account-name"
+                  class="ui-input"
+                  type="text"
+                  autocomplete="name"
+                  [formField]="profileForm.name"
+                />
+                <app-field-error [field]="profileForm.name" />
+              </div>
+
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-email"
+                  >{{ 'ACCOUNT.EMAIL' | translate }}</label
+                >
+                <input
+                  id="account-email"
+                  class="ui-input"
+                  type="email"
+                  readonly
+                  aria-describedby="account-email-hint"
+                  [value]="account.email"
+                />
+                <p
+                  id="account-email-hint"
+                  class="ui-hint"
+                >
+                  {{ 'ACCOUNT.EMAIL_READONLY_HINT' | translate }}
+                </p>
+              </div>
+
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-language"
+                  >{{ 'ACCOUNT.LANGUAGE' | translate }}</label
+                >
+                <select
+                  id="account-language"
+                  class="ui-select"
+                  aria-describedby="account-language-hint"
+                  [formField]="profileForm.preferredLanguage"
+                >
+                  @for (language of languages; track language) {
+                    <option [value]="language">
+                      {{ 'NAV.LANGUAGE_' + language.toUpperCase() | translate }}
+                    </option>
+                  }
+                </select>
+                <p
+                  id="account-language-hint"
+                  class="ui-hint"
+                >
+                  {{ 'ACCOUNT.LANGUAGE_HINT' | translate }}
+                </p>
+              </div>
+
+              <p class="ui-hint">
+                {{
+                  'ACCOUNT.MEMBER_SINCE'
+                    | translate
+                      : { date: (account.createdAt | date: 'longDate' : undefined : locale()) }
+                }}
+              </p>
+            </form>
+            <div class="ui-card__footer">
+              <button
+                type="button"
+                class="ui-btn ui-btn--ghost"
+                [disabled]="!profileChanged()"
+                (click)="undoProfile()"
+              >
+                <i
+                  class="bi bi-arrow-counterclockwise"
+                  aria-hidden="true"
+                ></i>
+                {{ 'COMMON.UNDO' | translate }}
+              </button>
+              <button
+                type="submit"
+                form="account-profile-form"
+                class="ui-btn ui-btn--primary"
+                [disabled]="!canSaveProfile()"
+              >
+                <i
+                  class="bi bi-check-lg"
+                  aria-hidden="true"
+                ></i>
+                {{ 'ACCOUNT.SAVE_PROFILE' | translate }}
+              </button>
+            </div>
+          </section>
+
+          <section
+            class="ui-card"
+            aria-labelledby="account-password-title"
+          >
+            <div class="ui-card__header account__card-header">
+              <h2
+                id="account-password-title"
+                class="ui-card__title"
+              >
+                {{ 'ACCOUNT.PASSWORD_SECTION' | translate }}
+              </h2>
+              <p class="ui-hint">{{ 'ACCOUNT.PASSWORD_SECTION_LEAD' | translate }}</p>
+            </div>
+            <form
+              id="account-password-form"
+              class="ui-card__body ui-stack"
+              novalidate
+              (submit)="onPasswordSubmit($event)"
+            >
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-current-password"
+                  >{{ 'AUTH.CURRENT_PASSWORD' | translate }}</label
+                >
+                <input
+                  id="account-current-password"
+                  class="ui-input"
+                  type="password"
+                  autocomplete="current-password"
+                  [formField]="passwordForm.currentPassword"
+                />
+                <app-field-error [field]="passwordForm.currentPassword" />
+              </div>
+
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-new-password"
+                  >{{ 'AUTH.NEW_PASSWORD' | translate }}</label
+                >
+                <input
+                  id="account-new-password"
+                  class="ui-input"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="account-new-password-hint"
+                  [formField]="passwordForm.newPassword"
+                />
+                <p
+                  id="account-new-password-hint"
+                  class="ui-hint"
+                >
+                  {{ 'AUTH.PASSWORD_HINT' | translate: { min: passwordMinLength } }}
+                </p>
+                <app-field-error [field]="passwordForm.newPassword" />
+              </div>
+
+              <div class="ui-field">
+                <label
+                  class="ui-label"
+                  for="account-confirm-password"
+                  >{{ 'AUTH.PASSWORD_CONFIRM' | translate }}</label
+                >
+                <input
+                  id="account-confirm-password"
+                  class="ui-input"
+                  type="password"
+                  autocomplete="new-password"
+                  [formField]="passwordForm.confirmPassword"
+                />
+                <app-field-error [field]="passwordForm.confirmPassword" />
+              </div>
+            </form>
+            <div class="ui-card__footer">
+              <button
+                type="submit"
+                form="account-password-form"
+                class="ui-btn ui-btn--primary"
+                [disabled]="!canChangePassword()"
+              >
+                <i
+                  class="bi bi-key"
+                  aria-hidden="true"
+                ></i>
+                {{ 'ACCOUNT.CHANGE_PASSWORD' | translate }}
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="account__column">
+          <app-account-avatar [account]="account" />
+
+          <section
+            class="ui-card"
+            aria-labelledby="account-deactivate-title"
+          >
+            <div class="ui-card__header">
+              <h2
+                id="account-deactivate-title"
+                class="ui-card__title"
+              >
+                {{ 'ACCOUNT.DEACTIVATE_SECTION' | translate }}
+              </h2>
+            </div>
+            <div class="ui-card__body ui-stack">
+              <p class="ui-hint">{{ 'ACCOUNT.DEACTIVATE_LEAD' | translate }}</p>
+              <div>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--danger"
+                  aria-haspopup="dialog"
+                  (click)="deactivateOpen.set(true)"
+                >
+                  <i
+                    class="bi bi-person-x"
+                    aria-hidden="true"
+                  ></i>
+                  {{ 'ACCOUNT.DEACTIVATE_BUTTON' | translate }}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    } @else {
+      <div
+        class="ui-skeleton account__skeleton"
+        aria-hidden="true"
+      ></div>
+    }
+  </div>
+</div>
+
+<app-deactivate-account-modal [(open)]="deactivateOpen" />

@@ -1,0 +1,352 @@
+// Field chrome. The invalid state comes from provideSignalFormsConfig (.ui-invalid on every
+// touched + invalid [formField] element) or aria-invalid; templates never set either by hand.
+
+.ui-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-2);
+    min-inline-size: 0;
+}
+
+.ui-label {
+    color: var(--ui-text);
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-strong);
+    line-height: var(--ui-leading-tight);
+}
+
+.ui-hint {
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+    line-height: var(--ui-leading-normal);
+}
+
+.ui-field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-2);
+    color: var(--ui-danger-ink);
+    font-size: var(--ui-text-sm);
+    font-weight: 500;
+    line-height: var(--ui-leading-normal);
+    animation: ui-field-error-in var(--ui-duration-base) var(--ui-ease);
+
+    > .bi {
+        flex: none;
+        line-height: inherit;
+    }
+}
+
+@keyframes ui-field-error-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.25rem);
+    }
+}
+
+%ui-control {
+    --_border: var(--ui-border-strong);
+    --_ring: var(--ui-focus-ring);
+    --_halo: var(--ui-accent-soft);
+
+    display: block;
+    inline-size: 100%;
+    min-block-size: var(--ui-control-height);
+    padding: var(--ui-space-2) var(--ui-space-3);
+    border: 1px solid var(--_border);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface);
+    color: var(--ui-text);
+    font-family: inherit;
+    // 1rem keeps iOS from zooming into a focused field.
+    font-size: var(--ui-text-md);
+    line-height: 1.4;
+    transition:
+        border-color var(--ui-duration-fast) var(--ui-ease),
+        box-shadow var(--ui-duration-fast) var(--ui-ease),
+        background-color var(--ui-duration-fast) var(--ui-ease);
+
+    &:hover:not(:disabled, :focus-visible, [readonly]) {
+        --_border: var(--ui-text-muted);
+    }
+
+    // The ring is a box-shadow for its soft halo; the transparent outline shows in forced colours.
+    &:focus-visible {
+        border-color: var(--_ring);
+        outline: 0.125rem solid transparent;
+        outline-offset: 0;
+        box-shadow:
+            0 0 0 1px var(--_ring),
+            0 0 0 0.3125rem var(--_halo);
+    }
+
+    &:disabled {
+        --_border: var(--ui-border);
+
+        background-color: var(--ui-surface-sunken);
+        color: var(--ui-text-muted);
+        cursor: not-allowed;
+    }
+
+    &[readonly] {
+        background-color: var(--ui-surface-sunken);
+    }
+
+    &.ui-invalid,
+    &[aria-invalid='true'],
+    .ui-invalid & {
+        --_border: var(--ui-danger);
+        --_ring: var(--ui-danger);
+        --_halo: var(--ui-danger-soft);
+    }
+}
+
+.ui-input {
+    @extend %ui-control;
+}
+
+.ui-textarea {
+    @extend %ui-control;
+
+    min-block-size: 6rem;
+    line-height: var(--ui-leading-normal);
+    resize: vertical;
+    field-sizing: content;
+    max-block-size: 24rem;
+}
+
+// Chevron: two hairline diagonals in adjacent tiles, so its colour stays a token.
+.ui-select {
+    @extend %ui-control;
+
+    padding-inline-end: var(--ui-space-8);
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 40%, var(--ui-text-muted) 40% 60%, transparent 60%),
+        linear-gradient(-45deg, transparent 40%, var(--ui-text-muted) 40% 60%, transparent 60%);
+    background-position:
+        calc(100% - 1.125rem) 50%,
+        calc(100% - 0.75rem) 50%;
+    background-size: 0.375rem 0.375rem;
+    background-repeat: no-repeat;
+    cursor: pointer;
+
+    &[multiple],
+    &[size]:not([size='1']) {
+        padding-inline-end: var(--ui-space-3);
+        background-image: none;
+    }
+}
+
+// Checkbox / radio row: <label class="ui-check"><input type="checkbox" /> Text</label>
+.ui-check {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--ui-space-3);
+    color: var(--ui-text);
+    font-size: var(--ui-text-md);
+    line-height: 1.4;
+    cursor: pointer;
+
+    > input:is([type='checkbox'], [type='radio']):not(.ui-switch) {
+        flex: none;
+        inline-size: 1.125rem;
+        block-size: 1.125rem;
+        margin: 0.0625rem 0 0;
+        accent-color: var(--ui-accent);
+        cursor: inherit;
+    }
+
+    &:has(> input:disabled) {
+        color: var(--ui-text-muted);
+        cursor: not-allowed;
+    }
+}
+
+input.ui-invalid:is([type='checkbox'], [type='radio']),
+.ui-check > input[aria-invalid='true'] {
+    outline: 0.125rem solid var(--ui-danger);
+    outline-offset: 0.125rem;
+}
+
+// <input type="checkbox" role="switch" class="ui-switch" />, usually inside a .ui-check label.
+// Track and thumb are backgrounds, so the thumb slides via background-position.
+.ui-switch {
+    --_track: var(--ui-text-subtle);
+    --_thumb: var(--ui-surface);
+
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 1.5rem;
+    margin: 0;
+    border-radius: var(--ui-radius-pill);
+    appearance: none;
+    background-color: var(--_track);
+    background-image: radial-gradient(circle, var(--_thumb) 0 0.5625rem, transparent 0.625rem);
+    background-position: 0 50%;
+    background-size: 1.5rem 1.5rem;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition:
+        background-color var(--ui-duration-base) var(--ui-ease),
+        background-position var(--ui-duration-base) var(--ui-ease);
+
+    &:checked {
+        --_track: var(--ui-accent);
+        --_thumb: var(--ui-on-accent);
+
+        background-position: 100% 50%;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    @media (forced-colors: active) {
+        appearance: auto;
+    }
+}
+
+// Range. The filled part is --ui-range-progress (0%..100%), set by the owning component;
+// Firefox fills natively.
+.ui-range {
+    --_track-size: 0.375rem;
+    --_thumb-size: 1.25rem;
+
+    display: block;
+    inline-size: 100%;
+    block-size: 1.5rem;
+    margin: 0;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+        block-size: var(--_track-size);
+        border-radius: var(--ui-radius-pill);
+        background: linear-gradient(
+            to right,
+            var(--ui-accent) var(--ui-range-progress, 0%),
+            var(--ui-border-strong) var(--ui-range-progress, 0%)
+        );
+    }
+
+    &::-moz-range-track {
+        block-size: var(--_track-size);
+        border-radius: var(--ui-radius-pill);
+        background-color: var(--ui-border-strong);
+    }
+
+    &::-moz-range-progress {
+        block-size: var(--_track-size);
+        border-radius: var(--ui-radius-pill);
+        background-color: var(--ui-accent);
+    }
+
+    &::-webkit-slider-thumb {
+        inline-size: var(--_thumb-size);
+        block-size: var(--_thumb-size);
+        margin-block-start: calc((var(--_track-size) - var(--_thumb-size)) / 2);
+        border: 0.125rem solid var(--ui-accent);
+        border-radius: 50%;
+        appearance: none;
+        background-color: var(--ui-surface-raised);
+        box-shadow: var(--ui-shadow-sm);
+        transition: transform var(--ui-duration-fast) var(--ui-ease);
+    }
+
+    &::-moz-range-thumb {
+        inline-size: var(--_thumb-size);
+        block-size: var(--_thumb-size);
+        border: 0.125rem solid var(--ui-accent);
+        border-radius: 50%;
+        background-color: var(--ui-surface-raised);
+        box-shadow: var(--ui-shadow-sm);
+        transition: transform var(--ui-duration-fast) var(--ui-ease);
+    }
+
+    &:hover:not(:disabled)::-webkit-slider-thumb {
+        transform: scale(1.1);
+    }
+
+    &:hover:not(:disabled)::-moz-range-thumb {
+        transform: scale(1.1);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+// Segmented control. Options are labels around a radio (preferred: native arrow keys) or
+// buttons with aria-pressed / aria-checked.
+.ui-segmented {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.125rem;
+    max-inline-size: 100%;
+    padding: 0.1875rem;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface-sunken);
+}
+
+.ui-segmented__option {
+    position: relative;
+    display: inline-flex;
+    flex: 1 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ui-space-2);
+    min-block-size: 2rem;
+    padding-inline: var(--ui-space-3);
+    border: 0;
+    border-radius: max(var(--ui-radius-sm), calc(var(--ui-radius-md) - 0.1875rem));
+    background: none;
+    color: var(--ui-text-muted);
+    font-family: inherit;
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-strong);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color var(--ui-duration-fast) var(--ui-ease),
+        box-shadow var(--ui-duration-fast) var(--ui-ease),
+        color var(--ui-duration-fast) var(--ui-ease);
+
+    > input {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        opacity: 0;
+        cursor: inherit;
+    }
+
+    &:hover {
+        color: var(--ui-text);
+    }
+
+    // Raised chip plus a border-strong hairline: the hairline carries the 3:1 state contrast.
+    &:has(> input:checked),
+    &[aria-pressed='true'],
+    &[aria-checked='true'] {
+        background-color: var(--ui-surface-raised);
+        box-shadow:
+            var(--ui-shadow-sm),
+            inset 0 0 0 1px var(--ui-border-strong);
+        color: var(--ui-text);
+    }
+
+    &:has(> input:focus-visible) {
+        outline: 0.125rem solid var(--ui-focus-ring);
+        outline-offset: 0.0625rem;
+    }
+
+    &:has(> input:disabled),
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}

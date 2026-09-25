@@ -1,0 +1,17 @@
+// Layout only; the panel and items are .ui-menu.
+
+.account-menu__panel {
+    margin-block: var(--ui-space-2);
+}
+
+.account-menu__identity {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+}
+
+.account-menu__email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
