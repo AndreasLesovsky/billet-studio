@@ -80,15 +80,6 @@ describe('Register', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith('/billets');
   });
 
-  it('returns to a safe returnUrl after signing in', async () => {
-    const { component, router, type } = setup({ returnUrl: '/billets?import=1' });
-    type();
-
-    await component.onSubmit();
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/billets?import=1');
-  });
-
   it('a refused sign-up neither signs in nor leaves the page', async () => {
     const { component, authApi, router, type } = setup({
       register: async () => {

@@ -26,6 +26,15 @@ const CHANGE = {
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+/** A file drag as the browser fires it; jsdom has no DragEvent with a DataTransfer. */
+function fileDrag(type: 'dragover' | 'drop'): DragEvent {
+  const event = new Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'dataTransfer', {
+    value: { types: ['Files'], files: [], dropEffect: 'copy' },
+  });
+  return event as DragEvent;
+}
+
 function setup() {
   const accountApi = {
     account: signal<AccountDto | null>(null),
@@ -50,7 +59,7 @@ function setup() {
   // Loads async and renders children (avatar, dialog): the logic is under test, not the template.
   TestBed.overrideComponent(Account, { set: { template: '<div></div>', imports: [] } });
   const fixture = TestBed.createComponent(Account);
-  return { component: fixture.componentInstance, accountApi, languageService };
+  return { fixture, component: fixture.componentInstance, accountApi, languageService };
 }
 
 describe('Account', () => {
@@ -148,5 +157,30 @@ describe('Account', () => {
 
     expect(accountApi.changePassword).not.toHaveBeenCalled();
     expect(component.passwordForm().invalid()).toBe(true);
+  });
+
+  it('a file dropped beside the avatar card is refused instead of opening in the tab', async () => {
+    const { fixture } = setup();
+    await flush();
+    const accept = (e: Event) => e.preventDefault();
+    const accepted = fileDrag('dragover');
+    const stray = fileDrag('dragover');
+    const strayDrop = fileDrag('drop');
+
+    document.body.addEventListener('dragover', accept, { once: true });
+    document.body.dispatchEvent(accepted);
+    document.body.dispatchEvent(stray);
+    document.body.dispatchEvent(strayDrop);
+
+    // The card's own accepted drag keeps its copy effect.
+    expect(accepted.dataTransfer?.dropEffect).toBe('copy');
+    expect(stray.defaultPrevented).toBe(true);
+    expect(stray.dataTransfer?.dropEffect).toBe('none');
+    expect(strayDrop.defaultPrevented).toBe(true);
+
+    fixture.destroy();
+    const afterLeaving = fileDrag('drop');
+    document.body.dispatchEvent(afterLeaving);
+    expect(afterLeaving.defaultPrevented).toBe(false);
   });
 });

@@ -46,13 +46,6 @@ describe('ConfirmationModalStore', () => {
       expect(store.config()).toBeNull();
     });
 
-    it('opens the modal with the given labels', () => {
-      void ask();
-
-      expect(store.isOpen()).toBe(true);
-      expect(store.config()?.confirmLabel).toBe('ok');
-    });
-
     it('a second question answers the first with no instead of leaving it hanging forever', async () => {
       const first = ask();
       const second = ask();

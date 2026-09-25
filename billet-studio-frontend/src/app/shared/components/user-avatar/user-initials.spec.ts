@@ -6,15 +6,12 @@ describe('getUserInitials', () => {
   it('takes the first letter of the first two words', () => {
     expect(getUserInitials('Anna Berger')).toBe('AB');
     expect(getUserInitials('a b c')).toBe('AB');
+    expect(getUserInitials('  Anna   Berger ')).toBe('AB');
   });
 
   it('takes the first two letters of a single word', () => {
     expect(getUserInitials('Anna')).toBe('AN');
     expect(getUserInitials('A')).toBe('A');
-  });
-
-  it('collapses extra whitespace', () => {
-    expect(getUserInitials('  Anna   Berger ')).toBe('AB');
   });
 
   it('falls back to the local part of the email when there is no name', () => {

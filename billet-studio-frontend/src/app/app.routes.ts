@@ -2,6 +2,7 @@ import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth-guard';
+import { guestGuard } from './core/guards/guest-guard';
 import { requireRole } from './core/guards/role-guard';
 import { unsavedChangesGuard } from './core/guards/unsaved-changes-guard';
 
@@ -47,22 +48,26 @@ export const routes: Routes = [
       },
       {
         path: 'login',
+        canActivate: [guestGuard],
         loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
         data: { breadcrumb: 'BREADCRUMB.LOGIN' },
       },
       {
         path: 'register',
+        canActivate: [guestGuard],
         loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
         data: { breadcrumb: 'BREADCRUMB.REGISTER' },
       },
       {
         path: 'forgot-password',
+        canActivate: [guestGuard],
         loadComponent: () =>
           import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
         data: { breadcrumb: 'BREADCRUMB.FORGOT_PASSWORD' },
       },
       {
         path: 'reset-password',
+        canActivate: [guestGuard],
         loadComponent: () =>
           import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
         data: { breadcrumb: 'BREADCRUMB.RESET_PASSWORD' },

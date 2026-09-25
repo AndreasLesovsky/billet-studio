@@ -27,7 +27,7 @@
     gap: var(--ui-space-2);
     color: var(--ui-danger-ink);
     font-size: var(--ui-text-sm);
-    font-weight: 500;
+    font-weight: var(--ui-font-weight-medium);
     line-height: var(--ui-leading-normal);
     animation: ui-field-error-in var(--ui-duration-base) var(--ui-ease);
 

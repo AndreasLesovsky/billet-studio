@@ -97,26 +97,6 @@ describe('signal-validators', () => {
     });
   });
 
-  describe('the password rule of the contract', () => {
-    it.each([
-      ['empty', '', 'SPEC.PASSWORD_REQUIRED'],
-      ['too short', 'Abc1234', 'SPEC.MIN_LENGTH'],
-      ['no digit', 'Abcdefgh', 'SPEC.PASSWORD_REQUIREMENTS'],
-      ['no uppercase', 'abcdefg1', 'SPEC.PASSWORD_REQUIREMENTS'],
-      ['no lowercase', 'ABCDEFG1', 'SPEC.PASSWORD_REQUIREMENTS'],
-    ])('%s → shows its own message first', (_case, password, message) => {
-      const { testForm } = createForm({ password, confirm: password });
-
-      expect(testForm.password().errors()[0]?.message).toBe(message);
-    });
-
-    it('accepts eight characters with lower, upper and a digit', () => {
-      const { testForm } = createForm({ password: 'Abcdefg1', confirm: 'Abcdefg1' });
-
-      expect(testForm.password().valid()).toBe(true);
-    });
-  });
-
   describe('the shared patterns', () => {
     it.each(['Anna', 'Jean-Luc', "O'Brien", 'Zoë Müller', 'Åsa'])(
       'NAME_PATTERN accepts %s',

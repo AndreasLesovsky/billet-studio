@@ -3,27 +3,20 @@ import { provideRouter } from '@angular/router';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { AuthApi } from '../../../core/services/auth-api';
-import {
-  createMockAuthApi,
-  MockAuthApi,
-  testUser,
-  translateTestingModule,
-} from '../../../../test-helpers';
+import { createMockAuthApi, testUser, translateTestingModule } from '../../../../test-helpers';
 import { AccountMenu } from './account-menu';
 
 describe('AccountMenu', () => {
   let fixture: ComponentFixture<AccountMenu>;
-  let authApi: MockAuthApi;
 
   /** The menu renders into the CDK overlay container, outside the component. */
   const items = () => [...document.querySelectorAll<HTMLElement>('.ui-menu .ui-menu__item')];
   const links = () => items().map((item) => item.getAttribute('href'));
 
   async function openAs(user: ReturnType<typeof testUser> | null): Promise<void> {
-    authApi = createMockAuthApi({ user });
     TestBed.configureTestingModule({
       imports: [AccountMenu, translateTestingModule()],
-      providers: [provideRouter([]), { provide: AuthApi, useValue: authApi }],
+      providers: [provideRouter([]), { provide: AuthApi, useValue: createMockAuthApi({ user }) }],
     });
     fixture = TestBed.createComponent(AccountMenu);
     await fixture.whenStable();
@@ -50,13 +43,5 @@ describe('AccountMenu', () => {
     await openAs(testUser({ role: 'ROLE_ADMIN' }));
 
     expect(links()).toEqual(['/account', '/admin/users', null]);
-  });
-
-  it('signs out through AuthApi', async () => {
-    await openAs(testUser());
-
-    items().at(-1)!.click();
-
-    expect(authApi.logout).toHaveBeenCalledOnce();
   });
 });

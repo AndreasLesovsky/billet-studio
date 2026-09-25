@@ -5,12 +5,12 @@ import { AccessToken } from '../services/access-token';
 import { MessageStore } from '../stores/message-store';
 
 /**
- * Is someone logged in - answered from state, not from a request. Both guards ask exactly this.
+ * Is someone logged in - answered from state, not from a request. Every guard asks exactly this.
  *
  * The one request left is the recovery case: the hint says this browser has a session but no user is
  * loaded, which happens when startup could not reach the server or a tab sat idle past the window.
  */
-async function hasSession(auth: AuthApi, accessToken: AccessToken): Promise<boolean> {
+export async function hasSession(auth: AuthApi, accessToken: AccessToken): Promise<boolean> {
   if (auth.isLoggedIn()) return true;
   if (!accessToken.couldHaveSession()) return false;
 

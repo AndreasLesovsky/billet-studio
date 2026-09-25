@@ -2,27 +2,49 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { FONT_BY_ID, type FontCatalogEntry } from '../../billet/fonts/font-catalog.generated';
+import { BILLET_THEME_PRESETS, type BilletThemePreset } from './billet-theme-presets.generated';
 import {
   COLOR_MODE_STORAGE_KEY,
-  DEFAULT_THEME,
+  SITE_COLOR_TOKENS,
+  SITE_THEME,
   THEME_COLOR_TOKENS,
   THEME_IDS,
-  THEME_STORAGE_KEY,
   THEMES,
   type ColorMode,
   type ThemeColorTokens,
 } from './theme-registry.generated';
 
 /**
- * Guard for section 9 of CLAUDE.md: every theme x mode passes WCAG AA. generate-themes.mjs already
- * refuses to write a failing theme; this re-checks the generated values independently, so a
- * hand-edited or stale generated file fails the test run as well.
+ * Guard for section 9 of CLAUDE.md: the site theme and every editor theme pass WCAG AA in both
+ * modes, and every editor theme's billet preset is readable and uses shipped font faces.
+ * generate-themes.mjs already refuses to write a failing theme; this re-checks the generated
+ * values independently, so a hand-edited or stale generated file fails the test run as well.
  */
 
 type Pair = readonly [fg: keyof ThemeColorTokens, bg: keyof ThemeColorTokens, min: number];
 
+type BilletPaletteKey = keyof BilletThemePreset['palette']['light'];
+
 const TEXT = 4.5;
 const UI = 3;
+
+const BILLET_PAIRS: readonly (readonly [BilletPaletteKey, BilletPaletteKey, number])[] = [
+  ['ink', 'background', TEXT],
+  ['ink', 'surface', TEXT],
+  ['inkSoft', 'background', TEXT],
+  ['accent', 'accentSoft', UI],
+  ['accent', 'background', UI],
+];
+
+const FONT_ROLES = ['title', 'titleAccent', 'heading', 'body', 'signature', 'ui'] as const;
+
+/** The parts of docs/fixtures/muttertag.billet.json a theme preset covers. */
+interface OriginalCard {
+  readonly palette: BilletThemePreset['palette'];
+  readonly typography: BilletThemePreset['typography'];
+  readonly particles: { readonly colors: readonly string[] };
+}
 
 const PAIRS: readonly Pair[] = [
   ['text', 'bg', TEXT],
@@ -80,7 +102,7 @@ function contrast(a: string, b: string): number {
 
 const MODES: readonly ColorMode[] = ['light', 'dark'];
 
-describe('theme contrast (WCAG AA)', () => {
+describe('theme contrast and billet presets', () => {
   it('computes WCAG contrast correctly', () => {
     expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);
     expect(contrast('#767676', '#ffffff')).toBeCloseTo(4.54, 2);
@@ -91,10 +113,15 @@ describe('theme contrast (WCAG AA)', () => {
     expect(THEMES.map((t) => t.id)).toEqual([...THEME_IDS]);
   });
 
-  for (const id of THEME_IDS) {
+  const tokenSets = [
+    [SITE_THEME, SITE_COLOR_TOKENS],
+    ...THEME_IDS.map((id) => [id, THEME_COLOR_TOKENS[id]] as const),
+  ] as const;
+
+  for (const [id, byMode] of tokenSets) {
     for (const mode of MODES) {
       it(`${id} / ${mode} passes every pair`, () => {
-        const tokens = THEME_COLOR_TOKENS[id][mode];
+        const tokens = byMode[mode];
         const failures = PAIRS.filter(
           ([fg, bg, min]) => contrast(tokens[fg], tokens[bg]) < min,
         ).map(
@@ -106,14 +133,44 @@ describe('theme contrast (WCAG AA)', () => {
     }
   }
 
-  it('theme-boot.js knows exactly the registry theme ids, the default and the storage keys', () => {
+  it('theme-boot.js sets only the site theme and reads only the colour mode', () => {
     const boot = readFileSync(join('public', 'theme-boot.js'), 'utf8');
-    const list = /var ids = \[([^\]]*)\]/.exec(boot)?.[1] ?? '';
-    const ids = [...list.matchAll(/['"]([a-z0-9]+)['"]/g)].map((m) => m[1]);
+    const themes = [...boot.matchAll(/'data-theme', '([a-z0-9]+)'/g)].map((m) => m[1]);
+    const keys = [...boot.matchAll(/getItem\('([^']+)'\)/g)].map((m) => m[1]);
 
-    expect(ids).toEqual([...THEME_IDS]);
-    expect(boot).toMatch(new RegExp(`theme = ['"]${DEFAULT_THEME}['"]`));
-    expect(boot).toContain(THEME_STORAGE_KEY);
-    expect(boot).toContain(COLOR_MODE_STORAGE_KEY);
+    expect(themes).toEqual([SITE_THEME]);
+    expect(keys).toEqual([COLOR_MODE_STORAGE_KEY]);
+    expect(THEME_IDS).not.toContain(SITE_THEME);
+  });
+
+  it("the rose billet preset is the original Mother's Day card", () => {
+    const fixture = join('..', 'docs', 'fixtures', 'muttertag.billet.json');
+    const card = JSON.parse(readFileSync(fixture, 'utf8')) as OriginalCard;
+
+    expect(BILLET_THEME_PRESETS.rose).toEqual({
+      palette: { light: card.palette.light, dark: card.palette.dark },
+      typography: card.typography,
+      particleColors: card.particles.colors,
+    });
+  });
+
+  it('every billet preset is readable in both modes and uses shipped font faces', () => {
+    const fonts: ReadonlyMap<string, FontCatalogEntry> = FONT_BY_ID;
+    const failures = THEME_IDS.flatMap((id) => {
+      const { palette, typography } = BILLET_THEME_PRESETS[id];
+      const unreadable = MODES.flatMap((mode) =>
+        BILLET_PAIRS.filter(
+          ([fg, bg, min]) => contrast(palette[mode][fg], palette[mode][bg]) < min,
+        ).map(([fg, bg]) => `${id}/${mode}: ${fg} on ${bg}`),
+      );
+      const unshipped = FONT_ROLES.filter((role) => {
+        const { fontId, weight, italic } = typography[role];
+        const font = fonts.get(fontId);
+        return !(italic ? font?.italicWeights : font?.weights)?.includes(weight);
+      }).map((role) => `${id}: ${role} ${typography[role].fontId} ${typography[role].weight}`);
+      return [...unreadable, ...unshipped];
+    });
+
+    expect(failures).toEqual([]);
   });
 });

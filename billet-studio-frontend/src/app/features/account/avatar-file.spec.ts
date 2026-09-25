@@ -6,12 +6,11 @@ import { AVATAR_MAX_MB, avatarFileProblem } from './avatar-file';
 const MB = 1024 * 1024;
 
 describe('avatarFileProblem', () => {
-  it.each(['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/avif'])(
-    'accepts %s',
-    (type) => {
-      expect(avatarFileProblem(fileOf(MB, type))).toBeNull();
-    },
-  );
+  it('accepts every type the backend decodes', () => {
+    const types = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/avif'];
+
+    expect(types.filter((type) => avatarFileProblem(fileOf(MB, type)) !== null)).toEqual([]);
+  });
 
   it('accepts a known extension when the system reports no or an odd type', () => {
     expect(avatarFileProblem(new File([''], 'me.BMP', { type: 'image/x-ms-bmp' }))).toBeNull();

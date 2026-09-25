@@ -126,7 +126,9 @@
                   <td>{{ user.email }}</td>
                   <td>{{ 'ADMIN_USERS.ROLES.' + user.role | translate }}</td>
                   <td><app-user-status [user]="user" /></td>
-                  <td>{{ user.createdAt | date: 'mediumDate' : undefined : locale() }}</td>
+                  <td class="ui-table__num">
+                    {{ user.createdAt | date: 'mediumDate' : undefined : locale() }}
+                  </td>
                   <td class="ui-table__actions">
                     <div
                       class="user-list__actions"

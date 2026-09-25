@@ -3,24 +3,8 @@
     display: block;
 }
 
-.theme-picker {
-    display: flex;
-    flex-direction: column;
-    gap: var(--ui-space-6);
-}
-
-.theme-picker__group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--ui-space-3);
-}
-
 .theme-picker__legend {
     margin-block-end: var(--ui-space-3);
-}
-
-.theme-picker__modes {
-    align-self: flex-start;
 }
 
 .theme-picker__grid {

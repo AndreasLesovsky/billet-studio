@@ -1,0 +1,45 @@
+// Layout only: the swatch colours and the sample's colours and fonts are preset data, bound inline.
+
+.preset {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin: 0;
+}
+
+.preset__palettes {
+    display: grid;
+    gap: var(--ui-space-1);
+    margin: 0;
+}
+
+.preset__palette {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    align-items: center;
+    gap: var(--ui-space-2);
+}
+
+.preset__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-1);
+    margin: 0;
+}
+
+.preset__sample {
+    overflow: hidden;
+    border-radius: var(--ui-radius-md);
+}
+
+.preset__hero {
+    margin: 0;
+    padding: var(--ui-space-3) var(--ui-space-4);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.preset__body {
+    margin: 0;
+    padding: var(--ui-space-3) var(--ui-space-4) var(--ui-space-4);
+    line-height: 1.5;
+}

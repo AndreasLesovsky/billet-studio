@@ -408,27 +408,51 @@ Two token families that never touch each other:
 
 | Family | Scope | Set by | Consumed by |
 |---|---|---|---|
-| `--ui-*` | the editor/app chrome | `<html data-theme="<id>" data-mode="light\|dark">` | the CSS component layer |
+| `--ui-*` | the website (site theme) and, inside the editor, editor themes | `<html data-theme="studio" data-mode="light\|dark">` for the site; a `[appThemeScope]` element for an editor theme | the CSS component layer |
 | `--billet-*` | one billet | inline style bindings on the billet root | `billet/` renderer styles only |
 
-### Editor themes (`--ui-*`)
-- Source of truth: `themes.json` (~16 themes, ~10 seed tokens each). `scripts/generate-themes.mjs`
-  generates `_themes.generated.scss` (`[data-theme=x]` selectors with `light-dark()`) and
-  `public/theme-boot.js`, which sets `data-theme` / `data-mode` before Angular starts (no flash,
-  CSP-compatible - no inline script). **Never edit a `*.generated.*` file or `theme-boot.js` by
-  hand**; change `themes.json` or the generator and re-run it.
-- Derived tokens (`--ui-surface-raised`, `--ui-text-muted`, `--ui-border`, `--ui-accent-soft`,
-  `--ui-on-accent`, `--ui-accent-ink`, `--ui-focus-ring`) are computed once in `_ui-base.scss` via
-  `color-mix()`, together with the shared scales `--ui-space-*` and `--ui-radius-*`. Add a derived
-  token there, never per component.
-- `ThemeService` owns switching: validated theme IDs only, mode `system | light | dark`.
-- The theme-picker cards set `data-theme` on themselves, so each card previews its own theme.
-- **Every theme × mode must pass the contrast spec** (WCAG AA for text and UI components). A new
-  theme or seed change that fails it is not done.
+### The site: one fixed design ("Studio")
+- **The website has exactly ONE design, the site theme `studio`**: clean white surfaces, one violet
+  accent, Manrope headings, Inter for body and UI, in light and dark. Every page outside the editor
+  renders in it: home, auth, account, admin, billet list, public pages, the app shell.
+- `public/theme-boot.js` always sets `<html data-theme="studio">` and `data-mode` (stored choice,
+  else `prefers-color-scheme`) before Angular starts - no flash, CSP-compatible (no inline script).
+- **Never add a site theme switcher.** The header offers the colour mode only (`ColorModeMenu`:
+  System / Hell / Dunkel). Nothing writes `data-theme` on `<html>` except `theme-boot.js`.
+- `ColorModeService` (`core/theme/color-mode-service.ts`) owns the mode: `mode()`
+  (`system | light | dark`), `resolvedMode()` (`light | dark`), `setMode(mode)`. It follows
+  `prefers-color-scheme` live while the mode is `system`, follows other tabs via the `storage` event,
+  persists `billet-studio.color-mode` (absent = system) and writes **only** `data-mode` on `<html>`.
+
+### Editor themes: only inside the editor
+- The 16 editor themes are **editor-only**. They apply through the `ThemeScope` directive
+  (`[appThemeScope]="themeId"`, `shared/directives/theme-scope.ts`) on the editor root and on
+  theme-picker cards - plus the dev ui-kit. Nothing else may ever render in an editor theme, and no
+  editor theme is ever set on `<html>`. `theme-scope.spec.ts` enforces both (where a scope may be
+  opened; nothing but `ThemeScope` writes `data-theme`).
+- `ThemeScope` binds `data-theme` (unknown id → `DEFAULT_THEME`), `data-mode` (default: the site's
+  `resolvedMode()`, override via `[themeMode]`) and the class `ui-theme-scope`, which re-applies
+  background, text colour and body font from the scope's own tokens. The page around it stays Studio.
+- An editor theme flows into a billet as a **starting preset**: `BilletDocument.theme` plus the
+  palette / typography / particle colours it writes (docs/billet-document.md, "Themes vs. site").
+  The renderer never reads the theme id.
+
+### Source of truth
+- `src/styles/themes/themes.json` holds the seeds of the site theme (`site`) and of the editor themes
+  (`themes[]`). `scripts/generate-themes.mjs` derives every other `--ui-*` colour in OKLCH and writes
+  `_themes.generated.scss`, `theme-registry.generated.ts` and `public/theme-boot.js`. **Never edit a
+  `*.generated.*` file or `theme-boot.js` by hand**; change `themes.json` or the generator and re-run
+  it. Workflow, selectors and APIs: "Design system reference" at the end of this file.
+- Theme-independent scales (`--ui-space-*`, `--ui-text-*`, base radii, motion, weights) live in
+  `_tokens.scss` on `:root`. A `:root` token must never reference a themed token: it would resolve
+  in the site theme and leak Studio values into every editor-theme scope.
+- **Every theme × mode, the site included, must pass the contrast spec** (WCAG AA for text and UI
+  components), and every heading weight must be a face the font catalog ships. A new theme or seed
+  change that fails either is not done - the generator refuses to write it.
 
 ### Where colors may appear
-- Color values exist only in `themes.json` (editor) and in billet palettes (document data and
-  templates). No hex/rgb/hsl literals in component SCSS or templates.
+- Color values exist only in `themes.json` (site + editor themes) and in billet palettes (document
+  data and templates). No hex/rgb/hsl literals in component SCSS or templates.
 - The CSS component layer in `src/styles/` (`ui-btn`, `ui-field`, `ui-card`, `ui-tabs`, `ui-switch`,
   `ui-range`, `ui-dialog`, `ui-toast`, `ui-menu`, `ui-skeleton`, …) is the only place that applies
   `--ui-*` colors. Component classes are prefixed `ui-`.
@@ -438,9 +462,10 @@ Two token families that never touch each other:
 ### Billet tokens (`--billet-*`)
 - Set inline on the billet root from the document (`palette`, `typography`, `spacing`) - e.g.
   `[style.--billet-accent]`. They must **never reference `--ui-*`**, and nothing in `billet/` may
-  depend on the editor theme: a billet looks the same in every editor theme and on the public page.
+  depend on the site or editor theme: a billet looks the same in every editor theme and on the
+  public page.
 - The billet's light/dark follows the document's `colorMode` (and the preview toggle in the editor),
-  never the editor's `data-mode`.
+  never the site's or a scope's `data-mode`.
 
 ---
 
@@ -584,7 +609,10 @@ through the interceptor again → deadlock (no translations, endless spinner).
   `billet/`.
 - Request/response DTOs are Java records with Jakarta validation. The billet document is parsed by
   `BilletDocumentCodec` (Jackson 3 `JsonMapper`): unknown fields are dropped, output is normalized
-  (so "changed since publish" is a string compare), `StreamReadConstraints` cap body size.
+  (so "changed since publish" is a string compare).
+- Parser limits (StreamReadConstraints: string 65 536 chars, depth 32, document = import cap) are set
+  on the Boot JsonMapper by `shared/config/JacksonConfig` (it replaces Boot's `JsonMapper.Builder` and
+  applies every customizer; in Jackson 3 a `JsonMapperBuilderCustomizer` cannot set them).
 - Time is `Instant`, UTC (`hibernate.jdbc.time_zone = UTC`); entities stamp `created_at` /
   `updated_at` in `@PrePersist` / `@PreUpdate`. Schedulers run in UTC.
 - Spring `@Transactional` (not `jakarta.transaction`); optimistic locking via `@Version`.
@@ -683,11 +711,26 @@ Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), li
   dwebp/avifdec run only after the header check.
 - `docker info` is not a reliable Docker check on this machine; judge IT runs by Testcontainers'
   "Found Docker environment" log line and `Skipped: 0` on `*IT` classes.
+- Every `@RequestBody` is capped before parsing by the handler-bound `shared/web/RequestBodyLimitAdvice`
+  (default 16 KiB; `BilletController` 2 × max-document-bytes, import × 20) - never by a URL filter
+  (URL filters see the undecoded path and are bypassable). Oversized bodies and parser-limit
+  violations answer 400 `VALIDATION_ERROR`.
+- `spring.mvc.formcontent.filter.enabled=false` must stay: `FormContentFilter` reads form-encoded
+  PUT/PATCH/DELETE bodies unbounded, before authentication (pinned by `ServletContainerTest`).
+- Rate-limit buckets are keyed by `ClientIp.rateLimitKey`: IPv4 address, IPv6 /64, IPv4-mapped IPv6 as
+  IPv4; audit logs keep the full IP. Buckets that refilled are swept every 10 minutes.
+- Every free-text field of the billet document carries `@NoControlCharacters` (only `
+` allowed;
+  tab, CR, other C0 and DEL are `VALIDATION_ERROR`). The editor strips `` and turns tabs into spaces
+  on input, and shortens text only at code-point/grapheme boundaries.
+- The first publish of a billet takes a pessimistic row lock, so a billet only ever gets one share token.
 
 ### Application rules
 - No HTML-string sinks (section 11). User content is text, always.
-- Share tokens are 128-bit random (22 chars base64url); the public endpoint is rate-limited and
-  returns only the published snapshot.
+- Share tokens are 128-bit random (22 chars base64url); the public endpoint is rate-limited,
+  `noindex`, ignores (never rejects) a stale bearer token, and returns only the published snapshot -
+  only while the owner's account is active (lock/deactivation = the same 404 `BILLET_NOT_FOUND`;
+  reactivation restores the link).
 - Refresh cookie `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/v1/auth`. The access token lives in
   memory only.
 
@@ -883,29 +926,86 @@ Before a phase is committed:
 
 ## Design system reference
 
-The editor chrome (`--ui-*`) in one place. Live preview of every class in the current theme: the
-`UiKit` page (`features/dev/ui-kit`, route `dev/ui`).
+The `--ui-*` layer in one place. Live preview: the `UiKit` page (`features/dev/ui-kit`, route
+`dev/ui`, dev builds only) - first every class in the site theme (Studio), then the theme picker and
+a mini editor panel (card, input, badge, buttons) per editor theme, each inside its own `ThemeScope`.
+Toggle light/dark with the header's colour-mode menu.
+
+### Site theme and editor themes
+- **Studio** (`site` in `themes.json`, id `studio`) is the ONE design of the website, on `<html>`.
+  Inter for body and UI (400 text, 500 `--ui-font-weight-medium`, 600 `--ui-font-weight-strong`),
+  Manrope for headings (600 for h3-h6 / card and dialog titles, 800 for h1/h2 / page titles / the
+  wordmark; Manrope ships 200/400/600/800 - never 700). Light: white bg and surface, cool sunken
+  plane, accent `#6246ea`. Dark: bg `#111016`, surface `#1a1920`, accent `#9d8cff` (AA as ink, so
+  labels on it are dark).
+- **Never add a site theme switcher**, and never render a site page in an editor theme. The header
+  has the colour mode only.
+- **Editor themes** (`themes[]`, 16 ids, `default` = `rose`) render only inside `[appThemeScope]`:
+  the editor root, theme-picker cards, the dev ui-kit (`theme-scope.spec.ts` enforces it).
 
 ### Theme workflow
 1. Edit seeds in `billet-studio-frontend/src/styles/themes/themes.json`: per theme `id`, `fontBody`,
-   `fontHeading`, optional `headingWeight` (default 600) / `headingScale` (default 1), `radius`
-   (factor on the base radii), `shadowTint`; per `light` / `dark` only `bg`, `surface`, `text`,
-   `accent`, optional `accent2`. Theme names are i18n keys `THEMES.<ID>`.
+   `fontHeading`, optional `headingWeight` (default 600), `displayWeight` (h1/h2, page titles,
+   wordmark; default `headingWeight`), `headingScale` (default 1), `radius` (factor on the base
+   radii), `shadowTint`; per `light` / `dark` only `bg`, `surface`, `text`, `accent`, optional
+   `accent2` (decorative) and `sunken` (overrides the derived `--ui-surface-sunken`). Editor theme
+   names are i18n keys `THEMES.<ID>`. The site id must differ from every editor id.
 2. `npm run themes:gen` (also runs in prestart / prebuild / pretest) runs
-   `scripts/generate-themes.mjs`. It derives every other token in OKLCH (this supersedes the
-   `color-mix()` / `light-dark()` idea in section 9: the derivation needs contrast-driven searches
-   CSS cannot do), checks WCAG AA for every pair the UI uses, and exits 1 without writing when one
-   fails. It writes `src/styles/_themes.generated.scss`, `src/app/core/theme/theme-registry.generated.ts`
-   and `public/theme-boot.js`.
-3. `theme-contrast.spec.ts` re-checks the generated values and that `theme-boot.js` knows exactly
-   `THEME_IDS`.
+   `scripts/generate-themes.mjs`. It derives every other token in OKLCH (contrast-driven searches CSS
+   cannot do), checks WCAG AA for every pair the UI uses, checks every heading / display weight (and
+   the site's body weights 400/500/600) against `billet/fonts/font-catalog.generated.ts`, and exits 1
+   without writing when anything fails. It writes `src/styles/_themes.generated.scss`,
+   `src/app/core/theme/theme-registry.generated.ts` and `public/theme-boot.js`.
+3. `theme-contrast.spec.ts` re-checks the generated values of Studio and every editor theme, and
+   that `theme-boot.js` sets only the site theme and reads only the colour-mode key.
 
-Selectors are `[data-theme='x']` (fonts, radii) and `[data-theme='x'][data-mode='light|dark']`
-(colours, shadows, `color-scheme`), never `:root`-only, so any element carrying both attributes
-renders in that theme. localStorage: `billet-studio.theme`, `billet-studio.color-mode` (absent =
-follow the system). `ThemeService` (`core/theme/theme-service.ts`): `theme()`, `mode()`
-(`system | light | dark`), `resolvedMode()`, `setTheme(id)` (unknown ids ignored), `setMode(mode)`;
-it follows `prefers-color-scheme` live and other tabs via the `storage` event.
+Selectors: Studio is `[data-theme='studio']` / `[data-theme='studio'][data-mode='light|dark']`, with
+`:root:not([data-theme])` fallbacks so a bare `<html>` still renders as the site. Editor themes are
+`[data-theme='x']` (fonts, radii, weights) and `[data-theme='x'][data-mode='light|dark']` (colours,
+shadows, `color-scheme`), never `:root`-only, so any element carrying both attributes renders in that
+theme. `.ui-theme-scope` (`_base.scss`) re-applies `background-color`, `color` and `font-family` from
+the scope's tokens; heading rules resolve their tokens on the heading itself, so they follow the
+scope too. localStorage: `billet-studio.color-mode` only (absent = follow the system; a stale
+`billet-studio.theme` key from earlier builds is ignored).
+
+### Theme APIs (for the editor)
+- `theme-registry.generated.ts`: `THEME_IDS` (the 16 editor ids, picker order), `ThemeId`,
+  `ColorMode` (`'light' | 'dark'`), `DEFAULT_THEME` (`'rose'`), `SITE_THEME` (`'studio'`, not a
+  `ThemeId`), `COLOR_MODE_STORAGE_KEY`, `THEMES: readonly ThemeMeta[]` (`id`, `nameKey`, `fontBody`,
+  `fontHeading`, `swatch.light|dark` = final `bg surface text accent accent2`), `isThemeId(value)`,
+  `ThemeColorTokens`; `THEME_COLOR_TOKENS` / `SITE_COLOR_TOKENS` are for the contrast spec only.
+- `ColorModeService` (`core/theme/color-mode-service.ts`, root): `mode()`, `resolvedMode()`,
+  `setMode(mode: ColorModeSetting)`; `ColorModeSetting = 'system' | ColorMode`. Writes only
+  `<html data-mode>`; created at startup by `App`.
+- `ThemeScope` (`shared/directives/theme-scope.ts`): `[appThemeScope]="themeId"` (required; unknown →
+  `DEFAULT_THEME`), optional `[themeMode]` (default: `ColorModeService.resolvedMode()`). Host:
+  `data-theme`, `data-mode`, class `ui-theme-scope`. Never set these attributes by hand.
+- `ThemePicker` (`app-theme-picker`, `shared/components/theme-picker`): a
+  `FormValueControl<string>` - `[formField]="billetForm.theme"` or standalone `[(value)]`; `disabled`
+  input, `touch` output on focus-out, `focus()`. Native radio group (fieldset + legend
+  `THEME_PICKER.LABEL`); each card is a `ThemeScope` in the site's resolved mode and shows the
+  theme's swatches and name. An unknown value shows the default theme checked without writing back.
+- `ColorModeMenu` (`app-color-mode-menu`): the header's icon button + CDK menu of
+  `menuitemradio` items (i18n `COLOR_MODE.*`).
+- Billet presets: every editor theme in `themes.json` carries a `billet` block (`light`/`dark`
+  BilletPalette, six typography roles + `emphasis`, `particleColors`). The generator validates fonts
+  against the catalog and five billet contrast rules (ink/background ≥ 4.5, ink/surface ≥ 4.5,
+  inkSoft/background ≥ 4.5, accent/accentSoft ≥ 3, accent/background ≥ 3) and writes
+  `core/theme/billet-theme-presets.generated.ts`: `BilletThemePreset`, `BILLET_THEME_PRESETS`,
+  `billetPresetFor(id)` (unknown → default). `rose` must equal `docs/fixtures/muttertag.billet.json`
+  (the live card; `theme-contrast.spec.ts` pins it). `titleAccent.size` is relative to the final
+  title size (1em of the hero h1).
+
+### Icons (generated subset)
+- `scripts/generate-icons.mjs` (`npm run icons:gen`; also prestart / prebuild / pretest) collects
+  every `bi-<name>` in `src/**/*.{html,ts}` (specs excluded) plus the class names in
+  `src/styles/icons/dynamic-icons.json` (only for names assembled at runtime), and writes
+  `src/styles/_icons.generated.scss`: the `@font-face` (url() to the woff2 in
+  `node_modules/bootstrap-icons`, bundled by the build with a hashed name), the base `.bi` rule and
+  one `::before` rule per used icon, codepoints from `bootstrap-icons.json`. A name that does not
+  exist fails the script. `bootstrap-icons.css` is never included.
+- A new icon needs nothing but its literal class in a template or TS string; the next
+  start / build / test regenerates the subset. Prefer literal names over string building.
 
 ### Tokens
 | Group | Tokens |
@@ -916,7 +1016,7 @@ it follows `prefers-color-scheme` live and other tabs via the `storage` event.
 | Accent | `--ui-accent` (fills, ≥ 3:1 on bg), `--ui-accent-hover`, `--ui-accent-soft` (tinted bg), `--ui-on-accent` (label on accent), `--ui-accent-ink` (accent as text/icon, ≥ 4.5:1), `--ui-accent-2` (decorative), `--ui-focus-ring` |
 | Status | `--ui-{danger,success,warning,info}` (fill), `-soft` (tinted bg), `-ink` (text/icon), `--ui-on-{status}` (label on the fill), `--ui-danger-hover` |
 | Misc colour | `--ui-overlay` (dialog backdrop), `--ui-shadow-sm/md/lg` |
-| Type | `--ui-font-body`, `--ui-font-heading`, `--ui-font-heading-weight`, `--ui-font-heading-scale`, `--ui-font-mono`, `--ui-font-weight-strong`, `--ui-text-xs/sm/md/lg/xl/2xl/3xl`, `--ui-leading-tight/normal` |
+| Type | `--ui-font-body`, `--ui-font-heading`, `--ui-font-heading-weight` (h3-h6, card/dialog titles), `--ui-font-display-weight` (h1/h2, page titles, wordmark), `--ui-font-heading-scale`, `--ui-font-mono`, `--ui-font-weight-medium` (500: tabs, secondary labels), `--ui-font-weight-strong` (600: labels, buttons, badges), `--ui-text-xs/sm/md/lg/xl/2xl/3xl`, `--ui-leading-tight/normal` |
 | Shape | `--ui-radius-sm/md/lg/xl` (per theme), `--ui-radius-pill` |
 | Space | `--ui-space-1..12` = .25 .5 .75 1 1.25 1.5 2 2.5 3 4 5 6 rem |
 | Motion | `--ui-duration-fast/base/slow` (0 under reduced motion), `--ui-ease` |
@@ -929,6 +1029,8 @@ uses `-ink` on `-soft`.
 ### Component classes (`src/styles/components/`)
 - **Layout:** `ui-container`, `ui-page` (+ `__header __title __lead`), `ui-stack` (+ `--sm --lg`),
   `ui-cluster`, `ui-grid` (column minimum via `--ui-grid-min`), `ui-visually-hidden`.
+- **App:** `ui-app-header` (frosted when sticky), `ui-app-footer`, `ui-wordmark` (+ `__mark` accent
+  tile with the billet icon, `__accent`), `ui-skip-link`.
 - **Buttons:** `ui-btn` + `--primary | --secondary | --ghost | --danger`, `--sm | --lg`, `--icon`
   (needs `aria-label`), `--block`. Disabled via `disabled` or `aria-disabled="true"`.
 - **Forms:** `ui-field` > `ui-label` + control + `ui-hint`; controls `ui-input`, `ui-textarea`,
@@ -939,17 +1041,19 @@ uses `-ink` on `-soft`.
   radio, or a button with `aria-pressed` / `aria-checked`).
 - **Surfaces:** `ui-card` (+ `__header __title __body __footer`, `--interactive` for a stretched-link
   card), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`, `--lg`),
-  `ui-menu` / `ui-menu__item` (+ `--danger`) / `ui-menu__separator` / `ui-menu__label` and
-  `ui-popover` for CDK overlay panels (`cdk.overlay()` is included globally), `ui-table-wrap` >
-  `ui-table` (+ `__actions` cell).
+  `ui-menu` / `ui-menu__item` (+ `--danger`) / `ui-menu__check` (trailing tick of a checked
+  `menuitemradio`) / `ui-menu__separator` / `ui-menu__label` and `ui-popover` for CDK overlay panels
+  (`cdk.overlay()` is included globally), `ui-table-wrap` > `ui-table` (+ `__actions` cell).
 - **Feedback:** `ui-alert` (+ `--info --success --warning --danger`, `__title`), `ui-badge`
   (+ `--accent --muted --success --warning --danger`), `ui-spinner` (+ `--sm --lg`, pair with a
   `role="status"` text), `ui-skeleton`, `ui-avatar` (+ `--sm --lg --xl`), `ui-toast-region` >
   `ui-toast` (+ variants, `__body`).
 - **Navigation:** `ui-tabs` > `ui-tab` (`aria-selected` or `aria-current="page"`), `ui-breadcrumb`
   (the `<ol>` inside a labelled `<nav>`), `ui-link`.
-- **Theme preview:** `ui-theme-option` / `__frame` / `__name` / `__check` and `ui-theme-card`
-  (+ `__bar __dot __body __title __line __actions __button __chip`), used by `app-theme-picker`.
+- **Theme preview:** `ui-theme-option` / `__frame` / `__name` / `__check` (site theme) and
+  `ui-theme-card` (+ `__bar __swatch --accent-2 --text __body __title __line __actions __button
+  __chip`, rendered inside a `ThemeScope`), used by `app-theme-picker`. `ui-theme-scope` is set by
+  `ThemeScope` only.
 
 Use a class as-is; a missing variant is added to `src/styles/components/`, never as colour in
 component SCSS.

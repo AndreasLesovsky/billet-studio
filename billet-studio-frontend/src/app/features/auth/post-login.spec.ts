@@ -14,13 +14,6 @@ describe('postLoginTarget', () => {
     expect(postLoginTarget(null, owner(true), 7)).toBe(POST_LOGIN_ROUTE);
   });
 
-  it.each(['//evil.example/x', 'https://evil.example', 'javascript:alert(1)', 'billets'])(
-    'ignores the unsafe returnUrl %s',
-    (url) => {
-      expect(postLoginTarget(url, owner(true), 7)).toBe(POST_LOGIN_ROUTE);
-    },
-  );
-
   it("drops the page another account's session ended on, asking with this user's id", () => {
     const authApi = owner(false);
 
@@ -28,11 +21,11 @@ describe('postLoginTarget', () => {
     expect(authApi.returnUrlBelongsTo).toHaveBeenCalledWith('/admin/users', 8);
   });
 
-  it('does not spend the return intent on an unsafe url', () => {
+  // Which URLs are unsafe is return-url.spec.ts's table.
+  it('ignores an unsafe returnUrl without spending the return intent on it', () => {
     const authApi = owner(true);
 
-    postLoginTarget('//evil.example', authApi, 7);
-
+    expect(postLoginTarget('//evil.example', authApi, 7)).toBe(POST_LOGIN_ROUTE);
     expect(authApi.returnUrlBelongsTo).not.toHaveBeenCalled();
   });
 });

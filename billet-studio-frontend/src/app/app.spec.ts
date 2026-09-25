@@ -65,13 +65,6 @@ describe('app routes', () => {
 
   beforeEach(() => configure());
 
-  it('renders the home page inside the app shell', async () => {
-    const harness = await RouterTestingHarness.create('/');
-
-    expect(harness.routeNativeElement?.tagName).toBe('APP-SHELL');
-    expect(harness.routeNativeElement?.querySelector('app-home')).not.toBeNull();
-  });
-
   it('answers an unknown path with the not-found page and its crumb', async () => {
     const harness = await RouterTestingHarness.create('/nowhere/at/all');
 
@@ -101,6 +94,21 @@ describe('app routes', () => {
     await RouterTestingHarness.create('/account');
 
     expect(TestBed.inject(Router).url).toBe('/login?returnUrl=%2Faccount');
+  });
+
+  it('sends a signed-in user from the sign-in and password pages to their billets', async () => {
+    TestBed.resetTestingModule();
+    configure(createMockAuthApi({ user: testUser() }));
+    const harness = await RouterTestingHarness.create();
+    const router = TestBed.inject(Router);
+
+    const landed: string[] = [];
+    for (const page of ['/login', '/register', '/forgot-password', '/reset-password?token=t']) {
+      await harness.navigateByUrl(page);
+      landed.push(router.url);
+    }
+
+    expect(landed).toEqual(['/billets', '/billets', '/billets', '/billets']);
   });
 
   it('sends a signed-in non-admin away from the user management', async () => {

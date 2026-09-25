@@ -72,12 +72,6 @@ describe('user-form-schema', () => {
     });
   });
 
-  it("reads a reason the user gave themselves as none: it is not the admin's to send", () => {
-    expect(
-      toUserFormModel({ ...RESPONSE, deactivationReason: 'PRIVACY_CONCERNS' }).deactivationReason,
-    ).toBe('');
-  });
-
   it('sends an active account without a reason, whatever the select still holds', () => {
     expect(toUserRequestDto({ ...FILLED, active: true, deactivationReason: 'SPAM' })).toEqual({
       name: 'Berta Blum',

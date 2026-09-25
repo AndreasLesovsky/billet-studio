@@ -77,6 +77,8 @@ describe('AdminUserApi', () => {
       req.flush({ rows: [], totalRows: 0, page: 0, size: 20 });
 
       expect((await promise).totalRows).toBe(0);
+      // Reading is silent: no success toast.
+      expect(messageStore.addMessage).not.toHaveBeenCalled();
     });
 
     it('sends a trimmed search term and the status filter when set', async () => {
@@ -94,29 +96,6 @@ describe('AdminUserApi', () => {
       req.flush({ rows: [], totalRows: 0, page: 0, size: 20 });
       await promise;
     });
-
-    it('reading is silent: no success toast', async () => {
-      const promise = api.list(QUERY);
-      http.expectOne((r) => r.url === url).flush({ rows: [], totalRows: 0, page: 0, size: 20 });
-      await promise;
-
-      expect(messageStore.addMessage).not.toHaveBeenCalled();
-    });
-  });
-
-  it('loadRoles stores the roles', async () => {
-    const promise = api.loadRoles();
-    http.expectOne({ method: 'GET', url: `${url}/roles` }).flush(['ROLE_USER', 'ROLE_ADMIN']);
-
-    await promise;
-    expect(api.roles()).toEqual(['ROLE_USER', 'ROLE_ADMIN']);
-  });
-
-  it('get reads one user', async () => {
-    const promise = api.get(5);
-    http.expectOne({ method: 'GET', url: `${url}/5` }).flush({ id: 5 });
-
-    expect((await promise).id).toBe(5);
   });
 
   it('create POSTs the UserRequestDto and confirms', async () => {

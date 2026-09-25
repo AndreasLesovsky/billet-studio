@@ -202,6 +202,11 @@
         block-size: 100%;
         object-fit: cover;
     }
+
+    // The guest glyph reads smaller than two capitals of the same size.
+    > .bi {
+        font-size: 1.25em;
+    }
 }
 
 .ui-avatar--sm {

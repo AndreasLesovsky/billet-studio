@@ -48,15 +48,17 @@
     "LANGUAGE": "Language",
     "LANGUAGE_DE": "Deutsch",
     "LANGUAGE_EN": "English",
-    "THEME": "Theme",
     "TEMPLATES": "Templates"
   },
+  "COLOR_MODE": {
+    "LABEL": "Colour mode",
+    "TRIGGER": "Colour mode: {{mode}}",
+    "SYSTEM": "System",
+    "LIGHT": "Light",
+    "DARK": "Dark"
+  },
   "THEME_PICKER": {
-    "THEME_LABEL": "Colour theme",
-    "MODE_LABEL": "Colour mode",
-    "MODE_SYSTEM": "System",
-    "MODE_LIGHT": "Light",
-    "MODE_DARK": "Dark"
+    "LABEL": "Theme"
   },
   "THEMES": {
     "ROSE": "Rose",
@@ -285,8 +287,12 @@
   },
   "UI_KIT": {
     "TITLE": "UI kit",
-    "LEAD": "Every building block of the design system in the current theme, for visual checks in light and dark.",
-    "SECTION_THEME": "Theme",
+    "LEAD": "Every building block of the design system: the website in its fixed Studio design first, then the editor themes – for visual checks in light and dark.",
+    "SITE_TITLE": "Website · Studio",
+    "SITE_LEAD": "The fixed design of every page outside the editor. Switch between light and dark in the header.",
+    "EDITOR_THEMES_TITLE": "Editor themes",
+    "EDITOR_THEMES_LEAD": "They apply only inside the editor and the theme picker. Each panel renders in its own theme, in the current colour mode; below it is the billet preset that picking the theme writes into a billet.",
+    "SECTION_THEME_PICKER": "Theme picker",
     "SECTION_TYPOGRAPHY": "Typography",
     "SECTION_BUTTONS": "Buttons",
     "SECTION_FORMS": "Form controls",
@@ -356,7 +362,11 @@
     "COLUMN_UPDATED": "Updated",
     "CARD_TITLE": "Mother's Day card",
     "CARD_BODY": "A bunch of tulips, warm colours and a few kind lines.",
-    "CARD_NEW_BODY": "Start from a template or a blank page."
+    "CARD_NEW_BODY": "Start from a template or a blank page.",
+    "PRESET_TITLE": "Billet preset",
+    "PRESET_SAMPLE_TITLE": "Mom",
+    "PRESET_SAMPLE_EMPHASIS": "Thank you",
+    "PRESET_SAMPLE_BODY": "for everything no book could teach me – and for all your patience."
   },
   "MESSAGES": {
     "ERROR": {

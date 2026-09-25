@@ -29,10 +29,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -73,12 +70,8 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "setupFiles": [
-              "src/test-setup.ts"
-            ],
-            "exclude": [
-              "e2e/**"
-            ]
+            "setupFiles": ["src/test-setup.ts"],
+            "exclude": ["e2e/**"]
           }
         }
       }

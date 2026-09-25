@@ -1,0 +1,40 @@
+<figure class="preset">
+  <figcaption class="ui-label">{{ 'UI_KIT.PRESET_TITLE' | translate }}</figcaption>
+  <dl class="preset__palettes">
+    @for (p of palettes(); track p.mode) {
+      <div class="preset__palette">
+        <dt class="ui-hint">{{ p.labelKey | translate }}</dt>
+        <dd class="preset__swatches">
+          @for (swatch of p.swatches; track swatch.key) {
+            <span
+              class="ui-swatch"
+              role="img"
+              [style.background-color]="swatch.color"
+              [attr.aria-label]="swatch.label"
+              [title]="swatch.label"
+            ></span>
+          }
+        </dd>
+      </div>
+    }
+  </dl>
+  @let view = sample();
+  <div
+    class="preset__sample"
+    [style]="view.page"
+  >
+    <p
+      class="preset__hero"
+      [style]="view.hero"
+    >
+      {{ 'UI_KIT.PRESET_SAMPLE_TITLE' | translate }}
+    </p>
+    <p
+      class="preset__body"
+      [style]="view.body"
+    >
+      <em [style.color]="view.emphasis">{{ 'UI_KIT.PRESET_SAMPLE_EMPHASIS' | translate }}</em>
+      {{ 'UI_KIT.PRESET_SAMPLE_BODY' | translate }}
+    </p>
+  </div>
+</figure>

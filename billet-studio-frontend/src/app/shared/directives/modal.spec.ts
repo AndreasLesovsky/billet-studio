@@ -68,6 +68,8 @@ describe('Modal', () => {
 
     await setOpen(false);
     expect(dialog().open).toBe(false);
+    // A close the state asked for is not a dismissal.
+    expect(host.dismissed()).toBe(0);
   });
 
   it('gives focus back to whatever opened it', async () => {
@@ -96,13 +98,6 @@ describe('Modal', () => {
     dialog().close();
 
     expect(host.dismissed()).toBe(1);
-  });
-
-  it('a close that the state asked for is not a dismissal', async () => {
-    await setOpen(true);
-    await setOpen(false);
-
-    expect(host.dismissed()).toBe(0);
   });
 
   it('a click on the backdrop asks to close; a click inside does not', async () => {

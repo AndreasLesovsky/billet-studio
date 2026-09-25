@@ -41,6 +41,10 @@ import {
   ],
   templateUrl: './account.html',
   styleUrl: './account.scss',
+  host: {
+    '(window:dragover)': 'refuseStrayFileDrop($event)',
+    '(window:drop)': 'refuseStrayFileDrop($event)',
+  },
 })
 export class Account implements HasUnsavedChanges {
   private readonly accountApi = inject(AccountApi);
@@ -112,6 +116,17 @@ export class Account implements HasUnsavedChanges {
 
   undoProfile(): void {
     this.profileUndo.undo();
+  }
+
+  /**
+   * A file dropped beside the avatar card would be opened by the browser in this tab, and the page
+   * would go with everything unsaved. The card accepts its own drops first (defaultPrevented);
+   * every other file drag is refused while this page is shown.
+   */
+  protected refuseStrayFileDrop(event: DragEvent): void {
+    if (event.defaultPrevented || !event.dataTransfer?.types.includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'none';
   }
 
   async onProfileSubmit(event?: Event): Promise<void> {

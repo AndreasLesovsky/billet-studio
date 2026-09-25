@@ -1,87 +1,104 @@
-import { signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it, vi } from 'vitest';
+import { disabled, form, FormField } from '@angular/forms/signals';
+import { describe, expect, it } from 'vitest';
 
 import { translateTestingModule } from '../../../../test-helpers';
-import { THEME_IDS, ThemeId } from '../../../core/theme/theme-registry.generated';
-import { ColorModeSetting, ThemeService } from '../../../core/theme/theme-service';
+import { ColorModeService } from '../../../core/theme/color-mode-service';
+import { THEME_IDS } from '../../../core/theme/theme-registry.generated';
 import { ThemePicker } from './theme-picker';
 
-function setup(
-  options: { theme?: ThemeId; mode?: ColorModeSetting; resolved?: 'light' | 'dark' } = {},
-) {
-  const service = {
-    theme: signal<ThemeId>(options.theme ?? 'rose'),
-    mode: signal<ColorModeSetting>(options.mode ?? 'system'),
-    resolvedMode: signal<'light' | 'dark'>(options.resolved ?? 'light'),
-    setTheme: vi.fn(),
-    setMode: vi.fn(),
-  };
-  TestBed.configureTestingModule({
-    imports: [ThemePicker, translateTestingModule()],
-    providers: [{ provide: ThemeService, useValue: service }],
-  });
-  const fixture = TestBed.createComponent(ThemePicker);
-  fixture.detectChanges();
-  const host = fixture.nativeElement as HTMLElement;
-  return { fixture, host, service };
+@Component({
+  imports: [ThemePicker],
+  template: `<app-theme-picker [(value)]="theme" />`,
+})
+class StandaloneHost {
+  readonly theme = signal('midnight');
 }
 
-const themeRadios = (host: HTMLElement) => [
-  ...host.querySelectorAll<HTMLInputElement>('.ui-theme-option input[type="radio"]'),
-];
-const modeRadios = (host: HTMLElement) => [
-  ...host.querySelectorAll<HTMLInputElement>('.ui-segmented input[type="radio"]'),
-];
+@Component({
+  imports: [ThemePicker, FormField],
+  template: `<app-theme-picker [formField]="designForm.theme" />`,
+})
+class FormHost {
+  readonly locked = signal(false);
+  readonly model = signal({ theme: 'midnight' });
+  readonly designForm = form(this.model, (p) => {
+    disabled(p.theme, { when: () => this.locked() });
+  });
+}
+
+function render<T>(host: new () => T) {
+  TestBed.configureTestingModule({
+    imports: [host, translateTestingModule()],
+    providers: [{ provide: ColorModeService, useValue: { resolvedMode: signal('light') } }],
+  });
+  const fixture = TestBed.createComponent(host);
+  fixture.detectChanges();
+  const element = fixture.nativeElement as HTMLElement;
+  const radios = () => [
+    ...element.querySelectorAll<HTMLInputElement>('.ui-theme-option input[type="radio"]'),
+  ];
+  const checked = () =>
+    radios()
+      .filter((r) => r.checked)
+      .map((r) => r.value);
+  const pick = (id: string) =>
+    radios()
+      .find((r) => r.value === id)!
+      .click();
+  return { fixture, element, radios, checked, pick };
+}
 
 describe('ThemePicker', () => {
-  it('offers every registry theme as one radio group with the current theme checked', () => {
-    const { host } = setup({ theme: 'midnight' });
-    const radios = themeRadios(host);
+  it('offers every editor theme, each card scoped to its own theme', () => {
+    const { element, radios } = render(StandaloneHost);
+    const cards = [...element.querySelectorAll<HTMLElement>('.ui-theme-card')];
 
-    expect(radios.map((r) => r.value)).toEqual([...THEME_IDS]);
-    expect(new Set(radios.map((r) => r.name)).size).toBe(1);
-    expect(radios.filter((r) => r.checked).map((r) => r.value)).toEqual(['midnight']);
-  });
-
-  it('previews each card in its own theme and in the resolved mode', () => {
-    const { host, fixture, service } = setup({ resolved: 'dark' });
-    const cards = [...host.querySelectorAll<HTMLElement>('.ui-theme-card')];
-
+    expect(radios().map((r) => r.value)).toEqual([...THEME_IDS]);
     expect(cards.map((c) => c.dataset['theme'])).toEqual([...THEME_IDS]);
-    expect(cards.every((c) => c.dataset['mode'] === 'dark')).toBe(true);
+    expect(new Set(cards.map((c) => c.dataset['mode']))).toEqual(new Set(['light']));
+  });
 
-    service.resolvedMode.set('light');
+  it('works standalone with [(value)] in both directions', () => {
+    const { fixture, checked, pick } = render(StandaloneHost);
+    expect(checked()).toEqual(['midnight']);
+
+    pick('sage');
+    expect(fixture.componentInstance.theme()).toBe('sage');
+
+    fixture.componentInstance.theme.set('neon');
     fixture.detectChanges();
-    expect(cards.every((c) => c.dataset['mode'] === 'light')).toBe(true);
+    expect(checked()).toEqual(['neon']);
   });
 
-  it('selecting a card switches the theme', () => {
-    const { host, service } = setup();
-    const sage = themeRadios(host).find((r) => r.value === 'sage');
-    sage?.click();
+  it('works as a [formField] control, value and disabled state included', () => {
+    const { fixture, radios, checked, pick } = render(FormHost);
+    expect(checked()).toEqual(['midnight']);
 
-    expect(service.setTheme).toHaveBeenCalledWith('sage');
+    pick('paper');
+    expect(fixture.componentInstance.model().theme).toBe('paper');
+
+    fixture.componentInstance.locked.set(true);
+    fixture.detectChanges();
+    expect(radios().every((r) => r.matches(':disabled'))).toBe(true);
   });
 
-  it('the mode control reflects and sets system / light / dark', () => {
-    const { host, service } = setup({ mode: 'dark' });
-    const radios = modeRadios(host);
+  it('shows the default theme for an unknown value without writing it back', () => {
+    const { fixture, checked } = render(StandaloneHost);
+    fixture.componentInstance.theme.set('studio');
+    fixture.detectChanges();
 
-    expect(radios.map((r) => r.value)).toEqual(['system', 'light', 'dark']);
-    expect(radios.find((r) => r.checked)?.value).toBe('dark');
-
-    radios[0].click();
-    expect(service.setMode).toHaveBeenCalledWith('system');
+    expect(checked()).toEqual(['rose']);
+    expect(fixture.componentInstance.theme()).toBe('studio');
   });
 
   it('keeps radio groups apart when two pickers are on one page', () => {
-    const first = setup().host;
-    const second = TestBed.createComponent(ThemePicker);
+    const first = render(StandaloneHost).radios()[0].name;
+    const second = TestBed.createComponent(StandaloneHost);
     second.detectChanges();
-    const host2 = second.nativeElement as HTMLElement;
+    const other = (second.nativeElement as HTMLElement).querySelector('input')!.name;
 
-    expect(themeRadios(first)[0].name).not.toBe(themeRadios(host2)[0].name);
-    expect(modeRadios(first)[0].name).not.toBe(modeRadios(host2)[0].name);
+    expect(first).not.toBe(other);
   });
 });

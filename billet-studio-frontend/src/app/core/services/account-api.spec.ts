@@ -57,19 +57,11 @@ describe('AccountApi', () => {
 
   afterEach(() => http.verify());
 
-  it('get loads the account and exposes it', async () => {
-    const promise = api.get();
-    http.expectOne({ method: 'GET', url }).flush(account());
-
-    expect(await promise).toEqual(account());
-    expect(api.account()).toEqual(account());
-    expect(messageStore.addMessage).not.toHaveBeenCalled();
-  });
-
   it('forgets the account once someone else is signed in, instead of showing their data', async () => {
     const promise = api.get();
-    http.expectOne(url).flush(account({ id: 7 }));
+    http.expectOne({ method: 'GET', url }).flush(account({ id: 7 }));
     await promise;
+    expect(api.account()?.id).toBe(7);
 
     authApi.user.set(testUser({ id: 8 }));
 

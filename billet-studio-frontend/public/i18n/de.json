@@ -48,15 +48,17 @@
     "LANGUAGE": "Sprache",
     "LANGUAGE_DE": "Deutsch",
     "LANGUAGE_EN": "English",
-    "THEME": "Design",
     "TEMPLATES": "Vorlagen"
   },
+  "COLOR_MODE": {
+    "LABEL": "Farbmodus",
+    "TRIGGER": "Farbmodus: {{mode}}",
+    "SYSTEM": "System",
+    "LIGHT": "Hell",
+    "DARK": "Dunkel"
+  },
   "THEME_PICKER": {
-    "THEME_LABEL": "Farbthema",
-    "MODE_LABEL": "Farbmodus",
-    "MODE_SYSTEM": "System",
-    "MODE_LIGHT": "Hell",
-    "MODE_DARK": "Dunkel"
+    "LABEL": "Theme"
   },
   "THEMES": {
     "ROSE": "Rosé",
@@ -285,8 +287,12 @@
   },
   "UI_KIT": {
     "TITLE": "UI-Kit",
-    "LEAD": "Alle Bausteine des Design-Systems im aktuellen Theme – zum visuellen Prüfen in hell und dunkel.",
-    "SECTION_THEME": "Theme",
+    "LEAD": "Alle Bausteine des Design-Systems: oben die Website im festen Studio-Design, darunter die Editor-Themes – zum visuellen Prüfen in hell und dunkel.",
+    "SITE_TITLE": "Website · Studio",
+    "SITE_LEAD": "Das feste Design aller Seiten außerhalb des Editors. Hell und dunkel schaltest du oben im Header um.",
+    "EDITOR_THEMES_TITLE": "Editor-Themes",
+    "EDITOR_THEMES_LEAD": "Gelten nur im Editor und in der Theme-Auswahl. Jedes Panel steht in seinem eigenen Theme, im aktuellen Farbmodus; darunter die Billet-Voreinstellung, die das Theme beim Auswählen ins Billet schreibt.",
+    "SECTION_THEME_PICKER": "Theme-Auswahl",
     "SECTION_TYPOGRAPHY": "Typografie",
     "SECTION_BUTTONS": "Buttons",
     "SECTION_FORMS": "Formularelemente",
@@ -356,7 +362,11 @@
     "COLUMN_UPDATED": "Geändert",
     "CARD_TITLE": "Muttertagskarte",
     "CARD_BODY": "Ein Strauß Tulpen, warme Farben und ein paar liebe Zeilen.",
-    "CARD_NEW_BODY": "Starte mit einer Vorlage oder einem leeren Blatt."
+    "CARD_NEW_BODY": "Starte mit einer Vorlage oder einem leeren Blatt.",
+    "PRESET_TITLE": "Billet-Voreinstellung",
+    "PRESET_SAMPLE_TITLE": "Mama",
+    "PRESET_SAMPLE_EMPHASIS": "Danke",
+    "PRESET_SAMPLE_BODY": "für alles, was kein Buch lehrt – und für deine Geduld."
   },
   "MESSAGES": {
     "ERROR": {

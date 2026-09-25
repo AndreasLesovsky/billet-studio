@@ -255,6 +255,16 @@
     }
 }
 
+// Trailing tick of a menuitemradio / menuitemcheckbox, so the checked state is not colour alone.
+.ui-menu__check {
+    margin-inline-start: auto;
+    visibility: hidden;
+
+    [aria-checked='true'] > & {
+        visibility: visible;
+    }
+}
+
 .ui-menu__separator {
     flex: none;
     block-size: 0;
@@ -295,7 +305,6 @@
     inline-size: 100%;
     border-collapse: collapse;
     font-size: var(--ui-text-sm);
-    font-variant-numeric: tabular-nums;
 
     caption {
         padding: var(--ui-space-3) var(--ui-space-4);
@@ -331,6 +340,13 @@
         &:last-child > * {
             border-block-end: 0;
         }
+    }
+
+    // Dates and counts line up down the column. Only these cells: Inter's tabular set also widens
+    // the hyphen, which would open gaps in names and addresses.
+    .ui-table__num {
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
     }
 
     // Row actions: the last cell, right-aligned, as narrow as its buttons. Pinned to the end edge,

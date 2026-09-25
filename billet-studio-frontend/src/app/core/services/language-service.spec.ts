@@ -44,12 +44,7 @@ describe('LanguageService', () => {
     expect(translate.use).toHaveBeenCalledWith('de');
   });
 
-  // The app initializer awaits whenReady() so the active translations are loaded before the first
-  // paint. It must resolve once the initial use() emits (file loaded + applied).
-  it('whenReady() resolves once the initial language file is loaded', async () => {
-    await expect(create().whenReady()).resolves.toBeUndefined();
-  });
-
+  // The app initializer awaits whenReady() (the loaded case is app.config.spec.ts's boot).
   it('whenReady() also resolves when the file fails to load, so bootstrap never hangs', async () => {
     translate.use.mockReturnValue(throwError(() => new Error('404')));
 

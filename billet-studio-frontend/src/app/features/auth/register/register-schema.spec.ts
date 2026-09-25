@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import { formFor } from '../../../../test-helpers';
 import {
-  EMPTY_MODEL,
   RegisterFormModel,
   registerSchema,
   toRegisterDto,
@@ -23,10 +22,6 @@ describe('register-schema', () => {
 
   it('accepts a complete sign-up', () => {
     expect(build().tree().valid()).toBe(true);
-  });
-
-  it.each(['Jürgen', 'Anne-Marie', "O'Brien", 'José Luis'])('accepts the real name %s', (name) => {
-    expect(build({ name }).tree.name().valid()).toBe(true);
   });
 
   it.each([
@@ -59,11 +54,6 @@ describe('register-schema', () => {
     expect(tree.password().errors()[0]?.message).toBe(key);
   });
 
-  it('carries the bound of a length rule for the message', () => {
-    const error = build({ password: 'Abc1', confirmPassword: 'Abc1' }).tree.password().errors()[0];
-    expect(error).toMatchObject({ minLength: 8 });
-  });
-
   it('asks for the confirmation, then for it to match', () => {
     expect(build({ confirmPassword: '' }).tree.confirmPassword().errors()[0]?.message).toBe(
       'AUTH.PASSWORD_CONFIRM_REQUIRED',
@@ -89,19 +79,7 @@ describe('register-schema', () => {
     });
   });
 
-  it('the language starts empty on the UI language', () => {
-    expect(withUiLanguage('en')).toEqual({ ...EMPTY_MODEL, preferredLanguage: 'en' });
-  });
-
-  it('the language follows a switch of the UI language and keeps what was typed', () => {
-    const typed = { ...VALID, preferredLanguage: 'de' };
-
-    expect(withUiLanguage('en', { source: 'de', value: typed })).toEqual({
-      ...typed,
-      preferredLanguage: 'en',
-    });
-  });
-
+  // Starting on the UI language and following the header is pinned by register.spec.ts.
   it('the language keeps a value picked in the form', () => {
     const picked = { ...VALID, preferredLanguage: 'en' };
 

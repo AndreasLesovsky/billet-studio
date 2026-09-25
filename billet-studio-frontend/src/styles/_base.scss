@@ -1,12 +1,5 @@
 // Document defaults. Every colour is a --ui-* token.
 
-// The root and every theme-preview element (theme-picker cards) resolve text and font from their
-// own tokens; a plain inherited font-family would keep the outer theme's font.
-[data-theme] {
-    color: var(--ui-text);
-    font-family: var(--ui-font-body);
-}
-
 html {
     // Several theme fonts ship without a 600 face; the nearest real face beats a smeared fake bold.
     font-synthesis-weight: none;
@@ -34,6 +27,17 @@ app-root {
     isolation: isolate;
 }
 
+// An editor-theme scope (ThemeScope: the editor root, theme-picker cards, the dev ui-kit) carries
+// data-theme + data-mode itself, so every --ui-* token inside it is its theme's. Inherited
+// properties were already computed from the site theme around it; the scope re-applies them from
+// its own tokens. color-scheme comes with the generated [data-theme][data-mode] block, and the
+// heading rules below resolve their tokens on the heading itself, so they follow the scope too.
+.ui-theme-scope {
+    background-color: var(--ui-bg);
+    color: var(--ui-text);
+    font-family: var(--ui-font-body);
+}
+
 h1,
 h2,
 h3,
@@ -46,6 +50,12 @@ h6 {
     line-height: var(--ui-leading-tight);
     letter-spacing: -0.01em;
     text-wrap: balance;
+}
+
+h1,
+h2 {
+    font-weight: var(--ui-font-display-weight);
+    letter-spacing: -0.02em;
 }
 
 h1 {

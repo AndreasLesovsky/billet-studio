@@ -5,9 +5,15 @@
 
 // ---- Header / footer ------------------------------------------------------------------------
 
+// Sticky from md on (layout/app-shell): the page scrolls under a frosted bar.
 .ui-app-header {
     border-block-end: 1px solid var(--ui-border);
     background-color: var(--ui-surface);
+
+    @supports (backdrop-filter: blur(1rem)) {
+        background-color: color-mix(in oklab, var(--ui-surface) 82%, transparent);
+        backdrop-filter: saturate(1.6) blur(0.75rem);
+    }
 }
 
 .ui-app-footer {
@@ -16,17 +22,19 @@
     font-size: var(--ui-text-sm);
 }
 
-// Typographic brand: the name in the heading font, its second half in the accent ink.
+// Brand: an accent tile with the billet icon, then the name in the display face, its second half
+// in the accent ink.
 .ui-wordmark {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
+    gap: var(--ui-space-2);
     border-radius: var(--ui-radius-sm);
     color: var(--ui-text);
     font-family: var(--ui-font-heading);
     font-size: calc(var(--ui-text-lg) * var(--ui-font-heading-scale));
-    font-weight: var(--ui-font-heading-weight);
+    font-weight: var(--ui-font-display-weight);
     font-synthesis-weight: none;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
@@ -34,6 +42,20 @@
     @include bp.up(sm) {
         font-size: calc(var(--ui-text-xl) * var(--ui-font-heading-scale));
     }
+}
+
+.ui-wordmark__mark {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: 1.875rem;
+    block-size: 1.875rem;
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-accent);
+    box-shadow: var(--ui-shadow-sm);
+    color: var(--ui-on-accent);
+    font-size: 1rem;
+    letter-spacing: 0;
 }
 
 .ui-wordmark__accent {

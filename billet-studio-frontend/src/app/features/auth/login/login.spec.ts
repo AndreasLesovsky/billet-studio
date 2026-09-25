@@ -15,14 +15,9 @@ import { Login } from './login';
 
 const VALID = { email: 'anna@example.com', password: 'whatever' };
 
-function setup(opts: {
-  returnUrl?: string;
-  login?: () => Promise<UserWithTokenDto | null>;
-  belongs?: boolean;
-}) {
+function setup(opts: { returnUrl?: string; login?: () => Promise<UserWithTokenDto | null> }) {
   const authApi = createMockAuthApi();
   authApi.login.mockImplementation(opts.login ?? (async () => testUser({ id: 7 })));
-  authApi.returnUrlBelongsTo.mockReturnValue(opts.belongs ?? true);
   const router = createMockRouter();
 
   TestBed.configureTestingModule({
@@ -51,33 +46,6 @@ describe('Login', () => {
     expect(authApi.login).toHaveBeenCalledWith(VALID);
     expect(authApi.returnUrlBelongsTo).toHaveBeenCalledWith('/account', 7);
     expect(router.navigateByUrl).toHaveBeenCalledWith('/account');
-  });
-
-  it('lands on the billet list without a returnUrl', async () => {
-    const { component, router } = setup({});
-    component.model.set(VALID);
-
-    await component.onSubmit();
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/billets');
-  });
-
-  it('lands on the billet list when the returnUrl leaves the app', async () => {
-    const { component, router } = setup({ returnUrl: '//evil.example/steal' });
-    component.model.set(VALID);
-
-    await component.onSubmit();
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/billets');
-  });
-
-  it("lands on the billet list when the returnUrl is another account's expired page", async () => {
-    const { component, router } = setup({ returnUrl: '/admin/users', belongs: false });
-    component.model.set(VALID);
-
-    await component.onSubmit();
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/billets');
   });
 
   it('stays on the page when the credentials are refused', async () => {

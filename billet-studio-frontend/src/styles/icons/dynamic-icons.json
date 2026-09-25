@@ -1,0 +1,4 @@
+{
+  "$comment": "Icons whose bi-<name> class is assembled at runtime, so it never appears literally in src/**/*.{html,ts}. scripts/generate-icons.mjs adds them to the icon subset. Prefer a literal class name in the source; list one here only when that is impossible.",
+  "icons": []
+}

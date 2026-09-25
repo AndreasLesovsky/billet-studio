@@ -22,8 +22,7 @@ const DEFAULT: UserListQuery = {
 
 describe('user-list-schema', () => {
   it('a bare URL is the first page of all accounts, newest first, twenty per page', () => {
-    expect(parseUserListQuery({})).toEqual(DEFAULT);
-    expect(USER_PAGE_SIZE).toBe(20);
+    expect(parseUserListQuery({})).toEqual({ ...DEFAULT, size: 20 });
   });
 
   it('reads every param, with the 1-based page of the URL as the 0-based page of the API', () => {

@@ -9,7 +9,11 @@
     <a
       class="ui-wordmark shell__brand"
       routerLink="/"
-      >billet<span class="ui-wordmark__accent">-studio</span></a
+      ><span
+        class="ui-wordmark__mark"
+        aria-hidden="true"
+        ><i class="bi bi-envelope-paper-heart"></i></span
+      ><span>billet<span class="ui-wordmark__accent">-studio</span></span></a
     >
 
     <nav
@@ -44,68 +48,11 @@
 
     <div class="shell__tools">
       <app-language-switch />
-      <button
-        type="button"
-        class="ui-btn ui-btn--ghost ui-btn--icon"
-        cdkOverlayOrigin
-        #themeOrigin="cdkOverlayOrigin"
-        aria-haspopup="dialog"
-        [attr.aria-label]="'NAV.THEME' | translate"
-        [attr.aria-expanded]="themeOpen()"
-        [attr.aria-controls]="themeOpen() ? 'shell-theme-popover' : null"
-        (click)="toggleTheme()"
-      >
-        <i
-          class="bi bi-palette"
-          aria-hidden="true"
-        ></i>
-      </button>
+      <app-color-mode-menu />
       <app-account-menu />
     </div>
   </div>
 </header>
-
-<ng-template
-  cdkConnectedOverlay
-  [cdkConnectedOverlayOrigin]="themeOrigin"
-  [cdkConnectedOverlayOpen]="themeOpen()"
-  [cdkConnectedOverlayPositions]="themePositions"
-  [cdkConnectedOverlayPush]="true"
-  [cdkConnectedOverlayViewportMargin]="themeViewportMargin"
-  (overlayOutsideClick)="closeTheme()"
-  (overlayKeydown)="onThemeKeydown($event)"
-  (detach)="closeTheme()"
->
-  <div
-    id="shell-theme-popover"
-    class="ui-popover shell__theme"
-    role="dialog"
-    aria-labelledby="shell-theme-title"
-    cdkTrapFocus
-    [cdkTrapFocusAutoCapture]="true"
-  >
-    <div class="shell__theme-header">
-      <h2
-        id="shell-theme-title"
-        class="ui-card__title"
-      >
-        {{ 'NAV.THEME' | translate }}
-      </h2>
-      <button
-        type="button"
-        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
-        [attr.aria-label]="'COMMON.CLOSE' | translate"
-        (click)="closeTheme()"
-      >
-        <i
-          class="bi bi-x-lg"
-          aria-hidden="true"
-        ></i>
-      </button>
-    </div>
-    <app-theme-picker />
-  </div>
-</ng-template>
 
 <main
   id="main-content"

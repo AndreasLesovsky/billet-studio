@@ -95,21 +95,8 @@ describe('AccountAvatar', () => {
     expect(accountApi.uploadAvatar).not.toHaveBeenCalled();
   });
 
-  it('refuses a file that is no image with a warning and keeps nothing', () => {
-    const { component, messageStore } = setup();
-
-    component.offer(new File([''], 'cv.pdf', { type: 'application/pdf' }));
-
-    expect(messageStore.addMessage).toHaveBeenCalledWith(
-      'warning',
-      'INVALID_IMAGE',
-      undefined,
-      undefined,
-    );
-    expect(component.hasStaged()).toBe(false);
-  });
-
-  it('refuses an image over the limit and says the limit', () => {
+  // Which files are refused is avatar-file.spec.ts's table; this is how a refusal reaches the user.
+  it('refuses an image over the limit with a warning that says the limit, and keeps nothing', () => {
     const { component, messageStore } = setup();
 
     component.offer(fileOf(21 * 1024 * 1024));
@@ -117,6 +104,7 @@ describe('AccountAvatar', () => {
     expect(messageStore.addMessage).toHaveBeenCalledWith('warning', 'IMAGE_TOO_LARGE', undefined, {
       maxMb: 20,
     });
+    expect(component.hasStaged()).toBe(false);
   });
 
   it('takes a dropped image like a picked one', () => {
@@ -156,13 +144,5 @@ describe('AccountAvatar', () => {
     component.onDragLeave(dragEvent([], null));
     expect(component.dragActive()).toBe(false);
     child.remove();
-  });
-
-  it('removes the saved picture', async () => {
-    const { component, accountApi } = setup();
-
-    await component.remove();
-
-    expect(accountApi.removeAvatar).toHaveBeenCalled();
   });
 });

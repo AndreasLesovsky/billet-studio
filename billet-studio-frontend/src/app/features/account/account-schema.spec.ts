@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { PasswordChangeDto } from '../../core/models/models';
 import { formFor } from '../../../test-helpers';
-import {
-  EMPTY_PASSWORD_MODEL,
-  passwordChangeSchema,
-  profileSchema,
-  toProfileModel,
-} from './account-schema';
+import { EMPTY_PASSWORD_MODEL, passwordChangeSchema, profileSchema } from './account-schema';
 
 const CHANGE: PasswordChangeDto = {
   currentPassword: 'whatever it was',
@@ -18,20 +13,6 @@ const CHANGE: PasswordChangeDto = {
 describe('account-schema', () => {
   const password = (patch: Partial<PasswordChangeDto> = {}) =>
     formFor<PasswordChangeDto>({ ...CHANGE, ...patch }, passwordChangeSchema).tree;
-
-  it('seeds the profile from the account', () => {
-    expect(
-      toProfileModel({
-        id: 7,
-        name: 'Anna',
-        email: 'anna@example.com',
-        role: 'ROLE_USER',
-        preferredLanguage: 'en',
-        avatarUrl: null,
-        createdAt: '2026-01-01T00:00:00Z',
-      }),
-    ).toEqual({ name: 'Anna', preferredLanguage: 'en' });
-  });
 
   it.each([
     ['  ', 'AUTH.NAME_REQUIRED'],

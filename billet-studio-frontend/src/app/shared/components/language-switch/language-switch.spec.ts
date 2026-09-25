@@ -35,10 +35,6 @@ describe('LanguageSwitch', () => {
     await fixture.whenStable();
   });
 
-  it('checks the language that is loaded', () => {
-    expect(radios().map((r) => r.checked)).toEqual([true, false]);
-  });
-
   it('names each option in its own language, which starts with the visible code', () => {
     const labels = [...(fixture.nativeElement as HTMLElement).querySelectorAll('label')];
     const text = (label: Element, selector: string) =>
@@ -52,7 +48,9 @@ describe('LanguageSwitch', () => {
     ]);
   });
 
-  it('switches the UI language on selection', () => {
+  it('checks the loaded language and switches the UI language on selection', () => {
+    expect(radios().map((r) => r.checked)).toEqual([true, false]);
+
     radios()[1].click();
 
     expect(setLanguage).toHaveBeenCalledWith('en');

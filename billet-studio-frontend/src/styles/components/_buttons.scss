@@ -5,6 +5,7 @@
     --_bg-hover: var(--ui-surface-sunken);
     --_fg: var(--ui-text);
     --_border: var(--ui-border);
+    --_border-hover: var(--_border);
     --_shadow: var(--ui-shadow-sm);
 
     display: inline-flex;
@@ -36,6 +37,7 @@
         transform var(--ui-duration-fast) var(--ui-ease);
 
     &:hover:not(:disabled, [aria-disabled='true']) {
+        border-color: var(--_border-hover);
         background-color: var(--_bg-hover);
     }
 
@@ -43,11 +45,16 @@
         transform: translateY(0.0625rem);
     }
 
+    // A sunken plane with a muted label that stays readable (--ui-text-muted passes AA on every
+    // plane), instead of a faded brand colour. Ghost keeps no plane (below).
     &:disabled,
     &[aria-disabled='true'] {
+        --_bg: var(--ui-surface-sunken);
+        --_border: var(--ui-border);
+        --_fg: var(--ui-text-muted);
+
         box-shadow: none;
         cursor: not-allowed;
-        opacity: 0.5;
     }
 
     > .bi {
@@ -68,6 +75,7 @@
     --_bg-hover: var(--ui-surface-sunken);
     --_fg: var(--ui-text);
     --_border: var(--ui-border);
+    --_border-hover: var(--ui-border-strong);
 }
 
 .ui-btn--ghost {
@@ -75,6 +83,12 @@
     --_bg-hover: var(--ui-surface-sunken);
     --_border: transparent;
     --_shadow: none;
+
+    &:disabled,
+    &[aria-disabled='true'] {
+        --_bg: transparent;
+        --_border: transparent;
+    }
 }
 
 .ui-btn--danger {

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MessageStore } from '../../../core/stores/message-store';
 import { translateTestingModule } from '../../../../test-helpers';
-import { AUTO_DISMISS_MS, formatCountdown, Toast } from './toast';
+import { AUTO_DISMISS_MS, Toast } from './toast';
 
 describe('Toast', () => {
   let fixture: ComponentFixture<Toast>;
@@ -121,6 +121,8 @@ describe('Toast', () => {
 
     expect(toasts()[0].textContent).toContain('Deine Sitzung endet in');
     expect(countdown()).toBe('5:00');
+    // The ticking clock is kept away from screen readers.
+    expect(root().querySelector('.toast__countdown')!.getAttribute('aria-hidden')).toBe('true');
 
     advance(61_000);
     expect(countdown()).toBe('3:59');
@@ -128,22 +130,5 @@ describe('Toast', () => {
     advance(10 * 60_000);
     expect(countdown()).toBe('0:00');
     expect(store.messages()).toHaveLength(1);
-  });
-
-  it('keeps the ticking clock away from screen readers', () => {
-    store.showSessionWarning('SESSION_ENDING', Date.now() + 60_000);
-    render();
-
-    expect(root().querySelector('.toast__countdown')!.getAttribute('aria-hidden')).toBe('true');
-  });
-
-  it('formatCountdown: minutes and zero-padded seconds', () => {
-    expect(formatCountdown(5 * 60_000)).toBe('5:00');
-    expect(formatCountdown(61_000)).toBe('1:01');
-    expect(formatCountdown(9_000)).toBe('0:09');
-  });
-
-  it('formatCountdown never goes below zero', () => {
-    expect(formatCountdown(-5_000)).toBe('0:00');
   });
 });

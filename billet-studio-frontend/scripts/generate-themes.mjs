@@ -1,23 +1,34 @@
-// Expands the seed colours in src/styles/themes/themes.json into the full --ui-* token set and
-// writes three files (never edit them by hand):
-//   src/styles/_themes.generated.scss              one block per theme and per theme x mode
-//   src/app/core/theme/theme-registry.generated.ts  ids, picker metadata, final colour tokens
-//   public/theme-boot.js                            sets data-theme / data-mode before first paint
-// Runs via the prestart/prebuild/pretest npm hooks. Every theme x mode must pass WCAG AA, otherwise
-// the script exits 1 and writes nothing. Pure Node, no dependencies: the OKLCH math is below.
+// Expands the seed colours in src/styles/themes/themes.json - the fixed site theme ("site") and the
+// editor themes ("themes") - into the full --ui-* token set and writes four files (never edit them
+// by hand):
+//   src/styles/_themes.generated.scss                    one block per theme and per theme x mode
+//   src/app/core/theme/theme-registry.generated.ts        ids, picker metadata, final colour tokens
+//   src/app/core/theme/billet-theme-presets.generated.ts  the billet preset of every editor theme
+//   public/theme-boot.js                                  sets the site theme + data-mode first
+// Runs via the prestart/prebuild/pretest npm hooks. Every theme x mode must pass WCAG AA, every
+// heading weight must be a face the font catalog ships, and every billet preset must use shipped
+// faces and pass the billet contrast rules, otherwise the script exits 1 and writes nothing. Pure
+// Node, no dependencies: the OKLCH math is below.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = join(root, 'src', 'styles', 'themes', 'themes.json');
+const FONT_CATALOG = join(root, 'src', 'app', 'billet', 'fonts', 'font-catalog.generated.ts');
 const OUT_SCSS = join(root, 'src', 'styles', '_themes.generated.scss');
 const OUT_TS = join(root, 'src', 'app', 'core', 'theme', 'theme-registry.generated.ts');
+const OUT_PRESETS = join(root, 'src', 'app', 'core', 'theme', 'billet-theme-presets.generated.ts');
 const OUT_BOOT = join(root, 'public', 'theme-boot.js');
 
-const THEME_STORAGE_KEY = 'billet-studio.theme';
 const MODE_STORAGE_KEY = 'billet-studio.color-mode';
 const MODES = ['light', 'dark'];
+
+// The site's component layer sets running text at 400, medium UI text at 500 and labels/buttons at
+// 600 (--ui-font-weight-strong); its body font must ship all three. Editor themes take the nearest
+// face their body font has (font-synthesis-weight: none).
+const SITE_BODY_WEIGHTS = [400, 500, 600];
+const DEFAULT_HEADING_WEIGHT = 600;
 
 // Families shipped by public/fonts/fonts.css (tools/asset-pipeline) and their fallback stacks.
 const SANS = "system-ui, -apple-system, 'Segoe UI', sans-serif";
@@ -254,9 +265,10 @@ function deriveStatus(name, { bg, planes, dark, accent }) {
   return tokens;
 }
 
-function deriveNeutrals({ bg, surface, text }, dark) {
+function deriveNeutrals({ bg, surface, text, sunken }, dark) {
   const surfaceRaised = dark ? addLightness(surface, 0.04) : mix(surface, WHITE, 0.6);
-  const surfaceSunken = dark ? addLightness(bg, -0.025) : mix(bg, text, 0.04);
+  // Mixing a near-neutral text into the bg keeps no tint; a theme that wants one seeds it.
+  const surfaceSunken = sunken ?? (dark ? addLightness(bg, -0.025) : mix(bg, text, 0.04));
   const planes = [bg, surface, surfaceRaised, surfaceSunken];
   const quiet = [bg, surface, surfaceSunken];
   return {
@@ -365,6 +377,11 @@ function contrastPairs(t) {
 const HEX = /^#[0-9a-f]{6}$/;
 const optional = (check) => (v) => v === undefined || check(v);
 const within = (lo, hi) => (v) => typeof v === 'number' && v >= lo && v <= hi;
+const isWeight = (v) => Number.isInteger(v) && v >= 100 && v <= 900 && v % 100 === 0;
+
+const headingWeight = (theme) => theme.headingWeight ?? DEFAULT_HEADING_WEIGHT;
+/** h1/h2, page titles and the wordmark; defaults to the heading weight. */
+const displayWeight = (theme) => theme.displayWeight ?? headingWeight(theme);
 
 /** Per-field rules for one theme: [field, predicate, message]. */
 const THEME_RULES = [
@@ -376,11 +393,8 @@ const THEME_RULES = [
   ],
   ['fontHeading', (v) => v in FONTS, 'fontHeading is not an available font'],
   ['radius', within(0.4, 1.6), 'radius must be within 0.4..1.6'],
-  [
-    'headingWeight',
-    optional((v) => [400, 500, 600, 700].includes(v)),
-    'headingWeight must be 400..700 in steps of 100',
-  ],
+  ['headingWeight', optional(isWeight), 'headingWeight must be 100..900 in steps of 100'],
+  ['displayWeight', optional(isWeight), 'displayWeight must be 100..900 in steps of 100'],
   ['headingScale', optional(within(0.8, 1.4)), 'headingScale must be within 0.8..1.4'],
   ['shadowTint', (v) => HEX.test(v ?? ''), 'shadowTint must be a lowercase #rrggbb'],
 ];
@@ -390,24 +404,204 @@ function seedErrors(theme, mode) {
   const seeds = theme[mode];
   if (!seeds) return [`missing "${mode}" seeds`];
   const bad = SEED_KEYS.filter((key) => !HEX.test(seeds[key] ?? ''));
-  if (seeds.accent2 !== undefined && !HEX.test(seeds.accent2)) bad.push('accent2');
+  for (const key of ['accent2', 'sunken']) {
+    if (seeds[key] !== undefined && !HEX.test(seeds[key])) bad.push(key);
+  }
   return bad.map((key) => `${mode}.${key} must be a lowercase #rrggbb`);
 }
 
-function validate(source) {
+const CATALOG_ENTRY =
+  /id: '([^']+)',\s*family: '([^']+)',[\s\S]*?\bweights: \[([^\]]*)\],\s*italicWeights: \[([^\]]*)\]/g;
+
+/**
+ * The faces the asset pipeline ships (read-only here; public/fonts is its output): upright weights
+ * by family (the --ui-* fonts are named by family) and upright/italic weights by id (billet FontRef).
+ */
+function readFontCatalog() {
+  const numbers = (list) =>
+    list
+      .split(',')
+      .filter((v) => v.trim())
+      .map(Number);
+  const source = readFileSync(FONT_CATALOG, 'utf8');
+  const entries = [...source.matchAll(CATALOG_ENTRY)].map((m) => ({
+    id: m[1],
+    family: m[2],
+    weights: numbers(m[3]),
+    italicWeights: numbers(m[4]),
+  }));
+  if (!entries.length) fail('Font catalog unreadable', [`no entry matched in ${FONT_CATALOG}`]);
+  return {
+    families: new Map(entries.map((e) => [e.family, e.weights])),
+    faces: new Map(entries.map((e) => [e.id, e])),
+  };
+}
+
+/** A requested weight the catalog does not ship would render in the nearest face instead. */
+function weightErrors(theme, families, bodyWeights) {
+  const wanted = [
+    [theme.fontHeading, headingWeight(theme), 'headingWeight'],
+    [theme.fontHeading, displayWeight(theme), 'displayWeight'],
+    ...bodyWeights.map((w) => [theme.fontBody, w, 'body weight']),
+  ];
+  return wanted
+    .filter(([family, weight]) => !(families.get(family) ?? []).includes(weight))
+    .map(([family, weight, what]) => {
+      const shipped = families.get(family)?.join('/') ?? 'none';
+      return `${what} ${weight} is not shipped for ${family} (catalog: ${shipped})`;
+    });
+}
+
+function themeErrors(theme, catalog, bodyWeights = []) {
+  const fieldErrors = THEME_RULES.filter(([field, ok]) => !ok(theme[field])).map(
+    ([, , message]) => message,
+  );
+  return [
+    ...fieldErrors,
+    ...MODES.flatMap((mode) => seedErrors(theme, mode)),
+    ...(fieldErrors.length ? [] : weightErrors(theme, catalog.families, bodyWeights)),
+  ];
+}
+
+function siteErrors(site, editorIds, catalog) {
+  if (!site) return ['"site" (the fixed website theme) is missing'];
+  const errors = themeErrors(site, catalog, SITE_BODY_WEIGHTS);
+  if (editorIds.includes(site.id)) errors.push('its id must differ from every editor theme id');
+  return errors.map((e) => `site "${site.id}": ${e}`);
+}
+
+// --- The billet preset of an editor theme: the shapes of docs/billet-document.md ---
+
+const BILLET_PALETTE_KEYS = [
+  'accent',
+  'accentSoft',
+  'border',
+  'background',
+  'ink',
+  'inkSoft',
+  'surface',
+];
+const BILLET_FONT_ROLES = ['title', 'titleAccent', 'heading', 'body', 'signature', 'ui'];
+const BILLET_FONT_KEYS = ['fontId', 'weight', 'italic', 'size'];
+const BILLET_EMPHASIS = ['inkSoft', 'accent'];
+// FontRef.size is 0.5..2 in the document; a preset brings 4..7 of its 1..8 particle colours.
+const BILLET_FONT_SIZE = within(0.5, 2);
+const BILLET_PARTICLE_COLORS = { min: 4, max: 7 };
+
+/** Missing and unknown keys: a misspelt seed must fail, not fall back silently. */
+function keyErrors(value, keys, what) {
+  if (value === undefined) return [`${what} is missing`];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return [`${what} must be an object`];
+  }
+  return [
+    ...keys.filter((key) => !(key in value)).map((key) => `${what}.${key} is missing`),
+    ...Object.keys(value)
+      .filter((key) => !keys.includes(key))
+      .map((key) => `${what}.${key} is not a known key`),
+  ];
+}
+
+function billetPaletteErrors(palette, what) {
+  const errors = keyErrors(palette, BILLET_PALETTE_KEYS, what);
+  if (errors.length) return errors;
+  return BILLET_PALETTE_KEYS.filter((key) => !HEX.test(palette[key])).map(
+    (key) => `${what}.${key} must be a lowercase #rrggbb`,
+  );
+}
+
+/** A FontRef must name a catalog font and a face it ships, upright or italic as requested. */
+function fontRefErrors(ref, faces, what) {
+  const errors = keyErrors(ref, BILLET_FONT_KEYS, what);
+  if (errors.length) return errors;
+  const font = faces.get(ref.fontId);
+  if (!font) return [`${what}.fontId "${ref.fontId}" is not in the font catalog`];
+  if (typeof ref.italic !== 'boolean') errors.push(`${what}.italic must be a boolean`);
+  if (!BILLET_FONT_SIZE(ref.size)) errors.push(`${what}.size must be within 0.5..2`);
+  const shipped = ref.italic ? font.italicWeights : font.weights;
+  if (!shipped.includes(ref.weight)) {
+    const face = `${ref.weight}${ref.italic ? ' italic' : ''}`;
+    const list = shipped.join('/') || 'none';
+    errors.push(`${what}: ${ref.fontId} ${face} is not shipped (catalog: ${list})`);
+  }
+  return errors;
+}
+
+function billetTypographyErrors(typography, faces) {
+  const what = 'billet.typography';
+  const errors = keyErrors(typography, [...BILLET_FONT_ROLES, 'emphasis'], what);
+  if (errors.length) return errors;
+  if (!BILLET_EMPHASIS.includes(typography.emphasis)) {
+    errors.push(`${what}.emphasis must be one of ${BILLET_EMPHASIS.join(', ')}`);
+  }
+  return [
+    ...errors,
+    ...BILLET_FONT_ROLES.flatMap((role) =>
+      fontRefErrors(typography[role], faces, `${what}.${role}`),
+    ),
+  ];
+}
+
+function particleColorErrors(colors) {
+  const { min, max } = BILLET_PARTICLE_COLORS;
+  if (!Array.isArray(colors) || colors.length < min || colors.length > max) {
+    return [`billet.particleColors must hold ${min}..${max} colours`];
+  }
+  return colors
+    .filter((color) => !HEX.test(color))
+    .map((color) => `billet.particleColors: "${color}" must be a lowercase #rrggbb`);
+}
+
+function billetErrors(billet, faces) {
+  const errors = keyErrors(billet, [...MODES, 'typography', 'particleColors'], 'billet');
+  if (errors.length) return errors;
+  return [
+    ...MODES.flatMap((mode) => billetPaletteErrors(billet[mode], `billet.${mode}`)),
+    ...billetTypographyErrors(billet.typography, faces),
+    ...particleColorErrors(billet.particleColors),
+  ];
+}
+
+// Readability of a billet palette in light and dark: running text 4.5:1; the accent is display text
+// (hero line 2, label, divider mark, signature) and needs 3:1 on the hero (accentSoft) and the page.
+// The rose preset - the original card - passes every rule.
+const BILLET_PAIRS = [
+  ['ink', 'background', AA_TEXT],
+  ['ink', 'surface', AA_TEXT],
+  ['inkSoft', 'background', AA_TEXT],
+  ['accent', 'accentSoft', AA_UI],
+  ['accent', 'background', AA_UI],
+];
+
+function billetContrastFailures(themes) {
+  const failures = [];
+  for (const { id, billet } of themes) {
+    for (const mode of MODES) {
+      for (const [fg, bg, min] of BILLET_PAIRS) {
+        const ratio = contrast(billet[mode][fg], billet[mode][bg]);
+        if (ratio >= min) continue;
+        failures.push(`${id}/${mode} billet: ${fg} on ${bg} = ${ratio.toFixed(2)} (< ${min})`);
+      }
+    }
+  }
+  return failures;
+}
+
+function validate(source, catalog) {
   const themes = Array.isArray(source.themes) ? source.themes : [];
   const errors = themes.length ? [] : ['themes[] is empty'];
   const ids = themes.map((t) => t.id);
   for (const theme of themes) {
     const problems = [
-      ...THEME_RULES.filter(([field, ok]) => !ok(theme[field])).map(([, , message]) => message),
-      ...MODES.flatMap((mode) => seedErrors(theme, mode)),
+      ...themeErrors(theme, catalog),
+      ...billetErrors(theme.billet, catalog.faces),
       ...(ids.indexOf(theme.id) !== ids.lastIndexOf(theme.id) ? ['duplicate id'] : []),
     ];
     errors.push(...problems.map((p) => `theme "${theme.id}": ${p}`));
   }
   if (!ids.includes(source.default))
     errors.push(`default theme "${source.default}" is not defined`);
+  errors.push(...siteErrors(source.site, ids, catalog));
   return errors;
 }
 
@@ -457,13 +651,14 @@ function declaration(property, value) {
 const HEADER =
   'AUTO-GENERATED by scripts/generate-themes.mjs from src/styles/themes/themes.json. Do not edit.';
 
-/** Mode-independent tokens: fonts and radii. The default theme also covers a bare <html>. */
-function themeBlock(theme, isDefault) {
+/** Mode-independent tokens: fonts and radii. */
+function themeBlock(theme, rootFallback) {
   return [
-    `${isDefault ? ':root:not([data-theme]),\n' : ''}[data-theme='${theme.id}'] {`,
+    `${rootFallback ? `${rootFallback},\n` : ''}[data-theme='${theme.id}'] {`,
     declaration('--ui-font-body', fontStack(theme.fontBody)),
     declaration('--ui-font-heading', fontStack(theme.fontHeading)),
-    declaration('--ui-font-heading-weight', theme.headingWeight ?? 600),
+    declaration('--ui-font-heading-weight', headingWeight(theme)),
+    declaration('--ui-font-display-weight', displayWeight(theme)),
     // Evens out display faces with a small x-height (Cormorant) or a condensed cap-only cut (Bebas).
     declaration('--ui-font-heading-scale', theme.headingScale ?? 1),
     ...['sm', 'md', 'lg', 'xl'].map(
@@ -474,10 +669,9 @@ function themeBlock(theme, isDefault) {
   ];
 }
 
-function modeBlock(theme, mode, colors, isDefault) {
-  const fallback = isDefault && mode === 'light' ? ':root:not([data-theme][data-mode]),\n' : '';
+function modeBlock(theme, mode, colors, rootFallback) {
   return [
-    `${fallback}[data-theme='${theme.id}'][data-mode='${mode}'] {`,
+    `${rootFallback ? `${rootFallback},\n` : ''}[data-theme='${theme.id}'][data-mode='${mode}'] {`,
     `    color-scheme: ${mode};`,
     ...Object.entries(colors).map(([key, value]) => declaration(`--ui-${kebab(key)}`, value)),
     declaration('--ui-overlay', overlay(theme, mode, colors)),
@@ -489,26 +683,41 @@ function modeBlock(theme, mode, colors, isDefault) {
   ];
 }
 
-function renderScss(themes, defaultId, derived) {
+// A <html> without data-theme (theme-boot.js did not run) still renders as the site; the dark
+// fallback outranks the light one by specificity.
+const SITE_ROOT_FALLBACK = {
+  fonts: ':root:not([data-theme])',
+  light: ':root:not([data-theme])',
+  dark: ":root:not([data-theme])[data-mode='dark']",
+};
+
+function renderScss(site, themes, derived) {
   const out = [
     `// ${HEADER}`,
-    '// Selectors are attribute-based (not :root-only), so any element can preview a theme by',
-    '// carrying data-theme + data-mode itself (theme-picker cards).',
+    `// The site theme ("${site.id}") is the one <html> carries (public/theme-boot.js). Editor themes`,
+    '// apply only to an element that carries data-theme + data-mode itself (ThemeScope: the editor',
+    '// root, theme-picker cards, the dev ui-kit), which is why no selector here is :root-only.',
     "@use 'tokens';",
     '',
+    ...themeBlock(site, SITE_ROOT_FALLBACK.fonts),
+    ...MODES.flatMap((mode) =>
+      modeBlock(site, mode, derived[site.id][mode], SITE_ROOT_FALLBACK[mode]),
+    ),
   ];
   for (const theme of themes) {
-    const isDefault = theme.id === defaultId;
-    out.push(...themeBlock(theme, isDefault));
-    for (const mode of MODES)
-      out.push(...modeBlock(theme, mode, derived[theme.id][mode], isDefault));
+    out.push(...themeBlock(theme, null));
+    for (const mode of MODES) out.push(...modeBlock(theme, mode, derived[theme.id][mode], null));
   }
   return out.join('\n').trimEnd() + '\n';
 }
 
 const quote = (s) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 
-function renderRegistry(themes, defaultId, derived) {
+function colorTokenLines(colors, colorKeys, indent) {
+  return colorKeys.map((k) => `${indent}${k}: ${quote(colors[k])},`);
+}
+
+function renderRegistry(site, themes, defaultId, derived) {
   const colorKeys = Object.keys(derived[themes[0].id].light);
   const swatch = (mode, c) => [
     `      ${mode}: {`,
@@ -518,6 +727,7 @@ function renderRegistry(themes, defaultId, derived) {
   const lines = [
     `// ${HEADER}`,
     '',
+    '/** The editor themes, in picker order. The site theme is not one of them. */',
     'export const THEME_IDS = [',
     ...themes.map((t) => `  ${quote(t.id)},`),
     '] as const;',
@@ -528,8 +738,10 @@ function renderRegistry(themes, defaultId, derived) {
     '',
     `export const DEFAULT_THEME: ThemeId = ${quote(defaultId)};`,
     '',
-    '// Shared with public/theme-boot.js, which reads them before the app bootstraps.',
-    `export const THEME_STORAGE_KEY = ${quote(THEME_STORAGE_KEY)};`,
+    '/** The fixed website theme on <html>; never offered as an editor theme. */',
+    `export const SITE_THEME = ${quote(site.id)};`,
+    '',
+    '// Shared with public/theme-boot.js, which reads it before the app bootstraps.',
     `export const COLOR_MODE_STORAGE_KEY = ${quote(MODE_STORAGE_KEY)};`,
     '',
     'export interface ThemeSwatch {',
@@ -584,48 +796,136 @@ function renderRegistry(themes, defaultId, derived) {
   for (const t of themes) {
     lines.push(`  ${t.id}: {`);
     for (const mode of MODES) {
-      const c = derived[t.id][mode];
       lines.push(
         `    ${mode}: {`,
-        ...colorKeys.map((k) => `      ${k}: ${quote(c[k])},`),
+        ...colorTokenLines(derived[t.id][mode], colorKeys, '      '),
         '    },',
       );
     }
     lines.push('  },');
   }
-  lines.push('};', '');
+  lines.push(
+    '};',
+    '',
+    "/** The site theme's final colour values; read by theme-contrast.spec.ts only. */",
+    'export const SITE_COLOR_TOKENS: ModeTokens = {',
+    ...MODES.flatMap((mode) => [
+      `  ${mode}: {`,
+      ...colorTokenLines(derived[site.id][mode], colorKeys, '    '),
+      '  },',
+    ]),
+    '};',
+    '',
+  );
   return lines.join('\n');
 }
 
-function renderBoot(themes, defaultId) {
-  return `// ${HEADER}
-// Runs before the app bootstraps, so the first paint already carries the theme attributes.
-// Plain ES5 on purpose: it must never throw, even with storage blocked or matchMedia missing.
-(function () {
-  var ids = [
-${themes.map((t) => `    '${t.id}',`).join('\n')}
+/** `key: { a, b },` / `key: [a, b],` on one line when it fits Prettier's 100 columns, else wrapped. */
+function literal(indent, key, entries, [open, close]) {
+  const pad = open === '{' ? ' ' : '';
+  const line = `${indent}${key}: ${open}${pad}${entries.join(', ')}${pad}${close},`;
+  if (line.length <= 100) return [line];
+  return [
+    `${indent}${key}: ${open}`,
+    ...entries.map((e) => `${indent}  ${e},`),
+    `${indent}${close},`,
   ];
-  var root = document.documentElement;
-  var theme = null;
+}
+
+function presetLines({ id, billet }) {
+  const palette = (mode) => [
+    `      ${mode}: {`,
+    ...BILLET_PALETTE_KEYS.map((key) => `        ${key}: ${quote(billet[mode][key])},`),
+    '      },',
+  ];
+  const font = (role) => {
+    const { fontId, weight, italic, size } = billet.typography[role];
+    const entries = [`fontId: ${quote(fontId)}`, `weight: ${weight}`, `italic: ${italic}`];
+    return literal('      ', role, [...entries, `size: ${size}`], ['{', '}']);
+  };
+  return [
+    `  ${id}: {`,
+    '    palette: {',
+    ...MODES.flatMap(palette),
+    '    },',
+    '    typography: {',
+    ...BILLET_FONT_ROLES.flatMap(font),
+    `      emphasis: ${quote(billet.typography.emphasis)},`,
+    '    },',
+    ...literal('    ', 'particleColors', billet.particleColors.map(quote), ['[', ']']),
+    '  },',
+  ];
+}
+
+function renderBilletPresets(themes) {
+  return [
+    `// ${HEADER}`,
+    '',
+    "import { DEFAULT_THEME, isThemeId, ThemeId } from './theme-registry.generated';",
+    '',
+    '// The shapes of BilletPalette, FontRef and typography in docs/billet-document.md.',
+    'interface BilletPresetPalette {',
+    ...BILLET_PALETTE_KEYS.map((key) => `  readonly ${key}: string;`),
+    '}',
+    '',
+    'interface BilletPresetFont {',
+    '  readonly fontId: string;',
+    '  readonly weight: number;',
+    '  readonly italic: boolean;',
+    '  readonly size: number;',
+    '}',
+    '',
+    'interface BilletPresetTypography {',
+    ...BILLET_FONT_ROLES.map((role) => `  readonly ${role}: BilletPresetFont;`),
+    `  readonly emphasis: ${BILLET_EMPHASIS.map(quote).join(' | ')};`,
+    '}',
+    '',
+    '/**',
+    ' * What picking an editor theme writes into a billet: palette.light / palette.dark, typography and',
+    ' * particles.colors. The objects are shared: copy them into a document, never alias them.',
+    ' */',
+    'export interface BilletThemePreset {',
+    '  readonly palette: {',
+    '    readonly light: BilletPresetPalette;',
+    '    readonly dark: BilletPresetPalette;',
+    '  };',
+    '  readonly typography: BilletPresetTypography;',
+    '  readonly particleColors: readonly string[];',
+    '}',
+    '',
+    'export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> = {',
+    ...themes.flatMap(presetLines),
+    '};',
+    '',
+    "/** The billet preset of an editor theme; an unknown id gets the default theme's preset. */",
+    'export function billetPresetFor(id: string): BilletThemePreset {',
+    '  return BILLET_THEME_PRESETS[isThemeId(id) ? id : DEFAULT_THEME];',
+    '}',
+    '',
+  ].join('\n');
+}
+
+function renderBoot(site) {
+  return `// ${HEADER}
+// Runs before the app bootstraps, so the first paint already carries the site theme and the colour
+// mode. The site always renders in its own theme; editor themes are element-scoped and never set
+// here. Plain ES5 on purpose: it must never throw, even with storage blocked or matchMedia missing.
+(function () {
   var mode = null;
   try {
-    theme = localStorage.getItem('${THEME_STORAGE_KEY}');
     mode = localStorage.getItem('${MODE_STORAGE_KEY}');
   } catch (e) {
-    // Storage blocked (private mode, sandboxed frame): defaults below.
+    // Storage blocked (private mode, sandboxed frame): follow the system below.
   }
-  if (ids.indexOf(theme) < 0) theme = '${defaultId}';
   if (mode !== 'light' && mode !== 'dark') {
-    var dark = false;
     try {
-      dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } catch (e) {
-      // No matchMedia: stay light.
+      mode = 'light';
     }
-    mode = dark ? 'dark' : 'light';
   }
-  root.setAttribute('data-theme', theme);
-  root.setAttribute('data-mode', mode);
+  document.documentElement.setAttribute('data-theme', '${site.id}');
+  document.documentElement.setAttribute('data-mode', mode);
 })();
 `;
 }
@@ -667,37 +967,54 @@ function deriveAll(themes) {
   return { derived, failures };
 }
 
+function printTables(site, themes, derived) {
+  console.table(
+    [site, ...themes].map((t) => ({
+      id: t === site ? `${t.id} (site)` : t.id,
+      body: t.fontBody,
+      heading: `${t.fontHeading} ${headingWeight(t)}/${displayWeight(t)}`,
+      light: derived[t.id].light.accent,
+      dark: derived[t.id].dark.accent,
+    })),
+  );
+  const face = ({ fontId, weight, italic }) => `${fontId} ${weight}${italic ? ' italic' : ''}`;
+  console.table(
+    themes.map(({ id, billet }) => ({
+      billet: id,
+      accent: `${billet.light.accent} / ${billet.dark.accent}`,
+      title: face(billet.typography.title),
+      titleAccent: face(billet.typography.titleAccent),
+      body: face(billet.typography.body),
+    })),
+  );
+}
+
 function main() {
   const source = JSON.parse(readFileSync(SOURCE, 'utf8'));
-  const errors = validate(source);
+  const errors = validate(source, readFontCatalog());
   if (errors.length) fail('themes.json is invalid', errors);
 
-  const { derived, failures } = deriveAll(source.themes);
-  if (failures.length) fail('Theme contrast check failed (WCAG AA)', failures);
+  const { site, themes } = source;
+  const { derived, failures } = deriveAll([site, ...themes]);
+  failures.push(...billetContrastFailures(themes));
+  if (failures.length) {
+    fail('Contrast check failed (WCAG AA for the UI, readability rules for billets)', failures);
+  }
 
   const outputs = [
-    [OUT_SCSS, renderScss(source.themes, source.default, derived)],
-    [OUT_TS, renderRegistry(source.themes, source.default, derived)],
-    [OUT_BOOT, renderBoot(source.themes, source.default)],
+    [OUT_SCSS, renderScss(site, themes, derived)],
+    [OUT_TS, renderRegistry(site, themes, source.default, derived)],
+    [OUT_PRESETS, renderBilletPresets(themes)],
+    [OUT_BOOT, renderBoot(site)],
   ];
   const changed = outputs.filter(([file, content]) => writeIfChanged(file, content));
 
-  if (process.argv.includes('--table')) {
-    console.table(
-      source.themes.map((t) => ({
-        id: t.id,
-        body: t.fontBody,
-        heading: t.fontHeading,
-        light: derived[t.id].light.accent,
-        dark: derived[t.id].dark.accent,
-      })),
-    );
-  }
+  if (process.argv.includes('--table')) printTables(site, themes, derived);
   const summary = changed.length
     ? `wrote ${changed.map(([file]) => basename(file)).join(', ')}`
     : 'outputs unchanged';
   console.log(
-    `themes -> ${source.themes.length} themes x ${MODES.length} modes pass WCAG AA; ${summary}`,
+    `themes -> site "${site.id}" + ${themes.length} editor themes x ${MODES.length} modes pass WCAG AA, ${themes.length} billet presets pass; ${summary}`,
   );
 }
 

@@ -75,26 +75,6 @@
     }
 }
 
-.shell__theme {
-    display: flex;
-    flex-direction: column;
-    gap: var(--ui-space-4);
-    inline-size: min(46rem, calc(100vw - 2 * var(--ui-space-4)));
-    max-inline-size: none;
-    max-block-size: min(44rem, calc(100dvh - 5rem));
-    margin-block: var(--ui-space-2);
-    padding: var(--ui-space-5);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-}
-
-.shell__theme-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--ui-space-3);
-}
-
 .shell__main {
     display: flex;
     flex: 1;

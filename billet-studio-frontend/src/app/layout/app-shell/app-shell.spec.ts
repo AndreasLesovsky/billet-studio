@@ -26,17 +26,6 @@ const routes: Routes = [
 describe('AppShell', () => {
   let fixture: ComponentFixture<AppShell>;
 
-  const themeButton = () =>
-    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
-      'button[aria-haspopup="dialog"]',
-    )!;
-  const popover = () => document.getElementById('shell-theme-popover');
-
-  async function openTheme(): Promise<void> {
-    themeButton().click();
-    await fixture.whenStable();
-  }
-
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [AppShell, translateTestingModule()],
@@ -61,37 +50,6 @@ describe('AppShell', () => {
   afterEach(() => {
     fixture.destroy();
     (fixture.nativeElement as HTMLElement).remove();
-  });
-
-  it('the theme button opens the picker as a labelled dialog and reports it expanded', async () => {
-    expect(themeButton().getAttribute('aria-expanded')).toBe('false');
-
-    await openTheme();
-
-    expect(popover()?.getAttribute('role')).toBe('dialog');
-    expect(popover()?.querySelector('app-theme-picker')).not.toBeNull();
-    expect(themeButton().getAttribute('aria-expanded')).toBe('true');
-    expect(themeButton().getAttribute('aria-controls')).toBe('shell-theme-popover');
-  });
-
-  it('Esc closes the picker, also from an event that carries no legacy keyCode', async () => {
-    await openTheme();
-
-    // keyCode stays 0 here, as with some assistive tech and automation; CDK alone would ignore it.
-    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-    await fixture.whenStable();
-
-    expect(popover()).toBeNull();
-    expect(themeButton().getAttribute('aria-expanded')).toBe('false');
-  });
-
-  it('the close button closes the picker', async () => {
-    await openTheme();
-
-    popover()!.querySelector<HTMLButtonElement>('.shell__theme-header button')!.click();
-    await fixture.whenStable();
-
-    expect(popover()).toBeNull();
   });
 
   it('titles the document after the current page, the home page with the site name alone', async () => {

@@ -42,7 +42,7 @@ const VARIANTS: Record<AppMessage['type'], { variant: Variant; icon: string }> =
 const URGENT: ReadonlySet<Variant> = new Set(['danger', 'warning']);
 
 /** m:ss left, never below zero. */
-export function formatCountdown(msLeft: number): string {
+function formatCountdown(msLeft: number): string {
   const seconds = Math.max(0, Math.round(msLeft / 1000));
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }

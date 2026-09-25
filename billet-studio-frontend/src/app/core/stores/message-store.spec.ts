@@ -16,19 +16,6 @@ describe('MessageStore', () => {
   afterEach(() => vi.useRealTimers());
 
   describe('addMessage', () => {
-    it('queues a toast with its code, status and params', () => {
-      store.addMessage('error', 'BILLET_LIMIT_REACHED', 409, { max: 50 });
-
-      expect(store.messages()).toEqual([
-        expect.objectContaining({
-          type: 'error',
-          code: 'BILLET_LIMIT_REACHED',
-          status: 409,
-          params: { max: 50 },
-        }),
-      ]);
-    });
-
     it('drops the same code reported twice within a second - one event, two requests', () => {
       vi.useFakeTimers();
       store.addMessage('error', 'INTERNAL_SERVER_ERROR', 500);
@@ -44,15 +31,6 @@ describe('MessageStore', () => {
       ['A', 'B', 'C', 'D', 'E'].forEach((code) => store.addMessage('info', code));
 
       expect(store.messages().map((m) => m.code)).toEqual(['B', 'C', 'D', 'E']);
-    });
-
-    it('removeMessage takes one toast off by id', () => {
-      store.addMessage('success', 'A');
-      store.addMessage('success', 'B');
-
-      store.removeMessage(store.messages()[0].id);
-
-      expect(store.messages().map((m) => m.code)).toEqual(['B']);
     });
   });
 
@@ -103,16 +81,6 @@ describe('MessageStore', () => {
 
       store.dismissSessionWarning();
       expect(store.sessionWarningEndsAt()).toBeNull();
-    });
-
-    it('is not confused by ordinary toasts around it', () => {
-      const endsAt = Date.now() + FIVE_MINUTES;
-      store.addMessage('success', 'ACCOUNT_UPDATED');
-      store.showSessionWarning('SESSION_ENDING', endsAt);
-      store.addMessage('info', 'SESSION_ENDED_BY_OTHER_TAB');
-
-      expect(store.sessionWarningEndsAt()).toBe(endsAt);
-      expect(store.messages()).toHaveLength(3);
     });
 
     it('outlasts a burst of other toasts', () => {

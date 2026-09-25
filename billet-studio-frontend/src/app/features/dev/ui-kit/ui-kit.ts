@@ -1,9 +1,12 @@
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { DatePipe } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { DEFAULT_THEME, THEMES } from '../../../core/theme/theme-registry.generated';
 import { ThemePicker } from '../../../shared/components/theme-picker/theme-picker';
+import { ThemeScope } from '../../../shared/directives/theme-scope';
+import { BilletPresetSample } from './billet-preset-sample';
 
 type KitTab = 'content' | 'design' | 'scene';
 
@@ -68,12 +71,23 @@ function targetTab(key: string, index: number, count: number): number | null {
 }
 
 /**
- * Kitchen sink of every ui-* component class in the current theme, for visual QA (route dev/ui).
+ * Kitchen sink for visual QA (route dev/ui): every ui-* component class in the site (Studio) theme,
+ * then the theme picker and, per editor theme, a mini editor panel inside its own ThemeScope and
+ * the theme's billet preset.
  * Sample content is static; nothing here talks to the backend.
  */
 @Component({
   selector: 'app-ui-kit',
-  imports: [TranslatePipe, DatePipe, CdkMenu, CdkMenuItem, CdkMenuTrigger, ThemePicker],
+  imports: [
+    TranslatePipe,
+    DatePipe,
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
+    ThemePicker,
+    ThemeScope,
+    BilletPresetSample,
+  ],
   templateUrl: './ui-kit.html',
   styleUrl: './ui-kit.scss',
 })
@@ -82,6 +96,11 @@ export class UiKit {
   protected readonly rows = SAMPLE_ROWS;
   protected readonly activeTab = signal<KitTab>('content');
   protected readonly spacing = signal(40);
+  protected readonly themes = THEMES;
+  protected readonly editorTheme = signal<string>(DEFAULT_THEME);
+  protected readonly editorThemeName = computed(
+    () => THEMES.find((t) => t.id === this.editorTheme())?.nameKey ?? '',
+  );
 
   protected onSpacing(event: Event): void {
     this.spacing.set(Number((event.target as HTMLInputElement).value));

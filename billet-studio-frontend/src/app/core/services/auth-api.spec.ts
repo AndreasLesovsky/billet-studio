@@ -131,18 +131,11 @@ describe('AuthApi', () => {
       expect(authApi.returnUrlBelongsTo('/billets/5/edit', 7)).toBe(true);
     });
 
-    it('and to nobody else on that tab', () => {
-      authApi.user.set(testUser({ id: 7 }));
-      authApi.endSession({ reason: 'expired', returnUrl: '/billets/5/edit' });
-
-      expect(authApi.returnUrlBelongsTo('/billets/5/edit', 8)).toBe(false);
-    });
-
     it("a returnUrl no expiry wrote - a guard deep link - is anyone's", () => {
       expect(authApi.returnUrlBelongsTo('/billets/5/edit', 8)).toBe(true);
     });
 
-    it('is spent on the first login attempt, whoever makes it', () => {
+    it('and to nobody else on that tab, spent on the first login attempt, whoever makes it', () => {
       authApi.user.set(testUser({ id: 7 }));
       authApi.endSession({ reason: 'expired', returnUrl: '/billets/5/edit' });
 
@@ -159,44 +152,32 @@ describe('AuthApi', () => {
   });
 
   describe('endSession', () => {
-    it('reason: expired with returnUrl → SESSION_EXPIRED toast + navigate with queryParams', () => {
-      localStorage.setItem(SESSION_HINT_KEY, '1');
-      authApi.endSession({ reason: 'expired', returnUrl: '/account' });
+    const toLogin = [['/login']];
+    it.each<[EndSessionReason, string | undefined, unknown[][], unknown[]]>([
+      [
+        'expired',
+        '/account',
+        [['error', 'SESSION_EXPIRED']],
+        [['/login'], { queryParams: { returnUrl: '/account' } }],
+      ],
+      ['expired', undefined, [['error', 'SESSION_EXPIRED']], toLogin],
+      ['logout', undefined, [['success', 'LOGOUT_SUCCESS']], toLogin],
+      ['deactivated', undefined, [], toLogin],
+      ['multi-tab', undefined, [['info', 'SESSION_ENDED_BY_OTHER_TAB']], toLogin],
+    ])(
+      '%s (returnUrl %s): clears the session, toasts %j, opens the login',
+      (reason, returnUrl, toasts, navigation) => {
+        localStorage.setItem(SESSION_HINT_KEY, '1');
+        authApi.user.set(testUser());
 
-      expect(localStorage.getItem(SESSION_HINT_KEY)).toBeNull();
-      expect(messageStore.addMessage).toHaveBeenCalledWith('error', 'SESSION_EXPIRED');
-      expect(router.navigate).toHaveBeenCalledWith(['/login'], {
-        queryParams: { returnUrl: '/account' },
-      });
-    });
+        authApi.endSession({ reason, returnUrl });
 
-    it('reason: expired without returnUrl → toast + navigate without queryParams', () => {
-      authApi.endSession({ reason: 'expired' });
-
-      expect(messageStore.addMessage).toHaveBeenCalledWith('error', 'SESSION_EXPIRED');
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
-
-    it('reason: logout → LOGOUT_SUCCESS toast + navigate without queryParams', () => {
-      authApi.endSession({ reason: 'logout' });
-
-      expect(messageStore.addMessage).toHaveBeenCalledWith('success', 'LOGOUT_SUCCESS');
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
-
-    it('reason: deactivated → NO toast + navigate to /login', () => {
-      authApi.endSession({ reason: 'deactivated' });
-
-      expect(messageStore.addMessage).not.toHaveBeenCalled();
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
-
-    it('reason: multi-tab → SESSION_ENDED_BY_OTHER_TAB info toast + navigate to /login', () => {
-      authApi.endSession({ reason: 'multi-tab' });
-
-      expect(messageStore.addMessage).toHaveBeenCalledWith('info', 'SESSION_ENDED_BY_OTHER_TAB');
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
+        expect(localStorage.getItem(SESSION_HINT_KEY)).toBeNull();
+        expect(authApi.user()).toBeNull();
+        expect(messageStore.addMessage.mock.calls).toEqual(toasts);
+        expect(router.navigate).toHaveBeenCalledWith(...navigation);
+      },
+    );
 
     it('keeps the open work of whoever was signed in', () => {
       authApi.user.set(testUser());
@@ -219,17 +200,6 @@ describe('AuthApi', () => {
 
       expect(authApi.user()).toBeNull();
       expect(localStorage.getItem(SESSION_HINT_KEY)).toBeNull();
-    });
-
-    it('always clears tokens regardless of reason', () => {
-      const reasons: EndSessionReason[] = ['expired', 'logout', 'deactivated', 'multi-tab'];
-      for (const reason of reasons) {
-        localStorage.setItem(SESSION_HINT_KEY, '1');
-        authApi.user.set(testUser());
-        authApi.endSession({ reason });
-        expect(localStorage.getItem(SESSION_HINT_KEY)).toBeNull();
-        expect(authApi.user()).toBeNull();
-      }
     });
   });
 
@@ -260,7 +230,7 @@ describe('AuthApi', () => {
       expect(httpClient.post).not.toHaveBeenCalled();
     });
 
-    it('with a hint: renews and adopts the session', async () => {
+    it('with a hint: renews without an error toast (its caller decides) and adopts the session', async () => {
       localStorage.setItem(SESSION_HINT_KEY, '1');
       const dto = testUser({ accessToken: 'fresh' });
       httpClient.post.mockReturnValue(of(dto));
@@ -269,13 +239,6 @@ describe('AuthApi', () => {
 
       expect(authApi.user()).toEqual(dto);
       expect(authApi.role()).toBe('ROLE_USER');
-    });
-
-    it('the renewal suppresses the error toast: its caller decides what a failure means', async () => {
-      localStorage.setItem(SESSION_HINT_KEY, '1');
-      httpClient.post.mockReturnValue(of(testUser()));
-
-      await authApi.restoreSession();
 
       const [url, , options] = httpClient.post.mock.calls[0] as [
         string,
@@ -324,13 +287,17 @@ describe('AuthApi', () => {
       httpClient.post.mockClear();
     }
 
-    it('typing renews once the session is past half its window', async () => {
-      // Someone fills in a long form, the page makes no requests at all, and without this the
-      // session idles out under someone who is plainly there.
+    // Someone fills in a long form, the page makes no requests at all, and without this the
+    // session idles out under someone who is plainly there.
+    it.each([
+      ['typing', () => new KeyboardEvent('keydown', { key: 'a' })],
+      ['a wheel event', () => new WheelEvent('wheel')],
+      ['a touchstart', () => new Event('touchstart')],
+    ])('%s renews once the session is past half its window', async (_, event) => {
       await loggedInFor(1800);
       vi.setSystemTime(Date.now() + 16 * 60 * 1000);
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+      document.dispatchEvent(event());
 
       expect(httpClient.post).toHaveBeenCalledOnce();
     });
@@ -343,24 +310,6 @@ describe('AuthApi', () => {
       }
 
       expect(httpClient.post).not.toHaveBeenCalled();
-    });
-
-    it('a wheel event counts as activity', async () => {
-      await loggedInFor(1800);
-      vi.setSystemTime(Date.now() + 16 * 60 * 1000);
-
-      document.dispatchEvent(new WheelEvent('wheel'));
-
-      expect(httpClient.post).toHaveBeenCalledOnce();
-    });
-
-    it('a touchstart counts as activity', async () => {
-      await loggedInFor(1800);
-      vi.setSystemTime(Date.now() + 16 * 60 * 1000);
-
-      document.dispatchEvent(new Event('touchstart'));
-
-      expect(httpClient.post).toHaveBeenCalledOnce();
     });
 
     it('scales with the window the server reports, so no lifetime is duplicated here', async () => {
@@ -664,25 +613,6 @@ describe('AuthApi', () => {
         confirmPassword: 'Secret123',
       });
       expect(messageStore.addMessage).toHaveBeenCalledWith('success', 'PASSWORD_RESET_SUCCESS');
-    });
-  });
-
-  describe('patching the cached user', () => {
-    it('patchAvatar and patchName update the header without a round trip', () => {
-      authApi.user.set(testUser({ avatarUrl: null, name: 'Anna' }));
-
-      authApi.patchAvatar('/uploads/avatars/7.webp');
-      authApi.patchName('Anne');
-
-      expect(authApi.user()?.avatarUrl).toBe('/uploads/avatars/7.webp');
-      expect(authApi.user()?.name).toBe('Anne');
-    });
-
-    it('does nothing without a user', () => {
-      authApi.patchAvatar(null);
-      authApi.patchName('Anne');
-
-      expect(authApi.user()).toBeNull();
     });
   });
 });

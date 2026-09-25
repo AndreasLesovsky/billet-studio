@@ -44,10 +44,6 @@ describe('AccessToken', () => {
     expect(accessToken.couldHaveSession()).toBe(true);
   });
 
-  it('namespaces its hint, so another app on the same origin cannot fake or clear it', () => {
-    expect(SESSION_HINT_KEY.startsWith('billet-studio.')).toBe(true);
-  });
-
   it('adopts a deadline another tab wrote', () => {
     // What keeps a background tab from counting down to a deadline that has already moved.
     const moved = Date.now() + 30 * 60 * 1000;

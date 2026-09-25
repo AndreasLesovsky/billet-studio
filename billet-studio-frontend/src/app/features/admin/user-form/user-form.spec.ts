@@ -184,6 +184,30 @@ describe('UserForm', () => {
     );
   });
 
+  it('a plain edit of a self-deactivated account sends no reason, so its grace period stays', async () => {
+    const { component, adminUserApi } = setup({
+      id: '20',
+      get: async () => ({
+        ...BERTA,
+        active: false,
+        deactivatedAt: '2026-02-01T00:00:00Z',
+        deletionScheduledAt: '2026-03-03T00:00:00Z',
+        deactivationReason: 'PRIVACY_CONCERNS',
+      }),
+    });
+    await flush();
+    // The owner's reason is not an admin reason: the select reads "no reason".
+    expect(component.model().deactivationReason).toBe('');
+    component.model.update((m) => ({ ...m, name: 'Berta Bloom' }));
+
+    await component.onSubmit();
+
+    expect(adminUserApi.update).toHaveBeenCalledWith(
+      20,
+      expect.objectContaining({ name: 'Berta Bloom', active: false, deactivationReason: null }),
+    );
+  });
+
   it('a refused save keeps the form and its changes', async () => {
     const { component, adminUserApi, router } = setup({ id: '20' });
     await flush();

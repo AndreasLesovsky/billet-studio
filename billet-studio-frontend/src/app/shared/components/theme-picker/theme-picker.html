@@ -1,75 +1,50 @@
-<div class="theme-picker">
-  <fieldset class="theme-picker__group">
-    <legend class="ui-label theme-picker__legend">
-      {{ 'THEME_PICKER.MODE_LABEL' | translate }}
-    </legend>
-    <div class="ui-segmented theme-picker__modes">
-      @for (option of modeOptions; track option.value) {
-        <label class="ui-segmented__option">
-          <input
-            type="radio"
-            [name]="modeGroup"
-            [value]="option.value"
-            [checked]="mode() === option.value"
-            (change)="selectMode(option.value)"
-          />
-          <i
-            class="bi"
-            [class]="option.icon"
+<fieldset
+  class="theme-picker"
+  [disabled]="disabled()"
+  (focusout)="onFocusOut($event)"
+>
+  <legend class="ui-label theme-picker__legend">{{ 'THEME_PICKER.LABEL' | translate }}</legend>
+  <div class="theme-picker__grid">
+    @for (t of themes; track t.id) {
+      <label class="ui-theme-option">
+        <input
+          type="radio"
+          class="ui-visually-hidden"
+          [name]="group"
+          [value]="t.id"
+          [checked]="selected() === t.id"
+          (change)="select(t.id)"
+        />
+        <span class="ui-theme-option__frame">
+          <span
+            class="ui-theme-card"
             aria-hidden="true"
-          ></i>
-          <span>{{ option.labelKey | translate }}</span>
-        </label>
-      }
-    </div>
-  </fieldset>
-
-  <fieldset class="theme-picker__group">
-    <legend class="ui-label theme-picker__legend">
-      {{ 'THEME_PICKER.THEME_LABEL' | translate }}
-    </legend>
-    <div class="theme-picker__grid">
-      @for (t of themes; track t.id) {
-        <label class="ui-theme-option">
-          <input
-            type="radio"
-            class="ui-visually-hidden"
-            [name]="themeGroup"
-            [value]="t.id"
-            [checked]="theme() === t.id"
-            (change)="selectTheme(t.id)"
-          />
-          <span class="ui-theme-option__frame">
-            <span
-              class="ui-theme-card"
-              aria-hidden="true"
-              [attr.data-theme]="t.id"
-              [attr.data-mode]="previewMode()"
-            >
-              <span class="ui-theme-card__bar">
-                <span class="ui-theme-card__dot"></span>
-                <span class="ui-theme-card__dot"></span>
-              </span>
-              <span class="ui-theme-card__body">
-                <span class="ui-theme-card__title">Aa</span>
-                <span class="ui-theme-card__line"></span>
-                <span class="ui-theme-card__line ui-theme-card__line--short"></span>
-                <span class="ui-theme-card__actions">
-                  <span class="ui-theme-card__button"></span>
-                  <span class="ui-theme-card__chip"></span>
-                </span>
+            [appThemeScope]="t.id"
+          >
+            <span class="ui-theme-card__bar">
+              <span class="ui-theme-card__swatch"></span>
+              <span class="ui-theme-card__swatch ui-theme-card__swatch--accent-2"></span>
+              <span class="ui-theme-card__swatch ui-theme-card__swatch--text"></span>
+            </span>
+            <span class="ui-theme-card__body">
+              <span class="ui-theme-card__title">Aa</span>
+              <span class="ui-theme-card__line"></span>
+              <span class="ui-theme-card__line ui-theme-card__line--short"></span>
+              <span class="ui-theme-card__actions">
+                <span class="ui-theme-card__button"></span>
+                <span class="ui-theme-card__chip"></span>
               </span>
             </span>
           </span>
-          <span class="ui-theme-option__name">
-            <i
-              class="bi bi-check-circle-fill ui-theme-option__check"
-              aria-hidden="true"
-            ></i>
-            {{ t.nameKey | translate }}
-          </span>
-        </label>
-      }
-    </div>
-  </fieldset>
-</div>
+        </span>
+        <span class="ui-theme-option__name">
+          <i
+            class="bi bi-check-circle-fill ui-theme-option__check"
+            aria-hidden="true"
+          ></i>
+          {{ t.nameKey | translate }}
+        </span>
+      </label>
+    }
+  </div>
+</fieldset>

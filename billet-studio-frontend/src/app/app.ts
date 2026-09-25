@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { ThemeService } from './core/theme/theme-service';
+import { ColorModeService } from './core/theme/color-mode-service';
 import { ConfirmationModal } from './shared/components/confirmation-modal/confirmation-modal';
 import { Spinner } from './shared/components/spinner/spinner';
 import { Toast } from './shared/components/toast/toast';
@@ -17,8 +17,8 @@ import { Toast } from './shared/components/toast/toast';
 })
 export class App {
   constructor() {
-    // Created at startup, not when the picker first renders: it follows prefers-color-scheme and
-    // other tabs' choices only while it exists.
-    inject(ThemeService);
+    // Created at startup, not when the colour-mode menu first renders: it follows
+    // prefers-color-scheme and other tabs' choices only while it exists.
+    inject(ColorModeService);
   }
 }
