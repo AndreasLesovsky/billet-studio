@@ -152,7 +152,9 @@ Density mapping: `count = round(density × 0.56)`, `inAirMax = round(count × 0.
 
 ## Reference document — the original Mother's Day card
 
-Parity fixture (`muttertag_threejs/index.html`). The same document lives in
+Parity fixture: the LIVE card https://muttertag.andreas-web.dev (snapshot in
+`billet-studio-frontend/e2e/fixtures/muttertag-original/index.html`; it differs from the local
+`muttertag_threejs/index.html` only in `--rose-pale`, live `#fdf5f2` is canonical). The same document lives in
 [`fixtures/muttertag.billet.json`](fixtures/muttertag.billet.json), which backend tests and the
 Playwright parity test read directly — change both together.
 
@@ -165,7 +167,7 @@ Playwright parity test read directly — change both together.
   "lang": "de",
   "colorMode": "auto",
   "palette": {
-    "light": { "accent": "#c8614a", "accentSoft": "#fbe5dc", "border": "#e8c4bb", "background": "#faf6f0", "ink": "#2a1f1a", "inkSoft": "#6b5148", "surface": "#ffffff" },
+    "light": { "accent": "#c8614a", "accentSoft": "#fdf5f2", "border": "#e8c4bb", "background": "#faf6f0", "ink": "#2a1f1a", "inkSoft": "#6b5148", "surface": "#ffffff" },
     "dark":  { "accent": "#c8614a", "accentSoft": "#261710", "border": "#5a3028", "background": "#1e1410", "ink": "#f0e8e4", "inkSoft": "#c4a090", "surface": "#231512" },
     "darkLinked": false
   },
