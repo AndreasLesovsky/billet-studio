@@ -36,3 +36,5 @@ Alle `DATETIME`-Spalten enthalten UTC und werden ausschließlich von der Anwendu
 ## Spätere Änderungen
 
 Schemaänderungen kommen als eigene Datei nach `sql/migrations/<YYYY-MM-DD>_<name>.sql` (z. B. `sql/migrations/2026-10-01_billet_og_image.sql`) und werden im selben Commit in `schema.sql` nachgezogen, damit eine frische Installation immer nur `schema.sql` + Seeds braucht. Bestehende Datenbanken spielen nur die neuen Migrationen ein, in Datumsreihenfolge.
+
+Dasselbe gilt für Änderungen am Modell-Katalog (`tbl_models`, z. B. neue Standardwerte einer Szene oder eine neu gebaute GLB): `seed_models.sql` wird für frische Datenbanken aktualisiert, und zusätzlich gibt es eine kleine datierte Migration mit genau den geänderten Zeilen (`UPDATE`/`INSERT`), damit eine bestehende DB nie die ganze Seed-Datei neu braucht.

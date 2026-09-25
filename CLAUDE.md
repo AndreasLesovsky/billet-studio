@@ -673,6 +673,10 @@ through the interceptor again → deadlock (no translations, endless spinner).
 
 ---
 
+- Every change to catalog DATA (new model, changed scene defaults, rebuilt GLB with a new size) updates
+  `sql/seed_models.sql` (fresh databases) AND ships a dated `sql/migrations/<YYYY-MM-DD>_<name>.sql`
+  with only the changed rows, so the user never has to re-run the whole seed (user rule).
+
 ## 17. Internationalization (i18n)
 
 - ngx-translate, files `public/i18n/de.json` and `public/i18n/en.json`.
