@@ -148,13 +148,84 @@
     line-height: 1.4;
     cursor: pointer;
 
+    // Drawn by hand like .ui-switch: with only accent-color the browser picks the tick colour
+    // itself (Firefox always white), which vanishes on a light dark-mode accent. The tick uses
+    // --ui-on-accent, the colour every theme guarantees on the accent fill.
     > input:is([type='checkbox'], [type='radio']):not(.ui-switch) {
+        display: inline-grid;
         flex: none;
+        place-content: center;
         inline-size: 1.125rem;
         block-size: 1.125rem;
         margin: 0.0625rem 0 0;
-        accent-color: var(--ui-accent);
+        border: 1px solid var(--ui-border-strong);
+        border-radius: var(--ui-radius-sm);
+        background-color: var(--ui-surface);
         cursor: inherit;
+        appearance: none;
+        transition:
+            background-color var(--ui-duration-fast) var(--ui-ease),
+            border-color var(--ui-duration-fast) var(--ui-ease);
+
+        &::before {
+            content: '';
+            transform: scale(0);
+            transition: transform var(--ui-duration-fast) var(--ui-ease);
+        }
+
+        &:checked {
+            border-color: var(--ui-accent);
+            background-color: var(--ui-accent);
+
+            &::before {
+                transform: scale(1);
+            }
+        }
+
+        &:disabled {
+            border-color: var(--ui-border);
+            background-color: var(--ui-surface-sunken);
+        }
+
+        &:disabled:checked {
+            border-color: transparent;
+            background-color: color-mix(in oklab, var(--ui-accent) 50%, var(--ui-surface));
+        }
+
+        @media (forced-colors: active) {
+            appearance: auto;
+
+            &::before {
+                display: none;
+            }
+        }
+    }
+
+    // Tick: an L of two borders rotated 45°, nudged up so it sits optically centred.
+    > input[type='checkbox']:not(.ui-switch) {
+        &::before {
+            inline-size: 0.3125rem;
+            block-size: 0.625rem;
+            margin-block-start: -0.125rem;
+            border: solid var(--ui-on-accent);
+            border-width: 0 0.140625rem 0.140625rem 0;
+            transform: rotate(45deg) scale(0);
+        }
+
+        &:checked::before {
+            transform: rotate(45deg) scale(1);
+        }
+    }
+
+    > input[type='radio'] {
+        border-radius: 50%;
+
+        &::before {
+            inline-size: 0.5rem;
+            block-size: 0.5rem;
+            border-radius: 50%;
+            background-color: var(--ui-on-accent);
+        }
     }
 
     &:has(> input:disabled) {
