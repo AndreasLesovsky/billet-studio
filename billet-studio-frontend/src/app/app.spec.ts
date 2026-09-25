@@ -57,6 +57,7 @@ describe('app routes', () => {
           useValue: {
             availableLanguages: ['de', 'en'],
             currentLang: signal('de'),
+            locale: signal('de-DE'),
             setLanguage: vi.fn(),
           },
         },

@@ -1,0 +1,107 @@
+@let fields = billetForm();
+<div class="ui-stack ui-stack--lg">
+  <section
+    class="ui-card"
+    aria-labelledby="editor-design-theme"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-design-theme"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.DESIGN.THEME_TITLE' | translate }}
+      </h2>
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral ui-btn--sm"
+        [disabled]="matchesTheme()"
+        (click)="resetToTheme()"
+      >
+        <i
+          class="bi bi-arrow-counterclockwise"
+          aria-hidden="true"
+        ></i>
+        {{ 'EDITOR.DESIGN.THEME_RESET' | translate }}
+      </button>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <p class="ui-hint">{{ 'EDITOR.DESIGN.THEME_HINT' | translate }}</p>
+      <div class="design-panel__current">
+        <span
+          class="design-panel__swatches"
+          aria-hidden="true"
+        >
+          @for (color of swatches(); track $index) {
+            <span
+              class="ui-swatch"
+              [style.background-color]="color"
+            ></span>
+          }
+        </span>
+        <span
+          id="editor-theme-current"
+          class="ui-label design-panel__theme-name"
+          >{{ themeNameKey() | translate }}</span
+        >
+        <button
+          type="button"
+          class="ui-btn ui-btn--secondary ui-btn--sm"
+          aria-controls="editor-theme-picker"
+          aria-describedby="editor-theme-current"
+          [attr.aria-expanded]="themesOpen()"
+          (click)="toggleThemes()"
+        >
+          {{ 'EDITOR.DESIGN.THEME_CHOOSE' | translate }}
+          <i
+            class="bi"
+            [class]="themesOpen() ? 'bi-chevron-up' : 'bi-chevron-down'"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </div>
+      <div
+        id="editor-theme-picker"
+        [hidden]="!themesOpen()"
+      >
+        <app-theme-picker
+          [value]="document().theme"
+          (valueChange)="pickTheme($event)"
+        />
+      </div>
+      <fieldset class="ui-field">
+        <legend class="ui-label design-panel__legend">
+          {{ 'EDITOR.DESIGN.COLOR_MODE' | translate }}
+        </legend>
+        <div class="ui-segmented design-panel__modes">
+          @for (option of colorModes; track option.mode) {
+            <label class="ui-segmented__option">
+              <input
+                type="radio"
+                aria-describedby="editor-design-color-mode-hint"
+                [value]="option.mode"
+                [formField]="fields.colorMode"
+              />
+              {{ option.labelKey | translate }}
+            </label>
+          }
+        </div>
+        <p
+          id="editor-design-color-mode-hint"
+          class="ui-hint"
+        >
+          {{ 'EDITOR.DESIGN.COLOR_MODE_HINT' | translate }}
+        </p>
+      </fieldset>
+    </div>
+  </section>
+
+  <app-palette-editor
+    [billetForm]="billetForm()"
+    [document]="document()"
+  />
+
+  <app-typography-editor
+    [billetForm]="billetForm()"
+    [document]="document()"
+  />
+</div>

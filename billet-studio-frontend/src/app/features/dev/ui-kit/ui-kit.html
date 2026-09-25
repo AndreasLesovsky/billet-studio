@@ -862,6 +862,58 @@
         }
       </ul>
     </section>
+
+    <!-- Editor controls: once in Studio, once in the editor theme picked above. -->
+    <section
+      class="ui-stack ui-stack--lg"
+      aria-labelledby="kit-editor-controls"
+    >
+      <header class="ui-page__header">
+        <h2 id="kit-editor-controls">{{ 'CONTROLS.KIT.TITLE' | translate }}</h2>
+        <p class="ui-hint">{{ 'CONTROLS.KIT.LEAD' | translate }}</p>
+      </header>
+
+      <div class="kit__columns">
+        <section
+          class="ui-card"
+          aria-labelledby="kit-controls-studio"
+        >
+          <div class="ui-card__header">
+            <h3
+              id="kit-controls-studio"
+              class="ui-card__title"
+            >
+              {{ 'CONTROLS.KIT.STUDIO' | translate }}
+            </h3>
+          </div>
+          <div class="ui-card__body">
+            <app-editor-controls-sample />
+          </div>
+        </section>
+
+        <div
+          class="kit__theme"
+          [appThemeScope]="editorTheme()"
+        >
+          <section
+            class="ui-card"
+            aria-labelledby="kit-controls-theme"
+          >
+            <div class="ui-card__header">
+              <h3
+                id="kit-controls-theme"
+                class="ui-card__title"
+              >
+                {{ editorThemeName() | translate }}
+              </h3>
+            </div>
+            <div class="ui-card__body">
+              <app-editor-controls-sample [themeId]="editorTheme()" />
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 

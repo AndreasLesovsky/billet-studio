@@ -1,0 +1,128 @@
+@if (label()) {
+  <label
+    class="ui-label"
+    [id]="id + '-label'"
+    [for]="id + '-trigger'"
+    >{{ label() }}</label
+  >
+}
+<button
+  #trigger
+  #origin="cdkOverlayOrigin"
+  type="button"
+  class="ui-picker-trigger"
+  cdkOverlayOrigin
+  aria-haspopup="dialog"
+  [id]="id + '-trigger'"
+  [disabled]="disabled()"
+  [attr.aria-expanded]="popover.expanded()"
+  [attr.aria-controls]="popover.expanded() ? id + '-panel' : null"
+  [attr.aria-labelledby]="labelledBy()"
+  (click)="popover.toggle()"
+>
+  @if (value()) {
+    <span class="ui-picker-trigger__emoji">{{ value() }}</span>
+  } @else {
+    <i
+      class="bi bi-emoji-smile ui-picker-trigger__muted"
+      aria-hidden="true"
+    ></i>
+    <span class="ui-picker-trigger__text ui-picker-trigger__muted">{{
+      'CONTROLS.EMOJI.NONE' | translate
+    }}</span>
+  }
+  <i
+    class="bi bi-chevron-down ui-picker-trigger__chevron"
+    aria-hidden="true"
+  ></i>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="popover.expanded()"
+  [cdkConnectedOverlayPositions]="popover.positions"
+  [cdkConnectedOverlayUsePopover]="'inline'"
+  [cdkConnectedOverlayPush]="true"
+  (attach)="onAttach()"
+  (detach)="popover.detached()"
+  (overlayOutsideClick)="popover.close()"
+>
+  <div
+    #panel
+    class="ui-popover emoji-picker__panel"
+    role="dialog"
+    [id]="id + '-panel'"
+    [attr.aria-label]="label() || ('CONTROLS.EMOJI.PANEL' | translate)"
+    (focusout)="popover.focusOut($event)"
+  >
+    <div class="emoji-picker__groups">
+      @for (group of groups; track group.id) {
+        <section
+          class="ui-stack ui-stack--sm"
+          [attr.aria-labelledby]="id + '-' + group.id"
+        >
+          <h3
+            class="ui-picker-heading"
+            [id]="id + '-' + group.id"
+          >
+            {{ group.titleKey | translate }}
+          </h3>
+          <div
+            class="emoji-picker__grid"
+            role="group"
+            [attr.aria-labelledby]="id + '-' + group.id"
+          >
+            @for (item of group.items; track item.index) {
+              <button
+                type="button"
+                class="ui-emoji-button"
+                [attr.aria-pressed]="item.emoji === value()"
+                [tabIndex]="item.index === tabStop() ? 0 : -1"
+                (click)="choose(item.emoji)"
+                (keydown)="onGridKey($event, item.index)"
+              >
+                {{ item.emoji }}
+              </button>
+            }
+          </div>
+        </section>
+      }
+    </div>
+
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        [for]="id + '-custom'"
+        >{{ 'CONTROLS.EMOJI.CUSTOM' | translate }}</label
+      >
+      <div class="emoji-picker__custom">
+        <input
+          class="ui-input"
+          type="text"
+          autocomplete="off"
+          [id]="id + '-custom'"
+          [attr.aria-describedby]="id + '-custom-hint'"
+          [maxLength]="iconLimit"
+          [value]="value()"
+          (input)="onCustomInput($event)"
+          (keydown.enter)="onCustomEnter($event)"
+        />
+        <button
+          type="button"
+          class="ui-btn ui-btn--neutral"
+          [disabled]="value() === ''"
+          (click)="clear()"
+        >
+          {{ 'CONTROLS.EMOJI.NONE' | translate }}
+        </button>
+      </div>
+      <p
+        class="ui-hint"
+        [id]="id + '-custom-hint'"
+      >
+        {{ 'CONTROLS.EMOJI.CUSTOM_HINT' | translate: { max: iconLimit } }}
+      </p>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,59 @@
+<div class="range-slider__head">
+  @if (label()) {
+    <label
+      class="ui-label"
+      [for]="id"
+      >{{ label() }}</label
+    >
+  }
+  <span
+    class="ui-range-readout range-slider__readout"
+    aria-hidden="true"
+    >{{ text() }}</span
+  >
+  @if (defaultValue() !== null) {
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [disabled]="disabled() || atDefault()"
+      [attr.aria-label]="'CONTROLS.RANGE.RESET' | translate: { value: defaultText() }"
+      [attr.title]="'CONTROLS.RANGE.RESET' | translate: { value: defaultText() }"
+      (click)="restoreDefault()"
+    >
+      <i
+        class="bi bi-arrow-counterclockwise"
+        aria-hidden="true"
+      ></i>
+    </button>
+  }
+</div>
+<div class="range-slider__track">
+  <input
+    #range
+    type="range"
+    class="ui-range"
+    [id]="id"
+    [min]="low()"
+    [max]="high()"
+    [step]="step()"
+    [value]="value()"
+    [disabled]="disabled()"
+    [attr.aria-labelledby]="ariaLabelledby()"
+    [attr.aria-valuetext]="text()"
+    [style.--ui-range-progress]="progress()"
+    (input)="onInput($event)"
+  />
+  @if (marks().length > 0) {
+    <div
+      class="ui-range-marks"
+      aria-hidden="true"
+    >
+      @for (m of markPositions(); track m.mark) {
+        <span
+          class="ui-range-marks__tick"
+          [style.--ui-range-mark]="m.at"
+        ></span>
+      }
+    </div>
+  }
+</div>

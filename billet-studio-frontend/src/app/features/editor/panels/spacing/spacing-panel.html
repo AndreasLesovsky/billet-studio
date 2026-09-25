@@ -1,0 +1,85 @@
+@let fields = billetForm();
+<div class="ui-stack ui-stack--lg">
+  <div class="ui-stack ui-stack--sm">
+    <p class="ui-hint">{{ 'EDITOR.SPACING.INTRO' | translate }}</p>
+    <div>
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral ui-btn--sm"
+        [disabled]="atOriginal()"
+        (click)="resetAll()"
+      >
+        <i
+          class="bi bi-arrow-counterclockwise"
+          aria-hidden="true"
+        ></i>
+        {{ 'EDITOR.SPACING.RESET_ALL' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @for (group of groups; track group.id) {
+    <section
+      class="ui-card"
+      [attr.aria-labelledby]="'editor-spacing-' + group.id"
+    >
+      <div class="ui-card__header">
+        <h2
+          class="ui-card__title"
+          [id]="'editor-spacing-' + group.id"
+        >
+          {{ group.titleKey | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body ui-stack">
+        @if (group.scene) {
+          <div class="ui-field">
+            <app-range-slider
+              [formField]="fields.scene.height"
+              [label]="'EDITOR.SPACING.SCENE_HEIGHT' | translate"
+              [step]="heightStep"
+              [marks]="heightMarks"
+              [valueText]="heightText()"
+              [defaultValue]="originalHeight"
+            />
+            <p class="ui-hint">{{ 'EDITOR.SPACING.SCENE_HEIGHT_HINT' | translate }}</p>
+            <app-field-error [field]="fields.scene.height" />
+          </div>
+        }
+
+        @for (step of group.steps; track step.key) {
+          <div class="ui-field">
+            <app-range-slider
+              [formField]="fields.spacing[step.key]"
+              [label]="step.labelKey | translate"
+              [marks]="stepMarks"
+              [valueText]="stepText()"
+              [defaultValue]="step.original"
+            />
+            <p class="ui-hint">{{ step.hintKey | translate }}</p>
+            <app-field-error [field]="fields.spacing[step.key]" />
+          </div>
+        }
+
+        @if (group.scene) {
+          <div class="ui-field">
+            <label
+              class="ui-label"
+              for="editor-divider-style"
+              >{{ 'EDITOR.SPACING.DIVIDER_STYLE' | translate }}</label
+            >
+            <select
+              id="editor-divider-style"
+              class="ui-select"
+              [formField]="fields.divider.style"
+            >
+              @for (option of dividerStyles; track option.style) {
+                <option [value]="option.style">{{ option.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>

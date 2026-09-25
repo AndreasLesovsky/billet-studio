@@ -8,6 +8,7 @@ import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
 import { ThemePicker } from '../../../shared/components/theme-picker/theme-picker';
 import { ThemeScope } from '../../../shared/directives/theme-scope';
 import { BilletPresetSample } from './billet-preset-sample';
+import { EditorControlsSample } from './editor-controls-sample';
 
 type KitTab = 'content' | 'design' | 'scene';
 
@@ -88,7 +89,7 @@ function targetTab(key: string, index: number, count: number): number | null {
 /**
  * Kitchen sink for visual QA (route dev/ui): every ui-* component class in the site (Studio) theme,
  * then the theme picker and, per editor theme, a mini editor panel inside its own ThemeScope and
- * the theme's billet preset.
+ * the theme's billet preset, then the editor's form controls in Studio and in the picked theme.
  * Sample content is static; nothing here talks to the backend.
  */
 @Component({
@@ -102,6 +103,7 @@ function targetTab(key: string, index: number, count: number): number | null {
     ThemePicker,
     ThemeScope,
     BilletPresetSample,
+    EditorControlsSample,
     AssetThumb,
   ],
   templateUrl: './ui-kit.html',

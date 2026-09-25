@@ -26,8 +26,8 @@ const STEPS: readonly Step[] = [
 const TEASER_COUNT = 5;
 
 /**
- * Landing page: hero, a teaser row of templates that leads to /templates, and how it works.
- * "New billet" stays visible but disabled until the editor exists.
+ * Landing page: hero, a teaser row of templates (each starts a billet from its template), and how
+ * it works. "New billet" leads to the template gallery.
  */
 @Component({
   selector: 'app-home',

@@ -1,0 +1,29 @@
+// Layout only; every visual comes from the ui-* classes.
+
+:host {
+    display: block;
+}
+
+.design-panel__current {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2) var(--ui-space-3);
+}
+
+.design-panel__swatches {
+    display: flex;
+    gap: var(--ui-space-1);
+}
+
+.design-panel__theme-name {
+    flex: 1;
+}
+
+.design-panel__legend {
+    margin-block-end: var(--ui-space-2);
+}
+
+.design-panel__modes {
+    display: flex;
+}

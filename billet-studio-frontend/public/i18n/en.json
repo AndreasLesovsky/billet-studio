@@ -96,7 +96,9 @@
       "GEBURTSTAG": "Cake, confetti and the very best wishes for the year ahead.",
       "WEIHNACHTEN": "A snow globe full of winter magic for the people you love.",
       "HOCHZEIT": "Champagne and heartfelt congratulations for the happy couple."
-    }
+    },
+    "BLANK_LEAD": "Rather start from scratch?",
+    "BLANK": "Create a blank billet"
   },
   "HOME": {
     "EYEBROW": "Digital billets with a 3D motif",
@@ -118,7 +120,272 @@
     "LEAD": "Every billet you have designed, in one place.",
     "EMPTY_TITLE": "No billets yet",
     "EMPTY_TEXT": "As soon as you design a billet, it appears here. Without an account, your billets stay on this device.",
-    "EDITOR_SOON": "The editor is coming soon."
+    "DEVICE_NOTE": "Your billets are stored in this browser, on this device only. Soon you can keep them in your account as well.",
+    "COUNT": "{{count}} of {{max}} places used.",
+    "EDITED": "Edited {{when}}",
+    "UNTITLED": "Untitled",
+    "DUPLICATE": "Duplicate",
+    "COPY_TITLE": "{{title}} (copy)",
+    "DELETE_TITLE": "Delete billet?",
+    "DELETE_NAMED": "Delete “{{title}}”",
+    "DELETE_MESSAGE": "“{{title}}” will be deleted from this device. This cannot be undone."
+  },
+  "EDITOR": {
+    "TITLE_LABEL": "Billet title (only for your overview)",
+    "UNDO": "Undo",
+    "REDO": "Redo",
+    "PREVIEW_MODE": "Preview colour mode",
+    "MODE_AUTO": "Auto",
+    "MODE_LIGHT": "Light",
+    "MODE_DARK": "Dark",
+    "REPLAY": "Replay",
+    "LANGUAGE": "Billet language",
+    "SAVE_STATUS": {
+      "SAVED": "Saved locally",
+      "PENDING": "Saving …",
+      "HELD": "Not saved",
+      "LOCAL_STORAGE_FULL": "Not saved: storage full",
+      "LOCAL_STORAGE_UNAVAILABLE": "Not saved: storage blocked",
+      "LOCAL_BILLET_LIMIT_REACHED": "Not saved: too many billets"
+    },
+    "SHARE": "Share",
+    "SHARE_GUEST_HINT": "Sign in to share your billet.",
+    "SHARE_SOON": "Sharing is coming soon.",
+    "TABS": {
+      "LABEL": "Edit",
+      "PREVIEW": "Preview",
+      "CONTENT": "Content",
+      "DESIGN": "Design",
+      "SPACING": "Spacing",
+      "SCENE": "3D",
+      "PARTICLES": "Particles"
+    },
+    "NOT_FOUND_TITLE": "Billet not found",
+    "NOT_FOUND_TEXT": "This billet does not exist in this browser (any more). It may have been deleted or created on another device.",
+    "NOT_FOUND_LINK": "Go to my billets",
+    "LEAVE_UNSAVED": "Your latest changes could not be saved. If you leave now, they are lost.",
+    "REMOTE": {
+      "CHANGED": "This billet was changed in another tab while you were working on it here.",
+      "REMOVED": "This billet was deleted in another tab.",
+      "LOAD_THEIRS": "Load the other version",
+      "KEEP_MINE": "Keep my version",
+      "RESTORE": "Restore"
+    },
+    "PREVIEW": {
+      "DEVICE": "Preview device",
+      "PHONE": "Phone",
+      "DESKTOP": "Desktop"
+    },
+    "CONTENT": {
+      "PAGE": "Page",
+      "PAGE_TITLE": "Page title",
+      "PAGE_TITLE_HINT": "Shown in the recipient's browser tab. Leave it empty to use the heading.",
+      "LANGUAGE_HINT": "For screen readers and hyphenation.",
+      "HERO": "Header",
+      "HERO_LABEL": "Line above",
+      "HERO_TITLE_LINE1": "Heading, first line",
+      "HERO_TITLE_LINE2": "Heading, second line",
+      "HERO_SUB": "Line below",
+      "BLOCKS": "Blocks",
+      "ADD_BLOCK": "Add block",
+      "ADD_BLOCK_HINT": "A new block goes after the one you last worked on.",
+      "BLOCKS_LIMIT": "A billet has at most {{max}} blocks.",
+      "BLOCKS_EMPTY": "No blocks yet. Add a paragraph, a card or a note.",
+      "BLOCK_TEXT": "Text",
+      "FORMATTING": "Formatting",
+      "ITALIC": "Italic",
+      "BOLD": "Bold",
+      "MARKUP_HINT": "*italic* and **bold**; an empty line starts a new paragraph.",
+      "COUNTER": "{{count}} / {{max}}",
+      "CARD_ICON": "Icon",
+      "CARD_ARIA_LABEL": "Label",
+      "CARD_ARIA_LABEL_HINT": "Read out by screen readers before the card.",
+      "DIVIDER_STYLE": "Shape",
+      "SPACE_ADJUST": "Space above",
+      "SPACE_ADJUST_HINT": "Steps more or less than the usual space.",
+      "DRAG": "Drag to move",
+      "MOVE_UP": "Move up",
+      "MOVE_DOWN": "Move down",
+      "DUPLICATE": "Duplicate",
+      "DELETE": "Delete",
+      "MOVED": "{{type}} is now at position {{position}} of {{count}}.",
+      "REMOVED": "{{type}} deleted – Undo brings the block back.",
+      "SIGNATURE": "Signature",
+      "SIGNATURE_NAME": "Name",
+      "SIGNATURE_SUB": "Line below"
+    },
+    "BLOCK_TYPES": {
+      "PARAGRAPH": "Paragraph",
+      "HEADING": "Heading",
+      "CARD": "Card",
+      "NOTE": "Note",
+      "DIVIDER": "Divider"
+    },
+    "DIVIDER_STYLES": {
+      "DIAMOND": "Diamond",
+      "DOT": "Dot",
+      "HEART": "Heart",
+      "STAR": "Star",
+      "LINE": "Line",
+      "NONE": "None"
+    },
+    "DESIGN": {
+      "THEME_TITLE": "Theme and colour mode",
+      "THEME_HINT": "A theme sets your billet's colours, fonts and particle colours and tints the editor. You can adjust everything afterwards.",
+      "THEME_CHOOSE": "Choose theme",
+      "THEME_RESET": "Reset to theme",
+      "COLOR_MODE": "Colour mode of the billet",
+      "COLOR_MODE_HINT": "Automatic follows the setting of the device your billet is opened on.",
+      "COLOR_MODES": {
+        "AUTO": "Automatic",
+        "LIGHT": "Light",
+        "DARK": "Dark"
+      },
+      "COLORS": "Colours",
+      "PALETTE_TABS": "Colour variant",
+      "PALETTE_LIGHT": "Light",
+      "PALETTE_DARK": "Dark",
+      "DARK_LINKED": "Derive dark automatically",
+      "DARK_LINKED_HINT": "Every change to the light colours creates the dark ones anew.",
+      "DARK_DERIVED": "These colours are derived from the light ones. Turn off “Derive dark automatically” to adjust them yourself.",
+      "DARK_PREVIEW_HINT": "Set the preview above to “Dark” to see these colours in the billet.",
+      "ROLES": {
+        "ACCENT": "Accent",
+        "ACCENT_SOFT": "Soft accent",
+        "BORDER": "Lines",
+        "BACKGROUND": "Background",
+        "INK": "Text",
+        "INK_SOFT": "Secondary text",
+        "SURFACE": "Card"
+      },
+      "ROLE_HINTS": {
+        "ACCENT": "Second title line, divider, signature",
+        "ACCENT_SOFT": "Background of the header",
+        "BORDER": "Divider lines and card border",
+        "BACKGROUND": "Background of the page",
+        "INK": "Main text",
+        "INK_SOFT": "Secondary text and 3D hint",
+        "SURFACE": "Background of the cards"
+      },
+      "ACCENT_NOTE": "The line above the title is accent on soft accent. It is decorative text, so a contrast of 3 : 1 is enough.",
+      "CONTRAST_TITLE": "Hard to read",
+      "CONTRAST_ISSUE": "{{fg}} on {{bg}}: {{ratio}} : 1, recommended {{min}} : 1",
+      "TYPOGRAPHY": "Typography",
+      "FONT_PAIRS": "Font pairings",
+      "FONT_PAIRS_HINT": "Takes the fonts of a theme; your colours stay.",
+      "FONT_ROLES": {
+        "TITLE": "Title",
+        "TITLE_ACCENT": "Title accent",
+        "HEADING": "Heading",
+        "BODY": "Text",
+        "SIGNATURE": "Signature",
+        "UI": "Small text"
+      },
+      "FONT_ROLE_HINTS": {
+        "TITLE": "First line of the title.",
+        "TITLE_ACCENT": "Second line of the title. Its size is relative to the title.",
+        "HEADING": "Heading blocks.",
+        "BODY": "Paragraphs, cards and notes.",
+        "SIGNATURE": "Your name below the text.",
+        "UI": "The lines above and below the title, the 3D hint and the line below the signature."
+      },
+      "FONT": "Font",
+      "WEIGHT": "Weight",
+      "WEIGHTS": {
+        "W100": "Thin",
+        "W200": "Extra light",
+        "W300": "Light",
+        "W400": "Regular",
+        "W500": "Medium",
+        "W600": "Semibold",
+        "W700": "Bold",
+        "W800": "Extra bold",
+        "W900": "Black"
+      },
+      "WEIGHT_OPTION": "{{name}} ({{weight}})",
+      "ITALIC": "Italic",
+      "ITALIC_UNAVAILABLE": "This font has no italic at this weight.",
+      "SIZE": "Size",
+      "EMPHASIS": "Emphasis colour",
+      "EMPHASIS_HINT": "For *italic* text in paragraphs, cards and notes."
+    },
+    "SPACING": {
+      "INTRO": "Spacing moves in fixed steps. The arrow next to a value resets it to the original card.",
+      "RESET_ALL": "Reset all spacing",
+      "PAGE": "Page",
+      "HERO": "Header",
+      "SCENE": "3D area and divider",
+      "TEXT": "Text",
+      "GUTTER": "Side margin",
+      "GUTTER_HINT": "Space to the left and right of the content.",
+      "HERO_TOP": "Above the title",
+      "HERO_TOP_HINT": "Room between the top of the page and the title.",
+      "HERO_BOTTOM": "Below the title",
+      "HERO_BOTTOM_HINT": "Room between the header and the 3D model.",
+      "SCENE_HEIGHT": "Height of the 3D area",
+      "SCENE_HEIGHT_HINT": "How much room the 3D model gets.",
+      "DIVIDER_GAP": "Around the divider",
+      "DIVIDER_GAP_HINT": "Space above and below the divider between the 3D area and the text.",
+      "DIVIDER_STYLE": "Divider below the 3D area",
+      "BLOCK_GAP": "Between blocks",
+      "BLOCK_GAP_HINT": "The usual space before each block. Adjust single blocks under Content.",
+      "SIGNATURE_GAP": "Above the signature",
+      "SIGNATURE_GAP_HINT": "Space between the last block and the signature.",
+      "PAGE_BOTTOM": "End of page",
+      "PAGE_BOTTOM_HINT": "Room below the signature."
+    },
+    "SCENE": {
+      "MODEL": "3D model",
+      "ENABLED": "Show 3D model",
+      "DISABLED_HINT": "Without a 3D model the text follows right after the header.",
+      "LIBRARY": "Model",
+      "LIBRARY_ERROR": "The models could not be loaded.",
+      "MODEL_HINT": "Another model brings its own size, camera and exposure.",
+      "RETIRED": "This model is no longer in the library. It stays in your billet until you choose another one.",
+      "CREDIT": "Model: {{credit}}",
+      "STAGE": "Display",
+      "STAGE_HINT": "The preview shows every change right away.",
+      "FIT_SIZE": "Size",
+      "Y_OFFSET": "Vertical position",
+      "EXPOSURE": "Brightness",
+      "CAMERA_DISTANCE": "Camera distance",
+      "CAMERA_HEIGHT": "Camera height",
+      "AUTO_ROTATE": "Rotates by itself",
+      "AUTO_ROTATE_SPEED": "Rotation speed",
+      "RESET": "Reset to model defaults",
+      "TEXTS": "Texts",
+      "HINT": "Hint below the model",
+      "HINT_HINT": "Leave empty to show no hint.",
+      "ARIA_LABEL": "Description for screen readers",
+      "ARIA_LABEL_HINT": "Say briefly what the model shows, especially after changing the model."
+    },
+    "PARTICLES": {
+      "TITLE": "Particles",
+      "ENABLED": "Show particles",
+      "REDUCED_MOTION": "Anyone who has turned on “Reduce motion” on their device sees no particles.",
+      "SHAPE": "Shape",
+      "SHAPES": {
+        "PETAL": "Petals",
+        "SNOWFLAKE": "Snowflakes",
+        "LEAF": "Leaves",
+        "CONFETTI": "Confetti",
+        "HEART": "Hearts"
+      },
+      "COLORS": "Colours",
+      "COLORS_HINT": "Each particle gets one of these colours at random. Up to {{max}} are possible.",
+      "COLOR": "Colour {{index}}",
+      "ADD_COLOR": "Add colour",
+      "REMOVE_COLOR": "Remove colour {{index}}",
+      "MOTION": "Amount and motion",
+      "DENSITY": "Amount",
+      "SPEED": "Speed",
+      "SIZE": "Size"
+    },
+    "VALIDATION": {
+      "TITLE_REQUIRED": "Give your billet a title.",
+      "MAX_BLOCKS": "At most {{maxLength}} blocks.",
+      "HEX_COLOR": "Enter a colour as #rrggbb."
+    }
   },
   "AUTH": {
     "LOGIN_TITLE": "Log in",
@@ -447,7 +714,10 @@
       "UNKNOWN_MODEL": "The selected 3D model does not exist.",
       "MODEL_NOT_FOUND": "3D model not found.",
       "SESSION_EXPIRED": "Your session has expired. Please log in again.",
-      "UNKNOWN_ERROR": "An unknown error occurred."
+      "UNKNOWN_ERROR": "An unknown error occurred.",
+      "LOCAL_BILLET_LIMIT_REACHED": "This device holds up to {{max}} billets. Delete one to create a new one.",
+      "LOCAL_STORAGE_FULL": "This browser's storage is full. Delete a billet to make room.",
+      "LOCAL_STORAGE_UNAVAILABLE": "This browser does not allow saving (for example in private mode). Your billets cannot be stored here."
     },
     "SUCCESS": {
       "LOGIN_SUCCESS": "You are logged in.",
@@ -474,6 +744,89 @@
       "SESSION_ENDING": "Your session ends in",
       "INVALID_IMAGE": "Please choose an image file (JPG, PNG, GIF, BMP, WebP or AVIF).",
       "IMAGE_TOO_LARGE": "The image is too large. Up to {{maxMb}} MB are allowed."
+    }
+  },
+  "CONTROLS": {
+    "COLOR": {
+      "PANEL": "Choose a colour",
+      "DOCUMENT_COLORS": "Colours in this billet",
+      "SUGGESTIONS": "Suggestions",
+      "RECENT": "Recently used",
+      "SWATCH": "Colour {{color}}",
+      "PLANE": "Saturation and brightness",
+      "PLANE_TEXT": "Saturation {{saturation}}%, brightness {{brightness}}%",
+      "HUE": "Hue",
+      "HUE_TEXT": "{{hue}} degrees",
+      "HEX": "Hex value",
+      "HEX_REQUIRED": "Enter a hex value.",
+      "HEX_INVALID": "Enter a hex value such as #c8614a or #c64.",
+      "EYEDROPPER": "Pick a colour from the screen",
+      "CONTRAST": "Contrast {{ratio}}:1",
+      "CONTRAST_AA": "AA",
+      "CONTRAST_AA_HINT": "Easy to read, body text included.",
+      "CONTRAST_AA_LARGE": "AA large",
+      "CONTRAST_AA_LARGE_HINT": "Enough for large text and decoration, not for body text.",
+      "CONTRAST_LOW": "Too low",
+      "CONTRAST_LOW_HINT": "Hard to read. Choose a lighter or darker colour."
+    },
+    "RANGE": {
+      "RESET": "Reset to {{value}}"
+    },
+    "FONT": {
+      "PANEL": "Choose a font",
+      "NONE": "No font selected",
+      "PREVIEW_DEFAULT": "For Mom",
+      "SEARCH": "Search fonts",
+      "SEARCH_PLACEHOLDER": "Search fonts …",
+      "CATEGORIES": "Font style",
+      "LIST": "Fonts",
+      "RESULT_COUNT": "Results: {{count}}",
+      "CATEGORY": {
+        "SERIF": "Serif",
+        "SANS": "Sans serif",
+        "DISPLAY": "Display",
+        "SCRIPT": "Script",
+        "HANDWRITING": "Handwriting"
+      }
+    },
+    "ASSET": {
+      "OCCASIONS": "Occasion",
+      "OCCASION": {
+        "MOTHERS_DAY": "Mother's Day",
+        "VALENTINES": "Valentine's Day",
+        "BIRTHDAY": "Birthday",
+        "CELEBRATION": "Celebration",
+        "CHRISTMAS": "Christmas",
+        "GENERAL": "General"
+      }
+    },
+    "EMOJI": {
+      "PANEL": "Choose a symbol",
+      "NONE": "No symbol",
+      "CUSTOM": "Custom symbol",
+      "CUSTOM_HINT": "Any other emoji or a short text, up to {{max}} characters.",
+      "GROUP": {
+        "LOVE": "Love",
+        "FLOWERS": "Flowers",
+        "CELEBRATION": "Celebration",
+        "WINTER": "Winter & Christmas",
+        "SYMBOLS": "Symbols"
+      }
+    },
+    "KIT": {
+      "TITLE": "Editor controls",
+      "LEAD": "The editor's own form controls: on the left in the Studio design, on the right in the editor theme chosen above. Both are bound to a signal form with [formField]; below them the same controls work on their own with [(value)].",
+      "STUDIO": "Studio",
+      "STANDALONE": "Without a form: [(value)]",
+      "LOCKED": "Disable all controls",
+      "ACCENT": "Accent colour",
+      "INK": "Text colour",
+      "TITLE_SIZE": "Title size",
+      "GUTTER": "Page margin",
+      "TITLE_FONT": "Title font",
+      "MODEL": "3D model",
+      "ICON": "Card icon",
+      "MODEL_STATE": "Form value"
     }
   }
 }

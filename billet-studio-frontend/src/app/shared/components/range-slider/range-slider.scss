@@ -1,0 +1,19 @@
+// Layout only; the track, readout and marks are .ui-range* in src/styles/components.
+// The host is a .ui-field: label row, track, marks.
+
+.range-slider__head {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    min-block-size: 2rem;
+}
+
+.range-slider__readout {
+    margin-inline-start: auto;
+}
+
+// The marks sit right under the track, closer than the field gap.
+.range-slider__track {
+    display: flex;
+    flex-direction: column;
+}

@@ -1,0 +1,38 @@
+// Layout only; the device frame's look is .ui-device (src/styles/components/_editor.scss).
+
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    block-size: 100%;
+    min-block-size: 0;
+}
+
+.preview__devices {
+    align-self: center;
+}
+
+.preview__stage {
+    position: relative;
+    flex: 1;
+    min-block-size: 0;
+    overflow: hidden;
+}
+
+// The frame keeps its real size - the billet inside is exactly 24.375rem (390 px) or 64rem wide -
+// and is scaled down to the stage from its top centre; its height fills the stage after scaling.
+.preview__frame {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 50%;
+    box-sizing: content-box;
+    inline-size: 24.375rem;
+    block-size: min(52.75rem, calc(100% / var(--preview-scale) - 2 * var(--ui-device-bezel)));
+    transform: translateX(-50%) scale(var(--preview-scale));
+    transform-origin: top center;
+}
+
+.preview__frame--desktop {
+    inline-size: 64rem;
+    block-size: calc(100% / var(--preview-scale) - 2 * var(--ui-device-bezel));
+}

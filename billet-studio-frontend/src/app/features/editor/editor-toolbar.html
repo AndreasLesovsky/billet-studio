@@ -1,0 +1,139 @@
+@let fields = billetForm();
+<div class="ui-field editor-toolbar__title">
+  <label
+    class="ui-visually-hidden"
+    for="editor-title"
+    >{{ 'EDITOR.TITLE_LABEL' | translate }}</label
+  >
+  <input
+    id="editor-title"
+    class="ui-input"
+    appBilletText
+    [formField]="fields.title"
+  />
+  <app-field-error [field]="fields.title" />
+</div>
+
+<div class="ui-cluster editor-toolbar__tools">
+  <div class="ui-cluster">
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--icon"
+      aria-keyshortcuts="Control+Z Meta+Z"
+      [attr.aria-label]="'EDITOR.UNDO' | translate"
+      [title]="'EDITOR.UNDO' | translate"
+      [disabled]="!canUndo()"
+      (click)="undo.emit()"
+    >
+      <i
+        class="bi bi-arrow-counterclockwise"
+        aria-hidden="true"
+      ></i>
+    </button>
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--icon"
+      aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+      [attr.aria-label]="'EDITOR.REDO' | translate"
+      [title]="'EDITOR.REDO' | translate"
+      [disabled]="!canRedo()"
+      (click)="redo.emit()"
+    >
+      <i
+        class="bi bi-arrow-clockwise"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+
+  <fieldset class="ui-segmented">
+    <legend class="ui-visually-hidden">{{ 'EDITOR.PREVIEW_MODE' | translate }}</legend>
+    @for (option of previewModes; track option.mode) {
+      <label class="ui-segmented__option">
+        <input
+          type="radio"
+          name="editor-preview-mode"
+          [value]="option.mode"
+          [checked]="previewMode() === option.mode"
+          (change)="previewMode.set(option.mode)"
+        />
+        {{ option.labelKey | translate }}
+      </label>
+    }
+  </fieldset>
+
+  <button
+    type="button"
+    class="ui-btn ui-btn--neutral"
+    (click)="replay.emit()"
+  >
+    <i
+      class="bi bi-arrow-repeat"
+      aria-hidden="true"
+    ></i>
+    {{ 'EDITOR.REPLAY' | translate }}
+  </button>
+
+  <div class="editor-toolbar__lang">
+    <label
+      class="ui-visually-hidden"
+      for="editor-lang"
+      >{{ 'EDITOR.LANGUAGE' | translate }}</label
+    >
+    <select
+      id="editor-lang"
+      class="ui-select"
+      [title]="'EDITOR.LANGUAGE' | translate"
+      [formField]="fields.lang"
+    >
+      @for (option of langs; track option.lang) {
+        <option
+          [value]="option.lang"
+          [lang]="option.lang"
+        >
+          {{ option.labelKey | translate }}
+        </option>
+      }
+    </select>
+  </div>
+</div>
+
+<p class="editor-toolbar__status">
+  <span [class]="status().className">
+    <i
+      class="bi"
+      [class]="status().icon"
+      aria-hidden="true"
+    ></i>
+    {{ status().key | translate }}
+  </span>
+</p>
+<p
+  class="ui-visually-hidden"
+  role="status"
+>
+  @if (announcement(); as key) {
+    {{ key | translate }}
+  }
+</p>
+
+<div class="ui-cluster editor-toolbar__share">
+  <button
+    type="button"
+    class="ui-btn ui-btn--primary"
+    disabled
+    aria-describedby="editor-share-hint"
+  >
+    <i
+      class="bi bi-share"
+      aria-hidden="true"
+    ></i>
+    {{ 'EDITOR.SHARE' | translate }}
+  </button>
+  <p
+    id="editor-share-hint"
+    class="ui-hint"
+  >
+    {{ (isLoggedIn() ? 'EDITOR.SHARE_SOON' : 'EDITOR.SHARE_GUEST_HINT') | translate }}
+  </p>
+</div>

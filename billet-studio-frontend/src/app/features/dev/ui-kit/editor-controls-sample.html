@@ -1,0 +1,101 @@
+<form
+  class="controls-sample"
+  (submit)="$event.preventDefault()"
+>
+  <label class="ui-check">
+    <input
+      type="checkbox"
+      role="switch"
+      class="ui-switch"
+      [checked]="locked()"
+      (change)="toggleLock($event)"
+    />
+    {{ 'CONTROLS.KIT.LOCKED' | translate }}
+  </label>
+
+  <div class="controls-sample__grid">
+    <app-color-picker
+      [formField]="controlsForm.accent"
+      [label]="'CONTROLS.KIT.ACCENT' | translate"
+      [documentColors]="documentColors()"
+      [presetColors]="presetColors()"
+      [contrastAgainst]="background()"
+    />
+    <app-color-picker
+      [formField]="controlsForm.ink"
+      [label]="'CONTROLS.KIT.INK' | translate"
+      [documentColors]="documentColors()"
+      [presetColors]="presetColors()"
+      [contrastAgainst]="background()"
+    />
+    <div class="ui-field">
+      <app-range-slider
+        [formField]="controlsForm.titleSize"
+        [label]="'CONTROLS.KIT.TITLE_SIZE' | translate"
+        [step]="titleSizeStep"
+        [valueText]="titleSizeText()"
+        [marks]="titleSizeMarks"
+        [defaultValue]="defaults.titleSize"
+      />
+      <app-field-error [field]="controlsForm.titleSize" />
+    </div>
+    <div class="ui-field">
+      <app-range-slider
+        [formField]="controlsForm.gutter"
+        [label]="'CONTROLS.KIT.GUTTER' | translate"
+        [valueText]="gutterText()"
+        [marks]="gutterMarks"
+        [defaultValue]="defaults.gutter"
+      />
+      <app-field-error [field]="controlsForm.gutter" />
+    </div>
+    <app-font-picker
+      [formField]="controlsForm.titleFont"
+      [label]="'CONTROLS.KIT.TITLE_FONT' | translate"
+    />
+    <app-emoji-picker
+      [formField]="controlsForm.icon"
+      [label]="'CONTROLS.KIT.ICON' | translate"
+    />
+    <app-asset-picker
+      class="controls-sample__wide"
+      [formField]="controlsForm.modelSlug"
+      [label]="'CONTROLS.KIT.MODEL' | translate"
+      [assets]="assets"
+    />
+  </div>
+
+  <details>
+    <summary class="ui-hint">{{ 'CONTROLS.KIT.MODEL_STATE' | translate }}</summary>
+    <pre class="controls-sample__state">{{ model() | json }}</pre>
+  </details>
+</form>
+
+<section class="controls-sample">
+  <h4>{{ 'CONTROLS.KIT.STANDALONE' | translate }}</h4>
+  <div class="controls-sample__grid">
+    <app-color-picker
+      [(value)]="color"
+      [label]="'CONTROLS.KIT.ACCENT' | translate"
+      [presetColors]="presetColors()"
+    />
+    <app-range-slider
+      [(value)]="percent"
+      [label]="'UI_KIT.LABEL_SPACING' | translate"
+      [min]="0"
+      [max]="100"
+      [step]="5"
+      [marks]="percentMarks"
+      [defaultValue]="40"
+    />
+    <app-font-picker
+      [(value)]="font"
+      [label]="'CONTROLS.KIT.TITLE_FONT' | translate"
+    />
+    <app-emoji-picker
+      [(value)]="icon"
+      [label]="'CONTROLS.KIT.ICON' | translate"
+    />
+  </div>
+  <p class="ui-hint">{{ color() }} · {{ percent() }} · {{ font() }} · {{ icon() }}</p>
+</section>

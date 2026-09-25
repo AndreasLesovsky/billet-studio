@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal, type Signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,7 +26,7 @@ export class BreadcrumbService {
   private readonly routeItems = signal<BreadcrumbItem[]>([]);
 
   /** Runtime labels keyed by position from the end: 0 = the last crumb. Reset on navigation. */
-  private readonly dynamicLabels = signal<ReadonlyMap<number, string>>(new Map());
+  private readonly dynamicLabels = signal<ReadonlyMap<number, string | Signal<string>>>(new Map());
 
   readonly items = computed<BreadcrumbItem[]>(() => {
     const crumbs = this.routeItems();
@@ -46,7 +46,8 @@ export class BreadcrumbService {
     const labelled = [...crumbs];
     for (const [fromEnd, label] of labels) {
       const index = labelled.length - 1 - fromEnd;
-      if (index >= 0) labelled[index] = { ...labelled[index], name: label };
+      const name = typeof label === 'string' ? label : label();
+      if (index >= 0) labelled[index] = { ...labelled[index], name };
     }
     return labelled;
   });
@@ -71,8 +72,12 @@ export class BreadcrumbService {
     this.build();
   }
 
-  /** Names the last crumb (or the one `fromEnd` steps before it). */
-  setDynamicLabel(label: string, fromEnd = 0): void {
+  /**
+   * Names the last crumb (or the one `fromEnd` steps before it). A signal keeps the crumb in step
+   * with what it names, such as a title while it is typed. Call it after the navigation has ended:
+   * NavigationEnd forgets every label.
+   */
+  setDynamicLabel(label: string | Signal<string>, fromEnd = 0): void {
     this.dynamicLabels.update((labels) => new Map(labels).set(fromEnd, label));
   }
 

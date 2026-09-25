@@ -1,0 +1,136 @@
+@let typography = billetForm().typography;
+<section
+  class="ui-card"
+  aria-labelledby="editor-design-typography"
+>
+  <div class="ui-card__header">
+    <h2
+      id="editor-design-typography"
+      class="ui-card__title"
+    >
+      {{ 'EDITOR.DESIGN.TYPOGRAPHY' | translate }}
+    </h2>
+  </div>
+  <div class="ui-card__body ui-stack ui-stack--lg">
+    <div class="ui-stack ui-stack--sm">
+      <h3
+        id="editor-font-pairs"
+        class="ui-picker-heading"
+      >
+        {{ 'EDITOR.DESIGN.FONT_PAIRS' | translate }}
+      </h3>
+      <p
+        id="editor-font-pairs-hint"
+        class="ui-hint"
+      >
+        {{ 'EDITOR.DESIGN.FONT_PAIRS_HINT' | translate }}
+      </p>
+      <div
+        class="ui-cluster"
+        role="group"
+        aria-labelledby="editor-font-pairs"
+        aria-describedby="editor-font-pairs-hint"
+      >
+        @for (pair of pairs(); track pair.id) {
+          <button
+            type="button"
+            class="ui-chip"
+            [attr.aria-pressed]="pair.active"
+            [style.font-family]="pair.stack"
+            [style.font-weight]="pair.weight"
+            (click)="applyPair(pair.id)"
+          >
+            {{ pair.nameKey | translate }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @for (role of roles(); track role.key) {
+      <fieldset class="typography-editor__role">
+        <legend class="ui-picker-heading typography-editor__legend">
+          {{ role.legendKey | translate }}
+        </legend>
+        <p class="ui-hint">{{ role.hintKey | translate }}</p>
+        <app-font-picker
+          [value]="role.fontId"
+          [label]="'EDITOR.DESIGN.FONT' | translate"
+          (valueChange)="pickFont(role.key, $event)"
+        />
+        <div class="typography-editor__row">
+          <div class="ui-field">
+            <label
+              class="ui-label"
+              [for]="'editor-font-weight-' + role.key"
+              >{{ 'EDITOR.DESIGN.WEIGHT' | translate }}</label
+            >
+            <select
+              class="ui-select"
+              [id]="'editor-font-weight-' + role.key"
+              (change)="pickWeight(role.key, $event)"
+            >
+              @for (option of role.weights; track option.weight) {
+                <option
+                  [value]="option.weight"
+                  [selected]="option.weight === role.weight"
+                >
+                  {{
+                    'EDITOR.DESIGN.WEIGHT_OPTION'
+                      | translate: { name: (option.nameKey | translate), weight: option.weight }
+                  }}
+                </option>
+              }
+            </select>
+          </div>
+          <label class="ui-check typography-editor__italic">
+            <input
+              type="checkbox"
+              role="switch"
+              class="ui-switch"
+              [formField]="typography[role.key].italic"
+            />
+            {{ 'EDITOR.DESIGN.ITALIC' | translate }}
+          </label>
+        </div>
+        @if (!role.italicAvailable) {
+          <p class="ui-hint">{{ 'EDITOR.DESIGN.ITALIC_UNAVAILABLE' | translate }}</p>
+        }
+        <div class="ui-field">
+          <app-range-slider
+            [formField]="typography[role.key].size"
+            [label]="'EDITOR.DESIGN.SIZE' | translate"
+            [step]="sizeStep"
+            [marks]="sizeMarks"
+            [valueText]="sizeText()"
+            [defaultValue]="role.defaultSize"
+          />
+          <app-field-error [field]="typography[role.key].size" />
+        </div>
+      </fieldset>
+    }
+
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        for="editor-font-emphasis"
+        >{{ 'EDITOR.DESIGN.EMPHASIS' | translate }}</label
+      >
+      <select
+        id="editor-font-emphasis"
+        class="ui-select"
+        aria-describedby="editor-font-emphasis-hint"
+        [formField]="typography.emphasis"
+      >
+        @for (option of emphasisOptions; track option.color) {
+          <option [value]="option.color">{{ option.labelKey | translate }}</option>
+        }
+      </select>
+      <p
+        id="editor-font-emphasis-hint"
+        class="ui-hint"
+      >
+        {{ 'EDITOR.DESIGN.EMPHASIS_HINT' | translate }}
+      </p>
+    </div>
+  </div>
+</section>

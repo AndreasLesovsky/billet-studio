@@ -1,0 +1,157 @@
+@if (label()) {
+  <label
+    class="ui-label"
+    [id]="id + '-label'"
+    [for]="id + '-trigger'"
+    >{{ label() }}</label
+  >
+}
+<button
+  #trigger
+  #origin="cdkOverlayOrigin"
+  type="button"
+  class="ui-picker-trigger"
+  cdkOverlayOrigin
+  aria-haspopup="dialog"
+  [id]="id + '-trigger'"
+  [disabled]="disabled()"
+  [attr.aria-expanded]="popover.expanded()"
+  [attr.aria-controls]="popover.expanded() ? id + '-panel' : null"
+  [attr.aria-labelledby]="labelledBy()"
+  (click)="toggle()"
+  (keydown)="onTriggerKey($event)"
+>
+  @if (selected(); as font) {
+    <span
+      class="ui-picker-trigger__text font-picker__family"
+      [style.font-family]="font.stack"
+      [style.font-weight]="font.weight"
+      >{{ font.family }}</span
+    >
+  } @else {
+    <span class="ui-picker-trigger__text ui-picker-trigger__muted">{{
+      value() || ('CONTROLS.FONT.NONE' | translate)
+    }}</span>
+  }
+  <i
+    class="bi bi-chevron-down ui-picker-trigger__chevron"
+    aria-hidden="true"
+  ></i>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="popover.expanded()"
+  [cdkConnectedOverlayPositions]="popover.positions"
+  [cdkConnectedOverlayUsePopover]="'inline'"
+  [cdkConnectedOverlayPush]="true"
+  (attach)="onAttach()"
+  (detach)="popover.detached()"
+  (overlayOutsideClick)="popover.close()"
+>
+  <div
+    #panel
+    class="ui-popover font-picker__panel"
+    role="dialog"
+    [id]="id + '-panel'"
+    [attr.aria-label]="label() || ('CONTROLS.FONT.PANEL' | translate)"
+    (focusout)="popover.focusOut($event)"
+  >
+    @if (preview(); as font) {
+      <p
+        class="ui-font-preview"
+        aria-hidden="true"
+        [style.font-family]="font.stack"
+        [style.font-weight]="font.weight"
+      >
+        {{ previewText() ?? ('CONTROLS.FONT.PREVIEW_DEFAULT' | translate) }}
+      </p>
+    }
+
+    <input
+      #search
+      type="search"
+      class="ui-input"
+      role="combobox"
+      autocomplete="off"
+      spellcheck="false"
+      aria-autocomplete="list"
+      aria-expanded="true"
+      [attr.aria-label]="'CONTROLS.FONT.SEARCH' | translate"
+      [attr.aria-controls]="id + '-listbox'"
+      [attr.aria-activedescendant]="activeOptionId()"
+      [placeholder]="'CONTROLS.FONT.SEARCH_PLACEHOLDER' | translate"
+      [value]="query()"
+      (input)="onQuery($event)"
+      (keydown)="onSearchKey($event)"
+    />
+
+    <div
+      class="ui-cluster"
+      role="group"
+      [attr.aria-label]="'CONTROLS.FONT.CATEGORIES' | translate"
+    >
+      <button
+        type="button"
+        class="ui-chip"
+        [attr.aria-pressed]="category() === null"
+        (click)="setCategory(null)"
+      >
+        {{ 'COMMON.ALL' | translate }}
+      </button>
+      @for (c of categories; track c.category) {
+        <button
+          type="button"
+          class="ui-chip"
+          [attr.aria-pressed]="category() === c.category"
+          (click)="setCategory(c.category)"
+        >
+          {{ c.labelKey | translate }}
+        </button>
+      }
+    </div>
+
+    <!-- mousedown would move focus off the search field and end the combobox. -->
+    <ul
+      class="ui-listbox"
+      role="listbox"
+      [id]="id + '-listbox'"
+      [attr.aria-label]="'CONTROLS.FONT.LIST' | translate"
+      (mousedown)="$event.preventDefault()"
+    >
+      @for (font of results(); track font.id; let i = $index) {
+        <li
+          role="option"
+          class="ui-option"
+          [id]="optionId(font)"
+          [class.ui-option--active]="i === activeIndex()"
+          [attr.aria-selected]="font.id === value()"
+          (click)="choose(font.id)"
+          (pointermove)="hover(i)"
+        >
+          <span
+            class="font-picker__family"
+            [style.font-family]="font.stack"
+            [style.font-weight]="font.weight"
+            >{{ font.family }}</span
+          >
+          <span class="ui-option__meta">{{ font.categoryKey | translate }}</span>
+          <i
+            class="bi bi-check2 ui-option__check"
+            aria-hidden="true"
+          ></i>
+        </li>
+      }
+    </ul>
+    @if (results().length === 0) {
+      <p class="ui-hint">{{ 'COMMON.NO_RESULTS' | translate }}</p>
+    }
+    <p
+      class="ui-visually-hidden"
+      role="status"
+    >
+      {{ 'CONTROLS.FONT.RESULT_COUNT' | translate: { count: results().length } }}
+    </p>
+  </div>
+</ng-template>

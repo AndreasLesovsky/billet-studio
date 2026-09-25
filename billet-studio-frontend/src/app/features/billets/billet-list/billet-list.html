@@ -5,43 +5,129 @@
         <h1 class="ui-page__title">{{ 'BILLETS.TITLE' | translate }}</h1>
         <p class="ui-page__lead">{{ 'BILLETS.LEAD' | translate }}</p>
       </div>
-      <button
-        type="button"
+      <a
+        id="billet-list-new"
         class="ui-btn ui-btn--primary"
-        disabled
-        aria-describedby="billet-list-editor-soon"
+        routerLink="/templates"
       >
         <i
           class="bi bi-plus-lg"
           aria-hidden="true"
         ></i>
         {{ 'NAV.NEW_BILLET' | translate }}
-      </button>
+      </a>
     </header>
 
-    <section
-      class="ui-card"
-      aria-labelledby="billet-list-empty"
-    >
-      <div class="ui-card__body ui-stack billet-list__empty">
-        <span
-          class="ui-brand-mark ui-brand-mark--lg"
-          aria-hidden="true"
-        ></span>
-        <h2
-          id="billet-list-empty"
-          class="ui-card__title"
-        >
-          {{ 'BILLETS.EMPTY_TITLE' | translate }}
-        </h2>
-        <p class="ui-hint">{{ 'BILLETS.EMPTY_TEXT' | translate }}</p>
-        <p
-          id="billet-list-editor-soon"
-          class="ui-hint"
-        >
-          {{ 'BILLETS.EDITOR_SOON' | translate }}
-        </p>
-      </div>
-    </section>
+    <p class="ui-alert ui-alert--info">
+      <i
+        class="bi bi-laptop"
+        aria-hidden="true"
+      ></i>
+      <span id="billet-list-count">
+        {{ 'BILLETS.DEVICE_NOTE' | translate }}
+        {{ 'BILLETS.COUNT' | translate: { count: cards().length, max: max } }}
+      </span>
+    </p>
+
+    @if (cards().length > 0) {
+      <ul
+        class="ui-grid billet-list__grid"
+        role="list"
+      >
+        @for (card of cards(); track card.entry.localId) {
+          <li class="ui-card">
+            <app-asset-thumb
+              [src]="card.previewUrl"
+              [emoji]="card.emoji"
+            />
+            <div class="ui-card__body ui-stack ui-stack--sm">
+              <h2 class="ui-card__title billet-list__title">
+                {{ card.entry.title || ('BILLETS.UNTITLED' | translate) }}
+              </h2>
+              <p class="ui-hint ui-cluster billet-list__meta">
+                <span
+                  class="billet-list__swatches"
+                  aria-hidden="true"
+                >
+                  @for (color of card.swatches; track $index) {
+                    <span
+                      class="ui-swatch"
+                      [style.background-color]="color"
+                    ></span>
+                  }
+                </span>
+                <span>{{ 'BILLETS.EDITED' | translate: { when: card.edited } }}</span>
+              </p>
+            </div>
+            <div class="ui-card__footer billet-list__actions">
+              <button
+                type="button"
+                class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+                [attr.aria-label]="
+                  'BILLETS.DELETE_NAMED'
+                    | translate: { title: card.entry.title || ('BILLETS.UNTITLED' | translate) }
+                "
+                [title]="'COMMON.DELETE' | translate"
+                (click)="remove(card.entry)"
+              >
+                <i
+                  class="bi bi-trash"
+                  aria-hidden="true"
+                ></i>
+              </button>
+              <button
+                type="button"
+                class="ui-btn ui-btn--neutral ui-btn--sm"
+                [disabled]="full()"
+                [attr.aria-describedby]="full() ? 'billet-list-count' : null"
+                (click)="duplicate(card.entry)"
+              >
+                <i
+                  class="bi bi-copy"
+                  aria-hidden="true"
+                ></i>
+                {{ 'BILLETS.DUPLICATE' | translate }}
+                <span class="ui-visually-hidden">{{
+                  card.entry.title || ('BILLETS.UNTITLED' | translate)
+                }}</span>
+              </button>
+              <a
+                class="ui-btn ui-btn--secondary ui-btn--sm"
+                [id]="card.linkId"
+                [routerLink]="['/billets/local', card.entry.localId, 'edit']"
+              >
+                <i
+                  class="bi bi-pencil"
+                  aria-hidden="true"
+                ></i>
+                {{ 'COMMON.EDIT' | translate }}
+                <span class="ui-visually-hidden">{{
+                  card.entry.title || ('BILLETS.UNTITLED' | translate)
+                }}</span>
+              </a>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <section
+        class="ui-card"
+        aria-labelledby="billet-list-empty"
+      >
+        <div class="ui-card__body ui-stack billet-list__empty">
+          <span
+            class="ui-brand-mark ui-brand-mark--lg"
+            aria-hidden="true"
+          ></span>
+          <h2
+            id="billet-list-empty"
+            class="ui-card__title"
+          >
+            {{ 'BILLETS.EMPTY_TITLE' | translate }}
+          </h2>
+          <p class="ui-hint">{{ 'BILLETS.EMPTY_TEXT' | translate }}</p>
+        </div>
+      </section>
+    }
   </div>
 </div>

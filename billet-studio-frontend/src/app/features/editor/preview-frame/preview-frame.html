@@ -1,0 +1,43 @@
+<fieldset class="ui-segmented preview__devices">
+  <legend class="ui-visually-hidden">{{ 'EDITOR.PREVIEW.DEVICE' | translate }}</legend>
+  @for (option of devices; track option.device) {
+    <label class="ui-segmented__option">
+      <input
+        type="radio"
+        name="editor-preview-device"
+        [value]="option.device"
+        [checked]="device() === option.device"
+        (change)="device.set(option.device)"
+      />
+      <i
+        class="bi"
+        [class]="option.icon"
+        aria-hidden="true"
+      ></i>
+      {{ option.labelKey | translate }}
+    </label>
+  }
+</fieldset>
+
+<div
+  #stage
+  class="preview__stage"
+  [style.--preview-scale]="scale()"
+>
+  <div
+    #frame
+    class="ui-device preview__frame"
+    [class.ui-device--desktop]="device() === 'desktop'"
+    [class.preview__frame--desktop]="device() === 'desktop'"
+  >
+    <div class="ui-device__screen">
+      <app-billet-view
+        [document]="document()"
+        [model]="asset()"
+        [mode]="mode()"
+        [animate]="animate()"
+        fill="frame"
+      />
+    </div>
+  </div>
+</div>

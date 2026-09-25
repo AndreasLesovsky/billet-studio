@@ -1,0 +1,51 @@
+// Layout only; every visual comes from the ui-* classes.
+
+:host {
+    display: block;
+}
+
+.particles-panel__note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-2);
+}
+
+.particles-panel__legend {
+    margin-block-end: var(--ui-space-2);
+}
+
+// Icon above label, as many per row as fit: the names are too long for one row of five.
+.particles-panel__shapes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+}
+
+.particles-panel__shape {
+    flex-direction: column;
+    gap: var(--ui-space-1);
+    min-block-size: 3.75rem;
+    padding-block: var(--ui-space-2);
+    white-space: normal;
+    text-align: center;
+}
+
+.particles-panel__shape-icon {
+    font-size: 1.25rem;
+}
+
+.particles-panel__colors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(11rem, 100%), 1fr));
+    gap: var(--ui-space-3);
+    margin: 0;
+}
+
+.particles-panel__color {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-1);
+}
+
+.particles-panel__picker {
+    flex: 1;
+}

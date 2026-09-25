@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -114,6 +115,17 @@ describe('BreadcrumbService', () => {
       ['Muttertag', true],
     ]);
     expect(service.items()[2].url).toBe('/billets/7/edit');
+  });
+
+  it('a signal label follows its source', () => {
+    const service = create(billetEditor());
+    const title = signal('Muttertag');
+    service.setDynamicLabel(title);
+    expect(service.items()[2].name).toBe('Muttertag');
+
+    title.set('Muttertag für Mama');
+
+    expect(service.items()[2].name).toBe('Muttertag für Mama');
   });
 
   it('forgets a runtime label on the next navigation', () => {

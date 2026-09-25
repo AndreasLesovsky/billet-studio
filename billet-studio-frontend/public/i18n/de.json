@@ -96,7 +96,9 @@
       "GEBURTSTAG": "Torte, Konfetti und die besten Wünsche fürs neue Lebensjahr.",
       "WEIHNACHTEN": "Eine Schneekugel voller Winterzauber für die Menschen, die du liebst.",
       "HOCHZEIT": "Champagner und herzliche Glückwünsche für das Brautpaar."
-    }
+    },
+    "BLANK_LEAD": "Lieber ganz von vorn?",
+    "BLANK": "Leeres Billet anlegen"
   },
   "HOME": {
     "EYEBROW": "Digitale Billets mit 3D-Motiv",
@@ -118,7 +120,272 @@
     "LEAD": "Alle Billets, die du gestaltet hast, an einem Ort.",
     "EMPTY_TITLE": "Noch keine Billets",
     "EMPTY_TEXT": "Sobald du ein Billet gestaltest, erscheint es hier. Ohne Konto bleiben deine Billets auf diesem Gerät.",
-    "EDITOR_SOON": "Der Editor folgt in Kürze."
+    "DEVICE_NOTE": "Deine Billets werden in diesem Browser gespeichert, nur auf diesem Gerät. Bald kannst du sie auch in deinem Konto sichern.",
+    "COUNT": "{{count}} von {{max}} Plätzen belegt.",
+    "EDITED": "Bearbeitet {{when}}",
+    "UNTITLED": "Ohne Titel",
+    "DUPLICATE": "Duplizieren",
+    "COPY_TITLE": "{{title}} (Kopie)",
+    "DELETE_TITLE": "Billet löschen?",
+    "DELETE_NAMED": "„{{title}}“ löschen",
+    "DELETE_MESSAGE": "„{{title}}“ wird von diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen."
+  },
+  "EDITOR": {
+    "TITLE_LABEL": "Titel des Billets (nur für deine Übersicht)",
+    "UNDO": "Rückgängig",
+    "REDO": "Wiederholen",
+    "PREVIEW_MODE": "Farbmodus der Vorschau",
+    "MODE_AUTO": "Auto",
+    "MODE_LIGHT": "Hell",
+    "MODE_DARK": "Dunkel",
+    "REPLAY": "Abspielen",
+    "LANGUAGE": "Sprache des Billets",
+    "SAVE_STATUS": {
+      "SAVED": "Lokal gespeichert",
+      "PENDING": "Speichert …",
+      "HELD": "Nicht gespeichert",
+      "LOCAL_STORAGE_FULL": "Nicht gespeichert: Speicher voll",
+      "LOCAL_STORAGE_UNAVAILABLE": "Nicht gespeichert: Speichern blockiert",
+      "LOCAL_BILLET_LIMIT_REACHED": "Nicht gespeichert: zu viele Billets"
+    },
+    "SHARE": "Teilen",
+    "SHARE_GUEST_HINT": "Melde dich an, um dein Billet zu teilen.",
+    "SHARE_SOON": "Teilen ist bald verfügbar.",
+    "TABS": {
+      "LABEL": "Bearbeiten",
+      "PREVIEW": "Vorschau",
+      "CONTENT": "Inhalt",
+      "DESIGN": "Design",
+      "SPACING": "Abstände",
+      "SCENE": "3D",
+      "PARTICLES": "Partikel"
+    },
+    "NOT_FOUND_TITLE": "Billet nicht gefunden",
+    "NOT_FOUND_TEXT": "Dieses Billet gibt es in diesem Browser nicht (mehr). Vielleicht wurde es gelöscht oder auf einem anderen Gerät angelegt.",
+    "NOT_FOUND_LINK": "Zu meinen Billets",
+    "LEAVE_UNSAVED": "Deine letzten Änderungen konnten nicht gespeichert werden. Wenn du jetzt gehst, sind sie verloren.",
+    "REMOTE": {
+      "CHANGED": "Dieses Billet wurde in einem anderen Tab geändert, während du hier daran gearbeitet hast.",
+      "REMOVED": "Dieses Billet wurde in einem anderen Tab gelöscht.",
+      "LOAD_THEIRS": "Andere Version laden",
+      "KEEP_MINE": "Meine Version behalten",
+      "RESTORE": "Wiederherstellen"
+    },
+    "PREVIEW": {
+      "DEVICE": "Gerät der Vorschau",
+      "PHONE": "Handy",
+      "DESKTOP": "Desktop"
+    },
+    "CONTENT": {
+      "PAGE": "Seite",
+      "PAGE_TITLE": "Seitentitel",
+      "PAGE_TITLE_HINT": "Steht im Browser-Tab des Empfängers. Leer lassen, um die Überschrift zu verwenden.",
+      "LANGUAGE_HINT": "Für Vorlesefunktionen und Silbentrennung.",
+      "HERO": "Kopfbereich",
+      "HERO_LABEL": "Zeile darüber",
+      "HERO_TITLE_LINE1": "Überschrift, erste Zeile",
+      "HERO_TITLE_LINE2": "Überschrift, zweite Zeile",
+      "HERO_SUB": "Zeile darunter",
+      "BLOCKS": "Blöcke",
+      "ADD_BLOCK": "Block hinzufügen",
+      "ADD_BLOCK_HINT": "Ein neuer Block kommt nach dem, an dem du zuletzt gearbeitet hast.",
+      "BLOCKS_LIMIT": "Ein Billet hat höchstens {{max}} Blöcke.",
+      "BLOCKS_EMPTY": "Noch keine Blöcke. Füge einen Absatz, eine Karte oder eine Notiz hinzu.",
+      "BLOCK_TEXT": "Text",
+      "FORMATTING": "Formatierung",
+      "ITALIC": "Kursiv",
+      "BOLD": "Fett",
+      "MARKUP_HINT": "*kursiv* und **fett**; eine Leerzeile beginnt einen neuen Absatz.",
+      "COUNTER": "{{count}} / {{max}}",
+      "CARD_ICON": "Symbol",
+      "CARD_ARIA_LABEL": "Beschriftung",
+      "CARD_ARIA_LABEL_HINT": "Wird von Screenreadern vor der Karte vorgelesen.",
+      "DIVIDER_STYLE": "Form",
+      "SPACE_ADJUST": "Abstand davor",
+      "SPACE_ADJUST_HINT": "Stufen mehr oder weniger als der übliche Abstand.",
+      "DRAG": "Ziehen zum Verschieben",
+      "MOVE_UP": "Nach oben",
+      "MOVE_DOWN": "Nach unten",
+      "DUPLICATE": "Duplizieren",
+      "DELETE": "Löschen",
+      "MOVED": "{{type}} ist jetzt an Position {{position}} von {{count}}.",
+      "REMOVED": "{{type}} gelöscht – mit „Rückgängig“ kommt der Block zurück.",
+      "SIGNATURE": "Unterschrift",
+      "SIGNATURE_NAME": "Name",
+      "SIGNATURE_SUB": "Zeile darunter"
+    },
+    "BLOCK_TYPES": {
+      "PARAGRAPH": "Absatz",
+      "HEADING": "Überschrift",
+      "CARD": "Karte",
+      "NOTE": "Notiz",
+      "DIVIDER": "Trenner"
+    },
+    "DIVIDER_STYLES": {
+      "DIAMOND": "Raute",
+      "DOT": "Punkt",
+      "HEART": "Herz",
+      "STAR": "Stern",
+      "LINE": "Linie",
+      "NONE": "Keine"
+    },
+    "DESIGN": {
+      "THEME_TITLE": "Theme und Farbmodus",
+      "THEME_HINT": "Ein Theme setzt Farben, Schriften und Partikelfarben deines Billets und färbt den Editor ein. Danach kannst du alles anpassen.",
+      "THEME_CHOOSE": "Theme wählen",
+      "THEME_RESET": "Auf Theme zurücksetzen",
+      "COLOR_MODE": "Farbmodus des Billets",
+      "COLOR_MODE_HINT": "Automatisch folgt der Einstellung des Geräts, auf dem dein Billet geöffnet wird.",
+      "COLOR_MODES": {
+        "AUTO": "Automatisch",
+        "LIGHT": "Hell",
+        "DARK": "Dunkel"
+      },
+      "COLORS": "Farben",
+      "PALETTE_TABS": "Farbvariante",
+      "PALETTE_LIGHT": "Hell",
+      "PALETTE_DARK": "Dunkel",
+      "DARK_LINKED": "Dunkel automatisch ableiten",
+      "DARK_LINKED_HINT": "Jede Änderung an den hellen Farben erzeugt die dunklen neu.",
+      "DARK_DERIVED": "Diese Farben entstehen aus den hellen. Schalte „Dunkel automatisch ableiten“ aus, um sie selbst anzupassen.",
+      "DARK_PREVIEW_HINT": "Stell die Vorschau oben auf „Dunkel“, um diese Farben im Billet zu sehen.",
+      "ROLES": {
+        "ACCENT": "Akzent",
+        "ACCENT_SOFT": "Akzent zart",
+        "BORDER": "Linien",
+        "BACKGROUND": "Hintergrund",
+        "INK": "Text",
+        "INK_SOFT": "Text sekundär",
+        "SURFACE": "Karte"
+      },
+      "ROLE_HINTS": {
+        "ACCENT": "Zweite Titelzeile, Trenner, Unterschrift",
+        "ACCENT_SOFT": "Hintergrund des Kopfbereichs",
+        "BORDER": "Trennlinien und Kartenrand",
+        "BACKGROUND": "Hintergrund der Seite",
+        "INK": "Haupttext",
+        "INK_SOFT": "Nebentexte und 3D-Hinweis",
+        "SURFACE": "Hintergrund der Karten"
+      },
+      "ACCENT_NOTE": "Die Zeile über der Überschrift steht in Akzent auf Akzent zart. Sie ist Zierschrift, dafür reicht ein Kontrast von 3 : 1.",
+      "CONTRAST_TITLE": "Schwer lesbar",
+      "CONTRAST_ISSUE": "{{fg}} auf {{bg}}: {{ratio}} : 1, empfohlen {{min}} : 1",
+      "TYPOGRAPHY": "Schrift",
+      "FONT_PAIRS": "Schriftpaare",
+      "FONT_PAIRS_HINT": "Übernimmt die Schriften eines Themes, deine Farben bleiben.",
+      "FONT_ROLES": {
+        "TITLE": "Titel",
+        "TITLE_ACCENT": "Titel-Akzent",
+        "HEADING": "Überschrift",
+        "BODY": "Text",
+        "SIGNATURE": "Signatur",
+        "UI": "Kleintext"
+      },
+      "FONT_ROLE_HINTS": {
+        "TITLE": "Erste Zeile der Überschrift.",
+        "TITLE_ACCENT": "Zweite Zeile der Überschrift. Ihre Größe gilt relativ zum Titel.",
+        "HEADING": "Überschrift-Blöcke.",
+        "BODY": "Absätze, Karten und Notizen.",
+        "SIGNATURE": "Dein Name unter dem Text.",
+        "UI": "Zeilen über und unter der Überschrift, der 3D-Hinweis und die Zeile unter der Unterschrift."
+      },
+      "FONT": "Schrift",
+      "WEIGHT": "Stärke",
+      "WEIGHTS": {
+        "W100": "Hauchdünn",
+        "W200": "Extraleicht",
+        "W300": "Leicht",
+        "W400": "Normal",
+        "W500": "Mittel",
+        "W600": "Halbfett",
+        "W700": "Fett",
+        "W800": "Extrafett",
+        "W900": "Schwarz"
+      },
+      "WEIGHT_OPTION": "{{name}} ({{weight}})",
+      "ITALIC": "Kursiv",
+      "ITALIC_UNAVAILABLE": "Diese Schrift hat in dieser Stärke keine kursive Form.",
+      "SIZE": "Größe",
+      "EMPHASIS": "Farbe von Hervorhebungen",
+      "EMPHASIS_HINT": "Für *kursiven* Text in Absätzen, Karten und Notizen."
+    },
+    "SPACING": {
+      "INTRO": "Abstände gehen in festen Stufen. Der Pfeil neben einem Wert setzt ihn auf die ursprüngliche Karte zurück.",
+      "RESET_ALL": "Alle Abstände zurücksetzen",
+      "PAGE": "Seite",
+      "HERO": "Kopfbereich",
+      "SCENE": "3D-Bereich und Trenner",
+      "TEXT": "Text",
+      "GUTTER": "Seitenrand",
+      "GUTTER_HINT": "Abstand links und rechts vom Inhalt.",
+      "HERO_TOP": "Über der Überschrift",
+      "HERO_TOP_HINT": "Luft zwischen Seitenanfang und Überschrift.",
+      "HERO_BOTTOM": "Unter der Überschrift",
+      "HERO_BOTTOM_HINT": "Luft zwischen Kopfbereich und 3D-Modell.",
+      "SCENE_HEIGHT": "Höhe des 3D-Bereichs",
+      "SCENE_HEIGHT_HINT": "So viel Platz bekommt das 3D-Modell.",
+      "DIVIDER_GAP": "Um den Trenner",
+      "DIVIDER_GAP_HINT": "Abstand über und unter dem Trenner zwischen 3D-Bereich und Text.",
+      "DIVIDER_STYLE": "Trenner unter dem 3D-Bereich",
+      "BLOCK_GAP": "Zwischen Blöcken",
+      "BLOCK_GAP_HINT": "Der übliche Abstand vor jedem Block. Einzelne Blöcke passt du im Inhalt an.",
+      "SIGNATURE_GAP": "Über der Unterschrift",
+      "SIGNATURE_GAP_HINT": "Abstand zwischen dem letzten Block und der Unterschrift.",
+      "PAGE_BOTTOM": "Seitenende",
+      "PAGE_BOTTOM_HINT": "Luft unter der Unterschrift."
+    },
+    "SCENE": {
+      "MODEL": "3D-Modell",
+      "ENABLED": "3D-Modell zeigen",
+      "DISABLED_HINT": "Ohne 3D-Modell folgt der Text direkt auf den Kopfbereich.",
+      "LIBRARY": "Modell",
+      "LIBRARY_ERROR": "Die Modelle konnten nicht geladen werden.",
+      "MODEL_HINT": "Ein anderes Modell bringt seine eigene Größe, Kamera und Belichtung mit.",
+      "RETIRED": "Dieses Modell gibt es nicht mehr in der Bibliothek. Es bleibt in deinem Billet, bis du ein anderes wählst.",
+      "CREDIT": "Modell: {{credit}}",
+      "STAGE": "Darstellung",
+      "STAGE_HINT": "Die Vorschau zeigt jede Änderung sofort.",
+      "FIT_SIZE": "Größe",
+      "Y_OFFSET": "Höhe im Bild",
+      "EXPOSURE": "Helligkeit",
+      "CAMERA_DISTANCE": "Kameraabstand",
+      "CAMERA_HEIGHT": "Kamerahöhe",
+      "AUTO_ROTATE": "Dreht sich von selbst",
+      "AUTO_ROTATE_SPEED": "Drehgeschwindigkeit",
+      "RESET": "Auf Modell-Standard zurücksetzen",
+      "TEXTS": "Texte",
+      "HINT": "Hinweis unter dem Modell",
+      "HINT_HINT": "Leer lassen, um keinen Hinweis zu zeigen.",
+      "ARIA_LABEL": "Beschreibung für Screenreader",
+      "ARIA_LABEL_HINT": "Sag kurz, was das Modell zeigt – vor allem nach einem Modellwechsel."
+    },
+    "PARTICLES": {
+      "TITLE": "Partikel",
+      "ENABLED": "Partikel zeigen",
+      "REDUCED_MOTION": "Wer auf seinem Gerät „Bewegung reduzieren“ eingestellt hat, sieht keine Partikel.",
+      "SHAPE": "Form",
+      "SHAPES": {
+        "PETAL": "Blütenblätter",
+        "SNOWFLAKE": "Schneeflocken",
+        "LEAF": "Blätter",
+        "CONFETTI": "Konfetti",
+        "HEART": "Herzen"
+      },
+      "COLORS": "Farben",
+      "COLORS_HINT": "Jedes Teilchen bekommt zufällig eine dieser Farben. Bis zu {{max}} sind möglich.",
+      "COLOR": "Farbe {{index}}",
+      "ADD_COLOR": "Farbe hinzufügen",
+      "REMOVE_COLOR": "Farbe {{index}} entfernen",
+      "MOTION": "Menge und Bewegung",
+      "DENSITY": "Menge",
+      "SPEED": "Geschwindigkeit",
+      "SIZE": "Größe"
+    },
+    "VALIDATION": {
+      "TITLE_REQUIRED": "Gib deinem Billet einen Titel.",
+      "MAX_BLOCKS": "Höchstens {{maxLength}} Blöcke.",
+      "HEX_COLOR": "Gib eine Farbe als #rrggbb ein."
+    }
   },
   "AUTH": {
     "LOGIN_TITLE": "Anmelden",
@@ -447,7 +714,10 @@
       "UNKNOWN_MODEL": "Das gewählte 3D-Modell gibt es nicht.",
       "MODEL_NOT_FOUND": "3D-Modell nicht gefunden.",
       "SESSION_EXPIRED": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
-      "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten."
+      "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
+      "LOCAL_BILLET_LIMIT_REACHED": "Auf diesem Gerät ist Platz für {{max}} Billets. Lösche eines, um ein neues anzulegen.",
+      "LOCAL_STORAGE_FULL": "Der Speicher dieses Browsers ist voll. Lösche ein Billet, um Platz zu schaffen.",
+      "LOCAL_STORAGE_UNAVAILABLE": "Dieser Browser lässt kein Speichern zu (etwa im privaten Modus). Deine Billets können hier nicht gespeichert werden."
     },
     "SUCCESS": {
       "LOGIN_SUCCESS": "Du bist angemeldet.",
@@ -474,6 +744,89 @@
       "SESSION_ENDING": "Deine Sitzung endet in",
       "INVALID_IMAGE": "Bitte wähle eine Bilddatei (JPG, PNG, GIF, BMP, WebP oder AVIF).",
       "IMAGE_TOO_LARGE": "Das Bild ist zu groß. Erlaubt sind bis zu {{maxMb}} MB."
+    }
+  },
+  "CONTROLS": {
+    "COLOR": {
+      "PANEL": "Farbe wählen",
+      "DOCUMENT_COLORS": "Farben in diesem Billet",
+      "SUGGESTIONS": "Vorschläge",
+      "RECENT": "Zuletzt verwendet",
+      "SWATCH": "Farbe {{color}}",
+      "PLANE": "Sättigung und Helligkeit",
+      "PLANE_TEXT": "Sättigung {{saturation}} %, Helligkeit {{brightness}} %",
+      "HUE": "Farbton",
+      "HUE_TEXT": "{{hue}} Grad",
+      "HEX": "Hex-Wert",
+      "HEX_REQUIRED": "Gib einen Hex-Wert ein.",
+      "HEX_INVALID": "Gib einen Hex-Wert wie #c8614a oder #c64 ein.",
+      "EYEDROPPER": "Farbe vom Bildschirm aufnehmen",
+      "CONTRAST": "Kontrast {{ratio}} : 1",
+      "CONTRAST_AA": "AA",
+      "CONTRAST_AA_HINT": "Gut lesbar, auch für Fließtext.",
+      "CONTRAST_AA_LARGE": "AA groß",
+      "CONTRAST_AA_LARGE_HINT": "Reicht für große Schrift und Zierelemente, nicht für Fließtext.",
+      "CONTRAST_LOW": "Zu gering",
+      "CONTRAST_LOW_HINT": "Schwer lesbar. Wähle eine hellere oder dunklere Farbe."
+    },
+    "RANGE": {
+      "RESET": "Zurücksetzen auf {{value}}"
+    },
+    "FONT": {
+      "PANEL": "Schrift wählen",
+      "NONE": "Keine Schrift gewählt",
+      "PREVIEW_DEFAULT": "Für Mama",
+      "SEARCH": "Schrift suchen",
+      "SEARCH_PLACEHOLDER": "Schrift suchen …",
+      "CATEGORIES": "Schriftstil",
+      "LIST": "Schriften",
+      "RESULT_COUNT": "Treffer: {{count}}",
+      "CATEGORY": {
+        "SERIF": "Serif",
+        "SANS": "Sans Serif",
+        "DISPLAY": "Display",
+        "SCRIPT": "Schreibschrift",
+        "HANDWRITING": "Handschrift"
+      }
+    },
+    "ASSET": {
+      "OCCASIONS": "Anlass",
+      "OCCASION": {
+        "MOTHERS_DAY": "Muttertag",
+        "VALENTINES": "Valentinstag",
+        "BIRTHDAY": "Geburtstag",
+        "CELEBRATION": "Feiern",
+        "CHRISTMAS": "Weihnachten",
+        "GENERAL": "Allgemein"
+      }
+    },
+    "EMOJI": {
+      "PANEL": "Symbol wählen",
+      "NONE": "Kein Symbol",
+      "CUSTOM": "Eigenes Symbol",
+      "CUSTOM_HINT": "Ein anderes Emoji oder ein kurzer Text, bis zu {{max}} Zeichen.",
+      "GROUP": {
+        "LOVE": "Liebe",
+        "FLOWERS": "Blumen",
+        "CELEBRATION": "Feiern",
+        "WINTER": "Winter & Weihnachten",
+        "SYMBOLS": "Symbole"
+      }
+    },
+    "KIT": {
+      "TITLE": "Editor-Steuerelemente",
+      "LEAD": "Die eigenen Formular-Steuerelemente des Editors: links im Studio-Design, rechts im oben gewählten Editor-Theme. Beide sind per [formField] an ein Signal-Formular gebunden; darunter dieselben Steuerelemente frei mit [(value)].",
+      "STUDIO": "Studio",
+      "STANDALONE": "Ohne Formular: [(value)]",
+      "LOCKED": "Alle Steuerelemente sperren",
+      "ACCENT": "Akzentfarbe",
+      "INK": "Textfarbe",
+      "TITLE_SIZE": "Titelgröße",
+      "GUTTER": "Seitenrand",
+      "TITLE_FONT": "Titelschrift",
+      "MODEL": "3D-Modell",
+      "ICON": "Kartensymbol",
+      "MODEL_STATE": "Formularwert"
     }
   }
 }

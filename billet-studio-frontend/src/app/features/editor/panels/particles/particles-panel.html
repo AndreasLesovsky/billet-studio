@@ -1,0 +1,176 @@
+@let fields = billetForm();
+@let enabled = document().particles.enabled;
+<div class="ui-stack ui-stack--lg">
+  <section
+    class="ui-card"
+    aria-labelledby="editor-particles-effect"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-particles-effect"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.PARTICLES.TITLE' | translate }}
+      </h2>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <div class="ui-stack ui-stack--sm">
+        <label class="ui-check">
+          <input
+            type="checkbox"
+            role="switch"
+            class="ui-switch"
+            [formField]="fields.particles.enabled"
+          />
+          {{ 'EDITOR.PARTICLES.ENABLED' | translate }}
+        </label>
+        <p class="ui-hint particles-panel__note">
+          <i
+            class="bi bi-universal-access"
+            aria-hidden="true"
+          ></i>
+          {{ 'EDITOR.PARTICLES.REDUCED_MOTION' | translate }}
+        </p>
+      </div>
+
+      @if (enabled) {
+        <fieldset class="ui-field">
+          <legend class="ui-label particles-panel__legend">
+            {{ 'EDITOR.PARTICLES.SHAPE' | translate }}
+          </legend>
+          <div class="ui-segmented particles-panel__shapes">
+            @for (option of shapes; track option.shape) {
+              <label class="ui-segmented__option particles-panel__shape">
+                <input
+                  type="radio"
+                  [value]="option.shape"
+                  [formField]="fields.particles.shape"
+                />
+                <i
+                  class="bi particles-panel__shape-icon"
+                  [class]="option.icon"
+                  aria-hidden="true"
+                ></i>
+                {{ option.labelKey | translate }}
+              </label>
+            }
+          </div>
+        </fieldset>
+      }
+    </div>
+  </section>
+
+  @if (enabled) {
+    <section
+      class="ui-card"
+      aria-labelledby="editor-particles-colors"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="editor-particles-colors"
+          class="ui-card__title"
+        >
+          {{ 'EDITOR.PARTICLES.COLORS' | translate }}
+        </h2>
+        <button
+          type="button"
+          class="ui-btn ui-btn--secondary ui-btn--sm"
+          [disabled]="!canAdd()"
+          (click)="addColor()"
+        >
+          <i
+            class="bi bi-plus-lg"
+            aria-hidden="true"
+          ></i>
+          {{ 'EDITOR.PARTICLES.ADD_COLOR' | translate }}
+        </button>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <p class="ui-hint">{{ 'EDITOR.PARTICLES.COLORS_HINT' | translate: { max: maxColors } }}</p>
+        <ul
+          class="particles-panel__colors"
+          role="list"
+        >
+          @for (color of colors(); track $index; let i = $index) {
+            <li class="particles-panel__color">
+              <span
+                class="ui-visually-hidden"
+                [id]="'editor-particle-color-' + i"
+                >{{ 'EDITOR.PARTICLES.COLOR' | translate: { index: i + 1 } }}</span
+              >
+              <div class="ui-field particles-panel__picker">
+                <app-color-picker
+                  [formField]="fields.particles.colors[i]"
+                  [ariaLabelledby]="'editor-particle-color-' + i"
+                  [documentColors]="documentColors()"
+                  [presetColors]="presetColors()"
+                />
+                <app-field-error [field]="fields.particles.colors[i]" />
+              </div>
+              <button
+                type="button"
+                class="ui-btn ui-btn--ghost ui-btn--icon"
+                [disabled]="!canRemove()"
+                [attr.aria-label]="'EDITOR.PARTICLES.REMOVE_COLOR' | translate: { index: i + 1 }"
+                [title]="'EDITOR.PARTICLES.REMOVE_COLOR' | translate: { index: i + 1 }"
+                (click)="removeColor(i)"
+              >
+                <i
+                  class="bi bi-trash"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section
+      class="ui-card"
+      aria-labelledby="editor-particles-motion"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="editor-particles-motion"
+          class="ui-card__title"
+        >
+          {{ 'EDITOR.PARTICLES.MOTION' | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <div class="ui-field">
+          <app-range-slider
+            [formField]="fields.particles.density"
+            [label]="'EDITOR.PARTICLES.DENSITY' | translate"
+            [marks]="densityMarks"
+            [defaultValue]="original.density"
+          />
+          <app-field-error [field]="fields.particles.density" />
+        </div>
+        <div class="ui-field">
+          <app-range-slider
+            [formField]="fields.particles.speed"
+            [label]="'EDITOR.PARTICLES.SPEED' | translate"
+            [step]="speedStep"
+            [marks]="factorMarks"
+            [valueText]="factorText()"
+            [defaultValue]="original.speed"
+          />
+          <app-field-error [field]="fields.particles.speed" />
+        </div>
+        <div class="ui-field">
+          <app-range-slider
+            [formField]="fields.particles.size"
+            [label]="'EDITOR.PARTICLES.SIZE' | translate"
+            [step]="sizeStep"
+            [marks]="factorMarks"
+            [valueText]="factorText()"
+            [defaultValue]="original.size"
+          />
+          <app-field-error [field]="fields.particles.size" />
+        </div>
+      </div>
+    </section>
+  }
+</div>

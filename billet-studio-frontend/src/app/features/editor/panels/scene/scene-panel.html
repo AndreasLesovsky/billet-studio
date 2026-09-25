@@ -1,0 +1,201 @@
+@let fields = billetForm();
+<div class="ui-stack ui-stack--lg">
+  <section
+    class="ui-card"
+    aria-labelledby="editor-scene-model"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-scene-model"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.SCENE.MODEL' | translate }}
+      </h2>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <div class="ui-stack ui-stack--sm">
+        <label class="ui-check">
+          <input
+            type="checkbox"
+            role="switch"
+            class="ui-switch"
+            [formField]="fields.scene.enabled"
+          />
+          {{ 'EDITOR.SCENE.ENABLED' | translate }}
+        </label>
+        @if (!scene().enabled) {
+          <p class="ui-hint">{{ 'EDITOR.SCENE.DISABLED_HINT' | translate }}</p>
+        }
+      </div>
+
+      @if (scene().enabled) {
+        @if (library.hasValue()) {
+          <app-asset-picker
+            [value]="scene().modelSlug"
+            [assets]="assets()"
+            [label]="'EDITOR.SCENE.LIBRARY' | translate"
+            (valueChange)="pickAsset($event)"
+          />
+          <p class="ui-hint">{{ 'EDITOR.SCENE.MODEL_HINT' | translate }}</p>
+          @if (retired()) {
+            <p class="ui-alert ui-alert--info">
+              <i
+                class="bi bi-info-circle"
+                aria-hidden="true"
+              ></i>
+              {{ 'EDITOR.SCENE.RETIRED' | translate }}
+            </p>
+          }
+        } @else if (library.error()) {
+          <div class="ui-alert ui-alert--danger">
+            <i
+              class="bi bi-exclamation-triangle"
+              aria-hidden="true"
+            ></i>
+            <div class="ui-stack ui-stack--sm">
+              <p>{{ 'EDITOR.SCENE.LIBRARY_ERROR' | translate }}</p>
+              <div>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn--neutral ui-btn--sm"
+                  (click)="reloadLibrary()"
+                >
+                  <i
+                    class="bi bi-arrow-repeat"
+                    aria-hidden="true"
+                  ></i>
+                  {{ 'COMMON.RETRY' | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+        @if (asset()?.credit; as credit) {
+          <p class="ui-hint">{{ 'EDITOR.SCENE.CREDIT' | translate: { credit } }}</p>
+        }
+      }
+    </div>
+  </section>
+
+  @if (scene().enabled) {
+    <section
+      class="ui-card"
+      aria-labelledby="editor-scene-stage"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="editor-scene-stage"
+          class="ui-card__title"
+        >
+          {{ 'EDITOR.SCENE.STAGE' | translate }}
+        </h2>
+        <button
+          type="button"
+          class="ui-btn ui-btn--neutral ui-btn--sm"
+          [disabled]="atDefaults()"
+          (click)="resetToAsset()"
+        >
+          <i
+            class="bi bi-arrow-counterclockwise"
+            aria-hidden="true"
+          ></i>
+          {{ 'EDITOR.SCENE.RESET' | translate }}
+        </button>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <p class="ui-hint">{{ 'EDITOR.SCENE.STAGE_HINT' | translate }}</p>
+        @for (slider of framing(); track slider.key) {
+          <div class="ui-field">
+            <app-range-slider
+              [formField]="fields.scene[slider.key]"
+              [label]="slider.labelKey | translate"
+              [step]="slider.step"
+              [marks]="slider.marks"
+              [defaultValue]="slider.defaultValue"
+            />
+            <app-field-error [field]="fields.scene[slider.key]" />
+          </div>
+        }
+        <label class="ui-check">
+          <input
+            type="checkbox"
+            role="switch"
+            class="ui-switch"
+            [formField]="fields.scene.autoRotate"
+          />
+          {{ 'EDITOR.SCENE.AUTO_ROTATE' | translate }}
+        </label>
+        @if (scene().autoRotate) {
+          <div class="ui-field">
+            <app-range-slider
+              [formField]="fields.scene.autoRotateSpeed"
+              [label]="speed().labelKey | translate"
+              [step]="speed().step"
+              [marks]="speed().marks"
+              [defaultValue]="speed().defaultValue"
+            />
+            <app-field-error [field]="fields.scene.autoRotateSpeed" />
+          </div>
+        }
+      </div>
+    </section>
+
+    <section
+      class="ui-card"
+      aria-labelledby="editor-scene-texts"
+    >
+      <div class="ui-card__header">
+        <h2
+          id="editor-scene-texts"
+          class="ui-card__title"
+        >
+          {{ 'EDITOR.SCENE.TEXTS' | translate }}
+        </h2>
+      </div>
+      <div class="ui-card__body ui-stack">
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="editor-scene-hint"
+            >{{ 'EDITOR.SCENE.HINT' | translate }}</label
+          >
+          <input
+            id="editor-scene-hint"
+            class="ui-input"
+            appBilletText
+            aria-describedby="editor-scene-hint-hint"
+            [formField]="fields.scene.hint"
+          />
+          <p
+            id="editor-scene-hint-hint"
+            class="ui-hint"
+          >
+            {{ 'EDITOR.SCENE.HINT_HINT' | translate }}
+          </p>
+          <app-field-error [field]="fields.scene.hint" />
+        </div>
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            for="editor-scene-aria-label"
+            >{{ 'EDITOR.SCENE.ARIA_LABEL' | translate }}</label
+          >
+          <input
+            id="editor-scene-aria-label"
+            class="ui-input"
+            appBilletText
+            aria-describedby="editor-scene-aria-label-hint"
+            [formField]="fields.scene.ariaLabel"
+          />
+          <p
+            id="editor-scene-aria-label-hint"
+            class="ui-hint"
+          >
+            {{ 'EDITOR.SCENE.ARIA_LABEL_HINT' | translate }}
+          </p>
+          <app-field-error [field]="fields.scene.ariaLabel" />
+        </div>
+      </div>
+    </section>
+  }
+</div>

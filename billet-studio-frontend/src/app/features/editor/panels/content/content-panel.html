@@ -1,0 +1,288 @@
+@let fields = billetForm();
+<div class="ui-stack ui-stack--lg">
+  <section
+    class="ui-card"
+    aria-labelledby="editor-content-page"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-content-page"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.CONTENT.PAGE' | translate }}
+      </h2>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-page-title"
+          >{{ 'EDITOR.CONTENT.PAGE_TITLE' | translate }}</label
+        >
+        <input
+          id="editor-page-title"
+          class="ui-input"
+          appBilletText
+          aria-describedby="editor-page-title-hint"
+          [formField]="fields.pageTitle"
+        />
+        <p
+          id="editor-page-title-hint"
+          class="ui-hint"
+        >
+          {{ 'EDITOR.CONTENT.PAGE_TITLE_HINT' | translate }}
+        </p>
+        <app-field-error [field]="fields.pageTitle" />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-content-lang"
+          >{{ 'EDITOR.LANGUAGE' | translate }}</label
+        >
+        <select
+          id="editor-content-lang"
+          class="ui-select"
+          aria-describedby="editor-content-lang-hint"
+          [formField]="fields.lang"
+        >
+          @for (option of langs; track option.lang) {
+            <option
+              [value]="option.lang"
+              [lang]="option.lang"
+            >
+              {{ option.labelKey | translate }}
+            </option>
+          }
+        </select>
+        <p
+          id="editor-content-lang-hint"
+          class="ui-hint"
+        >
+          {{ 'EDITOR.CONTENT.LANGUAGE_HINT' | translate }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="ui-card"
+    aria-labelledby="editor-content-hero"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-content-hero"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.CONTENT.HERO' | translate }}
+      </h2>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-hero-label"
+          >{{ 'EDITOR.CONTENT.HERO_LABEL' | translate }}</label
+        >
+        <input
+          id="editor-hero-label"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.hero.label"
+        />
+        <app-field-error [field]="fields.hero.label" />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-hero-line1"
+          >{{ 'EDITOR.CONTENT.HERO_TITLE_LINE1' | translate }}</label
+        >
+        <input
+          id="editor-hero-line1"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.hero.titleLine1"
+        />
+        <app-field-error [field]="fields.hero.titleLine1" />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-hero-line2"
+          >{{ 'EDITOR.CONTENT.HERO_TITLE_LINE2' | translate }}</label
+        >
+        <input
+          id="editor-hero-line2"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.hero.titleLine2"
+        />
+        <app-field-error [field]="fields.hero.titleLine2" />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-hero-sub"
+          >{{ 'EDITOR.CONTENT.HERO_SUB' | translate }}</label
+        >
+        <input
+          id="editor-hero-sub"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.hero.sub"
+        />
+        <app-field-error [field]="fields.hero.sub" />
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="ui-stack"
+    aria-labelledby="editor-content-blocks"
+  >
+    <div class="ui-cluster content-panel__blocks-header">
+      <h2
+        id="editor-content-blocks"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.CONTENT.BLOCKS' | translate }}
+      </h2>
+      <button
+        id="editor-add-block"
+        type="button"
+        class="ui-btn ui-btn--secondary ui-btn--sm"
+        aria-describedby="editor-add-block-hint"
+        [disabled]="!canAddBlock()"
+        [cdkMenuTriggerFor]="addMenu"
+      >
+        <i
+          class="bi bi-plus-lg"
+          aria-hidden="true"
+        ></i>
+        {{ 'EDITOR.CONTENT.ADD_BLOCK' | translate }}
+      </button>
+    </div>
+    <p
+      id="editor-add-block-hint"
+      class="ui-hint"
+    >
+      @if (canAddBlock()) {
+        {{ 'EDITOR.CONTENT.ADD_BLOCK_HINT' | translate }}
+      } @else {
+        {{ 'EDITOR.CONTENT.BLOCKS_LIMIT' | translate: { max: maxBlocks } }}
+      }
+    </p>
+
+    @if (document().blocks.length === 0) {
+      <p class="ui-alert ui-alert--info">
+        <i
+          class="bi bi-info-circle"
+          aria-hidden="true"
+        ></i>
+        {{ 'EDITOR.CONTENT.BLOCKS_EMPTY' | translate }}
+      </p>
+    }
+
+    <ol
+      class="content-panel__blocks ui-sortable"
+      role="list"
+      cdkDropList
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      @for (item of document().blocks; track item.id; let i = $index, count = $count) {
+        <li
+          cdkDrag
+          cdkDragLockAxis="y"
+          cdkDragPreviewContainer="parent"
+          (focusin)="onBlockFocus(item.id)"
+        >
+          <app-block-editor
+            [block]="fields.blocks[i]"
+            [position]="i + 1"
+            [count]="count"
+            (moveBy)="moveBlock(i, $event)"
+            (duplicate)="duplicateBlock(i)"
+            (remove)="removeBlock(i)"
+          />
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section
+    class="ui-card"
+    aria-labelledby="editor-content-signature"
+  >
+    <div class="ui-card__header">
+      <h2
+        id="editor-content-signature"
+        class="ui-card__title"
+      >
+        {{ 'EDITOR.CONTENT.SIGNATURE' | translate }}
+      </h2>
+    </div>
+    <div class="ui-card__body ui-stack">
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-signature-name"
+          >{{ 'EDITOR.CONTENT.SIGNATURE_NAME' | translate }}</label
+        >
+        <input
+          id="editor-signature-name"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.signature.name"
+        />
+        <app-field-error [field]="fields.signature.name" />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="editor-signature-sub"
+          >{{ 'EDITOR.CONTENT.SIGNATURE_SUB' | translate }}</label
+        >
+        <input
+          id="editor-signature-sub"
+          class="ui-input"
+          appBilletText
+          [formField]="fields.signature.sub"
+        />
+        <app-field-error [field]="fields.signature.sub" />
+      </div>
+    </div>
+  </section>
+</div>
+
+<p
+  class="ui-visually-hidden"
+  aria-live="polite"
+>
+  {{ announcement() }}
+</p>
+
+<ng-template #addMenu>
+  <div
+    class="ui-menu content-panel__menu"
+    cdkMenu
+    [appThemeScope]="document().theme"
+    [attr.aria-label]="'EDITOR.CONTENT.ADD_BLOCK' | translate"
+  >
+    @for (option of blockTypes; track option.type) {
+      <button
+        type="button"
+        class="ui-menu__item"
+        cdkMenuItem
+        (cdkMenuItemTriggered)="addBlock(option.type)"
+      >
+        <i
+          class="bi"
+          [class]="option.icon"
+          aria-hidden="true"
+        ></i>
+        {{ option.labelKey | translate }}
+      </button>
+    }
+  </div>
+</ng-template>

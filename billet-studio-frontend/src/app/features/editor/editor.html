@@ -1,0 +1,150 @@
+@if (found()) {
+  <div
+    class="editor"
+    [appThemeScope]="model().theme"
+  >
+    <app-editor-toolbar
+      [billetForm]="billetForm"
+      [canUndo]="canUndo()"
+      [canRedo]="canRedo()"
+      [saveStatus]="saveStatus()"
+      [saveFailure]="saveFailure()"
+      [(previewMode)]="previewMode"
+      (undo)="undo()"
+      (redo)="redo()"
+      (replay)="replay()"
+    />
+
+    @if (remote(); as change) {
+      <app-editor-remote-notice
+        class="editor__remote"
+        [change]="change"
+        (loadTheirs)="loadTheirs()"
+        (keepMine)="keepMine()"
+      />
+    }
+
+    <div class="editor__workspace">
+      <div
+        class="editor__tabs"
+        role="tablist"
+        [class]="tabBarClass()"
+        [attr.aria-label]="'EDITOR.TABS.LABEL' | translate"
+        (keydown)="onTabKeydown($event)"
+      >
+        @for (tab of tabs(); track tab.id) {
+          <button
+            type="button"
+            role="tab"
+            [class]="tabClass()"
+            [id]="'editor-tab-' + tab.id"
+            [attr.aria-selected]="tab.selected"
+            [attr.aria-controls]="tab.controls"
+            [tabIndex]="tab.tabIndex"
+            (click)="selectTab(tab.id)"
+          >
+            <i
+              class="bi"
+              [class]="tab.icon"
+              aria-hidden="true"
+            ></i>
+            <span>{{ tab.labelKey | translate }}</span>
+          </button>
+        }
+      </div>
+
+      <section
+        id="editor-panel-content"
+        class="editor__content"
+        [hidden]="!showContent()"
+        [attr.role]="contentPanel().role"
+        [attr.aria-labelledby]="contentPanel().labelledBy"
+        [attr.aria-label]="contentPanel().labelKey | translate"
+      >
+        <app-content-panel
+          [billetForm]="billetForm"
+          [document]="model()"
+        />
+      </section>
+
+      <section
+        id="editor-panel-preview"
+        class="ui-stage editor__preview"
+        [hidden]="!showPreview()"
+        [attr.role]="previewPanel().role"
+        [attr.aria-labelledby]="previewPanel().labelledBy"
+        [attr.aria-label]="previewPanel().labelKey | translate"
+      >
+        <app-preview-frame
+          [document]="model()"
+          [asset]="asset()"
+          [mode]="previewViewMode()"
+        />
+      </section>
+
+      @if (inspectorTab(); as tab) {
+        <section
+          class="editor__inspector"
+          role="tabpanel"
+          [id]="'editor-panel-' + tab"
+          [attr.aria-labelledby]="'editor-tab-' + tab"
+        >
+          @switch (tab) {
+            @case ('design') {
+              <app-design-panel
+                [billetForm]="billetForm"
+                [document]="model()"
+              />
+            }
+            @case ('spacing') {
+              <app-spacing-panel
+                [billetForm]="billetForm"
+                [document]="model()"
+              />
+            }
+            @case ('scene') {
+              <app-scene-panel
+                [billetForm]="billetForm"
+                [document]="model()"
+              />
+            }
+            @case ('particles') {
+              <app-particles-panel
+                [billetForm]="billetForm"
+                [document]="model()"
+              />
+            }
+          }
+        </section>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="ui-container">
+    <div class="ui-page">
+      <section
+        class="ui-card"
+        aria-labelledby="editor-not-found"
+      >
+        <div class="ui-card__body ui-stack editor__missing">
+          <span
+            class="ui-brand-mark ui-brand-mark--lg"
+            aria-hidden="true"
+          ></span>
+          <h1
+            id="editor-not-found"
+            class="ui-card__title"
+          >
+            {{ 'EDITOR.NOT_FOUND_TITLE' | translate }}
+          </h1>
+          <p class="ui-hint">{{ 'EDITOR.NOT_FOUND_TEXT' | translate }}</p>
+          <a
+            class="ui-btn ui-btn--primary"
+            routerLink="/billets"
+            >{{ 'EDITOR.NOT_FOUND_LINK' | translate }}</a
+          >
+        </div>
+      </section>
+    </div>
+  </div>
+}

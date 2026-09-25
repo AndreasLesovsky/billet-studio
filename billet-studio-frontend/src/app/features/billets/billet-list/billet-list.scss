@@ -1,4 +1,4 @@
-// Layout only; every visual comes from the ui-* classes.
+// Layout only; every visual comes from the ui-* classes, the swatch colours are theme data.
 @use '../../../../styles/breakpoints' as bp;
 
 .billet-list__header {
@@ -8,6 +8,31 @@
         flex-direction: row;
         align-items: flex-end;
         justify-content: space-between;
+    }
+}
+
+.billet-list__grid {
+    --ui-grid-min: 17rem;
+}
+
+.billet-list__title {
+    overflow-wrap: anywhere;
+}
+
+.billet-list__meta {
+    gap: var(--ui-space-2) var(--ui-space-3);
+}
+
+.billet-list__swatches {
+    display: flex;
+    gap: var(--ui-space-1);
+}
+
+.billet-list__actions {
+    justify-content: flex-start;
+
+    > :last-child {
+        margin-inline-start: auto;
     }
 }
 

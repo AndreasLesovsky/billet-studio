@@ -1,0 +1,32 @@
+// Layout only; every visual comes from the ui-* classes. The swatch colours are document data,
+// bound inline.
+
+:host {
+    display: block;
+}
+
+// Two columns where the inspector is wide enough, one on a phone.
+.palette-editor__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(9.5rem, 100%), 1fr));
+    gap: var(--ui-space-4) var(--ui-space-3);
+    margin: 0;
+}
+
+.palette-editor__derived {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--ui-space-2);
+
+    > .palette-editor__hex {
+        grid-column: 2;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.palette-editor__note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-2);
+}

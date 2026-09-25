@@ -1,0 +1,39 @@
+// Layout only; trigger and emoji button visuals live in src/styles/components/_pickers.scss.
+// The host is a .ui-field (label above the trigger).
+
+.emoji-picker__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-4);
+    inline-size: min(18rem, calc(100vw - 2 * var(--ui-space-4)));
+    margin-block: var(--ui-space-2);
+}
+
+// Scrolls on a short viewport; the free text field below stays in reach.
+.emoji-picker__groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    max-block-size: min(18rem, 50vh);
+    margin-inline: calc(-1 * var(--ui-space-2));
+    padding-inline: var(--ui-space-2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+// Six columns: every group of twelve fills whole rows (emoji-groups.ts, EMOJI_COLUMNS).
+.emoji-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.125rem;
+}
+
+.emoji-picker__custom {
+    display: flex;
+    gap: var(--ui-space-2);
+
+    > .ui-input {
+        flex: 1;
+        min-inline-size: 0;
+    }
+}

@@ -1,0 +1,153 @@
+@let palette = billetForm().palette;
+<section
+  class="ui-card"
+  aria-labelledby="editor-design-colors"
+>
+  <div class="ui-card__header">
+    <h2
+      id="editor-design-colors"
+      class="ui-card__title"
+    >
+      {{ 'EDITOR.DESIGN.COLORS' | translate }}
+    </h2>
+  </div>
+  <div class="ui-card__body ui-stack">
+    <div class="ui-stack ui-stack--sm">
+      <label class="ui-check">
+        <input
+          type="checkbox"
+          role="switch"
+          class="ui-switch"
+          aria-describedby="editor-palette-linked-hint"
+          [checked]="linked()"
+          (change)="setDarkLinked($event)"
+        />
+        {{ 'EDITOR.DESIGN.DARK_LINKED' | translate }}
+      </label>
+      <p
+        id="editor-palette-linked-hint"
+        class="ui-hint"
+      >
+        {{ 'EDITOR.DESIGN.DARK_LINKED_HINT' | translate }}
+      </p>
+    </div>
+
+    <div
+      class="ui-tabs"
+      role="tablist"
+      [attr.aria-label]="'EDITOR.DESIGN.PALETTE_TABS' | translate"
+      (keydown)="onTabKeydown($event)"
+    >
+      @for (option of modes; track option.mode) {
+        <button
+          type="button"
+          role="tab"
+          class="ui-tab"
+          aria-controls="editor-palette-panel"
+          [id]="tabId(option.mode)"
+          [attr.aria-selected]="mode() === option.mode"
+          [tabIndex]="mode() === option.mode ? 0 : -1"
+          (click)="selectMode(option.mode)"
+        >
+          <i
+            class="bi"
+            [class]="option.icon"
+            aria-hidden="true"
+          ></i>
+          {{ option.labelKey | translate }}
+        </button>
+      }
+    </div>
+
+    <div
+      id="editor-palette-panel"
+      class="ui-stack"
+      role="tabpanel"
+      [attr.aria-labelledby]="tabId(mode())"
+    >
+      @if (derived()) {
+        <p class="ui-alert ui-alert--info">
+          <i
+            class="bi bi-link-45deg"
+            aria-hidden="true"
+          ></i>
+          {{ 'EDITOR.DESIGN.DARK_DERIVED' | translate }}
+        </p>
+        <ul
+          class="palette-editor__grid"
+          role="list"
+        >
+          @for (role of roles(); track role.id) {
+            <li class="palette-editor__derived">
+              <span
+                class="ui-swatch"
+                aria-hidden="true"
+                [style.background-color]="role.hex"
+              ></span>
+              <span class="ui-label">{{ role.labelKey | translate }}</span>
+              <span class="ui-hint palette-editor__hex">{{ role.hex }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="palette-editor__grid">
+          @for (role of roles(); track role.id) {
+            <div class="ui-field">
+              <app-color-picker
+                [formField]="palette[mode()][role.key]"
+                [label]="role.labelKey | translate"
+                [documentColors]="documentColors()"
+                [presetColors]="presetColors()"
+                [contrastAgainst]="role.against"
+                (valueChange)="onColor(role.key, $event)"
+              />
+              <p class="ui-hint">{{ role.hintKey | translate }}</p>
+              <app-field-error [field]="palette[mode()][role.key]" />
+            </div>
+          }
+        </div>
+      }
+      @if (mode() === 'dark') {
+        <p class="ui-hint">{{ 'EDITOR.DESIGN.DARK_PREVIEW_HINT' | translate }}</p>
+      }
+
+      @if (issues().length > 0) {
+        <div class="ui-alert ui-alert--warning">
+          <i
+            class="bi bi-exclamation-triangle"
+            aria-hidden="true"
+          ></i>
+          <div>
+            <strong class="ui-alert__title">{{
+              'EDITOR.DESIGN.CONTRAST_TITLE' | translate
+            }}</strong>
+            <ul role="list">
+              @for (issue of issues(); track issue.id) {
+                <li>
+                  {{
+                    'EDITOR.DESIGN.CONTRAST_ISSUE'
+                      | translate
+                        : {
+                            fg: (issue.fgKey | translate),
+                            bg: (issue.bgKey | translate),
+                            ratio: issue.ratio,
+                            min: issue.min,
+                          }
+                  }}
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      <p class="ui-hint palette-editor__note">
+        <i
+          class="bi bi-info-circle"
+          aria-hidden="true"
+        ></i>
+        {{ 'EDITOR.DESIGN.ACCENT_NOTE' | translate }}
+      </p>
+    </div>
+  </div>
+</section>

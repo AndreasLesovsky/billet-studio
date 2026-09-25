@@ -1,0 +1,375 @@
+// The editor's form controls (shared/components: color-picker, range-slider, font-picker,
+// asset-picker, emoji-picker). Tokens only, so each control renders in the site theme and inside
+// any editor theme scope; their popovers are CDK overlays placed inline next to the trigger, so a
+// scope's tokens reach them too. Layout of the parts lives in the components.
+@use 'forms';
+
+// ---- Trigger: a button that looks like a field and opens a picker popover -------------------
+
+.ui-picker-trigger {
+    @extend %ui-control;
+
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    text-align: start;
+    cursor: pointer;
+
+    &[aria-expanded='true'] {
+        --_border: var(--ui-focus-ring);
+    }
+}
+
+.ui-picker-trigger__text {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ui-picker-trigger__muted {
+    color: var(--ui-text-muted);
+}
+
+.ui-picker-trigger__emoji {
+    flex: none;
+    font-size: 1.375rem;
+    line-height: 1;
+}
+
+.ui-picker-trigger__chevron {
+    flex: none;
+    margin-inline-start: auto;
+    color: var(--ui-text-muted);
+    font-size: 0.875rem;
+    transition: transform var(--ui-duration-fast) var(--ui-ease);
+
+    [aria-expanded='true'] > & {
+        transform: rotate(180deg);
+    }
+}
+
+// Small section title inside a picker popover.
+.ui-picker-heading {
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-family: var(--ui-font-body);
+    font-size: var(--ui-text-xs);
+    font-weight: var(--ui-font-weight-strong);
+    line-height: var(--ui-leading-tight);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+// ---- Filter chip: a toggle button (aria-pressed) in a row of filters -------------------------
+
+.ui-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-1);
+    min-block-size: 2rem;
+    padding: 0 var(--ui-space-3);
+    border: 1px solid var(--ui-border-strong);
+    border-radius: var(--ui-radius-pill);
+    background-color: var(--ui-surface);
+    color: var(--ui-text);
+    font-family: inherit;
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color var(--ui-duration-fast) var(--ui-ease),
+        border-color var(--ui-duration-fast) var(--ui-ease),
+        color var(--ui-duration-fast) var(--ui-ease);
+
+    &:hover:not(:disabled) {
+        background-color: var(--ui-surface-sunken);
+    }
+
+    // Weight and border change with the fill, so the pressed state is not colour alone.
+    &[aria-pressed='true'] {
+        border-color: var(--ui-accent);
+        background-color: var(--ui-accent-soft);
+        color: var(--ui-accent-ink);
+        font-weight: var(--ui-font-weight-strong);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+// ---- Colour picker ------------------------------------------------------------------------
+
+// A clickable data colour (bound inline as background-color). The inner ring keeps it visible on a
+// plane of the same colour (see .ui-swatch); the selected one gets the accent ring.
+.ui-swatch-button {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ui-radius-pill);
+    box-shadow: inset 0 0 0 1px var(--ui-border-strong);
+    cursor: pointer;
+    transition:
+        box-shadow var(--ui-duration-fast) var(--ui-ease),
+        transform var(--ui-duration-fast) var(--ui-ease);
+
+    &:hover {
+        transform: scale(1.08);
+    }
+
+    &[aria-pressed='true'] {
+        box-shadow:
+            inset 0 0 0 1px var(--ui-border-strong),
+            0 0 0 0.125rem var(--ui-surface-raised),
+            0 0 0 0.25rem var(--ui-accent);
+    }
+}
+
+// The plane and the hue bar draw a colour space, not the theme. Their gradients are its definition
+// (across: white to the pure hue, upwards: black to clear; around: the six hue primaries), so
+// they are the one place colour keywords appear outside themes.json. The thumbs carry a two-tone
+// ring (surface inside, text outside) that stays visible on any colour in either mode.
+.ui-color-plane {
+    position: relative;
+    block-size: 9.5rem;
+    border-radius: var(--ui-radius-md);
+    background:
+        linear-gradient(to top, black, transparent),
+        linear-gradient(to right, white, var(--ui-color-plane-hue, red));
+    box-shadow: inset 0 0 0 1px var(--ui-border);
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.ui-color-hue {
+    position: relative;
+    block-size: 0.875rem;
+    margin-inline: 0.5625rem;
+    border-radius: var(--ui-radius-pill);
+    background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+    box-shadow: inset 0 0 0 1px var(--ui-border);
+    cursor: pointer;
+    touch-action: none;
+}
+
+%ui-color-thumb {
+    position: absolute;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    border: 0.1875rem solid var(--ui-surface-raised);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 1px var(--ui-text),
+        var(--ui-shadow-sm);
+    pointer-events: none;
+}
+
+// Physical sides on purpose: the gradients run left to right in every writing direction.
+.ui-color-plane__thumb {
+    @extend %ui-color-thumb;
+
+    bottom: var(--ui-color-y, 0%);
+    left: var(--ui-color-x, 0%);
+    transform: translate(-50%, 50%);
+}
+
+.ui-color-hue__thumb {
+    @extend %ui-color-thumb;
+
+    top: 50%;
+    left: var(--ui-color-x, 0%);
+    transform: translate(-50%, -50%);
+}
+
+// ---- Listbox (font picker): options marked by aria-activedescendant, focus stays in the search --
+
+.ui-listbox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    max-block-size: min(16rem, 40vh);
+    margin: 0;
+    padding: var(--ui-space-1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface);
+    list-style: none;
+}
+
+.ui-option {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    min-block-size: 2.75rem;
+    padding: var(--ui-space-2) var(--ui-space-3);
+    border-radius: var(--ui-radius-sm);
+    color: var(--ui-text);
+    cursor: pointer;
+
+    &[aria-selected='true'] {
+        color: var(--ui-accent-ink);
+    }
+}
+
+// The keyboard's current option: DOM focus stays in the search field, so this is its focus ring.
+.ui-option--active {
+    background-color: var(--ui-surface-sunken);
+    outline: 0.125rem solid var(--ui-focus-ring);
+    outline-offset: -0.125rem;
+}
+
+.ui-option__meta {
+    color: var(--ui-text-muted);
+    font-family: var(--ui-font-body);
+    font-size: var(--ui-text-xs);
+    font-style: normal;
+    font-weight: var(--ui-font-weight-medium);
+}
+
+.ui-option__check {
+    flex: none;
+    margin-inline-start: auto;
+    color: var(--ui-accent-ink);
+    visibility: hidden;
+
+    [aria-selected='true'] > & {
+        visibility: visible;
+    }
+}
+
+// The sample line that shows the active font at reading size.
+.ui-font-preview {
+    padding: var(--ui-space-3);
+    overflow: hidden;
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface-sunken);
+    color: var(--ui-text);
+    font-size: var(--ui-text-2xl);
+    line-height: var(--ui-leading-tight);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// ---- Asset picker: native radios around a model preview -------------------------------------
+// Markup order: label.ui-asset-option > input + __frame + __name (> __check); the states select by
+// sibling from the radio.
+
+// A grid of one column: preview above the name, cells of a row aligned at the top.
+.ui-asset-option {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--ui-space-2);
+    min-inline-size: 0;
+    cursor: pointer;
+
+    &:has(input:disabled) {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+.ui-asset-option__frame {
+    display: block;
+    padding: 0.1875rem;
+    border-radius: calc(var(--ui-radius-md) + 0.1875rem);
+    box-shadow: 0 0 0 1px var(--ui-border);
+    transition: box-shadow var(--ui-duration-fast) var(--ui-ease);
+
+    :checked + & {
+        box-shadow: 0 0 0 0.125rem var(--ui-accent);
+    }
+
+    :focus-visible + & {
+        outline: 0.125rem solid var(--ui-focus-ring);
+        outline-offset: 0.1875rem;
+    }
+}
+
+// Long German compounds (Champagnerflasche) break inside the narrow cell instead of overflowing it.
+.ui-asset-option__name {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-1);
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-medium);
+    line-height: var(--ui-leading-tight);
+
+    // --_checked reaches the tick inside.
+    :checked ~ & {
+        --_checked: 1;
+
+        color: var(--ui-text);
+        font-weight: var(--ui-font-weight-strong);
+    }
+}
+
+.ui-asset-option__check {
+    flex: none;
+    color: var(--ui-accent-ink);
+    opacity: var(--_checked, 0);
+    transition: opacity var(--ui-duration-fast) var(--ui-ease);
+}
+
+// ---- Emoji picker -------------------------------------------------------------------------
+
+.ui-emoji-button {
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ui-radius-md);
+    background: none;
+    font-size: 1.375rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--ui-duration-fast) var(--ui-ease);
+
+    &:hover {
+        background-color: var(--ui-surface-sunken);
+    }
+
+    &[aria-pressed='true'] {
+        background-color: var(--ui-accent-soft);
+        box-shadow: inset 0 0 0 0.125rem var(--ui-accent);
+    }
+}
+
+// ---- Range slider: readout and marks around .ui-range --------------------------------------
+
+.ui-range-readout {
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+// Spans the thumb centres of a .ui-range (thumb 1.25rem), so a mark at n % sits under the thumb.
+.ui-range-marks {
+    position: relative;
+    block-size: 0.375rem;
+    margin-inline: 0.625rem;
+}
+
+.ui-range-marks__tick {
+    position: absolute;
+    left: var(--ui-range-mark, 0%);
+    inline-size: 1px;
+    block-size: 100%;
+    background-color: var(--ui-border-strong);
+    transform: translateX(-50%);
+}

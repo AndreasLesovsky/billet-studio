@@ -1,0 +1,44 @@
+// Layout only; trigger, swatches, plane and hue visuals live in src/styles/components/_pickers.scss.
+// The host is a .ui-field (label above the trigger).
+
+.color-picker__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    inline-size: min(17.5rem, calc(100vw - 2 * var(--ui-space-4)));
+    margin-block: var(--ui-space-2);
+}
+
+.color-picker__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-2);
+}
+
+// Field and EyeDropper side by side, the message on its own line below both.
+.color-picker__hex {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: var(--ui-space-2);
+
+    > .ui-input {
+        flex: 1;
+        min-inline-size: 0;
+    }
+
+    > app-field-error {
+        flex-basis: 100%;
+    }
+
+    // Only comment anchors while there is no message: no empty line below the field.
+    > app-field-error:empty {
+        display: none;
+    }
+}
+
+.color-picker__contrast {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-1);
+}

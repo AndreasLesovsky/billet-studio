@@ -99,17 +99,12 @@ export const routes: Routes = [
           ),
         data: { breadcrumb: 'BREADCRUMB.TEMPLATES' },
       },
-      // Open to guests: their billets live on this device.
+      // Open to guests: their billets live on this device. The list, /billets/new and the editor.
       {
         path: 'billets',
         data: { breadcrumb: 'BREADCRUMB.BILLETS' },
-        children: [
-          {
-            path: '',
-            loadComponent: () =>
-              import('./features/billets/billet-list/billet-list').then((m) => m.BilletList),
-          },
-        ],
+        loadChildren: () =>
+          import('./features/billets/billets.routes').then((m) => m.BILLET_ROUTES),
       },
       {
         path: 'account',

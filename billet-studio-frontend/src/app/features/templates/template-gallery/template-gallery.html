@@ -3,15 +3,17 @@
     <header class="ui-page__header">
       <h1 class="ui-page__title">{{ 'TEMPLATE_GALLERY.TITLE' | translate }}</h1>
       <p class="ui-page__lead">{{ 'TEMPLATE_GALLERY.LEAD' | translate }}</p>
-      <p
-        id="template-gallery-editor-soon"
-        class="ui-hint template-gallery__notice"
-      >
+      <p class="ui-hint template-gallery__notice">
         <i
-          class="bi bi-info-circle"
+          class="bi bi-file-earmark-plus"
           aria-hidden="true"
         ></i>
-        {{ 'BILLETS.EDITOR_SOON' | translate }}
+        {{ 'TEMPLATE_GALLERY.BLANK_LEAD' | translate }}
+        <a
+          class="ui-link"
+          routerLink="/billets/new"
+          >{{ 'TEMPLATE_GALLERY.BLANK' | translate }}</a
+        >
       </p>
     </header>
 
@@ -47,15 +49,14 @@
                 >{{ card.themeNameKey | translate }}</span
               >
             </p>
-            <button
-              type="button"
-              class="ui-btn ui-btn--primary ui-btn--block"
-              disabled
-              aria-describedby="template-gallery-editor-soon"
+            <a
+              class="ui-btn ui-btn--secondary ui-btn--block"
+              routerLink="/billets/new"
+              [queryParams]="{ template: card.id }"
             >
               {{ 'TEMPLATE_GALLERY.USE' | translate }}
               <span class="ui-visually-hidden">{{ card.nameKey | translate }}</span>
-            </button>
+            </a>
           </div>
         </li>
       }

@@ -1,0 +1,109 @@
+// The editor's chrome (features/editor): toolbar and bottom tab bar, the preview stage and its
+// device frame, and the sortable block list. Everything here renders inside the editor's
+// ThemeScope, so every token is the editor theme's.
+
+// ---- Bars: the toolbar on top, the tab bar at the bottom (phones) ---------------------------
+
+.ui-editor-bar {
+    border-block-end: 1px solid var(--ui-border);
+    background-color: var(--ui-surface);
+
+    @supports (backdrop-filter: blur(1rem)) {
+        background-color: color-mix(in oklab, var(--ui-surface) 88%, transparent);
+        backdrop-filter: saturate(1.6) blur(0.75rem);
+    }
+}
+
+.ui-editor-bar--bottom {
+    border-block-start: 1px solid var(--ui-border);
+    border-block-end: 0;
+}
+
+// A tab with its icon above the label, the active line on top (bottom tab bar).
+.ui-tab--stacked {
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.125rem;
+    min-inline-size: 0;
+    padding-inline: var(--ui-space-1);
+    margin-block: -1px 0;
+    border-block-start: 0.125rem solid transparent;
+    border-block-end: 0;
+    border-radius: 0;
+    font-size: var(--ui-text-xs);
+
+    > .bi {
+        font-size: 1.125rem;
+    }
+
+    &[aria-selected='true'] {
+        border-block-start-color: var(--ui-accent);
+        color: var(--ui-accent-ink);
+    }
+}
+
+// ---- Preview stage and device frame ---------------------------------------------------------
+
+.ui-stage {
+    border-radius: var(--ui-radius-xl);
+    background-color: var(--ui-surface-sunken);
+}
+
+// A device drawn with tokens: a bezel (border) around a scrolling screen, clipped to its radius.
+.ui-device {
+    --ui-device-bezel: 0.625rem;
+
+    display: flex;
+    overflow: hidden;
+    border: var(--ui-device-bezel) solid var(--ui-border-strong);
+    border-radius: 2.75rem;
+    background-color: var(--ui-border-strong);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.ui-device--desktop {
+    --ui-device-bezel: 0.5rem;
+
+    border-radius: var(--ui-radius-lg);
+}
+
+.ui-device__screen {
+    flex: 1;
+    min-inline-size: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+// ---- Sortable list (CDK drag and drop, preview kept in the list) ----------------------------
+
+.ui-sortable {
+    > .cdk-drag-preview {
+        border-radius: var(--ui-radius-lg);
+        box-shadow: var(--ui-shadow-lg);
+    }
+
+    > .cdk-drag-placeholder {
+        opacity: 0.35;
+    }
+
+    // While an item is dragged the others slide aside. The preview (a clone in the list) follows
+    // the pointer at once, the placeholder jumps (the drop measures where it is), and on the drop
+    // the preview glides into its place.
+    &.cdk-drop-list-dragging {
+        > .cdk-drag {
+            transition: transform var(--ui-duration-base) var(--ui-ease);
+        }
+
+        > .cdk-drag-preview,
+        > .cdk-drag-placeholder {
+            transition: none;
+        }
+
+        > .cdk-drag-animating {
+            transition: transform var(--ui-duration-base) var(--ui-ease);
+        }
+    }
+}

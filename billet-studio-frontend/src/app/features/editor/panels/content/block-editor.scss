@@ -1,0 +1,80 @@
+// Layout only; every visual comes from the ui-* classes.
+
+:host {
+    display: block;
+}
+
+.block-editor__header {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding-block-start: var(--ui-space-3);
+    padding-inline-start: var(--ui-space-2);
+}
+
+.block-editor__handle {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 2rem;
+    cursor: grab;
+    touch-action: none;
+}
+
+.block-editor__title {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--ui-space-2);
+    min-inline-size: 0;
+}
+
+.block-editor__actions {
+    display: flex;
+    flex: none;
+    gap: var(--ui-space-1);
+}
+
+.block-editor__text-head,
+.block-editor__text-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-2);
+}
+
+.block-editor__text-foot {
+    align-items: flex-start;
+}
+
+.block-editor__markup {
+    display: flex;
+    gap: var(--ui-space-1);
+}
+
+.block-editor__textarea--short {
+    min-block-size: 3rem;
+}
+
+.block-editor__counter {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+// Symbol and label side by side while the label keeps room for its text, else stacked.
+.block-editor__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+    align-items: start;
+
+    > :first-child {
+        flex: 0 0 9.5rem;
+    }
+
+    > :last-child {
+        flex: 1 1 12rem;
+        min-inline-size: 0;
+    }
+}

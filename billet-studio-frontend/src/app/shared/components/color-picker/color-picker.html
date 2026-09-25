@@ -1,0 +1,178 @@
+@if (label()) {
+  <label
+    class="ui-label"
+    [id]="id + '-label'"
+    [for]="id + '-trigger'"
+    >{{ label() }}</label
+  >
+}
+<button
+  #trigger
+  #origin="cdkOverlayOrigin"
+  type="button"
+  class="ui-picker-trigger"
+  cdkOverlayOrigin
+  aria-haspopup="dialog"
+  [id]="id + '-trigger'"
+  [disabled]="disabled()"
+  [attr.aria-expanded]="popover.expanded()"
+  [attr.aria-controls]="popover.expanded() ? id + '-panel' : null"
+  [attr.aria-labelledby]="labelledBy()"
+  (click)="popover.toggle()"
+>
+  <span
+    class="ui-swatch"
+    aria-hidden="true"
+    [style.background-color]="current()"
+  ></span>
+  <span class="ui-picker-trigger__text">{{ value() }}</span>
+  <i
+    class="bi bi-chevron-down ui-picker-trigger__chevron"
+    aria-hidden="true"
+  ></i>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="popover.expanded()"
+  [cdkConnectedOverlayPositions]="popover.positions"
+  [cdkConnectedOverlayUsePopover]="'inline'"
+  [cdkConnectedOverlayPush]="true"
+  (attach)="onAttach()"
+  (detach)="onDetach()"
+  (overlayOutsideClick)="popover.close()"
+>
+  <div
+    #panel
+    class="ui-popover color-picker__panel"
+    role="dialog"
+    [id]="id + '-panel'"
+    [attr.aria-label]="label() || ('CONTROLS.COLOR.PANEL' | translate)"
+    (focusout)="popover.focusOut($event)"
+  >
+    @for (group of groups(); track group.id) {
+      <section
+        class="ui-stack ui-stack--sm"
+        [attr.aria-labelledby]="id + '-' + group.id"
+      >
+        <h3
+          class="ui-picker-heading"
+          [id]="id + '-' + group.id"
+        >
+          {{ group.titleKey | translate }}
+        </h3>
+        <div
+          class="color-picker__swatches"
+          role="group"
+          [attr.aria-labelledby]="id + '-' + group.id"
+        >
+          @for (color of group.colors; track color) {
+            <button
+              type="button"
+              class="ui-swatch-button"
+              [style.background-color]="color"
+              [attr.aria-pressed]="color === current()"
+              [attr.aria-label]="'CONTROLS.COLOR.SWATCH' | translate: { color }"
+              [attr.title]="color"
+              [tabIndex]="color === group.tabStop ? 0 : -1"
+              (click)="pick(color)"
+              (keydown)="onSwatchKey($event)"
+            ></button>
+          }
+        </div>
+      </section>
+    }
+
+    <div
+      #plane
+      class="ui-color-plane"
+      role="slider"
+      tabindex="0"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-label]="'CONTROLS.COLOR.PLANE' | translate"
+      [attr.aria-valuenow]="planeText().saturation"
+      [attr.aria-valuetext]="'CONTROLS.COLOR.PLANE_TEXT' | translate: planeText()"
+      [style.--ui-color-plane-hue]="hueColor()"
+      (pointerdown)="onPointer($event, 'plane')"
+      (pointermove)="onPointer($event, 'plane')"
+      (keydown)="onSliderKey($event, 'plane')"
+    >
+      <span
+        class="ui-color-plane__thumb"
+        [style.--ui-color-x]="thumbs().saturation"
+        [style.--ui-color-y]="thumbs().brightness"
+        [style.background-color]="current()"
+      ></span>
+    </div>
+
+    <div
+      class="ui-color-hue"
+      role="slider"
+      tabindex="0"
+      aria-valuemin="0"
+      aria-valuemax="360"
+      [attr.aria-label]="'CONTROLS.COLOR.HUE' | translate"
+      [attr.aria-valuenow]="hueDegrees()"
+      [attr.aria-valuetext]="'CONTROLS.COLOR.HUE_TEXT' | translate: { hue: hueDegrees() }"
+      (pointerdown)="onPointer($event, 'hue')"
+      (pointermove)="onPointer($event, 'hue')"
+      (keydown)="onSliderKey($event, 'hue')"
+    >
+      <span
+        class="ui-color-hue__thumb"
+        [style.--ui-color-x]="thumbs().hue"
+        [style.background-color]="hueColor()"
+      ></span>
+    </div>
+
+    <div class="ui-field color-picker__hex">
+      <label
+        class="ui-visually-hidden"
+        [for]="id + '-hex'"
+        >{{ 'CONTROLS.COLOR.HEX' | translate }}</label
+      >
+      <input
+        class="ui-input"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        [id]="id + '-hex'"
+        [formField]="hexForm.hex"
+        (input)="onHexInput($event)"
+        (change)="commitHex()"
+        (keydown.enter)="commitHex()"
+      />
+      @if (eyeDropper) {
+        <button
+          type="button"
+          class="ui-btn ui-btn--neutral ui-btn--icon"
+          [attr.aria-label]="'CONTROLS.COLOR.EYEDROPPER' | translate"
+          [attr.title]="'CONTROLS.COLOR.EYEDROPPER' | translate"
+          (click)="pickFromScreen()"
+        >
+          <i
+            class="bi bi-eyedropper"
+            aria-hidden="true"
+          ></i>
+        </button>
+      }
+      <app-field-error [field]="hexForm.hex" />
+    </div>
+
+    @if (contrastReadout(); as readout) {
+      <div class="color-picker__contrast">
+        <p class="ui-cluster">
+          {{ 'CONTROLS.COLOR.CONTRAST' | translate: { ratio: readout.ratio } }}
+          <span
+            class="ui-badge"
+            [class]="readout.badge"
+            >{{ readout.labelKey | translate }}</span
+          >
+        </p>
+        <p class="ui-hint">{{ readout.hintKey | translate }}</p>
+      </div>
+    }
+  </div>
+</ng-template>

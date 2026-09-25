@@ -20,18 +20,16 @@
       </h1>
       <p class="ui-page__lead">{{ 'HOME.LEAD' | translate }}</p>
       <div class="ui-cluster home__actions">
-        <button
-          type="button"
+        <a
           class="ui-btn ui-btn--primary ui-btn--lg"
-          disabled
-          aria-describedby="home-editor-soon"
+          routerLink="/templates"
         >
           <i
             class="bi bi-plus-lg"
             aria-hidden="true"
           ></i>
           {{ 'NAV.NEW_BILLET' | translate }}
-        </button>
+        </a>
         @if (isLoggedIn()) {
           <a
             class="ui-btn ui-btn--secondary ui-btn--lg"
@@ -46,12 +44,6 @@
           >
         }
       </div>
-      <p
-        id="home-editor-soon"
-        class="ui-hint"
-      >
-        {{ 'BILLETS.EDITOR_SOON' | translate }}
-      </p>
     </section>
 
     <section
@@ -84,7 +76,8 @@
             <h3 class="ui-card__title home__template-title">
               <a
                 class="ui-card__link"
-                routerLink="/templates"
+                routerLink="/billets/new"
+                [queryParams]="{ template: card.id }"
                 >{{ card.nameKey | translate }}</a
               >
             </h3>

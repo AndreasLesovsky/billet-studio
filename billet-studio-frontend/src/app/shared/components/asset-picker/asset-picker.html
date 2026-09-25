@@ -1,0 +1,71 @@
+<fieldset
+  class="asset-picker"
+  [disabled]="disabled()"
+  [attr.aria-labelledby]="ariaLabelledby()"
+>
+  @if (label()) {
+    <legend class="ui-label asset-picker__legend">{{ label() }}</legend>
+  }
+  @if (occasions().length > 1) {
+    <div
+      class="ui-cluster"
+      role="group"
+      [attr.aria-label]="'CONTROLS.ASSET.OCCASIONS' | translate"
+    >
+      <button
+        type="button"
+        class="ui-chip"
+        [attr.aria-pressed]="occasion() === null"
+        (click)="setOccasion(null)"
+      >
+        {{ 'COMMON.ALL' | translate }}
+      </button>
+      @for (o of occasions(); track o.key) {
+        <button
+          type="button"
+          class="ui-chip"
+          [attr.aria-pressed]="occasion() === o.key"
+          (click)="setOccasion(o.key)"
+        >
+          @if (o.labelKey) {
+            {{ o.labelKey | translate }}
+          } @else {
+            {{ o.key }}
+          }
+        </button>
+      }
+    </div>
+  }
+  <div class="asset-picker__grid">
+    @for (m of options(); track m.slug) {
+      <label
+        class="ui-asset-option"
+        [attr.title]="m.credit"
+      >
+        <input
+          type="radio"
+          class="ui-visually-hidden"
+          [name]="group"
+          [value]="m.slug"
+          [checked]="value() === m.slug"
+          (change)="select(m.slug)"
+        />
+        <span class="ui-asset-option__frame">
+          <app-asset-thumb
+            [src]="m.previewUrl"
+            [emoji]="m.emoji"
+          />
+        </span>
+        <span class="ui-asset-option__name">
+          <i
+            class="bi bi-check-circle-fill ui-asset-option__check"
+            aria-hidden="true"
+          ></i>
+          <span class="asset-picker__name">{{ m.name }}</span>
+        </span>
+      </label>
+    } @empty {
+      <p class="ui-hint">{{ 'COMMON.NO_RESULTS' | translate }}</p>
+    }
+  </div>
+</fieldset>

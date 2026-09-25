@@ -7,7 +7,13 @@
   "ignoreUnresolvedImports": ["./env.js", "./theme-boot.js", "./fonts/fonts.css"],
 
   // Generated data: FONT_CATALOG feeds the editor's font picker; the renderer reads FONT_BY_ID.
-  "ignoreFindings": ["src/app/billet/fonts/font-catalog.generated.ts"],
+  // EditorPanel is the abstract base of the editor panels: its two inputs are read by the classes
+  // that extend it, which the unused-component-input check does not follow (and its suppression
+  // comment is not honoured for that check).
+  "ignoreFindings": [
+    "src/app/billet/fonts/font-catalog.generated.ts",
+    "src/app/features/editor/panels/editor-panel.ts",
+  ],
 
   // Class members fallow's static analysis cannot see as "used":
   // - whenReady: called through inject() in an app initializer

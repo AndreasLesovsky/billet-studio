@@ -1,0 +1,209 @@
+@let field = block();
+<article
+  class="ui-card block-editor"
+  [id]="id()"
+  [attr.aria-labelledby]="id() + '-title'"
+>
+  <header class="ui-card__header block-editor__header">
+    <span
+      class="block-editor__handle"
+      cdkDragHandle
+      aria-hidden="true"
+      [title]="'EDITOR.CONTENT.DRAG' | translate"
+    >
+      <i class="bi bi-grip-vertical"></i>
+    </span>
+    <h3
+      class="ui-card__title block-editor__title"
+      [id]="id() + '-title'"
+    >
+      <i
+        class="bi"
+        [class]="type().icon"
+        aria-hidden="true"
+      ></i>
+      {{ type().labelKey | translate }}
+      <span class="ui-badge ui-badge--muted">{{ position() }}</span>
+    </h3>
+    <div class="block-editor__actions">
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+        data-move="up"
+        [attr.aria-label]="'EDITOR.CONTENT.MOVE_UP' | translate"
+        [disabled]="position() === 1"
+        (click)="moveBy.emit(-1)"
+      >
+        <i
+          class="bi bi-arrow-up"
+          aria-hidden="true"
+        ></i>
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+        data-move="down"
+        [attr.aria-label]="'EDITOR.CONTENT.MOVE_DOWN' | translate"
+        [disabled]="position() === count()"
+        (click)="moveBy.emit(1)"
+      >
+        <i
+          class="bi bi-arrow-down"
+          aria-hidden="true"
+        ></i>
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+        [attr.aria-label]="'EDITOR.CONTENT.DUPLICATE' | translate"
+        (click)="duplicate.emit()"
+      >
+        <i
+          class="bi bi-copy"
+          aria-hidden="true"
+        ></i>
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+        [attr.aria-label]="'EDITOR.CONTENT.DELETE' | translate"
+        (click)="remove.emit()"
+      >
+        <i
+          class="bi bi-trash"
+          aria-hidden="true"
+        ></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="ui-card__body ui-stack">
+    @if (!field.text().hidden()) {
+      <div class="ui-field">
+        <div class="block-editor__text-head">
+          <label
+            class="ui-label"
+            [for]="id() + '-text'"
+            >{{ 'EDITOR.CONTENT.BLOCK_TEXT' | translate }}</label
+          >
+          <div
+            class="block-editor__markup"
+            role="toolbar"
+            [attr.aria-label]="'EDITOR.CONTENT.FORMATTING' | translate"
+            [attr.aria-controls]="id() + '-text'"
+          >
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+              [attr.aria-label]="'EDITOR.CONTENT.ITALIC' | translate"
+              (click)="wrap('*')"
+            >
+              <i
+                class="bi bi-type-italic"
+                aria-hidden="true"
+              ></i>
+            </button>
+            <button
+              type="button"
+              class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+              [attr.aria-label]="'EDITOR.CONTENT.BOLD' | translate"
+              (click)="wrap('**')"
+            >
+              <i
+                class="bi bi-type-bold"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+        </div>
+        <textarea
+          #textarea
+          class="ui-textarea"
+          [class.block-editor__textarea--short]="value().type === 'heading'"
+          appBilletText
+          [id]="id() + '-text'"
+          [formField]="field.text"
+          [attr.aria-describedby]="id() + '-markup'"
+        ></textarea>
+        <div class="block-editor__text-foot">
+          <p
+            class="ui-hint"
+            [id]="id() + '-markup'"
+          >
+            {{ 'EDITOR.CONTENT.MARKUP_HINT' | translate }}
+          </p>
+          <p class="ui-hint block-editor__counter">
+            {{
+              'EDITOR.CONTENT.COUNTER' | translate: { count: value().text.length, max: maxText() }
+            }}
+          </p>
+        </div>
+        <app-field-error [field]="field.text" />
+      </div>
+    }
+
+    @if (!field.icon().hidden()) {
+      <div class="block-editor__row">
+        <div class="ui-field">
+          <app-emoji-picker
+            [formField]="field.icon"
+            [label]="'EDITOR.CONTENT.CARD_ICON' | translate"
+          />
+          <app-field-error [field]="field.icon" />
+        </div>
+        <div class="ui-field">
+          <label
+            class="ui-label"
+            [for]="id() + '-aria-label'"
+            >{{ 'EDITOR.CONTENT.CARD_ARIA_LABEL' | translate }}</label
+          >
+          <input
+            class="ui-input"
+            appBilletText
+            [id]="id() + '-aria-label'"
+            [formField]="field.ariaLabel"
+            [attr.aria-describedby]="id() + '-aria-label-hint'"
+          />
+          <p
+            class="ui-hint"
+            [id]="id() + '-aria-label-hint'"
+          >
+            {{ 'EDITOR.CONTENT.CARD_ARIA_LABEL_HINT' | translate }}
+          </p>
+          <app-field-error [field]="field.ariaLabel" />
+        </div>
+      </div>
+    }
+
+    @if (!field.dividerStyle().hidden()) {
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          [for]="id() + '-divider'"
+          >{{ 'EDITOR.CONTENT.DIVIDER_STYLE' | translate }}</label
+        >
+        <select
+          class="ui-select"
+          [id]="id() + '-divider'"
+          [formField]="field.dividerStyle"
+        >
+          @for (option of dividerStyles; track option.style) {
+            <option [value]="option.style">{{ option.labelKey | translate }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="ui-field">
+      <app-range-slider
+        [formField]="field.spaceAdjust"
+        [label]="'EDITOR.CONTENT.SPACE_ADJUST' | translate"
+        [marks]="spaceMarks"
+        [valueText]="spaceText()"
+        [defaultValue]="0"
+      />
+      <p class="ui-hint">{{ 'EDITOR.CONTENT.SPACE_ADJUST_HINT' | translate }}</p>
+      <app-field-error [field]="field.spaceAdjust" />
+    </div>
+  </div>
+</article>

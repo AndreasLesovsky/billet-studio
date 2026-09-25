@@ -1,0 +1,52 @@
+// Layout only; the host is .ui-editor-bar.ui-cluster, everything else ui-* classes.
+@use '../../../styles/breakpoints' as bp;
+
+:host {
+    gap: var(--ui-space-2) var(--ui-space-4);
+    padding: var(--ui-space-2) var(--ui-space-4);
+
+    @include bp.up(md) {
+        padding-inline: var(--ui-space-6);
+    }
+}
+
+.editor-toolbar__title {
+    flex: 1 1 14rem;
+    max-inline-size: 28rem;
+}
+
+.editor-toolbar__tools {
+    gap: var(--ui-space-2) var(--ui-space-3);
+}
+
+// Phones: the content panel has the language too, and the bar keeps to the essentials.
+.editor-toolbar__lang {
+    @include bp.down(md) {
+        display: none;
+    }
+
+    > .ui-select {
+        inline-size: auto;
+    }
+}
+
+.editor-toolbar__status {
+    min-inline-size: 9rem;
+
+    > .ui-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--ui-space-1);
+        white-space: nowrap;
+    }
+}
+
+.editor-toolbar__share {
+    margin-inline-start: auto;
+
+    > .ui-hint {
+        max-inline-size: 16rem;
+        font-size: var(--ui-text-xs);
+        line-height: var(--ui-leading-tight);
+    }
+}

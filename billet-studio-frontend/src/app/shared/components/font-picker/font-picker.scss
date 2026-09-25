@@ -1,0 +1,20 @@
+// Layout only; trigger, chips and list visuals live in src/styles/components/_pickers.scss.
+// The host is a .ui-field (label above the trigger).
+
+.font-picker__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    inline-size: min(20rem, calc(100vw - 2 * var(--ui-space-4)));
+    margin-block: var(--ui-space-2);
+}
+
+.font-picker__family {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: var(--ui-text-lg);
+    line-height: var(--ui-leading-tight);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
