@@ -36,6 +36,11 @@ Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), ra
 - `DeactivationReason`: user actor `NOT_NEEDED_ANYMORE`, `PRIVACY_CONCERNS`, `TOO_COMPLICATED`,
   `OTHER_SERVICE`, `OTHER`; admin actor `SPAM`, `FRAUD`, `TERMS_VIOLATION`, `ABUSE`, `SECURITY_RISK`.
   Each side may only send its own values (else `VALIDATION_ERROR`).
+- Request bodies are capped before parsing: 16 KiB for every JSON body outside `/v1/billets` (its caps
+  are listed there), a declared `Content-Length` refused unread, a chunked body cut off at the cap. The
+  JSON parser refuses a string over 65 536 characters, nesting deeper than 32 levels and a body over
+  the import cap. All of these answer 400 `VALIDATION_ERROR`.
+- Rate limits count per client IP and endpoint; an IPv6 client counts by its /64 prefix.
 
 ## DTOs
 
@@ -161,5 +166,10 @@ are serialised, so a billet only ever gets one share token.
 | Method | Path | Response |
 |---|---|---|
 | GET | `/{shareToken}` | 200 `PublicBilletDto` (the published snapshot) / 404 `BILLET_NOT_FOUND` when unknown or unpublished — identical body |
+
+A link works only while its owner's account is active: an admin lock or a self-deactivation (also
+during the 30-day grace period before deletion) answers the same 404 `BILLET_NOT_FOUND`, and
+reactivating the account (login within the grace period, an admin unlock) restores its links with
+their tokens. Deleting the account deletes its billets.
 
 Rate limit 120/min per IP. Response header `X-Robots-Tag: noindex`.

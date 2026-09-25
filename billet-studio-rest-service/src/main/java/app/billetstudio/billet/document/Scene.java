@@ -1,6 +1,7 @@
 package app.billetstudio.billet.document;
 
 import app.billetstudio.billet.document.validation.MultipleOf;
+import app.billetstudio.billet.document.validation.NoControlCharacters;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -20,6 +21,6 @@ public record Scene(
     @NotNull @DecimalMin("-1.0") @DecimalMax("2.0") Double cameraHeight,
     @NotNull Boolean autoRotate,
     @NotNull @DecimalMin("0") @DecimalMax("3") Double autoRotateSpeed,
-    @NotNull @Size(max = 120) String hint,
-    @NotNull @Size(max = 160) String ariaLabel) {
+    @NotNull @NoControlCharacters @Size(max = 120) String hint,
+    @NotNull @NoControlCharacters @Size(max = 160) String ariaLabel) {
 }

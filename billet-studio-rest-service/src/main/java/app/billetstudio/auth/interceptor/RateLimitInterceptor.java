@@ -33,8 +33,9 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Enforces {@link RateLimited}: one token bucket per client IP and endpoint. The endpoint is the HTTP method
- * plus the matched route pattern, not the raw URI, so /v1/users/5 and /v1/users/6 share one bucket.
+ * Enforces {@link RateLimited}: one token bucket per client (ClientIp.rateLimitKey: the IPv4 address, the IPv6 /64)
+ * and endpoint. The endpoint is the HTTP method plus the matched route pattern, not the raw URI, so /v1/users/5 and
+ * /v1/users/6 share one bucket.
  */
 @Slf4j
 @Component
@@ -66,7 +67,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         AtomicBoolean allowed = new AtomicBoolean();
         // Consumed inside compute: the sweep drops buckets under the same per-key lock, so it cannot drop one between
         // the lookup and the consume and lose the token.
-        buckets.compute(clientIp + ":" + endpoint, (key, entry) -> {
+        buckets.compute(ClientIp.rateLimitKey(clientIp) + ":" + endpoint, (key, entry) -> {
             Entry current = entry != null ? entry : new Entry(limitFor(rateLimited));
             allowed.set(current.bucket().tryConsume(1));
             return current;

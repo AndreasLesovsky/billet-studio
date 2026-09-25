@@ -42,8 +42,8 @@ public interface BilletRepository extends JpaRepository<Billet, Long> {
     List<BilletSummaryRow> findSummariesByUserId(@Param("userId") Long userId);
 
     /**
-     * Public link: published, and only while the owner's account is active - a locked or deactivated account takes
-     * its shared pages offline with it.
+     * Public link: published, and only while the owner's account is active - an admin lock or a self-deactivation
+     * (also while it awaits deletion) takes the shared pages offline with it, a reactivation brings them back.
      */
     @Query("SELECT b FROM Billet b WHERE b.shareToken = :shareToken AND b.publishedDocument IS NOT NULL "
         + "AND b.user.active = true")

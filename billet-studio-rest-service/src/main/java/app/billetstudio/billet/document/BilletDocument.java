@@ -2,6 +2,7 @@ package app.billetstudio.billet.document;
 
 import java.util.List;
 
+import app.billetstudio.billet.document.validation.NoControlCharacters;
 import app.billetstudio.billet.document.validation.ValidBilletDocument;
 
 import jakarta.validation.Valid;
@@ -19,8 +20,8 @@ import jakarta.validation.constraints.Size;
 public record BilletDocument(
     @NotNull Integer schemaVersion,
     @NotNull @Pattern(regexp = "^[a-z0-9-]{1,40}$") String theme,
-    @NotNull @Size(min = 1, max = 120) String title,
-    @NotNull @Size(max = 120) String pageTitle,
+    @NotNull @NoControlCharacters @Size(min = 1, max = 120) String title,
+    @NotNull @NoControlCharacters @Size(max = 120) String pageTitle,
     @NotNull @Pattern(regexp = "^(de|en)$") String lang,
     @NotNull @Pattern(regexp = "^(auto|light|dark)$") String colorMode,
     @NotNull @Valid Palettes palette,

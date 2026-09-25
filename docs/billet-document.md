@@ -15,6 +15,8 @@ Rules:
   breaks (a blank line = paragraph gap inside a block). Never HTML; the renderer never uses
   innerHTML. Emoji are allowed everywhere.
 - Colours are `#rrggbb` (lowercase written by the frontend; backend accepts either case).
+- Text contains no control characters other than the `\n` line break: U+0000–U+001F (tab and
+  carriage return included) and U+007F in any text field are a 400 `VALIDATION_ERROR`.
 - Text must be well-formed UTF-16: an unpaired surrogate (half an emoji) is a 400 `VALIDATION_ERROR`.
   The frontend shortens text only at code-point/grapheme boundaries (`Array.from` / `Intl.Segmenter`),
   never with `String.slice` on UTF-16 units.

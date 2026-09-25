@@ -23,7 +23,8 @@ import org.testcontainers.mariadb.MariaDBContainer;
  * account, secrets, mail, DDL, cookie flag, billet limits, model base URL). They are @TestPropertySource and not
  * dynamic properties on purpose: a subclass can override them with its own @TestPropertySource, while dynamic
  * properties would always win. The billet cap is low so a test reaches it in a few requests without a context of its
- * own; the document cap is the shipped default.
+ * own. The document cap is low too: with control characters refused, a character of text is at most three bytes of
+ * JSON, so no document within every field limit reaches the shipped 256 KiB and the codec's check would be untestable.
  *
  * The database outlives every test class of the run, so tests create their own rows under
  * {@link #uniqueEmail(String)} and never assume a table is empty.
@@ -55,7 +56,7 @@ public abstract class MariaDbITBase {
     protected static final String FRONTEND_URL = "http://localhost:4200";
     protected static final String UPLOAD_DIRECTORY = "target/it-uploads";
     protected static final int MAX_BILLETS_PER_USER = 5;
-    protected static final int MAX_DOCUMENT_BYTES = 262144;
+    protected static final int MAX_DOCUMENT_BYTES = 65536;
     /** With a trailing slash, so a resolved model URL shows whether the join doubles it. */
     protected static final String MODELS_BASE_URL = "https://models.it.test/assets/";
 

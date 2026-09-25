@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import app.billetstudio.auth.bootstrap.RootUserBootstrap;
 import app.billetstudio.auth.entity.Role;
@@ -21,9 +22,13 @@ import app.billetstudio.auth.repository.RoleRepository;
 import app.billetstudio.auth.repository.UserRepository;
 import app.billetstudio.auth.security.JwtUtil;
 import app.billetstudio.auth.service.Roles;
+import app.billetstudio.shared.web.RequestBodyLimitAdvice;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -135,21 +140,28 @@ class ServletContainerTest {
         assertThat(jsonMapper.readTree(response.body()).get("status").asString()).isEqualTo("UP");
     }
 
+    static Stream<Arguments> oversizedBodies() {
+        return Stream.of(
+            // The autosave: the cap belongs to the handler, not to a spelling of its URL. Tomcat, Spring Security and
+            // Spring MVC all route the decoded path; MockMvc does not decode like the container, hence here.
+            Arguments.of("PUT", "/v1/%62illets/5", 2L * MAX_DOCUMENT_BYTES),
+            // Anonymous, and without a document: the small default cap.
+            Arguments.of("POST", "/v1/auth/login", RequestBodyLimitAdvice.DEFAULT_LIMIT));
+    }
+
     /**
-     * The billet body cap belongs to the handler, not to a spelling of its URL: Tomcat, Spring Security and Spring MVC
-     * all route the decoded path, so /v1/%62illets/5 is the autosave. MockMvc does not decode like the container, hence
-     * here. Chunked, so only the cut-off in the stream can stop it; unterminated, so a full parse would answer
-     * MALFORMED_REQUEST.
+     * Chunked, so only the cut-off in the stream can stop the body; whitespace in an unterminated object, so neither a
+     * parser limit nor a full parse (MALFORMED_REQUEST) can be what answers.
      */
-    @Test
-    void an_oversized_billet_body_is_cut_off_however_its_path_is_spelled() throws Exception {
-        byte[] body = ("{\"version\":1,\"document\":{\"title\":\"" + "a".repeat(3 * MAX_DOCUMENT_BYTES))
-            .getBytes(StandardCharsets.UTF_8);
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/v1/%62illets/5"))
+    @ParameterizedTest(name = "{0} {1}")
+    @MethodSource("oversizedBodies")
+    void an_oversized_body_is_cut_off_before_it_is_parsed(String method, String path, long limit) throws Exception {
+        byte[] body = ("{" + " ".repeat(Math.toIntExact(3 * limit))).getBytes(StandardCharsets.UTF_8);
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
             .version(HttpClient.Version.HTTP_1_1)
             .header("Authorization", "Bearer " + jwtUtil.generateToken(user.getId()))
             .header("Content-Type", "application/json")
-            .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> new ByteArrayInputStream(body)))
+            .method(method, HttpRequest.BodyPublishers.ofInputStream(() -> new ByteArrayInputStream(body)))
             .build();
 
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());

@@ -267,6 +267,14 @@ class BilletControllerIT extends WebITBase {
             rule("a missing field", doc -> node(doc, "/hero").remove("sub"), "VALIDATION_ERROR"),
             rule("half an emoji, its other half cut off",
                 doc -> node(doc, "/blocks/0").put("text", "Mama " + (char) 0xD83C), "VALIDATION_ERROR"),
+            rule("a C0 control character in a text field", doc -> node(doc, "/hero").put("sub", "von\u0000Andreas"),
+                "VALIDATION_ERROR"),
+            rule("a tab - the one control character a text field allows is \\n",
+                doc -> node(doc, "/blocks/0").put("text", "Mama\tPapa"), "VALIDATION_ERROR"),
+            rule("DEL in a text field", doc -> node(doc, "/signature").put("name", "Andreas\u007F"),
+                "VALIDATION_ERROR"),
+            rule("nesting past the parser's depth limit, in a field the document drops",
+                BilletControllerIT::nestDeeply, "VALIDATION_ERROR"),
             rule("schemaVersion 2, although a field is missing too", doc -> doc.put("schemaVersion", 2).remove("theme"),
                 "UNSUPPORTED_SCHEMA_VERSION"),
             rule("an enabled scene with an unknown model", doc -> node(doc, "/scene").put("modelSlug", "no-such-model"),
@@ -276,16 +284,24 @@ class BilletControllerIT extends WebITBase {
     }
 
     /**
-     * Only JSON escaping takes a document within every field limit past the byte cap: a control character is one
-     * character of text but a six-byte escape in JSON. 30 such paragraphs are about 360 KB - over the 256 KiB document
-     * cap, under the request body cap, so the codec's check is the one that answers.
+     * JSON escaping takes a document within every field limit past the byte cap: a quote is one character of text but
+     * a two-byte escape. 20 such paragraphs are about 80 KB - over the 64 KiB document cap MariaDbITBase pins, under
+     * the request body cap, so the codec's check is the one that answers.
      */
     private static void inflate(ObjectNode document) {
         ArrayNode blocks = (ArrayNode) document.get("blocks");
         ObjectNode paragraph = (ObjectNode) blocks.get(0);
         blocks.removeAll();
-        for (int i = 0; i < 30; i++) {
-            blocks.add(paragraph.deepCopy().put("id", "p" + i).put("text", String.valueOf((char) 1).repeat(2000)));
+        for (int i = 0; i < 20; i++) {
+            blocks.add(paragraph.deepCopy().put("id", "p" + i).put("text", "\"".repeat(2000)));
+        }
+    }
+
+    /** Dropped with the unknown field, were it not for JacksonConfig's nesting limit. */
+    private static void nestDeeply(ObjectNode document) {
+        ArrayNode nested = document.putArray("legacyField");
+        for (int i = 0; i < 40; i++) {
+            nested = nested.addArray();
         }
     }
 
@@ -300,14 +316,13 @@ class BilletControllerIT extends WebITBase {
     }
 
     /**
-     * A body far over the cap never reaches a full parse: it is unterminated JSON, which a parse would answer with
-     * MALFORMED_REQUEST. MockMvc always declares the length; a chunked body is ServletContainerTest's.
+     * A body far over the cap never reaches a full parse: it is whitespace in unterminated JSON, which a parse would
+     * answer with MALFORMED_REQUEST. MockMvc always declares the length; a chunked body is ServletContainerTest's.
      */
     @Test
     void aBodyFarOverTheCap_isRefusedBeforeItIsParsed() throws Exception {
         User anna = user("bodycap");
-        byte[] body = ("{\"document\":{\"title\":\"" + "a".repeat(16 * MAX_DOCUMENT_BYTES))
-            .getBytes(StandardCharsets.UTF_8);
+        byte[] body = ("{\"document\":" + " ".repeat(16 * MAX_DOCUMENT_BYTES)).getBytes(StandardCharsets.UTF_8);
 
         MvcResult result = mockMvc.perform(post("/v1/billets")
             .header(HttpHeaders.AUTHORIZATION, bearer(anna))
@@ -503,7 +518,7 @@ class BilletControllerIT extends WebITBase {
     /**
      * Unpublishing takes the page offline at once and keeps the token, so a republish restores the same link. Whoever
      * holds a link cannot tell an unpublished billet from an unknown or malformed token, or from an owner whose account
-     * is no longer active.
+     * is no longer active; a reactivated owner's links work again.
      */
     @Test
     void anUnpublishedLink_answersLikeAnUnknownOne_andARepublishRestoresIt() throws Exception {
@@ -532,6 +547,10 @@ class BilletControllerIT extends WebITBase {
         anna.setActive(false);
         userRepository.save(anna);
         assertThat(errorBody(publicBillet(token))).isEqualTo(errorBody(gone));
+
+        anna.setActive(true);
+        userRepository.save(anna);
+        assertThat(status(publicBillet(token))).isEqualTo(200);
     }
 
     // ---------------------------------------------------------------- duplicate, import, the cap

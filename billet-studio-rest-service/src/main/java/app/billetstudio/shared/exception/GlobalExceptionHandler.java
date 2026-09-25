@@ -36,6 +36,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import tools.jackson.core.exc.StreamConstraintsException;
+
 /**
  * Turns every failure into an {@link ApiError}. Framework errors arrive through the base class and are
  * mapped in {@link #handleExceptionInternal}, so malformed JSON is a 400 and an unknown route a 404 instead
@@ -130,8 +132,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private Mapping map(Exception ex, HttpStatusCode statusCode) {
         if (ex instanceof HttpMessageNotReadableException) {
-            // A body cut off at its size cap was not malformed, it was too large - the code an oversized document gets.
-            return causedBy(ex, RequestBodyTooLargeException.class)
+            // A body cut off at its size cap, or past a parser limit (JacksonConfig), was not malformed, it was too
+            // large - the code an oversized document gets.
+            return causedBy(ex, RequestBodyTooLargeException.class) || causedBy(ex, StreamConstraintsException.class)
                 ? new Mapping(HttpStatus.BAD_REQUEST, VALIDATION_ERROR)
                 : new Mapping(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST");
         }
