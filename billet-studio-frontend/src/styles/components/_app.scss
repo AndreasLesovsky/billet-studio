@@ -77,6 +77,12 @@
     color: var(--ui-accent-ink);
 }
 
+// Second headline line in the accent colour (home hero: "Deine Worte, / mit einem Geschenk in 3D.").
+.ui-heading-accent {
+    display: block;
+    color: var(--ui-accent-ink);
+}
+
 // ---- Skip link: above the viewport until it has focus ---------------------------------------
 
 .ui-skip-link {

@@ -87,8 +87,9 @@
   },
   "HOME": {
     "EYEBROW": "Digital billets with a 3D motif",
-    "TITLE": "Design billets that spin",
-    "LEAD": "Pick a template, write your words and add a 3D motif that spins right in the browser. Share it with a link – no app needed.",
+    "TITLE_LINE1": "Your words,",
+    "TITLE_ACCENT": "with a gift in 3D.",
+    "LEAD": "Pick a template, write your words and place a 3D gift inside – a bouquet, a cake, a heart. Whoever opens your billet turns it with a finger and discovers it from every side. Shared by link, no app needed.",
     "STEPS_TITLE": "How it works",
     "STEP_TEMPLATE_TITLE": "Pick a template",
     "STEP_TEMPLATE_TEXT": "Mother’s Day, birthday, wedding – you start from a finished design.",

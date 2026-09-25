@@ -87,8 +87,9 @@
   },
   "HOME": {
     "EYEBROW": "Digitale Billets mit 3D-Motiv",
-    "TITLE": "Billets gestalten, die sich drehen",
-    "LEAD": "Wähle eine Vorlage, schreib deine Worte und setz ein 3D-Motiv dazu, das sich im Browser dreht. Geteilt wird per Link – ganz ohne App.",
+    "TITLE_LINE1": "Deine Worte,",
+    "TITLE_ACCENT": "mit einem Geschenk in 3D.",
+    "LEAD": "Wähle eine Vorlage, schreib deine Worte und leg ein 3D-Motiv hinein – einen Blumenstrauß, eine Torte, ein Herz. Wer dein Billet öffnet, dreht es mit dem Finger und entdeckt es von allen Seiten. Geteilt per Link, ganz ohne App.",
     "STEPS_TITLE": "So funktioniert’s",
     "STEP_TEMPLATE_TITLE": "Vorlage wählen",
     "STEP_TEMPLATE_TEXT": "Muttertag, Geburtstag, Hochzeit – du startest mit einer fertigen Gestaltung.",

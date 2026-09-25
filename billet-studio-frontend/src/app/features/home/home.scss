@@ -18,7 +18,7 @@
 }
 
 .home__title {
-    max-inline-size: 18ch;
+    max-inline-size: 20ch;
     font-size: calc(var(--ui-text-3xl) * var(--ui-font-heading-scale));
 
     @include bp.up(md) {
