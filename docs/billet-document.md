@@ -147,7 +147,9 @@ Density mapping: `count = round(density × 0.56)`, `inAirMax = round(count × 0.
 
 ## Reference document — the original Mother's Day card
 
-Parity fixture (`muttertag_threejs/index.html`). Used by the Playwright parity test and backend tests.
+Parity fixture (`muttertag_threejs/index.html`). The same document lives in
+[`fixtures/muttertag.billet.json`](fixtures/muttertag.billet.json), which backend tests and the
+Playwright parity test read directly — change both together.
 
 ```json
 {

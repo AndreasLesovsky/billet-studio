@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "theme": "rose",
+  "title": "Muttertag 2026 – Mama",
+  "pageTitle": "Für Mama · Muttertag 2026",
+  "lang": "de",
+  "colorMode": "auto",
+  "palette": {
+    "light": {
+      "accent": "#c8614a",
+      "accentSoft": "#fbe5dc",
+      "border": "#e8c4bb",
+      "background": "#faf6f0",
+      "ink": "#2a1f1a",
+      "inkSoft": "#6b5148",
+      "surface": "#ffffff"
+    },
+    "dark": {
+      "accent": "#c8614a",
+      "accentSoft": "#261710",
+      "border": "#5a3028",
+      "background": "#1e1410",
+      "ink": "#f0e8e4",
+      "inkSoft": "#c4a090",
+      "surface": "#231512"
+    },
+    "darkLinked": false
+  },
+  "typography": {
+    "title": {
+      "fontId": "cormorant-garamond",
+      "weight": 300,
+      "italic": false,
+      "size": 1
+    },
+    "titleAccent": {
+      "fontId": "cormorant-garamond",
+      "weight": 300,
+      "italic": true,
+      "size": 1
+    },
+    "heading": {
+      "fontId": "cormorant-garamond",
+      "weight": 400,
+      "italic": false,
+      "size": 1
+    },
+    "body": {
+      "fontId": "cormorant-garamond",
+      "weight": 400,
+      "italic": false,
+      "size": 1
+    },
+    "signature": {
+      "fontId": "cormorant-garamond",
+      "weight": 300,
+      "italic": true,
+      "size": 1
+    },
+    "ui": {
+      "fontId": "jost",
+      "weight": 300,
+      "italic": false,
+      "size": 1
+    },
+    "emphasis": "inkSoft"
+  },
+  "spacing": {
+    "gutter": 8,
+    "heroTop": 14,
+    "heroBottom": 13,
+    "dividerGap": 9,
+    "blockGap": 10,
+    "signatureGap": 11,
+    "pageBottom": 15
+  },
+  "hero": {
+    "label": "10. Mai 2026 · Muttertag",
+    "titleLine1": "Für",
+    "titleLine2": "Mama",
+    "sub": "von Andreas"
+  },
+  "scene": {
+    "enabled": true,
+    "modelSlug": "flower-bouquet",
+    "height": 23.75,
+    "fitSize": 1.6,
+    "yOffset": -0.08,
+    "exposure": 0.6,
+    "cameraDistance": 2.8,
+    "cameraHeight": 0.1,
+    "autoRotate": true,
+    "autoRotateSpeed": 0.45,
+    "hint": "wischen zum drehen · pinch zum zoomen",
+    "ariaLabel": "3D Blumenstrauß, interaktiv drehbar"
+  },
+  "divider": {
+    "style": "diamond"
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "paragraph",
+      "text": "Du hast Dinge erlebt, bei denen andere längst aufgegeben hätten. Nicht jeder bringt diesen Löwencharakter 🦁 mit. Diese stille, unerschütterliche Kraft ist etwas, das ich tief *bewundere*.",
+      "icon": "",
+      "ariaLabel": "",
+      "dividerStyle": "none",
+      "spaceAdjust": 0
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "Ich schaue mir noch vieles von dir ab. Du weißt Dinge, die kein Buch lehrt und kein Kurs vermittelt. Ich bin froh, dass du meine Mama bist.",
+      "icon": "",
+      "ariaLabel": "",
+      "dividerStyle": "none",
+      "spaceAdjust": 0
+    },
+    {
+      "id": "b3",
+      "type": "card",
+      "text": "Sei es, wie man den perfekten Teig macht, ob **Nockerl** oder **Palatschinken**. Oder wie man mit Geld umgeht, ohne am Ende des Monats leer dazustehen.\n\nLehrplan: laufend. Danke für die Geduld.",
+      "icon": "🌸",
+      "ariaLabel": "Mit einem Schmunzler",
+      "dividerStyle": "none",
+      "spaceAdjust": 0
+    },
+    {
+      "id": "b4",
+      "type": "note",
+      "text": "🎶 Die Soundbar wolltest du schon lange. Bis heute warten, das wären nur sinnlose Tage ohne Soundbar gewesen.",
+      "icon": "",
+      "ariaLabel": "",
+      "dividerStyle": "none",
+      "spaceAdjust": -1
+    }
+  ],
+  "signature": {
+    "name": "Andreas",
+    "sub": "in Dankbarkeit & mit Liebe"
+  },
+  "particles": {
+    "enabled": true,
+    "shape": "petal",
+    "colors": [
+      "#e8927a",
+      "#f0b9aa",
+      "#d97060",
+      "#c8614a",
+      "#f5cdc0",
+      "#eaaa96"
+    ],
+    "density": 50,
+    "speed": 1,
+    "size": 1
+  }
+}
