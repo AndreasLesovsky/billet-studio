@@ -106,7 +106,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'dm-sans', weight: 400, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#a3b89a', '#c3d4b5', '#7a9a7e', '#dbe6cf', '#5e8566', '#b8cfa8'],
+    particleColors: ['#a3b89a', '#c3d4b5', '#7a9a7e', '#cddcbf', '#5e8566', '#b8cfa8'],
   },
   midnight: {
     palette: {
@@ -138,7 +138,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'raleway', weight: 500, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#e3c170', '#f3dc9b', '#c7a24e', '#d7dcef', '#aab2d6', '#f5f6fc'],
+    particleColors: ['#e3c170', '#ebd493', '#c7a24e', '#cdd3ea', '#aab2d6', '#c2d5f0'],
   },
   paper: {
     palette: {
@@ -170,7 +170,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'work-sans', weight: 400, italic: false, size: 1 },
       emphasis: 'inkSoft',
     },
-    particleColors: ['#d8cbb3', '#c2b192', '#8a3a2a', '#3a342c', '#e9dfcb', '#a8977a'],
+    particleColors: ['#d8cbb3', '#c2b192', '#8a3a2a', '#5a5248', '#d4b8a0', '#a8977a'],
   },
   lavender: {
     palette: {
@@ -202,7 +202,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'quicksand', weight: 500, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#c9b6f2', '#b39ae8', '#e2d7fa', '#9a7ddb', '#f0eafc', '#d4c4f5'],
+    particleColors: ['#c9b6f2', '#b39ae8', '#e2d7fa', '#9a7ddb', '#e0c9f0', '#d4c4f5'],
   },
   ocean: {
     palette: {
@@ -234,7 +234,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'montserrat', weight: 500, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#5cc4e6', '#9adcee', '#2f9fc4', '#7ad9c9', '#d2f1f7', '#11709a'],
+    particleColors: ['#5cc4e6', '#9adcee', '#2f9fc4', '#7ad9c9', '#b3dfe6', '#11709a'],
   },
   terracotta: {
     palette: {
@@ -330,7 +330,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'nunito', weight: 800, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#5fd6b3', '#9be7cf', '#2fb38f', '#c8f4e5', '#7fdcc4', '#0f7d63'],
+    particleColors: ['#5fd6b3', '#9be7cf', '#2fb38f', '#abe4cf', '#7fdcc4', '#0f7d63'],
   },
   peach: {
     palette: {
@@ -362,7 +362,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'outfit', weight: 600, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#ffb38a', '#ffc9a8', '#ff9a6b', '#f7d9c4', '#ffd6a5', '#e8764a'],
+    particleColors: ['#ffb38a', '#ffc9a8', '#ff9a6b', '#f5d0b8', '#ffd6a5', '#e8764a'],
   },
   aurora: {
     palette: {
@@ -426,7 +426,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'oswald', weight: 400, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#6f4a33', '#a57a55', '#d4a57a', '#c89b6d', '#3b2518', '#e8cfb2'],
+    particleColors: ['#6f4a33', '#a57a55', '#d4a57a', '#c89b6d', '#634231', '#e8cfb2'],
   },
   sakura: {
     palette: {
@@ -458,7 +458,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'poppins', weight: 400, italic: false, size: 0.95 },
       emphasis: 'accent',
     },
-    particleColors: ['#f7c1d3', '#f4a7c0', '#fcdce7', '#e98aa9', '#fff0f5', '#d8668c'],
+    particleColors: ['#f7c1d3', '#f4a7c0', '#f9d0de', '#e98aa9', '#eec6de', '#d8668c'],
   },
   forest: {
     palette: {
@@ -522,7 +522,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'raleway', weight: 600, italic: false, size: 1 },
       emphasis: 'inkSoft',
     },
-    particleColors: ['#d8b98a', '#e2b56d', '#c7a77a', '#b98a4a', '#f0dcb8', '#97661f'],
+    particleColors: ['#d8b98a', '#e2b56d', '#c7a77a', '#b98a4a', '#e8d0a6', '#97661f'],
   },
   neon: {
     palette: {
@@ -554,7 +554,7 @@ export const BILLET_THEME_PRESETS: Readonly<Record<ThemeId, BilletThemePreset>> 
       ui: { fontId: 'space-grotesk', weight: 600, italic: false, size: 1 },
       emphasis: 'accent',
     },
-    particleColors: ['#ff4fd8', '#22e3ff', '#b36bff', '#ffe066', '#ff8ae6', '#7af3ff'],
+    particleColors: ['#ff4fd8', '#22e3ff', '#b36bff', '#ffd84d', '#ff8ae6', '#5eeeff'],
   },
 };
 

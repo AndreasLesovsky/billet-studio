@@ -117,7 +117,11 @@ als GLB, Manifest, `preview.html` und Render-Skript sind.
    - Optional: `sizeLimitMB`, `previewRotationY` (Drehung nur fürs Vorschaubild, Standard −0,35 rad),
      `simplify` (`{ "ratio": 0.5, "error": 0.001 }`), `excludeMaterials` (Primitive mit diesen
      Materialnamen werden entfernt, z. B. Deko-Schneeflocken, die das Auto-Fit sprengen),
-     `losslessNormals` (Normal-Maps verlustfrei, wenn `models:compare` sichtbaren Verlust zeigt).
+     `losslessNormals` (Normal-Maps verlustfrei, wenn `models:compare` sichtbaren Verlust zeigt),
+     `opaqueMaterials` (diese Materialien werden deckend: `alphaMode` OPAQUE, Alpha 1 – für ein
+     BLEND-Material, das nicht durchsichtig sein soll; über der transparenten Canvas scheint sonst die
+     Seite durch und bei doppelseitigen Materialien die Rückseite, z. B. ein gespiegeltes Etikett.
+     Heute `champagne-bottle`, Material `Glass`).
 5. **Pipeline laufen lassen**: `npm run models` (optimieren → Vorschaubild → `sql/seed_models.sql`).
    Tabelle prüfen, Vorschaubild in `public/models/previews/` ansehen.
 6. **Datenbank**: `sql/seed_models.sql` spielst **du** ein (phpMyAdmin oder

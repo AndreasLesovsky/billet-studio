@@ -65,6 +65,8 @@ const settingsKey = (model) =>
         simplify: model.simplify,
         excludeMaterials: model.excludeMaterials,
         losslessNormals: model.losslessNormals,
+        // Only when set: a model without it keeps its key and is not rebuilt.
+        ...(model.opaqueMaterials.length ? { opaqueMaterials: model.opaqueMaterials } : {}),
       }),
     )
     .digest('hex')
@@ -108,6 +110,29 @@ function excludeMaterials(model, document) {
   console.log(`  ${model.slug}: removed ${removed} primitive(s) using ${[...names].join(', ')}`);
 }
 
+/**
+ * Forces the named materials opaque (alphaMode OPAQUE, base colour alpha 1). For a BLEND material
+ * that is not meant to be see-through: over the billet's transparent canvas it lets the page show
+ * through and, double-sided, the back faces (a mirrored label) as well.
+ */
+function makeOpaque(model, document) {
+  if (!model.opaqueMaterials.length) return;
+  const names = new Set(model.opaqueMaterials);
+  const materials = document
+    .getRoot()
+    .listMaterials()
+    .filter((material) => names.has(material.getName()));
+  const found = new Set(materials.map((material) => material.getName()));
+  const unknown = [...names].filter((name) => !found.has(name));
+  if (unknown.length)
+    throw new Error(`${model.slug}: opaqueMaterials not found: ${unknown.join(', ')}`);
+  for (const material of materials) {
+    const [r, g, b] = material.getBaseColorFactor();
+    material.setAlphaMode('OPAQUE').setBaseColorFactor([r, g, b, 1]);
+  }
+  console.log(`  ${model.slug}: made opaque: ${[...found].join(', ')}`);
+}
+
 /** WebP at textureQuality; with losslessNormals, a second pass encodes normal maps lossless. */
 function textureTransforms(model) {
   const options = {
@@ -126,6 +151,7 @@ function textureTransforms(model) {
 async function optimize(model, key) {
   const document = await io.read(model.sourcePath);
   excludeMaterials(model, document);
+  makeOpaque(model, document);
 
   await document.transform(
     dedup(),

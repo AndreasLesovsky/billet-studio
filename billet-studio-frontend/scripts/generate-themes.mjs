@@ -598,6 +598,13 @@ const BILLET_PAIRS = [
   ['accent', 'background', AA_UI],
 ];
 
+// Particles are decorative, but one colour list falls in both modes: every colour must stand out
+// from the light AND the dark background, not melt into either.
+const PARTICLE_MIN = 1.25;
+// Exempt: rose is the live card and must stay equal to docs/fixtures/muttertag.billet.json
+// (theme-contrast.spec). Its petals are pale by design - the fixture decides them, not this rule.
+const PARTICLE_EXEMPT = 'rose';
+
 function billetContrastFailures(themes) {
   const failures = [];
   for (const { id, billet } of themes) {
@@ -606,6 +613,14 @@ function billetContrastFailures(themes) {
         const ratio = contrast(billet[mode][fg], billet[mode][bg]);
         if (ratio >= min) continue;
         failures.push(`${id}/${mode} billet: ${fg} on ${bg} = ${ratio.toFixed(2)} (< ${min})`);
+      }
+      if (id === PARTICLE_EXEMPT) continue;
+      for (const color of billet.particleColors) {
+        const ratio = contrast(color, billet[mode].background);
+        if (ratio >= PARTICLE_MIN) continue;
+        failures.push(
+          `${id}/${mode} billet: particle ${color} on background = ${ratio.toFixed(2)} (< ${PARTICLE_MIN})`,
+        );
       }
     }
   }

@@ -1,5 +1,5 @@
 {
-  "$comment": "Seeds only: scripts/generate-themes.mjs derives every other --ui-* token and fails unless each theme x mode passes WCAG AA and every heading weight is a face the font catalog ships. \"site\" is the fixed website theme on <html> (never offered in the editor); \"themes\" are the editor themes, applied only inside ThemeScope elements (editor root, theme-picker cards). radius scales the base radii in _tokens.scss; shadowTint colours the light-mode shadows; headingWeight (default 600), displayWeight (h1/h2, page titles; default headingWeight) and headingScale (default 1) tune the heading face. Optional per mode: accent2 (decorative; default: accent hue + 40) and sunken (hover/table-head plane; default: derived from bg and text). Every editor theme also carries \"billet\": the starting preset picking the theme writes into a billet (docs/billet-document.md) - light/dark BilletPalette (accent, accentSoft, border, background, ink, inkSoft, surface), typography (six FontRef roles + emphasis; each fontId + weight/italic must be a face of the font catalog) and 4..7 particleColors; both palettes must pass the billet contrast rules. The rose preset is the original Mother's Day card (docs/fixtures/muttertag.billet.json) and must stay equal to it.",
+  "$comment": "Seeds only: scripts/generate-themes.mjs derives every other --ui-* token and fails unless each theme x mode passes WCAG AA and every heading weight is a face the font catalog ships. \"site\" is the fixed website theme on <html> (never offered in the editor); \"themes\" are the editor themes, applied only inside ThemeScope elements (editor root, theme-picker cards). radius scales the base radii in _tokens.scss; shadowTint colours the light-mode shadows; headingWeight (default 600), displayWeight (h1/h2, page titles; default headingWeight) and headingScale (default 1) tune the heading face. Optional per mode: accent2 (decorative; default: accent hue + 40) and sunken (hover/table-head plane; default: derived from bg and text). Every editor theme also carries \"billet\": the starting preset picking the theme writes into a billet (docs/billet-document.md) - light/dark BilletPalette (accent, accentSoft, border, background, ink, inkSoft, surface), typography (six FontRef roles + emphasis; each fontId + weight/italic must be a face of the font catalog) and 4..7 particleColors; both palettes must pass the billet contrast rules, and every particle colour must reach 1.25:1 on the light and on the dark background (rose, the live card, is exempt). The rose preset is the original Mother's Day card (docs/fixtures/muttertag.billet.json) and must stay equal to it.",
   "site": {
     "id": "studio",
     "fontBody": "Inter",
@@ -188,7 +188,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#a3b89a", "#c3d4b5", "#7a9a7e", "#dbe6cf", "#5e8566", "#b8cfa8"]
+        "particleColors": ["#a3b89a", "#c3d4b5", "#7a9a7e", "#cddcbf", "#5e8566", "#b8cfa8"]
       }
     },
     {
@@ -269,7 +269,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#e3c170", "#f3dc9b", "#c7a24e", "#d7dcef", "#aab2d6", "#f5f6fc"]
+        "particleColors": ["#e3c170", "#ebd493", "#c7a24e", "#cdd3ea", "#aab2d6", "#c2d5f0"]
       }
     },
     {
@@ -351,7 +351,7 @@
           },
           "emphasis": "inkSoft"
         },
-        "particleColors": ["#d8cbb3", "#c2b192", "#8a3a2a", "#3a342c", "#e9dfcb", "#a8977a"]
+        "particleColors": ["#d8cbb3", "#c2b192", "#8a3a2a", "#5a5248", "#d4b8a0", "#a8977a"]
       }
     },
     {
@@ -432,7 +432,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#c9b6f2", "#b39ae8", "#e2d7fa", "#9a7ddb", "#f0eafc", "#d4c4f5"]
+        "particleColors": ["#c9b6f2", "#b39ae8", "#e2d7fa", "#9a7ddb", "#e0c9f0", "#d4c4f5"]
       }
     },
     {
@@ -513,7 +513,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#5cc4e6", "#9adcee", "#2f9fc4", "#7ad9c9", "#d2f1f7", "#11709a"]
+        "particleColors": ["#5cc4e6", "#9adcee", "#2f9fc4", "#7ad9c9", "#b3dfe6", "#11709a"]
       }
     },
     {
@@ -759,7 +759,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#5fd6b3", "#9be7cf", "#2fb38f", "#c8f4e5", "#7fdcc4", "#0f7d63"]
+        "particleColors": ["#5fd6b3", "#9be7cf", "#2fb38f", "#abe4cf", "#7fdcc4", "#0f7d63"]
       }
     },
     {
@@ -841,7 +841,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#ffb38a", "#ffc9a8", "#ff9a6b", "#f7d9c4", "#ffd6a5", "#e8764a"]
+        "particleColors": ["#ffb38a", "#ffc9a8", "#ff9a6b", "#f5d0b8", "#ffd6a5", "#e8764a"]
       }
     },
     {
@@ -1005,7 +1005,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#6f4a33", "#a57a55", "#d4a57a", "#c89b6d", "#3b2518", "#e8cfb2"]
+        "particleColors": ["#6f4a33", "#a57a55", "#d4a57a", "#c89b6d", "#634231", "#e8cfb2"]
       }
     },
     {
@@ -1088,7 +1088,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#f7c1d3", "#f4a7c0", "#fcdce7", "#e98aa9", "#fff0f5", "#d8668c"]
+        "particleColors": ["#f7c1d3", "#f4a7c0", "#f9d0de", "#e98aa9", "#eec6de", "#d8668c"]
       }
     },
     {
@@ -1251,7 +1251,7 @@
           },
           "emphasis": "inkSoft"
         },
-        "particleColors": ["#d8b98a", "#e2b56d", "#c7a77a", "#b98a4a", "#f0dcb8", "#97661f"]
+        "particleColors": ["#d8b98a", "#e2b56d", "#c7a77a", "#b98a4a", "#e8d0a6", "#97661f"]
       }
     },
     {
@@ -1334,7 +1334,7 @@
           },
           "emphasis": "accent"
         },
-        "particleColors": ["#ff4fd8", "#22e3ff", "#b36bff", "#ffe066", "#ff8ae6", "#7af3ff"]
+        "particleColors": ["#ff4fd8", "#22e3ff", "#b36bff", "#ffd84d", "#ff8ae6", "#5eeeff"]
       }
     }
   ]

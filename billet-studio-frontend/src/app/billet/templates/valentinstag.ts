@@ -1,4 +1,4 @@
-import { defineTemplate } from './template';
+import { defineTemplate, SEPARATOR } from './template';
 
 export const VALENTINSTAG = defineTemplate({
   nameKey: 'TEMPLATES.VALENTINSTAG',
@@ -12,7 +12,7 @@ export const VALENTINSTAG = defineTemplate({
       title: 'Valentinstag',
       pageTitle: 'Für dich · Valentinstag',
       hero: {
-        label: '14. Februar · Valentinstag',
+        label: `14. Februar${SEPARATOR}Valentinstag`,
         titleLine1: 'Für dich,',
         titleLine2: 'mein Herz',
         sub: 'weil jeder Tag mit dir zählt',
@@ -44,7 +44,7 @@ export const VALENTINSTAG = defineTemplate({
       title: "Valentine's Day",
       pageTitle: "For you · Valentine's Day",
       hero: {
-        label: "February 14 · Valentine's Day",
+        label: `February 14${SEPARATOR}Valentine's Day`,
         titleLine1: 'For you,',
         titleLine2: 'my love',
         sub: 'because every day with you counts',

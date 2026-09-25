@@ -149,6 +149,7 @@
       "position": 80,
       "maxTextureSize": 2048,
       "losslessNormals": true,
+      "opaqueMaterials": ["Glass"],
       "scene": {
         "fitSize": 1.6,
         "yOffset": -0.08,
@@ -209,8 +210,8 @@
       "position": 110,
       "maxTextureSize": 2048,
       "scene": {
-        "fitSize": 1.45,
-        "yOffset": 0,
+        "fitSize": 1.35,
+        "yOffset": 0.07,
         "exposure": 0.6,
         "cameraDistance": 2.8,
         "cameraHeight": 0.1,

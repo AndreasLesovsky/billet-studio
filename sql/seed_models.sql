@@ -160,7 +160,7 @@ ON DUPLICATE KEY UPDATE
 
 -- champagne-bottle (champagne_bottle.glb)
 INSERT INTO `tbl_models` (`slug`, `name_de`, `name_en`, `occasion`, `file_path`, `preview_path`, `file_size_bytes`, `fit_size`, `y_offset`, `exposure`, `camera_distance`, `camera_height`, `auto_rotate_speed`, `credit`, `position`, `active`, `created_at`, `updated_at`) VALUES
-  ('champagne-bottle', 'Champagnerflasche', 'Champagne bottle', 'celebration', 'models/champagne-bottle.v1.glb', 'models/previews/champagne-bottle.v1.webp', 1967428, 1.60, -0.08, 0.60, 2.80, 0.10, 0.45, 'Champagne Bottle by ethan_garden (CC-BY-4.0) https://sketchfab.com/3d-models/champagne-bottle-1ce8a43374bf4057b757dc635351042b', 80, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+  ('champagne-bottle', 'Champagnerflasche', 'Champagne bottle', 'celebration', 'models/champagne-bottle.v1.glb', 'models/previews/champagne-bottle.v1.webp', 1967408, 1.60, -0.08, 0.60, 2.80, 0.10, 0.45, 'Champagne Bottle by ethan_garden (CC-BY-4.0) https://sketchfab.com/3d-models/champagne-bottle-1ce8a43374bf4057b757dc635351042b', 80, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
   `name_de` = VALUES(`name_de`),
   `name_en` = VALUES(`name_en`),
@@ -223,7 +223,7 @@ ON DUPLICATE KEY UPDATE
 
 -- snow-globe (christmas_ball.glb)
 INSERT INTO `tbl_models` (`slug`, `name_de`, `name_en`, `occasion`, `file_path`, `preview_path`, `file_size_bytes`, `fit_size`, `y_offset`, `exposure`, `camera_distance`, `camera_height`, `auto_rotate_speed`, `credit`, `position`, `active`, `created_at`, `updated_at`) VALUES
-  ('snow-globe', 'Schneekugel', 'Snow globe', 'christmas', 'models/snow-globe.v1.glb', 'models/previews/snow-globe.v1.webp', 1905960, 1.45, 0.00, 0.60, 2.80, 0.10, 0.45, 'Christmas Ball by Ivanix88 (CC-BY-4.0) https://sketchfab.com/3d-models/christmas-ball-36868988285f4b60b3e389e1aa1bab3f', 110, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+  ('snow-globe', 'Schneekugel', 'Snow globe', 'christmas', 'models/snow-globe.v1.glb', 'models/previews/snow-globe.v1.webp', 1905960, 1.35, 0.07, 0.60, 2.80, 0.10, 0.45, 'Christmas Ball by Ivanix88 (CC-BY-4.0) https://sketchfab.com/3d-models/christmas-ball-36868988285f4b60b3e389e1aa1bab3f', 110, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
   `name_de` = VALUES(`name_de`),
   `name_en` = VALUES(`name_en`),

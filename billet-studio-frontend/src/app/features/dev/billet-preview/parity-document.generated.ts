@@ -78,7 +78,7 @@ export const PARITY_DOCUMENT: unknown = {
     pageBottom: 15,
   },
   hero: {
-    label: '10. Mai 2026 · Muttertag',
+    label: '10. Mai 2026  ·  Muttertag',
     titleLine1: 'Für',
     titleLine2: 'Mama',
     sub: 'von Andreas',
@@ -94,7 +94,7 @@ export const PARITY_DOCUMENT: unknown = {
     cameraHeight: 0.1,
     autoRotate: true,
     autoRotateSpeed: 0.45,
-    hint: 'wischen zum drehen · pinch zum zoomen',
+    hint: 'wischen zum drehen  ·  pinch zum zoomen',
     ariaLabel: '3D Blumenstrauß, interaktiv drehbar',
   },
   divider: {

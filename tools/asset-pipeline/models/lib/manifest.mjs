@@ -68,9 +68,11 @@ export function loadManifest() {
       errors.push(`${at}: previewRotationY must be a number`);
     if (entry.losslessNormals !== undefined && typeof entry.losslessNormals !== 'boolean')
       errors.push(`${at}: losslessNormals must be boolean`);
-    const excluded = entry.excludeMaterials ?? [];
-    if (!Array.isArray(excluded) || excluded.some((name) => typeof name !== 'string'))
-      errors.push(`${at}: excludeMaterials must be a string array`);
+    for (const key of ['excludeMaterials', 'opaqueMaterials']) {
+      const names = entry[key] ?? [];
+      if (!Array.isArray(names) || names.some((name) => typeof name !== 'string' || !name))
+        errors.push(`${at}: ${key} must be an array of material names`);
+    }
 
     const fileName = `${entry.slug}.v${entry.version}.glb`;
     const previewName = `${entry.slug}.v${entry.version}.webp`;
@@ -78,6 +80,7 @@ export function loadManifest() {
       ...entry,
       simplify: entry.simplify ?? false,
       excludeMaterials: entry.excludeMaterials ?? [],
+      opaqueMaterials: entry.opaqueMaterials ?? [],
       losslessNormals: entry.losslessNormals ?? false,
       sourcePath: join(sourceDir, entry.source),
       fileName,

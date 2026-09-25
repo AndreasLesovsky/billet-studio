@@ -251,7 +251,7 @@ contract is `<component>-schema.ts` (section 7), and a form's writable state sig
 `model`.
 
 A file that only holds shared types or pure helpers takes a plain descriptive name after its
-subject (`billet-document.ts`, `spacing-scale.ts`, `palette.ts`), co-located with its one owner or in
+subject (`billet-document.ts`, `scene-math.ts`, `palette.ts`), co-located with its one owner or in
 `core/utils/` when several features share it.
 
 ### 3D models are "assets" in the frontend
@@ -491,7 +491,7 @@ Order of preference:
 ## 11. Billet renderer rules
 
 The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document.ts`,
-`inline-markup.ts`, `palette.ts`, `spacing-scale.ts`, `view/`, `particles/`, `scene/`).
+`text/inline-markup.ts`, `palette.ts`, `view/`, `particles/`, `scene/`, `templates/`).
 
 ### One view, WYSIWYG
 - **One `BilletView`** is used by the editor preview AND the public page `/b/:token`. Never fork
@@ -500,15 +500,21 @@ The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document
   so the phone-width preview in the editor is exactly what a phone shows.
 - The viewport meta has no `maximum-scale` / `user-scalable=no`.
 - The public page waits for the billet's fonts before its reveal; it is `noindex`.
-- The Muttertag template must stay at visual parity with `muttertag_threejs/index.html` (Playwright
-  parity test, ≤ 1 % pixel difference at 390×844 and 1280×800, light and dark). Any renderer change
-  re-runs it.
+- Every billet page has one `h1`: the hero title, or - with both title lines empty - a visually
+  hidden one reading `pageTitle || title` (a local `.sr-only`; the billet never uses site classes).
+- The Muttertag reference document (`docs/fixtures/muttertag.billet.json`) must stay at visual parity
+  with the live card (snapshot `e2e/fixtures/muttertag-original`; Playwright parity test, ≤ 1 % pixel
+  difference at 390×844 and 1280×800, light and dark). Any renderer change re-runs it.
+- Two deliberate deviations from the live card, both user decisions: the 3D hint is drawn in full
+  `inkSoft` so it stays readable (the card's 50 % opacity is about 2.3:1); the hero label keeps the
+  card's `accent` on `accentSoft` (3.7:1 in light mode), accepted as decorative text.
 
 ### Text: never `innerHTML`
 - **NEVER** `innerHTML`, `[innerHTML]`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
   `DomSanitizer.bypassSecurityTrust*` - anywhere in the app, not only in `billet/`.
-- User text goes through `inline-markup.ts`: `*italic*`, `**bold**` and line breaks are parsed into
-  nodes, and the template renders the nodes with `@for`. Anything else stays literal text.
+- User text goes through `src/app/billet/text/inline-markup.ts`: `*italic*`, `**bold**` and line
+  breaks are parsed into nodes, and the template renders the nodes with `@for`. Anything else stays
+  literal text.
 
 ### The document
 - One JSON shape (`BilletDocument`) in localStorage, in the API and in the database.
@@ -517,10 +523,12 @@ The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document
   (`UNSUPPORTED_SCHEMA_VERSION`).
 - Changing the shape = bump `schemaVersion` + migration step + migration test + backend records /
   Jakarta validation / `BilletDocumentCodec` - in the same commit.
-- **Blocks share one shape** (`id, type, text, icon, ariaLabel, dividerStyle, spaceBefore`; `type`:
+- **Blocks share one shape** (`id, type, text, icon, ariaLabel, dividerStyle, spaceAdjust`; `type`:
   `paragraph | heading | card | note | divider`). Signal Forms arrays need one element shape; fields a
   type does not use are `hidden()` in the schema. Never introduce per-type block shapes. Max 30 blocks.
-- Spacing values are steps on the fixed scale in `spacing-scale.ts`; the sliders move by step.
+- Spacing values are steps on the fixed scale `BILLET_SPACE_SCALE` in
+  `src/app/billet/billet-document.ts`; the sliders move by step. A block's `spaceAdjust` is added to
+  `spacing.blockGap` and clamped to the scale.
 - Colors are hex values; dark palettes derive via OKLCH in `palette.ts`, which also reports contrast.
 
 ### Particles
@@ -998,7 +1006,9 @@ scope too. localStorage: `billet-studio.color-mode` only (absent = follow the sy
 - Billet presets: every editor theme in `themes.json` carries a `billet` block (`light`/`dark`
   BilletPalette, six typography roles + `emphasis`, `particleColors`). The generator validates fonts
   against the catalog and five billet contrast rules (ink/background ≥ 4.5, ink/surface ≥ 4.5,
-  inkSoft/background ≥ 4.5, accent/accentSoft ≥ 3, accent/background ≥ 3) and writes
+  inkSoft/background ≥ 4.5, accent/accentSoft ≥ 3, accent/background ≥ 3), requires every particle
+  colour to reach 1.25:1 on the light AND on the dark background (rose exempt: it equals the live
+  card) and writes
   `core/theme/billet-theme-presets.generated.ts`: `BilletThemePreset`, `BILLET_THEME_PRESETS`,
   `billetPresetFor(id)` (unknown → default). `rose` must equal `docs/fixtures/muttertag.billet.json`
   (the live card; `theme-contrast.spec.ts` pins it). `titleAccent.size` is relative to the final

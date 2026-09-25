@@ -147,6 +147,15 @@ title `clamp(4.5rem, 22cqi, 5.5rem)`, titleAccent `1em` of the title, heading
 `clamp(2.125rem, 10cqi, 2.75rem)`, ui label `0.625rem`, hero sub `0.8125rem`, hint `0.625rem`,
 signature sub `0.6875rem`.
 
+- Hero title lines (title, titleAccent) shrink to fit on one line (`FitText`, down to 0.6× of their
+  size); a longer line then wraps between words, and one word wider than the page shrinks further.
+  A title line never breaks inside a word.
+- The 3D hint is drawn in full `inkSoft` (the original card: 50 % opacity, about 2.3:1), so it stays
+  readable - a user decision. The hero label keeps the original's `accent` on `accentSoft` (the live
+  card in light mode: 3.7:1) - also a user decision, accepted as decorative text.
+- Every billet page has an `h1`: with both title lines empty it is visually hidden and reads
+  `pageTitle`, else `title`.
+
 Density mapping: `count = round(density × 0.56)`, `inAirMax = round(count × 0.43)`,
 `totalCap = count × 3` (50 → 28 / 12 / 84, the original).
 
@@ -156,7 +165,8 @@ Parity fixture: the LIVE card https://muttertag.andreas-web.dev (snapshot in
 `billet-studio-frontend/e2e/fixtures/muttertag-original/index.html`; it differs from the local
 `muttertag_threejs/index.html` only in `--rose-pale`, live `#fdf5f2` is canonical). The same document lives in
 [`fixtures/muttertag.billet.json`](fixtures/muttertag.billet.json), which backend tests and the
-Playwright parity test read directly — change both together.
+Playwright parity test read directly — change both together. Its `·` separators are typed like
+the card's `&nbsp;·&nbsp;`: a space and a no-break space (U+00A0, `\u00a0` below) on each side.
 
 ```json
 {
@@ -181,12 +191,12 @@ Playwright parity test read directly — change both together.
     "emphasis": "inkSoft"
   },
   "spacing": { "gutter": 8, "heroTop": 14, "heroBottom": 13, "dividerGap": 9, "blockGap": 10, "signatureGap": 11, "pageBottom": 15 },
-  "hero": { "label": "10. Mai 2026 · Muttertag", "titleLine1": "Für", "titleLine2": "Mama", "sub": "von Andreas" },
+  "hero": { "label": "10. Mai 2026 \u00a0·\u00a0 Muttertag", "titleLine1": "Für", "titleLine2": "Mama", "sub": "von Andreas" },
   "scene": {
     "enabled": true, "modelSlug": "flower-bouquet", "height": 23.75,
     "fitSize": 1.6, "yOffset": -0.08, "exposure": 0.6, "cameraDistance": 2.8, "cameraHeight": 0.1,
     "autoRotate": true, "autoRotateSpeed": 0.45,
-    "hint": "wischen zum drehen · pinch zum zoomen", "ariaLabel": "3D Blumenstrauß, interaktiv drehbar"
+    "hint": "wischen zum drehen \u00a0·\u00a0 pinch zum zoomen", "ariaLabel": "3D Blumenstrauß, interaktiv drehbar"
   },
   "divider": { "style": "diamond" },
   "blocks": [

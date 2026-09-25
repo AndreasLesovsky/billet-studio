@@ -62,8 +62,8 @@ const SEED_DEFAULTS = {
     autoRotateSpeed: 0.45,
   },
   'snow-globe': {
-    fitSize: 1.45,
-    yOffset: 0,
+    fitSize: 1.35,
+    yOffset: 0.07,
     exposure: 0.6,
     cameraDistance: 2.8,
     cameraHeight: 0.1,
@@ -98,9 +98,12 @@ const SCENE_ARIA_LABEL: Record<SceneModelSlug, Record<BilletLang, string>> = {
   },
 };
 
+/** The live card's separator (' &nbsp;·&nbsp; '): a space and a no-break space on each side. */
+export const SEPARATOR = ' \u00a0·\u00a0 ';
+
 const SCENE_HINT: Record<BilletLang, string> = {
-  de: 'wischen zum drehen · pinch zum zoomen',
-  en: 'swipe to rotate · pinch to zoom',
+  de: `wischen zum drehen${SEPARATOR}pinch zum zoomen`,
+  en: `swipe to rotate${SEPARATOR}pinch to zoom`,
 };
 
 /** The original card's scene (height 23.75rem, auto-rotating) around one of the seeded models. */

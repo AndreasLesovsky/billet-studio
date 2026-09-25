@@ -31,6 +31,9 @@
           >{{ hero.titleLine2 }}</span
         >
       </h1>
+    } @else {
+      <!-- Every billet page has an h1: without title lines it is read, not seen. -->
+      <h1 class="sr-only">{{ document().pageTitle || document().title }}</h1>
     }
     @if (hero.sub) {
       <p

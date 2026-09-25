@@ -26,19 +26,6 @@ const PIXEL_THRESHOLD = 0.1;
 const MAX_MISMATCH_RATIO = 0.01;
 const MASK_COLOR = '#ff00ff';
 
-/**
- * The live card sets its '·' separators as ' &nbsp;·&nbsp; ' (a space and a no-break space on each
- * side), the fixture as ' · '. The test types them like the card, so it measures the renderer, not
- * the wording: with the fixture's text the label and the hint are 8.8 px narrower.
- */
-const NBSP = String.fromCharCode(0xa0);
-const liveSeparator = (text: string) => text.replace(' · ', ` ${NBSP}·${NBSP} `);
-const LIVE_CARD_DOCUMENT = {
-  ...PARITY_DOCUMENT,
-  hero: { ...PARITY_DOCUMENT.hero, label: liveSeparator(PARITY_DOCUMENT.hero['label']) },
-  scene: { ...PARITY_DOCUMENT.scene, hint: liveSeparator(PARITY_DOCUMENT.scene.hint) },
-};
-
 /** The live card's reveal is finished at once; the petals and the credit line are not the card. */
 const ORIGINAL_CSS = `
   .hero-label, .hero-title, .hero-sub, .botanical, .divider, .section, .fun-card, .soundbar-note,
@@ -292,7 +279,7 @@ for (const viewport of VIEWPORTS) {
         await original.goto(ORIGINAL_URL, { waitUntil: 'networkidle' });
         expect(await settle(original, ORIGINAL_CSS)).toEqual(expect.arrayContaining(CARD_FACES));
 
-        await mockBilletApi(page, { 'parity-token': publicBillet(LIVE_CARD_DOCUMENT) });
+        await mockBilletApi(page, { 'parity-token': publicBillet(PARITY_DOCUMENT) });
         await page.goto(OURS_URL);
         await expect(page.locator('app-billet-view .signature-sub')).toBeVisible();
         await page.waitForLoadState('networkidle');

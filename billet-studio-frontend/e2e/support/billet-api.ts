@@ -4,7 +4,6 @@ import { join } from 'node:path';
 
 interface ParityFixture {
   readonly hero: Readonly<Record<string, string>>;
-  readonly scene: Readonly<Record<string, unknown>> & { readonly hint: string };
   readonly [key: string]: unknown;
 }
 
