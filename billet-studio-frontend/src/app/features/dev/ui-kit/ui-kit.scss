@@ -100,14 +100,6 @@
     animation: none;
 }
 
-// Stretched link: the whole interactive card (position: relative) is the click target.
-.kit__card-link::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-}
-
 // One editor theme per tile: the tile is the ThemeScope, so its padding shows the theme's page
 // background around the card.
 .kit__themes {

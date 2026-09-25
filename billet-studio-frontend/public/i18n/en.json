@@ -85,6 +85,19 @@
     "WEIHNACHTEN": "Christmas",
     "HOCHZEIT": "Wedding"
   },
+  "TEMPLATE_GALLERY": {
+    "TITLE": "Templates",
+    "LEAD": "Choose an occasion: every template comes with words, colours, fonts and a 3D motif, and you can change all of it to suit you.",
+    "THEME": "Colour scheme:",
+    "USE": "Use template",
+    "DESCRIPTION": {
+      "MUTTERTAG": "A bouquet of flowers and a big thank-you to Mom.",
+      "VALENTINSTAG": "A heart and a few loving lines for your favourite person.",
+      "GEBURTSTAG": "Cake, confetti and the very best wishes for the year ahead.",
+      "WEIHNACHTEN": "A snow globe full of winter magic for the people you love.",
+      "HOCHZEIT": "Champagne and heartfelt congratulations for the happy couple."
+    }
+  },
   "HOME": {
     "EYEBROW": "Digital billets with a 3D motif",
     "TITLE_LINE1": "Your words,",
@@ -96,7 +109,9 @@
     "STEP_DESIGN_TITLE": "Make it yours",
     "STEP_DESIGN_TEXT": "Adjust the text, colours, fonts and the 3D model in the editor.",
     "STEP_SHARE_TITLE": "Share with a link",
-    "STEP_SHARE_TEXT": "With an account you publish your billet and send the link on."
+    "STEP_SHARE_TEXT": "With an account you publish your billet and send the link on.",
+    "TEMPLATES_TITLE": "Start from a template",
+    "TEMPLATES_ALL": "All templates"
   },
   "BILLETS": {
     "TITLE": "My billets",
@@ -258,6 +273,7 @@
     "LABEL": "Breadcrumb",
     "BACK_TO": "Back to {{label}}",
     "HOME": "Home",
+    "TEMPLATES": "Templates",
     "BILLETS": "My billets",
     "NEW_BILLET": "New billet",
     "EDIT_BILLET": "Edit billet",

@@ -721,7 +721,8 @@ Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), li
   IPv4; audit logs keep the full IP. Buckets that refilled are swept every 10 minutes.
 - Every free-text field of the billet document carries `@NoControlCharacters` (only `
 ` allowed;
-  tab, CR, other C0 and DEL are `VALIDATION_ERROR`). The editor strips `` and turns tabs into spaces
+  tab, CR, other C0 and DEL are `VALIDATION_ERROR`). The editor strips `
+` and turns tabs into spaces
   on input, and shortens text only at code-point/grapheme boundaries.
 - The first publish of a billet takes a pessimistic row lock, so a billet only ever gets one share token.
 
@@ -1053,7 +1054,9 @@ uses `-ink` on `-soft`.
   `[style.--ui-range-progress]="pct + '%'"`); `ui-segmented` > `ui-segmented__option` (label around a
   radio, or a button with `aria-pressed` / `aria-checked`).
 - **Surfaces:** `ui-card` (+ `__header __title __body __footer`, `--interactive` for a stretched-link
-  card), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`, `--lg`),
+  card whose link is `ui-card__link`), `ui-thumb` (+ `__emoji __img`, `--loaded`: a 3D model preview
+  on a tinted plane, rendered only by `app-asset-thumb`; as a card's first child it is the card's
+  full-bleed top), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`, `--lg`),
   `ui-menu` / `ui-menu__item` (+ `--danger`) / `ui-menu__check` (trailing tick of a checked
   `menuitemradio`) / `ui-menu__separator` / `ui-menu__label` and `ui-popover` for CDK overlay panels
   (`cdk.overlay()` is included globally), `ui-table-wrap` > `ui-table` (+ `__actions` cell).

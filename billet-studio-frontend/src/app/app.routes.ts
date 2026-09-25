@@ -72,6 +72,14 @@ export const routes: Routes = [
           import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
         data: { breadcrumb: 'BREADCRUMB.RESET_PASSWORD' },
       },
+      {
+        path: 'templates',
+        loadComponent: () =>
+          import('./features/templates/template-gallery/template-gallery').then(
+            (m) => m.TemplateGallery,
+          ),
+        data: { breadcrumb: 'BREADCRUMB.TEMPLATES' },
+      },
       // Open to guests: their billets live on this device.
       {
         path: 'billets',

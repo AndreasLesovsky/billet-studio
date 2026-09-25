@@ -1,0 +1,64 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header">
+      <h1 class="ui-page__title">{{ 'TEMPLATE_GALLERY.TITLE' | translate }}</h1>
+      <p class="ui-page__lead">{{ 'TEMPLATE_GALLERY.LEAD' | translate }}</p>
+      <p
+        id="template-gallery-editor-soon"
+        class="ui-hint template-gallery__notice"
+      >
+        <i
+          class="bi bi-info-circle"
+          aria-hidden="true"
+        ></i>
+        {{ 'BILLETS.EDITOR_SOON' | translate }}
+      </p>
+    </header>
+
+    <ul
+      class="ui-grid template-gallery__grid"
+      role="list"
+    >
+      @for (card of cards(); track card.id) {
+        <li class="ui-card">
+          <app-asset-thumb
+            [src]="card.previewUrl"
+            [emoji]="card.emoji"
+          />
+          <div class="ui-card__body template-gallery__body">
+            <div class="ui-stack ui-stack--sm">
+              <h2 class="ui-card__title">{{ card.nameKey | translate }}</h2>
+              <p class="ui-hint">{{ card.descriptionKey | translate }}</p>
+            </div>
+            <p class="ui-hint template-gallery__theme">
+              <span
+                class="template-gallery__swatches"
+                aria-hidden="true"
+              >
+                @for (color of card.swatches; track $index) {
+                  <span
+                    class="ui-swatch"
+                    [style.background-color]="color"
+                  ></span>
+                }
+              </span>
+              <span
+                ><span class="ui-visually-hidden">{{ 'TEMPLATE_GALLERY.THEME' | translate }} </span
+                >{{ card.themeNameKey | translate }}</span
+              >
+            </p>
+            <button
+              type="button"
+              class="ui-btn ui-btn--primary ui-btn--block"
+              disabled
+              aria-describedby="template-gallery-editor-soon"
+            >
+              {{ 'TEMPLATE_GALLERY.USE' | translate }}
+              <span class="ui-visually-hidden">{{ card.nameKey | translate }}</span>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

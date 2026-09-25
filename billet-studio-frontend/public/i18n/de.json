@@ -85,6 +85,19 @@
     "WEIHNACHTEN": "Weihnachten",
     "HOCHZEIT": "Hochzeit"
   },
+  "TEMPLATE_GALLERY": {
+    "TITLE": "Vorlagen",
+    "LEAD": "Such dir einen Anlass aus: Jede Vorlage bringt Worte, Farben, Schriften und ein 3D-Motiv mit, und alles davon passt du an, wie es dir gefällt.",
+    "THEME": "Farbwelt:",
+    "USE": "Vorlage verwenden",
+    "DESCRIPTION": {
+      "MUTTERTAG": "Ein Blumenstrauß und ein großes Danke an Mama.",
+      "VALENTINSTAG": "Ein Herz und ein paar liebe Zeilen für deinen Lieblingsmenschen.",
+      "GEBURTSTAG": "Torte, Konfetti und die besten Wünsche fürs neue Lebensjahr.",
+      "WEIHNACHTEN": "Eine Schneekugel voller Winterzauber für die Menschen, die du liebst.",
+      "HOCHZEIT": "Champagner und herzliche Glückwünsche für das Brautpaar."
+    }
+  },
   "HOME": {
     "EYEBROW": "Digitale Billets mit 3D-Motiv",
     "TITLE_LINE1": "Deine Worte,",
@@ -96,7 +109,9 @@
     "STEP_DESIGN_TITLE": "Gestalten",
     "STEP_DESIGN_TEXT": "Texte, Farben, Schriften und das 3D-Modell passt du im Editor an.",
     "STEP_SHARE_TITLE": "Per Link teilen",
-    "STEP_SHARE_TEXT": "Mit einem Konto veröffentlichst du dein Billet und schickst den Link weiter."
+    "STEP_SHARE_TEXT": "Mit einem Konto veröffentlichst du dein Billet und schickst den Link weiter.",
+    "TEMPLATES_TITLE": "Starte mit einer Vorlage",
+    "TEMPLATES_ALL": "Alle Vorlagen"
   },
   "BILLETS": {
     "TITLE": "Meine Billets",
@@ -258,6 +273,7 @@
     "LABEL": "Brotkrumen-Navigation",
     "BACK_TO": "Zurück zu {{label}}",
     "HOME": "Start",
+    "TEMPLATES": "Vorlagen",
     "BILLETS": "Meine Billets",
     "NEW_BILLET": "Neues Billet",
     "EDIT_BILLET": "Billet bearbeiten",

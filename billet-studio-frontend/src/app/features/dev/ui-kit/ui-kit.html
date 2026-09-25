@@ -711,12 +711,34 @@
               </span>
               <h4 class="ui-card__title">
                 <a
-                  class="kit__card-link"
+                  class="ui-card__link"
                   href="#kit-cards"
                   >{{ 'NAV.NEW_BILLET' | translate }}</a
                 >
               </h4>
               <p class="ui-hint">{{ 'UI_KIT.CARD_NEW_BODY' | translate }}</p>
+            </div>
+          </article>
+          <article class="ui-card ui-card--interactive">
+            <app-asset-thumb
+              src="models/previews/flower-bouquet.v1.webp"
+              emoji="💐"
+            />
+            <div class="ui-card__body">
+              <h4 class="ui-card__title">
+                <a
+                  class="ui-card__link"
+                  href="#kit-cards"
+                  >{{ 'TEMPLATES.MUTTERTAG' | translate }}</a
+                >
+              </h4>
+            </div>
+          </article>
+          <!-- A thumb without an image (catalog unknown, load failed): the emoji stays. -->
+          <article class="ui-card">
+            <app-asset-thumb emoji="🎂" />
+            <div class="ui-card__body">
+              <h4 class="ui-card__title">{{ 'TEMPLATES.GEBURTSTAG' | translate }}</h4>
             </div>
           </article>
           <article

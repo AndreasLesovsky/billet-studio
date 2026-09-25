@@ -97,7 +97,7 @@ ON DUPLICATE KEY UPDATE
 
 -- birthday-cake (birthday_cake.glb)
 INSERT INTO `tbl_models` (`slug`, `name_de`, `name_en`, `occasion`, `file_path`, `preview_path`, `file_size_bytes`, `fit_size`, `y_offset`, `exposure`, `camera_distance`, `camera_height`, `auto_rotate_speed`, `credit`, `position`, `active`, `created_at`, `updated_at`) VALUES
-  ('birthday-cake', 'Geburtstagstorte', 'Birthday cake', 'birthday', 'models/birthday-cake.v1.glb', 'models/previews/birthday-cake.v1.webp', 3206196, 1.60, -0.08, 0.60, 2.80, 0.10, 0.45, 'Birthday Cake by Taylor (CC-BY-4.0) https://sketchfab.com/3d-models/birthday-cake-054d99bef15c4905b9f7ffe95ce9a08a', 50, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+  ('birthday-cake', 'Geburtstagstorte', 'Birthday cake', 'birthday', 'models/birthday-cake.v1.glb', 'models/previews/birthday-cake.v1.webp', 3206196, 2.00, -0.08, 0.85, 2.80, 0.10, 0.45, 'Birthday Cake by Taylor (CC-BY-4.0) https://sketchfab.com/3d-models/birthday-cake-054d99bef15c4905b9f7ffe95ce9a08a', 50, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
   `name_de` = VALUES(`name_de`),
   `name_en` = VALUES(`name_en`),

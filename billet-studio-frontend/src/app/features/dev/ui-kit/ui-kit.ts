@@ -4,6 +4,7 @@ import { Component, computed, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { DEFAULT_THEME, THEMES } from '../../../core/theme/theme-registry.generated';
+import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
 import { ThemePicker } from '../../../shared/components/theme-picker/theme-picker';
 import { ThemeScope } from '../../../shared/directives/theme-scope';
 import { BilletPresetSample } from './billet-preset-sample';
@@ -101,6 +102,7 @@ function targetTab(key: string, index: number, count: number): number | null {
     ThemePicker,
     ThemeScope,
     BilletPresetSample,
+    AssetThumb,
   ],
   templateUrl: './ui-kit.html',
   styleUrl: './ui-kit.scss',

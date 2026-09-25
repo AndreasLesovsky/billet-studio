@@ -92,9 +92,9 @@
       "position": 50,
       "maxTextureSize": 2048,
       "scene": {
-        "fitSize": 1.6,
+        "fitSize": 2.0,
         "yOffset": -0.08,
-        "exposure": 0.6,
+        "exposure": 0.85,
         "cameraDistance": 2.8,
         "cameraHeight": 0.1,
         "autoRotateSpeed": 0.45

@@ -56,14 +56,48 @@
 
     <section
       class="ui-stack"
+      aria-labelledby="home-templates"
+    >
+      <div class="home__section-header">
+        <h2 id="home-templates">{{ 'HOME.TEMPLATES_TITLE' | translate }}</h2>
+        <a
+          class="ui-btn ui-btn--neutral"
+          routerLink="/templates"
+        >
+          {{ 'HOME.TEMPLATES_ALL' | translate }}
+          <i
+            class="bi bi-arrow-right"
+            aria-hidden="true"
+          ></i>
+        </a>
+      </div>
+      <ul
+        class="home__templates"
+        role="list"
+      >
+        @for (card of templates(); track card.id) {
+          <li class="ui-card ui-card--interactive">
+            <app-asset-thumb
+              [src]="card.previewUrl"
+              [emoji]="card.emoji"
+            />
+            <h3 class="ui-card__title home__template-title">
+              <a
+                class="ui-card__link"
+                routerLink="/templates"
+                >{{ card.nameKey | translate }}</a
+              >
+            </h3>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section
+      class="ui-stack"
       aria-labelledby="home-steps"
     >
-      <h2
-        id="home-steps"
-        class="ui-visually-hidden"
-      >
-        {{ 'HOME.STEPS_TITLE' | translate }}
-      </h2>
+      <h2 id="home-steps">{{ 'HOME.STEPS_TITLE' | translate }}</h2>
       <ol
         class="ui-grid home__steps"
         role="list"

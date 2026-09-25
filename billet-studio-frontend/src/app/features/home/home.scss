@@ -35,3 +35,51 @@
 .home__steps {
     grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
 }
+
+.home__section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--ui-space-3) var(--ui-space-4);
+}
+
+// Phones and tablets: one row that scrolls sideways, bleeding into the container's gutter so a card
+// peeks in at the edge. From lg the five cards share the row.
+.home__templates {
+    display: grid;
+    grid-auto-columns: minmax(10rem, 42%);
+    grid-auto-flow: column;
+    gap: var(--ui-space-3);
+    margin-inline: calc(-1 * var(--ui-space-4));
+    // Room for the hover lift, the shadow and the focus ring, which the scroller would clip.
+    padding: var(--ui-space-2) var(--ui-space-4) var(--ui-space-3);
+    overflow-x: auto;
+    scroll-padding-inline: var(--ui-space-4);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    > li {
+        scroll-snap-align: start;
+    }
+
+    @include bp.up(md) {
+        grid-auto-columns: minmax(11rem, 28%);
+        margin-inline: calc(-1 * var(--ui-space-6));
+        padding-inline: var(--ui-space-6);
+        scroll-padding-inline: var(--ui-space-6);
+    }
+
+    @include bp.up(lg) {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: var(--ui-space-4);
+        margin-inline: 0;
+        padding: 0;
+        overflow: visible;
+    }
+}
+
+.home__template-title {
+    padding: var(--ui-space-3) var(--ui-space-4) var(--ui-space-4);
+}

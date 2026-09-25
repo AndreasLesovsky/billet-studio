@@ -1,0 +1,31 @@
+// Layout only; every visual comes from the ui-* classes, the swatch colours are template data.
+
+.template-gallery__notice {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+}
+
+.template-gallery__grid {
+    --ui-grid-min: 18rem;
+}
+
+// Theme line and button sit at the bottom, so the cards of one row line up.
+.template-gallery__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-4);
+}
+
+.template-gallery__theme {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2) var(--ui-space-3);
+    margin-block-start: auto;
+}
+
+.template-gallery__swatches {
+    display: flex;
+    gap: var(--ui-space-1);
+}
