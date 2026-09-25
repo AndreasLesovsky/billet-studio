@@ -27,9 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * The tables below are the intent, written out: /v1/auth/**, /v1/public/**, GET /v1/models/**, /uploads/** and the
  * health check are public; /v1/users/** is ADMIN; everything else needs a login. They assert the CLASSIFICATION of
  * each rule group, not what the handler returns: "denied" is 401/403, everything else (200, 204, 400, 404, 405)
- * counts as "reached", because whether a controller then likes the request is not this file's business. Routes of
- * phase P2 (billets, models, public billets) are in the table before their controllers exist: an unknown route that
- * gets past security is a 404, one that does not is a 401.
+ * counts as "reached", because whether a controller then likes the request is not this file's business.
  */
 @Testcontainers(disabledWithoutDocker = true)
 class SecurityRoutesIT extends WebITBase {
@@ -84,6 +82,23 @@ class SecurityRoutesIT extends WebITBase {
             .isFalse();
     }
 
+    /**
+     * The anonymous reads never look at the Authorization header: a stale token the SPA still holds must not turn a
+     * shared link or the model library into a 401 (JwtAuthenticationFilter.isAnonymousRead mirrors the rules above).
+     */
+    @ParameterizedTest(name = "public despite a broken token: {0} {1}")
+    @CsvSource({
+        "GET, /v1/public/billets/aaaaaaaaaaaaaaaaaaaaaa",
+        "GET, /v1/models",
+        "GET, /v1/models/bouquet"
+    })
+    void anonymousReads_ignoreABrokenToken(String method, String path) throws Exception {
+        int status = status(request(method, path), "not.a.valid-token");
+        assertThat(isDenied(status))
+            .withFailMessage("%s %s must ignore a broken token but answered %d", method, path, status)
+            .isFalse();
+    }
+
     @ParameterizedTest(name = "login required: {0} {1}")
     @CsvSource({
         "GET,    /v1/account",
@@ -95,6 +110,12 @@ class SecurityRoutesIT extends WebITBase {
         "GET,    /v1/billets",
         "POST,   /v1/billets",
         "POST,   /v1/billets/import",
+        "GET,    /v1/billets/1",
+        "PUT,    /v1/billets/1",
+        "DELETE, /v1/billets/1",
+        "POST,   /v1/billets/1/duplicate",
+        "POST,   /v1/billets/1/publish",
+        "POST,   /v1/billets/1/unpublish",
         "POST,   /v1/models",
         "DELETE, /v1/models/bouquet",
         "GET,    /v1/anything-else",
@@ -114,6 +135,7 @@ class SecurityRoutesIT extends WebITBase {
     @CsvSource({
         "GET, /v1/account",
         "GET, /v1/billets",
+        "GET, /v1/billets/1",
         "GET, /v1/anything-else"
     })
     void protectedRoutes_areReachableForAUser(String method, String path) throws Exception {

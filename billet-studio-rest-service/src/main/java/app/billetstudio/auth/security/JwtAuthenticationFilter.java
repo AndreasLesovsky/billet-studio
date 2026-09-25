@@ -51,7 +51,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        return COOKIE_AUTHORISED_URIS.contains(request.getRequestURI());
+        String uri = request.getRequestURI();
+        return COOKIE_AUTHORISED_URIS.contains(uri) || isAnonymousRead(request.getMethod(), uri);
+    }
+
+    /**
+     * Public reads never look at the Authorization header: a stale token the SPA still holds must not turn a shared
+     * link or the model library into a 401. Must stay within SecurityConfig's permitAll rules - a path skipped here but
+     * not permitted there is simply anonymous and denied.
+     */
+    private static boolean isAnonymousRead(String method, String uri) {
+        return uri.equals("/v1/public") || uri.startsWith("/v1/public/")
+            || ("GET".equals(method) && (uri.equals("/v1/models") || uri.startsWith("/v1/models/")));
     }
 
     @Override

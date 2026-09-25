@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import app.billetstudio.auth.annotation.RateLimited;
@@ -52,6 +53,11 @@ class RateLimitInterceptorTest {
     public void configuredEndpoint() {
     }
 
+    /** Full again one millisecond after a request. */
+    @RateLimited(limit = 1, duration = 1, unit = ChronoUnit.MILLIS)
+    public void briefEndpoint() {
+    }
+
     private final MockEnvironment environment = new MockEnvironment();
     private final MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -85,6 +91,27 @@ class RateLimitInterceptorTest {
             .isInstanceOf(RateLimitExceededException.class);
         assertThat(interceptor.preHandle(request("PUT", "/v1/users/5", "/v1/users/{id}"), response, handler))
             .isTrue();
+    }
+
+    /**
+     * The sweep keeps the map from growing with every client IP, but only a bucket that is full again may go: dropping
+     * a partly drained one would hand its client a fresh allowance.
+     */
+    @Test
+    void theSweep_dropsRefilledBuckets_andKeepsTheLimitOfDrainedOnes() throws Exception {
+        RateLimitInterceptor interceptor = interceptor();
+        HandlerMethod hourly = new HandlerMethod(this, RateLimitInterceptorTest.class.getMethod("limitedEndpoint"));
+        HandlerMethod brief = new HandlerMethod(this, RateLimitInterceptorTest.class.getMethod("briefEndpoint"));
+        interceptor.preHandle(request("POST", "/hourly", "/hourly"), response, hourly);
+        interceptor.preHandle(request("POST", "/brief", "/brief"), response, brief);
+        Thread.sleep(5);
+
+        interceptor.dropRefilledBuckets();
+
+        assertThat((Map<?, ?>) ReflectionTestUtils.getField(interceptor, "buckets")).hasSize(1);
+        assertThat(interceptor.preHandle(request("POST", "/hourly", "/hourly"), response, hourly)).isTrue();
+        assertThatThrownBy(() -> interceptor.preHandle(request("POST", "/hourly", "/hourly"), response, hourly))
+            .isInstanceOf(RateLimitExceededException.class);
     }
 
     static Stream<Arguments> passwordGuessingEndpoints() throws NoSuchMethodException {

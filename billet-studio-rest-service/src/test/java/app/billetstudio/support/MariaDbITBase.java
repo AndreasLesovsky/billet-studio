@@ -16,12 +16,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mariadb.MariaDBContainer;
 
 /**
- * Base of every integration test: the shared Testcontainers MariaDB (schema.sql + seed_roles.sql) and a
+ * Base of every integration test: the shared Testcontainers MariaDB (schema.sql + role and model seeds) and a
  * configuration that cannot leak into anything real. Self-skips without Docker.
  *
  * The fixed properties pin everything a developer's .env.local could otherwise feed into the context (root
- * account, secrets, mail, DDL, cookie flag). They are @TestPropertySource and not @DynamicPropertySource on purpose:
- * a subclass can override them with its own @TestPropertySource, while dynamic properties would always win.
+ * account, secrets, mail, DDL, cookie flag, billet limits, model base URL). They are @TestPropertySource and not
+ * dynamic properties on purpose: a subclass can override them with its own @TestPropertySource, while dynamic
+ * properties would always win. The billet cap is low so a test reaches it in a few requests without a context of its
+ * own; the document cap is the shipped default.
  *
  * The database outlives every test class of the run, so tests create their own rows under
  * {@link #uniqueEmail(String)} and never assume a table is empty.
@@ -40,7 +42,10 @@ import org.testcontainers.mariadb.MariaDBContainer;
     "app.frontend-url=" + MariaDbITBase.FRONTEND_URL,
     "app.auth.cookie.secure=true",
     "app.upload.directory=" + MariaDbITBase.UPLOAD_DIRECTORY,
-    "app.log.directory=target/it-logs"
+    "app.log.directory=target/it-logs",
+    "app.billet.max-per-user=" + MariaDbITBase.MAX_BILLETS_PER_USER,
+    "app.billet.max-document-bytes=" + MariaDbITBase.MAX_DOCUMENT_BYTES,
+    "app.models.base-url=" + MariaDbITBase.MODELS_BASE_URL
 })
 public abstract class MariaDbITBase {
 
@@ -49,6 +54,10 @@ public abstract class MariaDbITBase {
     protected static final String ROOT_PASSWORD = "Root-password-of-the-integration-tests-1";
     protected static final String FRONTEND_URL = "http://localhost:4200";
     protected static final String UPLOAD_DIRECTORY = "target/it-uploads";
+    protected static final int MAX_BILLETS_PER_USER = 5;
+    protected static final int MAX_DOCUMENT_BYTES = 262144;
+    /** With a trailing slash, so a resolved model URL shows whether the join doubles it. */
+    protected static final String MODELS_BASE_URL = "https://models.it.test/assets/";
 
     private static final String RUN = UUID.randomUUID().toString().substring(0, 8);
     private static final AtomicInteger SEQUENCE = new AtomicInteger();

@@ -3,11 +3,13 @@ package app.billetstudio;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import app.billetstudio.auth.bootstrap.RootUserBootstrap;
@@ -25,7 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.filter.FormContentFilter;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -50,11 +54,14 @@ import tools.jackson.databind.json.JsonMapper;
     "app.root.email=root@container.test",
     "app.root.password=Root-password-of-the-container-test-1",
     "app.upload.directory=target/container-test-uploads",
-    "app.log.directory=target/container-test-logs"
+    "app.log.directory=target/container-test-logs",
+    "app.billet.max-document-bytes=" + ServletContainerTest.MAX_DOCUMENT_BYTES
 })
 class ServletContainerTest {
 
     private static final HttpClient HTTP = HttpClient.newHttpClient();
+    /** Small, so a body past the billet cap stays under Tomcat's 2 MiB swallow limit and the answer arrives. */
+    static final int MAX_DOCUMENT_BYTES = 65536;
 
     @LocalServerPort
     private int port;
@@ -63,6 +70,8 @@ class ServletContainerTest {
     private JwtUtil jwtUtil;
     @Autowired
     private JsonMapper jsonMapper;
+    @Autowired
+    private ApplicationContext context;
 
     @MockitoBean
     private UserRepository userRepository;
@@ -124,5 +133,36 @@ class ServletContainerTest {
 
         assertThat(response.statusCode()).as(response.body()).isEqualTo(200);
         assertThat(jsonMapper.readTree(response.body()).get("status").asString()).isEqualTo("UP");
+    }
+
+    /**
+     * The billet body cap belongs to the handler, not to a spelling of its URL: Tomcat, Spring Security and Spring MVC
+     * all route the decoded path, so /v1/%62illets/5 is the autosave. MockMvc does not decode like the container, hence
+     * here. Chunked, so only the cut-off in the stream can stop it; unterminated, so a full parse would answer
+     * MALFORMED_REQUEST.
+     */
+    @Test
+    void an_oversized_billet_body_is_cut_off_however_its_path_is_spelled() throws Exception {
+        byte[] body = ("{\"version\":1,\"document\":{\"title\":\"" + "a".repeat(3 * MAX_DOCUMENT_BYTES))
+            .getBytes(StandardCharsets.UTF_8);
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/v1/%62illets/5"))
+            .version(HttpClient.Version.HTTP_1_1)
+            .header("Authorization", "Bearer " + jwtUtil.generateToken(user.getId()))
+            .header("Content-Type", "application/json")
+            .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> new ByteArrayInputStream(body)))
+            .build();
+
+        HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode()).as(response.body()).isEqualTo(400);
+        assertThat(jsonMapper.readTree(response.body()).get("errorCode").asString()).isEqualTo("VALIDATION_ERROR");
+    }
+
+    /**
+     * It would read a whole form-encoded PUT, PATCH or DELETE body into memory, unbounded and before authentication.
+     */
+    @Test
+    void no_form_content_filter_reads_a_body_before_authentication() {
+        assertThat(context.getBeanNamesForType(FormContentFilter.class)).isEmpty();
     }
 }

@@ -11,8 +11,8 @@ import org.testcontainers.utility.MountableFile;
  * exit, so every IT class and every cached Spring context talks to the same server: a container per class would
  * be stopped while a cached context still points at it.
  *
- * The schema comes from the REAL ../sql/schema.sql and ../sql/seed_roles.sql (never Hibernate DDL), so an entity
- * that drifts from the delivered SQL fails here instead of on the user's database.
+ * The schema comes from the REAL ../sql/schema.sql, seed_roles.sql and seed_models.sql (never Hibernate DDL), so an
+ * entity that drifts from the delivered SQL fails here instead of on the user's database.
  */
 final class MariaDbContainer {
 
@@ -35,7 +35,8 @@ final class MariaDbContainer {
             // The image runs /docker-entrypoint-initdb.d/*.sql in name order against the test database, as the
             // mysql user - hence the explicit world-readable mode.
             .withCopyFileToContainer(sqlFile("schema.sql"), "/docker-entrypoint-initdb.d/01-schema.sql")
-            .withCopyFileToContainer(sqlFile("seed_roles.sql"), "/docker-entrypoint-initdb.d/02-seed_roles.sql");
+            .withCopyFileToContainer(sqlFile("seed_roles.sql"), "/docker-entrypoint-initdb.d/02-seed_roles.sql")
+            .withCopyFileToContainer(sqlFile("seed_models.sql"), "/docker-entrypoint-initdb.d/03-seed_models.sql");
         container.start();
         return container;
     }

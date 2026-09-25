@@ -68,7 +68,10 @@ public class SecurityConfig {
                     new NegatedRequestMatcher(swaggerPaths),
                     new ContentSecurityPolicyHeaderWriter("default-src 'none'; frame-ancestors 'none'")))
                 .addHeaderWriter(new StaticHeadersWriter(
-                    "Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=(), usb=()")))
+                    "Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=(), usb=()"))
+                // Shared billets are private greetings: no search engine may index them, error answers included.
+                .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(paths.matcher("/v1/public/**"),
+                    new StaticHeadersWriter("X-Robots-Tag", "noindex"))))
             .authorizeHttpRequests(auth -> auth
                 // The container's forward to /error after a sendError (e.g. a request the firewall rejects). It
                 // carries no authentication, so a protected /error would turn every such status into a 401.
@@ -78,8 +81,10 @@ public class SecurityConfig {
                 // Everything under /v1/auth authorises itself: login by credentials, refresh and logout by
                 // the refresh cookie. None of them may require a working access token.
                 .requestMatchers("/v1/auth/**").permitAll()
+                // Anonymous reads; JwtAuthenticationFilter.isAnonymousRead skips the token for exactly these.
                 .requestMatchers("/v1/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/models/**").permitAll()
+                .requestMatchers("/v1/billets/**").authenticated()
                 // Denies before the controller is reached; @PreAuthorize on UserController is the second gate.
                 .requestMatchers("/v1/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated())

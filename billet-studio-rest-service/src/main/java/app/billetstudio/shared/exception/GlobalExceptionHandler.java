@@ -130,7 +130,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private Mapping map(Exception ex, HttpStatusCode statusCode) {
         if (ex instanceof HttpMessageNotReadableException) {
-            return new Mapping(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST");
+            // A body cut off at its size cap was not malformed, it was too large - the code an oversized document gets.
+            return causedBy(ex, RequestBodyTooLargeException.class)
+                ? new Mapping(HttpStatus.BAD_REQUEST, VALIDATION_ERROR)
+                : new Mapping(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST");
         }
         if (ex instanceof MethodArgumentNotValidException || ex instanceof HandlerMethodValidationException) {
             return new Mapping(HttpStatus.BAD_REQUEST, VALIDATION_ERROR);
@@ -202,6 +205,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     .map(MessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(", ")))
             .collect(Collectors.joining("; ")));
+    }
+
+    private static boolean causedBy(Throwable ex, Class<? extends Throwable> type) {
+        for (Throwable cause = ex.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
+            if (type.isInstance(cause)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static ResponseEntity<ApiError> error(HttpStatus status, String errorCode) {

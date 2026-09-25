@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.billetstudio.auth.annotation.RateLimited;
 import app.billetstudio.auth.exception.RateLimitExceededException;
@@ -23,6 +25,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.convert.DurationStyle;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -39,7 +42,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class RateLimitInterceptor implements HandlerInterceptor {
 
     private final Environment environment;
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Map<String, Entry> buckets = new ConcurrentHashMap<>();
 
     /** Off only for the e2e suite; a deployment that never mentions the variable keeps every limit. */
     @Value("${app.rate-limit.enabled:true}")
@@ -60,8 +63,15 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String clientIp = ClientIp.resolve(request.getHeader("X-Forwarded-For"), request.getRemoteAddr());
         String endpoint = request.getMethod() + " " + routePattern(request);
 
-        Bucket bucket = buckets.computeIfAbsent(clientIp + ":" + endpoint, k -> createBucket(limitFor(rateLimited)));
-        if (bucket.tryConsume(1)) {
+        AtomicBoolean allowed = new AtomicBoolean();
+        // Consumed inside compute: the sweep drops buckets under the same per-key lock, so it cannot drop one between
+        // the lookup and the consume and lose the token.
+        buckets.compute(clientIp + ":" + endpoint, (key, entry) -> {
+            Entry current = entry != null ? entry : new Entry(limitFor(rateLimited));
+            allowed.set(current.bucket().tryConsume(1));
+            return current;
+        });
+        if (allowed.get()) {
             return true;
         }
         Limit limit = limitFor(rateLimited);
@@ -80,7 +90,25 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             .forEach(this::limitFor);
     }
 
+    /**
+     * Without it the map keeps one entry per client IP and endpoint for the whole uptime. Only full buckets go: a full
+     * bucket answers like a new one, a partly drained one still limits its client.
+     */
+    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
+    public void dropRefilledBuckets() {
+        buckets.keySet().forEach(key -> buckets.computeIfPresent(key, (k, entry) -> entry.isFull() ? null : entry));
+    }
+
     private record Limit(int capacity, Duration window) {
+    }
+
+    private record Entry(Bucket bucket, long capacity) {
+
+        Entry(Limit limit) {
+            this(createBucket(limit), limit.capacity());
+        }
+
+        boolean isFull() { return bucket.getAvailableTokens() >= capacity; }
     }
 
     private Limit limitFor(RateLimited rateLimited) {

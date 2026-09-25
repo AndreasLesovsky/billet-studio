@@ -34,7 +34,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:none}
-    show-sql: ${JPA_SHOW_SQL:true}
+    show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
         format_sql: true
@@ -47,6 +47,13 @@ spring:
   # JWT only; no in-memory user from Boot's UserDetailsService default.
   autoconfigure:
     exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+
+  mvc:
+    formcontent:
+      filter:
+        # JSON-only API. FormContentFilter would read a whole form-encoded PUT/PATCH/DELETE body into memory, with no
+        # limit and before authentication or any body cap runs.
+        enabled: false
 
   # ---------------------------------------------------------------------------
   # Email (SMTP) - only used when app.mail.enabled=true

@@ -145,6 +145,9 @@ PublicBilletDto     { document: BilletDocument, model: ModelDto | null, publishe
 
 Rate limits (per IP): create 30/h, import 5/h, publish 30/h, duplicate 30/h.
 Document size cap `app.billet.max-document-bytes` (default 256 KiB) → 400 `VALIDATION_ERROR`.
+Request bodies over 2 × `max-document-bytes` (import: × 20) are refused before parsing (400
+`VALIDATION_ERROR`). Bodies are `application/json` only. Concurrent first publishes of one billet
+are serialised, so a billet only ever gets one share token.
 
 ### `/v1/models` (public)
 

@@ -15,6 +15,9 @@ Rules:
   breaks (a blank line = paragraph gap inside a block). Never HTML; the renderer never uses
   innerHTML. Emoji are allowed everywhere.
 - Colours are `#rrggbb` (lowercase written by the frontend; backend accepts either case).
+- Text must be well-formed UTF-16: an unpaired surrogate (half an emoji) is a 400 `VALIDATION_ERROR`.
+  The frontend shortens text only at code-point/grapheme boundaries (`Array.from` / `Intl.Segmenter`),
+  never with `String.slice` on UTF-16 units.
 - Themes vs. site: the website itself has ONE fixed design (site theme "studio", light + dark by
   system). The 16 editor themes never touch the site; they are scoped to the editor root and flow
   into the billet through `theme` + the preset values it writes into `palette`, `typography` and
