@@ -1,4 +1,4 @@
-import { computed, inject, Injector, resource, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injector, resource, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,6 +10,7 @@ import type {
   BilletSaveResponse,
   PublishResponse,
 } from '../../core/models/models';
+import { AccountBackups } from '../../core/services/account-backups';
 import { AuthApi } from '../../core/services/auth-api';
 import { BilletApi } from '../../core/services/billet-api';
 import { ConfirmationModalStore } from '../../core/stores/confirmation-modal-store';
@@ -94,6 +95,7 @@ export class AccountEditorSession implements EditorSession {
   private readonly injector = inject(Injector);
   private readonly translate = inject(TranslateService);
   private readonly confirmation = inject(ConfirmationModalStore);
+  private readonly backups = inject(AccountBackups);
   private readonly host: EditorHost;
 
   private readonly billetId = toSignal(
@@ -155,6 +157,7 @@ export class AccountEditorSession implements EditorSession {
 
   constructor(host: EditorHost) {
     this.host = host;
+    inject(DestroyRef).onDestroy(this.backups.register(() => this.confirmLogout()));
   }
 
   /** After a failed load. */
@@ -198,6 +201,16 @@ export class AccountEditorSession implements EditorSession {
   confirmLeave(): boolean | Promise<boolean> {
     const coordinator = this.coordinator();
     if (!coordinator || coordinator.flush()) return true;
+    return askToLeaveUnsaved(this.confirmation, this.translate);
+  }
+
+  /**
+   * Before an explicit logout, which removes this device's backup too: saves what is pending and
+   * waits for the answer; asks when it could not be saved.
+   */
+  private async confirmLogout(): Promise<boolean> {
+    const coordinator = this.coordinator();
+    if (!coordinator || (await coordinator.settled()) === 'idle') return true;
     return askToLeaveUnsaved(this.confirmation, this.translate);
   }
 

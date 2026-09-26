@@ -10,6 +10,7 @@ import { MessageStore } from '../stores/message-store';
 import { baseUrl } from '../environments/environment';
 import { SKIP_ERROR_TOAST } from '../interceptors/http-context-tokens';
 import { AccessToken, SESSION_HINT_KEY } from './access-token';
+import { AccountBackups } from './account-backups';
 import { UnsavedWork } from './unsaved-work';
 
 /** Where a login without a (valid) returnUrl lands, for every role. */
@@ -75,6 +76,7 @@ export class AuthApi {
   private readonly messageStore = inject(MessageStore);
   private readonly accessToken = inject(AccessToken);
   private readonly unsavedWork = inject(UnsavedWork);
+  private readonly accountBackups = inject(AccountBackups);
   private readonly authApi = `${baseUrl}auth`;
 
   /**
@@ -309,9 +311,9 @@ export class AuthApi {
 
   /**
    * Single entry point for "session has ended" with UI feedback: clears state, shows the toast that
-   * matches the reason, and navigates to /login.
+   * matches the reason, and navigates to /login (the returned navigation).
    */
-  endSession(opts: { reason: EndSessionReason; returnUrl?: string }): void {
+  endSession(opts: { reason: EndSessionReason; returnUrl?: string }): Promise<boolean> {
     // Read before clearTokens() forgets who this was.
     const outgoingUserId = this.user()?.id;
     this.returnIntent =
@@ -331,11 +333,9 @@ export class AuthApi {
       this.messageStore.addMessage(toast.type, toast.code);
     }
 
-    if (opts.returnUrl) {
-      void this.router.navigate(['/login'], { queryParams: { returnUrl: opts.returnUrl } });
-    } else {
-      void this.router.navigate(['/login']);
-    }
+    return opts.returnUrl
+      ? this.router.navigate(['/login'], { queryParams: { returnUrl: opts.returnUrl } })
+      : this.router.navigate(['/login']);
   }
 
   /**
@@ -369,7 +369,16 @@ export class AuthApi {
     return response;
   }
 
+  /**
+   * The explicit logout. It leaves none of the account's editor backups on this device, so an open
+   * account editor first sends what is pending - or asks, when it cannot, and staying cancels.
+   */
   async logout(): Promise<void> {
+    const mark = this.sessionMark;
+    if (!(await this.accountBackups.settleOpenEditor())) return;
+    // Ended while the editor saved (an expiry keeps its backups); whoever ended it said so.
+    if (mark !== this.sessionMark) return;
+    const userId = this.user()?.id;
     try {
       await firstValueFrom(
         this.http.post(
@@ -382,8 +391,12 @@ export class AuthApi {
       );
     } catch {
       // See above.
+    }
+    try {
+      await this.endSession({ reason: 'logout' });
     } finally {
-      this.endSession({ reason: 'logout' });
+      // After the navigation: leaving the editor backs up what it still holds.
+      if (userId !== undefined) this.accountBackups.removeAll(userId);
     }
   }
 

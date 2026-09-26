@@ -188,6 +188,10 @@
     "SHARE": "Teilen",
     "SHARE_GUEST_HINT": "Melde dich an, um dein Billet zu teilen.",
     "SHARE_DEVICE_HINT": "Übernimm das Billet in dein Konto, um es zu teilen.",
+    "EDIT_TITLE": "Titel bearbeiten: {{title}}",
+    "TOOLS": "Werkzeuge",
+    "TOOLS_OPEN": "Werkzeuge öffnen",
+    "MORE": "Mehr",
     "TABS": {
       "LABEL": "Bearbeiten",
       "PREVIEW": "Vorschau",
@@ -672,7 +676,9 @@
   },
   "BILLET_SCENE": {
     "LOAD_3D": "3D-Modell laden",
-    "LOADING": "3D-Modell wird geladen"
+    "LOADING": "3D-Modell wird geladen",
+    "ZOOM_HINT": "Zum Zoomen Strg + Mausrad",
+    "ZOOM_HINT_APPLE": "Zum Zoomen ⌘ + Scrollen"
   },
   "FOOTER": {
     "TAGLINE": "Billets gestalten und per Link teilen."

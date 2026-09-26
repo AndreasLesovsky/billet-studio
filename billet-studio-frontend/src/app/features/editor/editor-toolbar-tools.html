@@ -1,0 +1,64 @@
+<fieldset
+  class="editor-toolbar-tools__modes"
+  [class.ui-field]="stacked()"
+>
+  <legend
+    class="editor-toolbar-tools__legend"
+    [class]="labelClass()"
+  >
+    {{ 'EDITOR.PREVIEW_MODE' | translate }}
+  </legend>
+  <div class="ui-segmented">
+    @for (option of previewModes; track option.mode) {
+      <label class="ui-segmented__option">
+        <input
+          type="radio"
+          name="editor-preview-mode"
+          [value]="option.mode"
+          [checked]="previewMode() === option.mode"
+          (change)="previewMode.set(option.mode)"
+        />
+        {{ option.labelKey | translate }}
+      </label>
+    }
+  </div>
+</fieldset>
+
+<button
+  type="button"
+  class="ui-btn ui-btn--neutral"
+  [class.ui-btn--block]="stacked()"
+  (click)="replay.emit()"
+>
+  <i
+    class="bi bi-arrow-repeat"
+    aria-hidden="true"
+  ></i>
+  {{ 'EDITOR.REPLAY' | translate }}
+</button>
+
+<div
+  class="editor-toolbar-tools__lang"
+  [class.ui-field]="stacked()"
+>
+  <label
+    for="editor-lang"
+    [class]="labelClass()"
+    >{{ 'EDITOR.LANGUAGE' | translate }}</label
+  >
+  <select
+    id="editor-lang"
+    class="ui-select"
+    [title]="'EDITOR.LANGUAGE' | translate"
+    [formField]="billetForm().lang"
+  >
+    @for (option of langs; track option.lang) {
+      <option
+        [value]="option.lang"
+        [lang]="option.lang"
+      >
+        {{ option.labelKey | translate }}
+      </option>
+    }
+  </select>
+</div>

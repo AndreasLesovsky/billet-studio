@@ -1,64 +1,79 @@
-// Layout only; the host is .ui-editor-bar.ui-cluster, everything else ui-* classes.
-@use '../../../styles/breakpoints' as bp;
+// Layout only; the host is .ui-editor-bar (the band), everything else ui-* classes. One row at every
+// width: nothing wraps, every control is --ui-control-height tall, and only the title (then the
+// save status) gives way. editor-skeleton.scss mirrors the row.
 
 :host {
-    gap: var(--ui-space-2) var(--ui-space-4);
-    padding: var(--ui-space-2) var(--ui-space-4);
+    // Above the workspace, which the title's message and the tooltips lie over.
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    margin-block-start: var(--ui-space-3);
+    padding: var(--ui-space-2) var(--ui-space-6);
 
-    @include bp.up(md) {
-        padding-inline: var(--ui-space-6);
+    > * {
+        flex: none;
     }
+}
+
+:host(.editor-toolbar--narrow) {
+    gap: var(--ui-space-2);
+    padding: var(--ui-space-1) var(--ui-space-4);
 }
 
 .editor-toolbar__title {
-    flex: 1 1 14rem;
+    position: relative;
+    flex: 2 4 16rem;
+    min-inline-size: 8rem;
     max-inline-size: 28rem;
-}
 
-.editor-toolbar__tools {
-    gap: var(--ui-space-2) var(--ui-space-3);
-}
-
-// Phones: the content panel has the language too, and the bar keeps to the essentials.
-.editor-toolbar__lang {
-    @include bp.down(md) {
-        display: none;
-    }
-
-    > .ui-select {
-        inline-size: auto;
+    > .ui-input {
+        block-size: var(--ui-control-height);
+        padding-block: 0;
     }
 }
 
-// The save status above the publish badge, together no taller than a control.
-.editor-toolbar__status {
+// Phones: the title as text, the pencil after it; the side sheet has the field.
+.editor-toolbar__title-button {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    min-inline-size: 0;
+    padding-inline: var(--ui-space-2);
+}
+
+.editor-toolbar__title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.editor-toolbar__history {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.125rem;
-    min-inline-size: 9rem;
+    gap: var(--ui-space-2);
 
-    > .ui-hint {
-        display: inline-flex;
-        align-items: center;
+    :host(.editor-toolbar--narrow) & {
         gap: var(--ui-space-1);
-        line-height: var(--ui-leading-tight);
-        white-space: nowrap;
     }
 }
 
-// An account billet's status keeps the width of its widest routine pair ("Saving …" over
-// "Unpublished changes"): the first edit of a published billet must not push Share onto a new row.
+// Wide: after the flexible gap, flush with the buttons after it. Its minimum holds the routine
+// statuses ("Saving …", "Saved"), so typing never moves the title; an account billet's holds
+// "Unpublished changes" too, which the first edit of a published billet brings. A longer status
+// (a failure) takes room from the title first, then ends in an ellipsis.
+.editor-toolbar__status {
+    flex: 0 1 auto;
+    min-inline-size: 9rem;
+    max-inline-size: 16rem;
+    margin-inline-start: auto;
+}
+
 .editor-toolbar__status--shared {
     min-inline-size: 14rem;
 }
 
-.editor-toolbar__share {
-    margin-inline-start: auto;
-
-    > .ui-hint {
-        max-inline-size: 16rem;
-        font-size: var(--ui-text-xs);
-        line-height: var(--ui-leading-tight);
-    }
+// Medium: its icons.
+:host(.editor-toolbar--medium) .editor-toolbar__status {
+    flex: none;
+    min-inline-size: 0;
 }

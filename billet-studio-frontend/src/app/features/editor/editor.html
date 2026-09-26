@@ -3,6 +3,7 @@
     <div class="editor">
       <app-editor-toolbar
         [billetForm]="billetForm"
+        [layout]="layout()"
         [canUndo]="canUndo()"
         [canRedo]="canRedo()"
         [saveIndicator]="session.saveIndicator()"

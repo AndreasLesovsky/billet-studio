@@ -1,0 +1,53 @@
+// Layout only; the status is .ui-hint or .ui-badge (its SaveIndicator), the publish badge .ui-badge.
+
+:host {
+    display: flex;
+    min-inline-size: 0;
+
+    > .ui-hint,
+    > .ui-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--ui-space-1);
+        min-inline-size: 0;
+        max-inline-size: 100%;
+        line-height: var(--ui-leading-tight);
+
+        > .bi {
+            flex: none;
+        }
+    }
+}
+
+// The status over the badge, flush with the end, together no taller than a control. A status longer
+// than the box the owner gives it ends in an ellipsis; its full text is its title.
+:host(.editor-save-status--stacked) {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.editor-save-status__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:host(.editor-save-status--row) {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2);
+}
+
+// The icons on the control's height; the anchor holds them and their tooltip.
+.editor-save-status__icons {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-1);
+    min-block-size: var(--ui-control-height);
+    padding-inline: var(--ui-space-1);
+
+    > .ui-hint {
+        display: inline-flex;
+        font-size: 1.125rem;
+    }
+}

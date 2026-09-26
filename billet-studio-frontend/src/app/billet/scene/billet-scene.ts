@@ -23,17 +23,22 @@ import type { ColorMode } from '../../core/theme/theme-registry.generated';
 import type { BilletDocument } from '../billet-document';
 import { mediaQuery, PREFERS_REDUCED_MOTION } from '../view/media-query';
 import { AssetCache } from './asset-cache';
-import { loadFraction, sameStageSettings, type StageSettings } from './scene-math';
+import { loadFraction, sameStageSettings, type StageSettings, type WheelZoom } from './scene-math';
 import type { SceneStage } from './scene-stage';
 import { ThreeRuntime } from './three-runtime';
 
 type SceneStatus = 'empty' | 'gated' | 'loading' | 'ready' | 'error';
+
+/** How long the zoom hint stays before it fades. */
+const ZOOM_HINT_MS = 1500;
 
 /**
  * The billet's 3D scene. Until the model is drawn, the model's preview image stands in; it is
  * rendered with the scene's camera (tools/asset-pipeline/models/preview.html), so it sits where the
  * model appears. On a data-saver connection the 3D waits for a tap unless `eager`; a failed load
  * keeps the preview. The host fills its parent, which sets the height (`scene.height`).
+ *
+ * With `wheelZoom` 'modifier' the first plain wheel over the shown model says, once, how to zoom.
  */
 @Component({
   selector: 'app-billet-scene',
@@ -54,6 +59,7 @@ export class BilletScene {
   readonly eager = input(false);
   /** How much a CSS transform magnifies the scene; the canvas renders sharper to match. */
   readonly magnification = input(1);
+  readonly wheelZoom = input<WheelZoom>('modifier');
   /** The model is drawn in 3D. */
   readonly loaded = output<void>();
 
@@ -61,7 +67,8 @@ export class BilletScene {
   private readonly assets = inject(AssetCache);
   private readonly destroyRef = inject(DestroyRef);
   private readonly language = inject(LanguageService);
-  private readonly saveData = prefersSaveData(inject(DOCUMENT).defaultView);
+  private readonly view = inject(DOCUMENT).defaultView;
+  private readonly saveData = prefersSaveData(this.view);
   private readonly reducedMotion = mediaQuery(PREFERS_REDUCED_MOTION);
   private readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -71,6 +78,8 @@ export class BilletScene {
   private readonly loadRequested = signal(false);
   private booting = false;
   private errorLogged = false;
+  private zoomHinted = false;
+  private zoomHintTimer: ReturnType<typeof setTimeout> | undefined;
 
   /** The loading UI is site text inside a billet that may be in the other language. */
   protected readonly uiLang = this.language.currentLang;
@@ -79,6 +88,10 @@ export class BilletScene {
     const progress = this.progress();
     return progress === null ? null : Math.round(progress * 100);
   });
+  protected readonly zoomHint = signal(false);
+  protected readonly zoomHintKey = isApple(this.view)
+    ? 'BILLET_SCENE.ZOOM_HINT_APPLE'
+    : 'BILLET_SCENE.ZOOM_HINT';
   protected readonly previewUrl = computed(() => this.model()?.previewUrl || null);
   protected readonly sizeLabel = computed(() =>
     megabytes(this.model()?.fileSizeBytes ?? 0, this.language.locale()),
@@ -121,6 +134,8 @@ export class BilletScene {
     effect(() => this.onStage((stage) => stage.setInteractive(this.interactive())));
     effect(() => this.onStage((stage) => stage.setReducedMotion(this.reducedMotion())));
     effect(() => this.onStage((stage) => stage.setMagnification(this.magnification())));
+    effect(() => this.onStage((stage) => stage.setWheelZoom(this.wheelZoom())));
+    this.destroyRef.onDestroy(() => clearTimeout(this.zoomHintTimer));
   }
 
   private onStage(apply: (stage: SceneStage) => void): void {
@@ -146,6 +161,8 @@ export class BilletScene {
         settings: this.settings(),
         interactive: this.interactive(),
         reducedMotion: this.reducedMotion(),
+        wheelZoom: this.wheelZoom(),
+        onPlainWheel: () => this.hintZoom(),
         debug: isDevMode(),
       });
       this.destroyRef.onDestroy(() => stage.dispose());
@@ -185,6 +202,14 @@ export class BilletScene {
     if (!abortSignal.aborted) this.loaded.emit();
   }
 
+  /** Once per scene, and only over a drawn model: there is nothing to zoom before. */
+  private hintZoom(): void {
+    if (this.zoomHinted || this.status() !== 'ready') return;
+    this.zoomHinted = true;
+    this.zoomHint.set(true);
+    this.zoomHintTimer = setTimeout(() => this.zoomHint.set(false), ZOOM_HINT_MS);
+  }
+
   /** The preview stays up on failure; no toast, one console line per scene. */
   private logOnce(error: unknown): void {
     if (this.errorLogged) return;
@@ -198,6 +223,15 @@ function prefersSaveData(view: Window | null): boolean {
   const navigator = view?.navigator as
     (Navigator & { connection?: { saveData?: boolean } }) | undefined;
   return navigator?.connection?.saveData === true;
+}
+
+/** macOS and iOS/iPadOS (an iPad reports itself as a Mac), where the zoom key is ⌘. */
+function isApple(view: Window | null): boolean {
+  const navigator = view?.navigator as
+    (Navigator & { userAgentData?: { platform?: string } }) | undefined;
+  return /mac|iphone|ipad|ipod/i.test(
+    navigator?.userAgentData?.platform || navigator?.platform || '',
+  );
 }
 
 function megabytes(bytes: number, locale: string): string {

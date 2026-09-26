@@ -79,14 +79,11 @@
     animation: billet-scene-sweep 1.2s ease-in-out infinite;
 }
 
-.billet-scene__load {
+// The scene's own UI text: a pill in the billet's surface and ink.
+.billet-scene__load,
+.billet-scene__hint {
     position: absolute;
-    bottom: 2.25rem;
     left: 50%;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 2.75rem;
     padding: 0.5rem 1.125rem;
     border: 1px solid var(--billet-border);
     border-radius: 1.5rem;
@@ -97,6 +94,14 @@
     font-size: calc(0.6875rem * var(--billet-size-ui, 1));
     letter-spacing: 0.12em;
     text-transform: uppercase;
+}
+
+.billet-scene__load {
+    bottom: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
     white-space: nowrap;
     transform: translateX(-50%);
     cursor: pointer;
@@ -107,12 +112,33 @@
     }
 }
 
+.billet-scene__hint {
+    top: 50%;
+    max-width: calc(100% - 2rem);
+    margin: 0;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: billet-scene-appear 0.2s both;
+}
+
+// On its way out (animate.leave).
+.billet-scene__hint--leaving {
+    animation: billet-scene-fade 0.4s both;
+}
+
 .billet-scene__size {
     color: var(--billet-ink-soft);
 }
 
 @keyframes billet-scene-appear {
     from {
+        opacity: 0;
+    }
+}
+
+@keyframes billet-scene-fade {
+    to {
         opacity: 0;
     }
 }

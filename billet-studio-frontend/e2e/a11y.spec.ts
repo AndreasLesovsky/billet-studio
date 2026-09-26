@@ -8,7 +8,8 @@ import { withoutWebGl } from './support/scene';
 
 // axe (WCAG 2.0 A/AA, 2.1 AA) on every page a visitor reaches, in the states that add UI: the
 // header menus, the delete confirmation, the editor (content tab, design tab with each picker open,
-// in both colour modes and on a phone), the share dialog, the billet page in both colour modes.
+// in both colour modes; on a phone with its tools side sheet; on a tablet with its "More" menu), the
+// share dialog, the billet page in both colour modes.
 // German UI (the browser's language). A violation fails the test; the only accepted ones are
 // listed in ACCEPTED with their reason.
 
@@ -89,9 +90,16 @@ async function expectAccessible(page: Page, state: string): Promise<void> {
 async function openMuttertag(page: Page): Promise<void> {
   await page.goto('/templates');
   await page.getByRole('link', { name: 'Vorlage verwenden Muttertag' }).click();
-  await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
-    'Muttertag für Mama',
-  );
+  // A phone's toolbar shows the title as a button that opens its field in the side sheet.
+  if ((page.viewportSize()?.width ?? 0) < 768) {
+    await expect(
+      page.getByRole('button', { name: 'Titel bearbeiten: Muttertag für Mama' }),
+    ).toBeVisible();
+  } else {
+    await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
+      'Muttertag für Mama',
+    );
+  }
 }
 
 test.describe('accessibility', () => {
@@ -139,7 +147,7 @@ test.describe('accessibility', () => {
       await expectAccessible(page, 'delete confirmation');
     });
 
-    test('the editor on a phone', async ({ page }) => {
+    test('the editor on a phone, and its tools side sheet', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await openMuttertag(page);
       await expectAccessible(page, 'phone, content tab');
@@ -147,6 +155,18 @@ test.describe('accessibility', () => {
       await page.getByRole('tab', { name: 'Vorschau' }).click();
       await expect(page.locator('#editor-panel-preview')).toBeVisible();
       await expectAccessible(page, 'phone, preview tab');
+
+      await page.getByRole('button', { name: 'Werkzeuge öffnen' }).click();
+      await expect(page.getByRole('dialog', { name: 'Werkzeuge' })).toBeVisible();
+      await expectAccessible(page, 'phone, tools side sheet');
+    });
+
+    test('the editor on a tablet, and its "More" menu', async ({ page }) => {
+      await page.setViewportSize({ width: 1024, height: 768 });
+      await openMuttertag(page);
+      await page.getByRole('button', { name: 'Mehr' }).click();
+      await expect(page.getByRole('menu')).toBeVisible();
+      await expectAccessible(page, 'tablet, "More" menu');
     });
 
     for (const colorScheme of ['light', 'dark'] as const) {

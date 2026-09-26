@@ -6,6 +6,7 @@ import { Subject, of, throwError } from 'rxjs';
 
 import { AuthApi, EndSessionReason } from './auth-api';
 import { SESSION_HINT_KEY } from './access-token';
+import { backupKey } from './account-backups';
 import { MessageStore } from '../stores/message-store';
 import { UnsavedWork } from './unsaved-work';
 import { SKIP_ERROR_TOAST } from '../interceptors/http-context-tokens';
@@ -102,6 +103,25 @@ describe('AuthApi', () => {
       expect(authApi.user()).toBeNull();
       expect(messageStore.addMessage).toHaveBeenCalledWith('success', 'LOGOUT_SUCCESS');
       expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    });
+
+    it("removes the account's editor backups from this device; an expired session keeps them", async () => {
+      const backups = () =>
+        Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i) ?? '')
+          .filter((key) => key.startsWith('billet-studio.backup.'))
+          .sort();
+      for (const billetId of [1, 2]) localStorage.setItem(backupKey(7, billetId), '{}');
+      localStorage.setItem(backupKey(70, 1), '{}');
+      localStorage.setItem(backupKey(8, 1), '{}');
+      httpClient.post.mockReturnValue(of(null));
+
+      authApi.user.set(testUser({ id: 7 }));
+      authApi.endSession({ reason: 'expired' });
+      expect(backups()).toHaveLength(4);
+
+      authApi.user.set(testUser({ id: 7 }));
+      await authApi.logout();
+      expect(backups()).toEqual([backupKey(70, 1), backupKey(8, 1)]);
     });
   });
 

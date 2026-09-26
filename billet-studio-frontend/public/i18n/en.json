@@ -188,6 +188,10 @@
     "SHARE": "Share",
     "SHARE_GUEST_HINT": "Sign in to share your billet.",
     "SHARE_DEVICE_HINT": "Move the billet into your account to share it.",
+    "EDIT_TITLE": "Edit title: {{title}}",
+    "TOOLS": "Tools",
+    "TOOLS_OPEN": "Open tools",
+    "MORE": "More",
     "TABS": {
       "LABEL": "Edit",
       "PREVIEW": "Preview",
@@ -672,7 +676,9 @@
   },
   "BILLET_SCENE": {
     "LOAD_3D": "Load 3D model",
-    "LOADING": "Loading 3D model"
+    "LOADING": "Loading 3D model",
+    "ZOOM_HINT": "Ctrl + mouse wheel to zoom",
+    "ZOOM_HINT_APPLE": "⌘ + scroll to zoom"
   },
   "FOOTER": {
     "TAGLINE": "Design billets and share them with a link."

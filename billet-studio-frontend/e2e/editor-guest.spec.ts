@@ -20,14 +20,21 @@ const blockCards = (page: Page) => page.locator('app-block-editor');
 const blockText = (page: Page, index: number) =>
   blockCards(page).nth(index).getByRole('textbox', { name: 'Text', exact: true });
 
+/** A phone's toolbar shows the title as a button that opens its field in the side sheet. */
+const PHONE_TITLE = 'Titel bearbeiten: Muttertag für Mama';
+
 /** /templates → "Vorlage verwenden" on Muttertag → the new billet's editor. */
 async function openMuttertag(page: Page): Promise<void> {
   await page.goto('/templates');
   await page.getByRole('link', { name: 'Vorlage verwenden Muttertag' }).click();
   await expect(page).toHaveURL(EDIT_URL);
-  await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
-    'Muttertag für Mama',
-  );
+  if ((page.viewportSize()?.width ?? 0) < 768) {
+    await expect(page.getByRole('button', { name: PHONE_TITLE })).toBeVisible();
+  } else {
+    await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
+      'Muttertag für Mama',
+    );
+  }
 }
 
 /** The billet documents this browser stores, by their index entry's order (newest first). */
@@ -199,6 +206,25 @@ test.describe('editor as a guest', () => {
     await tabs.getByRole('tab', { name: 'Inhalt' }).click();
     await expect(content).toBeVisible();
     await expect(previewPanel).toBeHidden();
+  });
+
+  test('on a phone the title opens the tools side sheet at its field; Esc goes back to it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openMuttertag(page);
+
+    await page.getByRole('button', { name: PHONE_TITLE }).click();
+    const sheet = page.getByRole('dialog', { name: 'Werkzeuge' });
+    const title = sheet.getByRole('textbox', { name: 'Titel des Billets' });
+    await expect(title).toBeFocused();
+    await title.fill('Für die beste Mama');
+    await page.keyboard.press('Escape');
+
+    await expect(sheet).toBeHidden();
+    await expect(
+      page.getByRole('button', { name: 'Titel bearbeiten: Für die beste Mama' }),
+    ).toBeFocused();
   });
 
   test('pasted tabs and carriage returns arrive as spaces and plain line breaks', async ({

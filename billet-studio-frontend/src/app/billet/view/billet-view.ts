@@ -4,6 +4,7 @@ import type { ModelAssetDto } from '../../core/models/modelAssetDto';
 import type { BilletDocument } from '../billet-document';
 import { BilletParticles } from '../particles/billet-particles';
 import { BilletScene } from '../scene/billet-scene';
+import type { WheelZoom } from '../scene/scene-math';
 import { BilletBlock } from './billet-block';
 import { BilletDivider } from './billet-divider';
 import { FitText } from './fit-text';
@@ -47,6 +48,8 @@ export class BilletView {
   readonly fill = input<'page' | 'frame'>('page');
   /** How much a CSS transform magnifies the billet (the editor's preview zoom), for the 3D canvas. */
   readonly magnification = input(1);
+  /** The mouse wheel over the 3D scene: 'off' where a slider sets the camera distance. */
+  readonly wheelZoom = input<WheelZoom>('modifier');
 
   private readonly timeline = inject(RevealTimeline);
   private readonly systemDark = mediaQuery(PREFERS_DARK);

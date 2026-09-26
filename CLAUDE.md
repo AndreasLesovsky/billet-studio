@@ -588,6 +588,17 @@ The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document
   controls, mixer, environment, materials/textures owned by the scene, and `renderer.dispose()`.
 - The canvas has `touch-action: pan-y` so a phone keeps scrolling the page, and an `aria-label`
   from the document (`scene.ariaLabel`).
+- **The mouse wheel never traps the page** (user decision; `wheelZoom` on `BilletView` →
+  `BilletScene` → `SceneStage`): a plain wheel over the scene scrolls the page past it.
+  - `'modifier'` (default: the public page, the dev preview): only Ctrl/⌘ + wheel zooms the camera
+    (a trackpad pinch arrives as Ctrl + wheel). The first plain wheel over the drawn model shows a
+    hint (`BILLET_SCENE.ZOOM_HINT`, `…_APPLE` with ⌘), once per scene, `aria-hidden`, fading after
+    1.5 s.
+  - `'off'` (the editor preview): the wheel never zooms the camera - its distance is a slider, and
+    Ctrl/⌘ + wheel zooms the preview frame, whose capture listener takes the event first.
+  - One gate, in `SceneStage`: a capture wheel listener on the container sets
+    `controls.enableZoom` before OrbitControls sees the event, so an unzoomed wheel is never
+    `preventDefault`ed; every `pointerdown` sets it back, so a touch pinch zooms in both modes.
 
 ---
 
@@ -797,6 +808,15 @@ Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), li
   reactivation restores the link).
 - Refresh cookie `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/v1/auth`. The access token lives in
   memory only.
+- The account editor backs up unsaved edits in this browser
+  (`billet-studio.backup.<userId>.<billetId>`, `features/editor/billet-backup.ts`). They survive a
+  lost connection, a closed tab and every end of a session the user did not choose (expiry,
+  another tab, deactivation) and are offered after the next login. **An explicit logout leaves
+  none behind** (user decision, `AuthApi.logout()`): the open account editor first sends what is
+  pending and waits for the answer - when it cannot be saved it asks, and "Bleiben" cancels the
+  logout - then, once the page has left for /login, every backup of the account is removed. The
+  editor registers that check with `AccountBackups`, which has no dependencies (DI deadlock rule,
+  section 13).
 
 ### Secret files
 These rules mirror the Read/Bash deny + allow patterns in `~/.claude/settings.json`; keep both in sync.

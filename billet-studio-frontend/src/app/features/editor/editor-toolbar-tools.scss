@@ -1,0 +1,33 @@
+// Layout only; the host takes no box, so its three controls are items of the toolbar's row or the
+// side sheet's stack. Each is a control's height; the wrappers are flex boxes, so no line box adds
+// its strut to that height.
+
+:host {
+    display: contents;
+}
+
+.editor-toolbar-tools__modes,
+.editor-toolbar-tools__lang {
+    display: flex;
+    flex: none;
+}
+
+.editor-toolbar-tools__modes > .ui-segmented {
+    flex-wrap: nowrap;
+    block-size: var(--ui-control-height);
+
+    > .ui-segmented__option {
+        min-block-size: 0;
+    }
+}
+
+// As wide as its words in the row; the stack stretches it.
+.editor-toolbar-tools__lang > .ui-select {
+    inline-size: auto;
+    block-size: var(--ui-control-height);
+    padding-block: 0;
+}
+
+.editor-toolbar-tools__legend {
+    margin-block-end: var(--ui-space-2);
+}

@@ -1,0 +1,76 @@
+@let fields = billetForm();
+<dialog
+  class="ui-dialog ui-dialog--sheet"
+  aria-labelledby="editor-sheet-title"
+  [appModal]="open()"
+  (dismissed)="close()"
+>
+  <div class="ui-dialog__header">
+    <h2
+      id="editor-sheet-title"
+      class="ui-dialog__title"
+    >
+      {{ 'EDITOR.TOOLS' | translate }}
+    </h2>
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      (click)="close()"
+    >
+      <i
+        class="bi bi-x-lg"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+
+  <div class="ui-dialog__body ui-stack">
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        for="editor-title"
+        >{{ 'EDITOR.TITLE_LABEL' | translate }}</label
+      >
+      <input
+        id="editor-title"
+        class="ui-input"
+        appBilletText
+        [attr.autofocus]="atTitle() ? '' : null"
+        [formField]="fields.title"
+      />
+      <app-field-error [field]="fields.title" />
+    </div>
+
+    <app-editor-toolbar-tools
+      [billetForm]="fields"
+      [stacked]="true"
+      [(previewMode)]="previewMode"
+      (replay)="replayAndClose()"
+    />
+  </div>
+
+  <div class="ui-dialog__footer editor-toolbar-sheet__foot">
+    <app-editor-save-status
+      variant="row"
+      [indicator]="saveIndicator()"
+      [facts]="shareFacts()"
+    />
+    @if (shareHintKey(); as hintKey) {
+      <p class="ui-hint">{{ hintKey | translate }}</p>
+    }
+    @if (guest()) {
+      <a
+        class="ui-btn ui-btn--secondary ui-btn--block"
+        routerLink="/login"
+        [queryParams]="{ returnUrl: returnUrl() }"
+      >
+        <i
+          class="bi bi-box-arrow-in-right"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.LOGIN' | translate }}
+      </a>
+    }
+  </div>
+</dialog>

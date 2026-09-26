@@ -154,6 +154,9 @@ signature sub `0.6875rem`.
 - The 3D hint is drawn in full `inkSoft` (the original card: 50 % opacity, about 2.3:1), so it stays
   readable - a user decision. The hero label keeps the original's `accent` on `accentSoft` (the live
   card in light mode: 3.7:1) - also a user decision, accepted as decorative text.
+- `scene.hint` is the author's text (the card's "pinch zum zoomen" still holds on touch). The mouse
+  wheel is not in the document: a plain wheel scrolls the page past the scene, Ctrl/⌘ + wheel
+  zooms, and the scene says so itself, once, in the site's language (CLAUDE.md section 12).
 - Every billet page has an `h1`: with both title lines empty it is visually hidden and reads
   `pageTitle`, else `title`.
 

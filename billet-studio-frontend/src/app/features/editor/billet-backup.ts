@@ -1,10 +1,12 @@
 import type { BilletDocument } from '../../billet/billet-document';
 import { migrateDocument } from '../../billet/migrate-document';
+import { backupKey } from '../../core/services/account-backups';
 
 /**
  * This device's copy of an account billet's unsaved edits: written before each save goes out,
- * removed once the server has them. It outlives a lost connection, a closed tab and an ended
- * session, and belongs to one user, so another account on this browser never sees it.
+ * removed once the server has them. It outlives a lost connection, a closed tab and an expired
+ * session (not an explicit logout: AccountBackups), and belongs to one user, so another account on
+ * this browser never sees it.
  */
 export interface BilletBackup {
   /** The server version the edits were made on. */
@@ -14,12 +16,10 @@ export interface BilletBackup {
   readonly document: BilletDocument;
 }
 
-const keyOf = (userId: number, billetId: number) => `billet-studio.backup.${userId}.${billetId}`;
-
 /** The backup, its document migrated; null when there is none or it cannot be read. */
 export function readBackup(userId: number, billetId: number): BilletBackup | null {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(keyOf(userId, billetId)) ?? 'null');
+    const parsed: unknown = JSON.parse(localStorage.getItem(backupKey(userId, billetId)) ?? 'null');
     if (typeof parsed !== 'object' || parsed === null) return null;
     const { version, savedAt, document } = parsed as Record<string, unknown>;
     const migrated = migrateDocument(document);
@@ -39,7 +39,7 @@ export function writeBackup(
 ): boolean {
   const backup: BilletBackup = { version, savedAt: new Date().toISOString(), document };
   try {
-    localStorage.setItem(keyOf(userId, billetId), JSON.stringify(backup));
+    localStorage.setItem(backupKey(userId, billetId), JSON.stringify(backup));
     return true;
   } catch {
     return false;
@@ -48,7 +48,7 @@ export function writeBackup(
 
 export function removeBackup(userId: number, billetId: number): void {
   try {
-    localStorage.removeItem(keyOf(userId, billetId));
+    localStorage.removeItem(backupKey(userId, billetId));
   } catch {
     // A key that cannot be removed could not be read either.
   }

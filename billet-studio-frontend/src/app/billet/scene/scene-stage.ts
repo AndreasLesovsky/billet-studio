@@ -22,6 +22,7 @@ import {
   orbitLimits,
   type FitBox,
   type StageSettings,
+  type WheelZoom,
 } from './scene-math';
 
 // Camera, lights, environment and controls are the original card's (muttertag_threejs/index.html).
@@ -36,6 +37,9 @@ export interface StageOptions {
   readonly settings: StageSettings;
   readonly interactive: boolean;
   readonly reducedMotion: boolean;
+  readonly wheelZoom: WheelZoom;
+  /** A wheel over the interactive scene that scrolls the page because it lacks Ctrl/⌘. */
+  readonly onPlainWheel: () => void;
   /** three's shader diagnostics; they force synchronous shader compiles, so dev builds only. */
   readonly debug: boolean;
 }
@@ -64,6 +68,8 @@ export class SceneStage {
   private readonly visibilityObserver: IntersectionObserver;
   private settings: StageSettings;
   private reducedMotion: boolean;
+  private wheelZoom: WheelZoom;
+  private readonly onPlainWheel: () => void;
   private magnification = 1;
   private model: ShownAsset | null = null;
   private width = 0;
@@ -81,6 +87,8 @@ export class SceneStage {
     this.container = options.container;
     this.settings = { ...options.settings };
     this.reducedMotion = options.reducedMotion;
+    this.wheelZoom = options.wheelZoom;
+    this.onPlainWheel = options.onPlainWheel;
 
     // Throws when WebGL is unavailable - before anything else exists that would need disposing.
     this.renderer = new WebGLRenderer({ canvas: this.canvas, alpha: true, antialias: true });
@@ -110,17 +118,7 @@ export class SceneStage {
     this.controls.addEventListener('change', this.invalidate);
     this.placeCamera(0);
     this.updateMotion();
-
-    const signal = this.listeners.signal;
-    const hold = (held: boolean) => () => this.holdPointer(held);
-    this.canvas.addEventListener('pointerdown', hold(true), { signal });
-    this.canvas.addEventListener('pointerup', hold(false), { signal });
-    this.canvas.addEventListener('pointercancel', hold(false), { signal });
-    this.canvas.addEventListener('webglcontextlost', (event) => this.loseContext(event), {
-      signal,
-    });
-    this.canvas.addEventListener('webglcontextrestored', () => this.restoreContext(), { signal });
-    document.addEventListener('visibilitychange', () => this.invalidate(), { signal });
+    this.listen();
 
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.container);
@@ -190,6 +188,10 @@ export class SceneStage {
   setReducedMotion(reduced: boolean): void {
     this.reducedMotion = reduced;
     this.updateMotion();
+  }
+
+  setWheelZoom(wheelZoom: WheelZoom): void {
+    this.wheelZoom = wheelZoom;
   }
 
   /**
@@ -278,6 +280,37 @@ export class SceneStage {
 
   private animatedMixer(): AnimationMixer | null {
     return this.reducedMotion ? null : (this.model?.mixer ?? null);
+  }
+
+  private listen(): void {
+    const signal = this.listeners.signal;
+    const hold = (held: boolean) => () => this.holdPointer(held);
+    this.canvas.addEventListener('pointerdown', hold(true), { signal });
+    this.canvas.addEventListener('pointerup', hold(false), { signal });
+    this.canvas.addEventListener('pointercancel', hold(false), { signal });
+    // Capture on the container runs before OrbitControls' wheel listener on the canvas, which with
+    // zoom off neither zooms nor prevents the event: the page scrolls. Only the wheel is gated -
+    // every pointer gesture (a touch pinch, a middle-button drag) starts with zoom on again.
+    this.container.addEventListener('wheel', (event) => this.gateWheel(event), {
+      capture: true,
+      passive: true,
+      signal,
+    });
+    this.container.addEventListener('pointerdown', () => (this.controls.enableZoom = true), {
+      capture: true,
+      signal,
+    });
+    this.canvas.addEventListener('webglcontextlost', (event) => this.loseContext(event), {
+      signal,
+    });
+    this.canvas.addEventListener('webglcontextrestored', () => this.restoreContext(), { signal });
+    document.addEventListener('visibilitychange', () => this.invalidate(), { signal });
+  }
+
+  private gateWheel(event: WheelEvent): void {
+    const modified = event.ctrlKey || event.metaKey;
+    this.controls.enableZoom = this.wheelZoom === 'modifier' && modified;
+    if (this.wheelZoom === 'modifier' && !modified && this.controls.enabled) this.onPlainWheel();
   }
 
   private holdPointer(held: boolean): void {

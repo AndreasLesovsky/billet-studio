@@ -31,7 +31,8 @@ import { EditorRemoteNotice } from './editor-remote-notice';
 import { billetSchema } from './editor-schema';
 import type { EditorHost, EditorSession, NoticeChoice } from './editor-session';
 import { EditorSkeleton } from './editor-skeleton';
-import { EditorToolbar, type PreviewMode } from './editor-toolbar';
+import { EditorToolbar } from './editor-toolbar';
+import type { PreviewMode } from './editor-toolbar-options';
 import { LocalEditorSession } from './local-editor-session';
 import { ContentPanel } from './panels/content/content-panel';
 import { EditorInspector, type InspectorTab } from './panels/editor-inspector';
@@ -235,11 +236,14 @@ export class Editor implements EditorCommands {
   }
 
   /**
-   * The app's history answers Ctrl/Cmd+Z and friends everywhere in the editor, text fields too -
-   * not in the share dialog, which sits in the editor but edits nothing.
+   * The app's history answers Ctrl/Cmd+Z and friends everywhere in the editor, text fields too
+   * (the toolbar's side sheet included) - not in the share dialog, which sits in the editor but
+   * edits nothing.
    */
   protected onShortcut(event: Event, action: HistoryAction | null): void {
-    if (!action || (event.target instanceof Element && event.target.closest('dialog'))) return;
+    if (!action || (event.target instanceof Element && event.target.closest('app-share-dialog'))) {
+      return;
+    }
     event.preventDefault();
     this.step(action);
   }
@@ -323,12 +327,15 @@ export class Editor implements EditorCommands {
     if (this.account) this.sharing.set(this.account.shareTarget);
   }
 
-  /** The notice goes away with the button just pressed: the focus goes to the billet's title. */
+  /**
+   * The notice goes away with the button just pressed: the focus goes to the billet's title (on a
+   * phone, the toolbar's title button).
+   */
   private afterNotice(): void {
     afterNextRender(
       () => {
         if (!this.host.contains(document.activeElement)) {
-          this.host.querySelector<HTMLElement>('#editor-title')?.focus();
+          this.host.querySelector<HTMLElement>('#editor-title, #editor-title-button')?.focus();
         }
       },
       { injector: this.injector },

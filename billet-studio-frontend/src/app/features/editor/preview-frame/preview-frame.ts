@@ -146,7 +146,7 @@ export class PreviewFrame {
       observer.observe(stage);
       observer.observe(frame);
       // Capture: Ctrl/Cmd + wheel zooms the preview everywhere over it, the 3D scene included,
-      // whose own wheel zoom would otherwise take it.
+      // which never sees it (its wheel zoom is off here: the camera distance is a slider).
       const listeners = new AbortController();
       stage.addEventListener('wheel', (event) => this.onWheel(event), {
         capture: true,

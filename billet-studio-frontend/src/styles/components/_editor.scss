@@ -4,13 +4,50 @@
 
 // ---- Bars: the toolbar on top, the tab bar at the bottom (phones) ---------------------------
 
+// A band of its own between two hairlines.
 .ui-editor-bar {
-    border-block-end: 1px solid var(--ui-border);
+    border-block: 1px solid var(--ui-border);
     background-color: var(--ui-surface);
 
     @supports (backdrop-filter: blur(1rem)) {
         background-color: color-mix(in oklab, var(--ui-surface) 88%, transparent);
         backdrop-filter: saturate(1.6) blur(0.75rem);
+    }
+}
+
+// The toolbar's "tools" button on phones: a dot on its corner while a save failed or is held (the
+// words are in the side sheet, and in the button's description).
+.ui-editor-bar__tools {
+    position: relative;
+}
+
+.ui-editor-bar__alert {
+    position: absolute;
+    inset-block-start: -0.1875rem;
+    inset-inline-end: -0.1875rem;
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+    border: 0.125rem solid var(--ui-surface);
+    border-radius: 50%;
+    background-color: var(--ui-danger);
+}
+
+// The title's message under the toolbar's one row: a raised callout over the workspace, so the bar
+// never grows. The class sits on app-field-error, which renders .ui-field-error inside.
+.ui-editor-bar__error {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: calc(100% + var(--ui-space-2));
+    inset-inline-start: 0;
+    inline-size: max-content;
+    max-inline-size: min(20rem, calc(100vw - 2 * var(--ui-space-4)));
+
+    > .ui-field-error {
+        padding: var(--ui-space-2) var(--ui-space-3);
+        border: 1px solid var(--ui-border);
+        border-radius: var(--ui-radius-md);
+        background-color: var(--ui-surface-raised);
+        box-shadow: var(--ui-shadow-md);
     }
 }
 

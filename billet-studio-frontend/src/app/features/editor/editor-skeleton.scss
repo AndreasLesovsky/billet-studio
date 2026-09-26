@@ -1,44 +1,102 @@
 // Layout only; the skeleton also loads editor.scss for the layout it shares with the editor. The
-// bar mirrors editor-toolbar.scss.
-@use '../../../styles/breakpoints' as bp;
+// bar mirrors editor-toolbar.scss: one row, the same gaps and control heights.
 
 .editor-skeleton__bar {
-    gap: var(--ui-space-2) var(--ui-space-4);
-    padding: var(--ui-space-2) var(--ui-space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    margin-block-start: var(--ui-space-3);
+    padding: var(--ui-space-2) var(--ui-space-6);
 
-    @include bp.up(md) {
-        padding-inline: var(--ui-space-6);
+    :host(.editor--narrow) & {
+        gap: var(--ui-space-2);
+        padding: var(--ui-space-1) var(--ui-space-4);
     }
 }
 
 .editor-skeleton__title {
-    flex: 1 1 14rem;
+    flex: 2 4 16rem;
+    min-inline-size: 8rem;
     max-inline-size: 28rem;
 }
 
-.editor-skeleton__tools {
-    gap: var(--ui-space-2) var(--ui-space-3);
+// Phones: the title as text on a ghost button of the control's height.
+.editor-skeleton__title-text {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-inline-size: 0;
+    block-size: var(--ui-control-height);
+    padding-inline: var(--ui-space-2);
 }
 
-// The preview's three colour modes.
+.editor-skeleton__history {
+    display: flex;
+    flex: none;
+    gap: var(--ui-space-2);
+
+    :host(.editor--narrow) & {
+        gap: var(--ui-space-1);
+    }
+}
+
+// The preview's three colour modes, and the billet's language.
 .editor-skeleton__modes {
     inline-size: 12rem;
 }
 
+.editor-skeleton__lang {
+    inline-size: 7.5rem;
+}
+
 .editor-skeleton__status {
-    inline-size: 9rem;
-}
-
-.editor-skeleton__share {
+    display: flex;
+    flex: 1 1 9rem;
+    justify-content: flex-end;
+    min-inline-size: 0;
+    max-inline-size: 16rem;
     margin-inline-start: auto;
-}
-
-.editor-skeleton__tab {
-    inline-size: 6rem;
 
     > .ui-skeleton {
+        inline-size: 7rem;
+    }
+}
+
+.editor-skeleton__status-icon {
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    margin-inline: auto var(--ui-space-1);
+}
+
+.editor-skeleton__share:not(.ui-skeleton--icon) {
+    inline-size: 6.5rem;
+}
+
+.editor-skeleton__more {
+    inline-size: 6rem;
+}
+
+// A tab's label; a stacked tab (phones) shares the bar's width like the real ones and shows its
+// icon above its label.
+.editor-skeleton__tab {
+    > .ui-skeleton--text {
         inline-size: 100%;
     }
+
+    &:not(.ui-tab--stacked) {
+        inline-size: 6rem;
+    }
+
+    &.ui-tab--stacked > .ui-skeleton--text {
+        inline-size: 70%;
+    }
+}
+
+.editor-skeleton__tab-icon {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    min-block-size: 0;
 }
 
 // The device bar above the phone frame, and the frame itself (24.375 x 52.75rem, preview-frame).

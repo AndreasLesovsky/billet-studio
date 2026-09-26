@@ -1,0 +1,120 @@
+<button
+  type="button"
+  class="ui-btn ui-btn--neutral"
+  [cdkMenuTriggerFor]="menu"
+  [cdkMenuPosition]="positions"
+>
+  <i
+    class="bi bi-three-dots"
+    aria-hidden="true"
+  ></i>
+  {{ 'EDITOR.MORE' | translate }}
+</button>
+
+<ng-template #menu>
+  <div
+    class="ui-menu editor-toolbar-menu__panel"
+    cdkMenu
+  >
+    <div
+      cdkMenuGroup
+      aria-labelledby="editor-menu-mode"
+    >
+      <div
+        id="editor-menu-mode"
+        class="ui-menu__label"
+      >
+        {{ 'EDITOR.PREVIEW_MODE' | translate }}
+      </div>
+      @for (option of previewModes; track option.mode) {
+        <button
+          type="button"
+          class="ui-menu__item"
+          cdkMenuItemRadio
+          [cdkMenuItemChecked]="previewMode() === option.mode"
+          (cdkMenuItemTriggered)="previewMode.set(option.mode)"
+        >
+          <i
+            class="bi"
+            [class]="option.icon"
+            aria-hidden="true"
+          ></i>
+          {{ option.labelKey | translate }}
+          <i
+            class="bi bi-check2 ui-menu__check"
+            aria-hidden="true"
+          ></i>
+        </button>
+      }
+    </div>
+    <div
+      class="ui-menu__separator"
+      role="separator"
+    ></div>
+    <button
+      type="button"
+      class="ui-menu__item"
+      cdkMenuItem
+      (cdkMenuItemTriggered)="replay.emit()"
+    >
+      <i
+        class="bi bi-arrow-repeat"
+        aria-hidden="true"
+      ></i>
+      {{ 'EDITOR.REPLAY' | translate }}
+    </button>
+    <div
+      class="ui-menu__separator"
+      role="separator"
+    ></div>
+    <div
+      cdkMenuGroup
+      aria-labelledby="editor-menu-lang"
+    >
+      <div
+        id="editor-menu-lang"
+        class="ui-menu__label"
+      >
+        {{ 'EDITOR.LANGUAGE' | translate }}
+      </div>
+      @for (option of langs; track option.lang) {
+        <button
+          type="button"
+          class="ui-menu__item"
+          cdkMenuItemRadio
+          [lang]="option.lang"
+          [cdkMenuItemChecked]="lang() === option.lang"
+          (cdkMenuItemTriggered)="setLang(option.lang)"
+        >
+          <i
+            class="bi bi-translate"
+            aria-hidden="true"
+          ></i>
+          {{ option.labelKey | translate }}
+          <i
+            class="bi bi-check2 ui-menu__check"
+            aria-hidden="true"
+          ></i>
+        </button>
+      }
+    </div>
+    @if (guest()) {
+      <div
+        class="ui-menu__separator"
+        role="separator"
+      ></div>
+      <a
+        class="ui-menu__item"
+        cdkMenuItem
+        routerLink="/login"
+        [queryParams]="{ returnUrl: returnUrl() }"
+      >
+        <i
+          class="bi bi-box-arrow-in-right"
+          aria-hidden="true"
+        ></i>
+        {{ 'NAV.LOGIN' | translate }}
+      </a>
+    }
+  </div>
+</ng-template>

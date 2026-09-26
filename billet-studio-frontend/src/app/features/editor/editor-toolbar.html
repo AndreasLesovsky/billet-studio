@@ -1,119 +1,114 @@
 @let fields = billetForm();
-<div class="ui-field editor-toolbar__title">
-  <label
-    class="ui-visually-hidden"
-    for="editor-title"
-    >{{ 'EDITOR.TITLE_LABEL' | translate }}</label
-  >
-  <input
-    id="editor-title"
-    class="ui-input"
-    appBilletText
-    [formField]="fields.title"
-  />
-  <app-field-error [field]="fields.title" />
-</div>
-
-<div class="ui-cluster editor-toolbar__tools">
-  <div class="ui-cluster">
-    <button
-      type="button"
-      class="ui-btn ui-btn--neutral ui-btn--icon"
-      aria-keyshortcuts="Control+Z Meta+Z"
-      [attr.aria-label]="'EDITOR.UNDO' | translate"
-      [title]="'EDITOR.UNDO' | translate"
-      [disabled]="!canUndo()"
-      (click)="undo.emit()"
-    >
-      <i
-        class="bi bi-arrow-counterclockwise"
-        aria-hidden="true"
-      ></i>
-    </button>
-    <button
-      type="button"
-      class="ui-btn ui-btn--neutral ui-btn--icon"
-      aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
-      [attr.aria-label]="'EDITOR.REDO' | translate"
-      [title]="'EDITOR.REDO' | translate"
-      [disabled]="!canRedo()"
-      (click)="redo.emit()"
-    >
-      <i
-        class="bi bi-arrow-clockwise"
-        aria-hidden="true"
-      ></i>
-    </button>
-  </div>
-
-  <fieldset class="ui-segmented">
-    <legend class="ui-visually-hidden">{{ 'EDITOR.PREVIEW_MODE' | translate }}</legend>
-    @for (option of previewModes; track option.mode) {
-      <label class="ui-segmented__option">
-        <input
-          type="radio"
-          name="editor-preview-mode"
-          [value]="option.mode"
-          [checked]="previewMode() === option.mode"
-          (change)="previewMode.set(option.mode)"
-        />
-        {{ option.labelKey | translate }}
-      </label>
-    }
-  </fieldset>
-
+@let view = shareView();
+@if (narrow()) {
   <button
     type="button"
-    class="ui-btn ui-btn--neutral"
-    (click)="replay.emit()"
+    class="ui-btn ui-btn--neutral ui-btn--icon ui-editor-bar__tools"
+    aria-haspopup="dialog"
+    [attr.aria-label]="'EDITOR.TOOLS_OPEN' | translate"
+    [attr.aria-describedby]="saveAlert() && 'editor-save-alert'"
+    [title]="'EDITOR.TOOLS_OPEN' | translate"
+    (click)="openSheet(false)"
   >
     <i
-      class="bi bi-arrow-repeat"
+      class="bi bi-layout-sidebar"
       aria-hidden="true"
     ></i>
-    {{ 'EDITOR.REPLAY' | translate }}
+    @if (saveAlert(); as key) {
+      <span
+        class="ui-editor-bar__alert"
+        aria-hidden="true"
+      ></span>
+      <span
+        id="editor-save-alert"
+        class="ui-visually-hidden"
+        >{{ key | translate }}</span
+      >
+    }
   </button>
-
-  <div class="editor-toolbar__lang">
+  @let shownTitle = title() || ('BILLETS.UNTITLED' | translate);
+  <button
+    id="editor-title-button"
+    type="button"
+    class="ui-btn ui-btn--ghost editor-toolbar__title-button"
+    aria-haspopup="dialog"
+    [attr.aria-label]="'EDITOR.EDIT_TITLE' | translate: { title: shownTitle }"
+    (click)="openSheet(true)"
+  >
+    <span class="editor-toolbar__title-text">{{ shownTitle }}</span>
+    <i
+      class="bi bi-pencil"
+      aria-hidden="true"
+    ></i>
+  </button>
+} @else {
+  <div class="ui-field editor-toolbar__title">
     <label
       class="ui-visually-hidden"
-      for="editor-lang"
-      >{{ 'EDITOR.LANGUAGE' | translate }}</label
+      for="editor-title"
+      >{{ 'EDITOR.TITLE_LABEL' | translate }}</label
     >
-    <select
-      id="editor-lang"
-      class="ui-select"
-      [title]="'EDITOR.LANGUAGE' | translate"
-      [formField]="fields.lang"
-    >
-      @for (option of langs; track option.lang) {
-        <option
-          [value]="option.lang"
-          [lang]="option.lang"
-        >
-          {{ option.labelKey | translate }}
-        </option>
-      }
-    </select>
+    <input
+      id="editor-title"
+      class="ui-input"
+      appBilletText
+      [formField]="fields.title"
+    />
+    <app-field-error
+      [field]="fields.title"
+      class="ui-editor-bar__error"
+    />
   </div>
-</div>
+}
 
-<p
-  class="editor-toolbar__status"
-  [class.editor-toolbar__status--shared]="shareFacts() !== null"
->
-  <span [class]="saveIndicator().className">
+<div class="editor-toolbar__history">
+  <button
+    type="button"
+    class="ui-btn ui-btn--neutral ui-btn--icon"
+    aria-keyshortcuts="Control+Z Meta+Z"
+    [attr.aria-label]="'EDITOR.UNDO' | translate"
+    [title]="'EDITOR.UNDO' | translate"
+    [disabled]="!canUndo()"
+    (click)="undo.emit()"
+  >
     <i
-      class="bi"
-      [class]="saveIndicator().icon"
+      class="bi bi-arrow-counterclockwise"
       aria-hidden="true"
     ></i>
-    {{ saveIndicator().key | translate }}
-  </span>
-  @if (shareFacts(); as facts) {
-    <app-publish-badge [facts]="facts" />
-  }
-</p>
+  </button>
+  <button
+    type="button"
+    class="ui-btn ui-btn--neutral ui-btn--icon"
+    aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+    [attr.aria-label]="'EDITOR.REDO' | translate"
+    [title]="'EDITOR.REDO' | translate"
+    [disabled]="!canRedo()"
+    (click)="redo.emit()"
+  >
+    <i
+      class="bi bi-arrow-clockwise"
+      aria-hidden="true"
+    ></i>
+  </button>
+</div>
+
+@if (layout() === 'wide') {
+  <app-editor-toolbar-tools
+    [billetForm]="fields"
+    [(previewMode)]="previewMode"
+    (replay)="replay.emit()"
+  />
+}
+
+@if (!narrow()) {
+  <app-editor-save-status
+    class="editor-toolbar__status"
+    [class.editor-toolbar__status--shared]="shareFacts() !== null"
+    [variant]="statusVariant()"
+    [indicator]="saveIndicator()"
+    [facts]="shareFacts()"
+  />
+}
 <p
   class="ui-visually-hidden"
   role="status"
@@ -123,40 +118,67 @@
   }
 </p>
 
-<div class="ui-cluster editor-toolbar__share">
+@if (signIn()) {
+  <a
+    class="ui-btn ui-btn--secondary"
+    routerLink="/login"
+    [queryParams]="{ returnUrl: returnUrl() }"
+  >
+    <i
+      class="bi bi-box-arrow-in-right"
+      aria-hidden="true"
+    ></i>
+    {{ 'NAV.LOGIN' | translate }}
+  </a>
+}
+
+<span appTooltipAnchor>
   <button
     type="button"
     aria-haspopup="dialog"
-    [class]="shareView().className"
-    [disabled]="shareView().hintKey !== null"
-    [attr.aria-describedby]="shareView().hintKey ? 'editor-share-hint' : null"
-    (click)="share.emit()"
+    [class]="view.className"
+    [class.ui-btn--icon]="narrow()"
+    [attr.aria-disabled]="view.hintKey !== null || null"
+    [attr.aria-describedby]="view.hintKey && 'editor-share-hint'"
+    (click)="onShare()"
   >
     <i
       class="bi bi-share"
       aria-hidden="true"
     ></i>
-    {{ 'EDITOR.SHARE' | translate }}
+    <span [class.ui-visually-hidden]="narrow()">{{ 'EDITOR.SHARE' | translate }}</span>
   </button>
-  @if (shareMode() === 'guest') {
-    <a
-      class="ui-btn ui-btn--secondary"
-      routerLink="/login"
-      [queryParams]="{ returnUrl: returnUrl() }"
-    >
-      <i
-        class="bi bi-box-arrow-in-right"
-        aria-hidden="true"
-      ></i>
-      {{ 'NAV.LOGIN' | translate }}
-    </a>
-  }
-  @if (shareView().hintKey; as hintKey) {
-    <p
+  @if (view.hintKey; as hintKey) {
+    <span
       id="editor-share-hint"
-      class="ui-hint"
+      class="ui-tooltip"
+      role="tooltip"
+      >{{ hintKey | translate }}</span
     >
-      {{ hintKey | translate }}
-    </p>
   }
-</div>
+</span>
+
+@if (layout() === 'medium') {
+  <app-editor-toolbar-menu
+    [lang]="lang()"
+    [guest]="guest()"
+    [returnUrl]="returnUrl()"
+    [(previewMode)]="previewMode"
+    (replay)="replay.emit()"
+  />
+}
+
+@if (narrow()) {
+  <app-editor-toolbar-sheet
+    [billetForm]="fields"
+    [atTitle]="sheetAtTitle()"
+    [saveIndicator]="saveIndicator()"
+    [shareFacts]="shareFacts()"
+    [shareHintKey]="view.hintKey"
+    [guest]="guest()"
+    [returnUrl]="returnUrl()"
+    [(open)]="sheetOpen"
+    [(previewMode)]="previewMode"
+    (replay)="replay.emit()"
+  />
+}

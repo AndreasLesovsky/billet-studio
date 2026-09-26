@@ -59,10 +59,13 @@
     min-inline-size: 0;
 }
 
+// A tab reaches 1px down over the header's hairline (.ui-tab), and the list, which scrolls sideways
+// when it must, clips at its padding box: its 1px padding at the bottom keeps the whole underline.
 .shell__nav-list {
     display: flex;
     gap: var(--ui-space-1);
-    block-size: 100%;
+    block-size: calc(100% + 1px);
+    padding-block-end: 1px;
     margin-inline: calc(-1 * var(--ui-space-3));
     overflow-x: auto;
     scrollbar-width: none;

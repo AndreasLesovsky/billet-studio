@@ -56,3 +56,14 @@
     </button>
   }
 }
+<!-- aria-hidden: a passing hint for the mouse wheel, never announced -->
+@if (zoomHint()) {
+  <p
+    class="billet-scene__hint"
+    aria-hidden="true"
+    [attr.lang]="uiLang()"
+    animate.leave="billet-scene__hint--leaving"
+  >
+    {{ zoomHintKey | translate }}
+  </p>
+}

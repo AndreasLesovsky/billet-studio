@@ -217,6 +217,60 @@
     inline-size: min(48rem, calc(100% - 2 * var(--ui-space-4)));
 }
 
+// A side sheet (offcanvas): the same dialog at the inline-start edge, full height, sliding in; the
+// body scrolls between the header and the footer. Reduced motion: a short fade instead of the slide.
+.ui-dialog--sheet {
+    inline-size: min(20rem, calc(100% - var(--ui-space-8)));
+    block-size: 100dvh;
+    max-block-size: none;
+    margin: 0;
+    margin-inline-end: auto;
+    padding-block-end: env(safe-area-inset-bottom, 0);
+    border-block: 0;
+    border-inline-start: 0;
+    border-radius: 0;
+    border-start-end-radius: var(--ui-radius-xl);
+    border-end-end-radius: var(--ui-radius-xl);
+    opacity: 1;
+    transform: translateX(-100%);
+
+    &[open] {
+        transform: none;
+    }
+
+    @starting-style {
+        &[open] {
+            opacity: 1;
+            transform: translateX(-100%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        // !important outranks the global transition reset in _base.scss.
+        &,
+        &::backdrop {
+            transition-duration: 150ms !important;
+            transition-timing-function: linear !important;
+        }
+
+        &,
+        &[open] {
+            transform: none;
+        }
+
+        &:not([open]) {
+            opacity: 0;
+        }
+
+        @starting-style {
+            &[open] {
+                opacity: 0;
+                transform: none;
+            }
+        }
+    }
+}
+
 .ui-dialog__header {
     display: flex;
     align-items: flex-start;
@@ -367,6 +421,64 @@
     max-inline-size: min(22rem, calc(100vw - 2 * var(--ui-space-4)));
     padding: var(--ui-space-4);
     font-size: var(--ui-text-sm);
+}
+
+// ---- Tooltip: .ui-tooltip-anchor > control + .ui-tooltip[role=tooltip] ---------------------------
+
+// A short text under its anchor, end edges aligned, while the anchor is hovered or holds the focus
+// (a tap focuses too). The control names it in aria-describedby (or aria-labelledby). It stays
+// while the pointer moves onto it (its ::before bridges the gap); Esc hides it through
+// --dismissed until the next hover or focus (WCAG 1.4.13). The anchor is the appTooltipAnchor
+// directive (shared/directives/tooltip-anchor.ts), which sets both classes.
+.ui-tooltip-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
+.ui-tooltip {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: calc(100% + var(--ui-space-2));
+    inset-inline-end: 0;
+    display: flex;
+    flex-direction: column;
+    inline-size: max-content;
+    max-inline-size: 16rem;
+    padding: var(--ui-space-2) var(--ui-space-3);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-md);
+    background-color: var(--ui-surface-raised);
+    box-shadow: var(--ui-shadow-md);
+    color: var(--ui-text);
+    font-size: var(--ui-text-xs);
+    font-weight: var(--ui-font-weight-medium);
+    line-height: var(--ui-leading-normal);
+    text-align: start;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity var(--ui-duration-fast) var(--ui-ease),
+        visibility var(--ui-duration-fast) allow-discrete;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset-block-end: 100%;
+        inset-inline: 0;
+        block-size: calc(var(--ui-space-2) + 1px);
+    }
+
+    .ui-tooltip-anchor:hover > &,
+    .ui-tooltip-anchor:focus-within > & {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .ui-tooltip-anchor.ui-tooltip-anchor--dismissed > & {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 // ---- Table ----------------------------------------------------------------------------------

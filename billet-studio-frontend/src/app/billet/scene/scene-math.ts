@@ -20,6 +20,13 @@ export function sameStageSettings(a: StageSettings, b: StageSettings): boolean {
   return STAGE_KEYS.every((key) => a[key] === b[key]);
 }
 
+/**
+ * What a mouse wheel over the scene does. 'modifier': a plain wheel scrolls the page past it, only
+ * Ctrl/⌘ + wheel zooms (a trackpad pinch arrives as Ctrl + wheel). 'off': the wheel never zooms.
+ * Touch pinch zooms in both.
+ */
+export type WheelZoom = 'modifier' | 'off';
+
 /** Bounding box of a model at identity transform. */
 export interface FitBox {
   readonly center: readonly [number, number, number];

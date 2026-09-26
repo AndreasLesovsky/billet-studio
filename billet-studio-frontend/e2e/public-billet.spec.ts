@@ -74,4 +74,34 @@ test.describe('public billet page', () => {
     await expect(accent).toHaveText('Weihnachten');
     await expect.poll(() => accent.evaluate(lineCount)).toBe(1);
   });
+
+  test('a plain wheel over the 3D model scrolls the page and says how to zoom; Ctrl + wheel zooms instead', async ({
+    page,
+  }) => {
+    await page.goto('/b/parity-token');
+    const scene = page.locator('app-billet-scene');
+    // Drawn in 3D: the stand-in image steps aside, and the wheel reaches the camera controls.
+    await expect(scene.locator('img')).toHaveClass(/billet-scene__preview--hidden/, {
+      timeout: 30_000,
+    });
+    await scene.scrollIntoViewIfNeeded();
+    const box = (await scene.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    const scrollY = () => page.evaluate(() => window.scrollY);
+    const top = await scrollY();
+
+    await page.mouse.wheel(0, 100);
+    await expect.poll(scrollY).toBe(top + 100);
+    const hint = scene.getByText(/to zoom/);
+    await expect(hint).toBeVisible();
+    await expect(hint).toBeHidden();
+
+    const model = async () => page.screenshot({ clip: (await scene.boundingBox())! });
+    const before = await model();
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, 100);
+    await page.keyboard.up('Control');
+    await expect.poll(async () => (await model()).equals(before)).toBe(false);
+    expect(await scrollY()).toBe(top + 100);
+  });
 });

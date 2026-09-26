@@ -1,14 +1,34 @@
 <div class="editor">
-  <div class="ui-editor-bar ui-cluster editor-skeleton__bar">
-    <span class="ui-skeleton ui-skeleton--control editor-skeleton__title"></span>
-    <span class="ui-cluster editor-skeleton__tools">
+  <div class="ui-editor-bar editor-skeleton__bar">
+    @if (layout() === 'narrow') {
+      <span class="ui-skeleton ui-skeleton--button ui-skeleton--icon"></span>
+      <span class="editor-skeleton__title-text">
+        <span class="ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+      </span>
+    } @else {
+      <span class="ui-skeleton ui-skeleton--control editor-skeleton__title"></span>
+    }
+    <span class="editor-skeleton__history">
       <span class="ui-skeleton ui-skeleton--button ui-skeleton--icon"></span>
       <span class="ui-skeleton ui-skeleton--button ui-skeleton--icon"></span>
+    </span>
+    @if (layout() === 'wide') {
       <span class="ui-skeleton ui-skeleton--button editor-skeleton__modes"></span>
       <span class="ui-skeleton ui-skeleton--button"></span>
-    </span>
-    <span class="ui-hint ui-skeleton ui-skeleton--text editor-skeleton__status"></span>
-    <span class="ui-skeleton ui-skeleton--button editor-skeleton__share"></span>
+      <span class="ui-skeleton ui-skeleton--button editor-skeleton__lang"></span>
+      <span class="editor-skeleton__status">
+        <span class="ui-hint ui-skeleton ui-skeleton--text"></span>
+      </span>
+    } @else if (layout() === 'medium') {
+      <span class="ui-skeleton ui-skeleton--circle editor-skeleton__status-icon"></span>
+    }
+    <span
+      class="ui-skeleton ui-skeleton--button editor-skeleton__share"
+      [class.ui-skeleton--icon]="layout() === 'narrow'"
+    ></span>
+    @if (layout() === 'medium') {
+      <span class="ui-skeleton ui-skeleton--button editor-skeleton__more"></span>
+    }
   </div>
 
   <div class="editor__workspace">
@@ -17,7 +37,10 @@
       [class]="tabBarClass()"
     >
       @for (tab of tabs(); track tab) {
-        <span class="ui-tab editor-skeleton__tab">
+        <span [class]="tabClass()">
+          @if (layout() === 'narrow') {
+            <span class="ui-skeleton ui-skeleton--circle editor-skeleton__tab-icon"></span>
+          }
           <span class="ui-skeleton ui-skeleton--text"></span>
         </span>
       }
