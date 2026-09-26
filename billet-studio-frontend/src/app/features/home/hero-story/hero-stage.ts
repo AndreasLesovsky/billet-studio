@@ -6,6 +6,7 @@ import {
   Euler,
   LoopOnce,
   type MeshStandardMaterial,
+  NeutralToneMapping,
   Object3D,
   PerspectiveCamera,
   Quaternion,
@@ -204,6 +205,8 @@ export class HeroStage {
       container: options.container,
       debug: options.debug,
       exposure: HERO_EXPOSURE,
+      // ACES washes the printed card's pale pink out to white; Neutral keeps print colours.
+      toneMapping: NeutralToneMapping,
       preserveDrawingBuffer: options.preserveDrawingBuffer,
       update: (seconds) => this.update(seconds),
       draw: () => this.runtime.renderer.render(this.scene, this.camera),
@@ -414,8 +417,9 @@ export class HeroStage {
       if (!this.drag) this.spin += IDLE_TURN * seconds;
       moved = true;
     }
+    // During the story the gift's clip runs on the story clock (pose), as authored in Blender.
     const mixer = this.shownGift?.mixer;
-    if (mixer) {
+    if (mixer && clock.phase === 'idle') {
       mixer.update(seconds);
       moved = true;
     }
@@ -444,6 +448,9 @@ export class HeroStage {
     rig.phone.quaternion.copy(rig.phonePose.quaternion);
     story.action.time = clock.time;
     story.mixer.update(0);
+    // The heart's beat is authored against the story time (it faces the viewer at the pop and the
+    // landing), so seeks and a held gate keep it in step.
+    if (clock.phase === 'story') this.shownGift?.mixer?.setTime(clock.time);
     rig.phonePose.position.copy(rig.phone.position);
     rig.phonePose.quaternion.copy(rig.phone.quaternion);
     if (clock.phase === 'idle') this.floatPhone(rig);

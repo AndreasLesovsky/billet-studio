@@ -10,7 +10,7 @@ export interface HeroHome {
 }
 
 export const HERO_HOME: HeroHome = {
-  storyUrl: null,
+  storyUrl: '/hero/story.0767edd6.glb',
   credits: {
     valentinstag: 'PUMPING HEART MODEL by omarelone (CC-BY-4.0) https://sketchfab.com/3d-models/pumping-heart-model-6f815b9822dc479eae0a17b8dcab9c75',
     geburtstag: 'Birthday Cake by Taylor (CC-BY-4.0) https://sketchfab.com/3d-models/birthday-cake-054d99bef15c4905b9f7ffe95ce9a08a',

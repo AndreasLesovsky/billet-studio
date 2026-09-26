@@ -3,6 +3,7 @@ import {
   type Camera,
   type Object3D,
   SRGBColorSpace,
+  type ToneMapping,
   WebGLRenderer,
 } from 'three';
 
@@ -17,6 +18,8 @@ export interface StageRuntimeOptions {
   /** three's shader diagnostics; they force synchronous shader compiles, so dev builds only. */
   readonly debug: boolean;
   readonly exposure: number;
+  /** The tone curve; ACES Filmic (the original card's) unless the owner needs another. */
+  readonly toneMapping?: ToneMapping;
   /** Keeps the drawn frame readable after compositing (a poster capture); costs a buffer copy. */
   readonly preserveDrawingBuffer?: boolean;
   /** Advances the owner's state; true when the picture changed and has to be drawn. */
@@ -71,7 +74,7 @@ export class StageRuntime {
     this.renderer.debug.checkShaderErrors = options.debug;
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
     this.renderer.outputColorSpace = SRGBColorSpace;
-    this.renderer.toneMapping = ACESFilmicToneMapping;
+    this.renderer.toneMapping = options.toneMapping ?? ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = options.exposure;
 
     const signal = this.listeners.signal;

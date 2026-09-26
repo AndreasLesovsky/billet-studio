@@ -57,7 +57,10 @@ export interface HeroAssets {
 }
 
 export const HERO_ASSETS: HeroAssets = {
-  story: null,
+  story: {
+    url: '/hero/story.0767edd6.glb',
+    bytes: 237964,
+  },
   posters: null,
   printFront: {
     de: {
