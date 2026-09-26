@@ -1,0 +1,26 @@
+<span class="ui-hint ui-skeleton ui-skeleton--text billet-list__skeleton-count"></span>
+<ul
+  class="ui-grid billet-list__grid"
+  role="list"
+>
+  @for (card of cards; track card) {
+    <li class="billet-list__item">
+      <div class="ui-card">
+        <app-asset-thumb
+          emoji=""
+          [pending]="true"
+        />
+        <div class="ui-card__body ui-stack ui-stack--sm">
+          <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--medium"></span>
+          <span class="ui-hint ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+        </div>
+        <div class="ui-card__footer billet-card__actions">
+          <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm ui-skeleton--icon"></span>
+          <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm ui-skeleton--icon"></span>
+          <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm billet-list__end"></span>
+          <span class="ui-skeleton ui-skeleton--button ui-skeleton--sm"></span>
+        </div>
+      </div>
+    </li>
+  }
+</ul>

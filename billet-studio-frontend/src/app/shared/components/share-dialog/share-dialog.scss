@@ -1,0 +1,10 @@
+// Layout only; every visual comes from the ui-* classes.
+
+.share-dialog__title {
+    overflow-wrap: anywhere;
+}
+
+// "Stop sharing" stands apart from Close, at the footer's start.
+.share-dialog__unpublish {
+    margin-inline-end: auto;
+}

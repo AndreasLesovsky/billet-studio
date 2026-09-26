@@ -22,7 +22,11 @@
       "DEACTIVATING": "Deactivating…",
       "SIGNING_IN": "Signing in…",
       "SIGNING_UP": "Creating account…",
-      "SENDING": "Sending…"
+      "SENDING": "Sending…",
+      "TAKING_OVER": "Moving…",
+      "DUPLICATING": "Duplicating…",
+      "PUBLISHING": "Publishing…",
+      "UNPUBLISHING": "Unpublishing…"
     },
     "NO_RESULTS": "No results found.",
     "YES": "Yes",
@@ -135,7 +139,7 @@
     "LEAD": "Every billet you have designed, in one place.",
     "EMPTY_TITLE": "No billets yet",
     "EMPTY_TEXT": "As soon as you design a billet, it appears here. Without an account, your billets stay on this device.",
-    "DEVICE_NOTE": "Your billets are stored in this browser, on this device only. Soon you can keep them in your account as well.",
+    "DEVICE_NOTE": "Your billets are stored in this browser, on this device only. With an account you can keep them safe and share them.",
     "COUNT": "{{count}} of {{max}} places used.",
     "EDITED": "Edited {{when}}",
     "UNTITLED": "Untitled",
@@ -143,7 +147,21 @@
     "COPY_TITLE": "{{title}} (copy)",
     "DELETE_TITLE": "Delete billet?",
     "DELETE_NAMED": "Delete “{{title}}”",
-    "DELETE_MESSAGE": "“{{title}}” will be deleted from this device. This cannot be undone."
+    "DELETE_MESSAGE": "“{{title}}” will be deleted from this device. This cannot be undone.",
+    "ACCOUNT_TITLE": "In your account",
+    "DEVICE_TITLE": "Only on this device",
+    "ACCOUNT_EMPTY_TEXT": "As soon as you design a billet, it appears here, safe in your account.",
+    "LOAD_FAILED": "Your billets could not be loaded.",
+    "DELETE_ACCOUNT_MESSAGE": "“{{title}}” will be deleted from your account. This cannot be undone.",
+    "DELETE_PUBLISHED_MESSAGE": "“{{title}}” will be deleted from your account, and its link stops working. This cannot be undone.",
+    "IMPORT": {
+      "TITLE_ONE": "1 billet is only on this device",
+      "TITLE_OTHER": "{{count}} billets are only on this device",
+      "TEXT": "In your account you can share your billets and keep editing them on any device.",
+      "NO_ROOM": "Your account does not have room for all of them: {{free}} of {{max}} places are free. Delete billets you no longer need, then they all fit.",
+      "REFUSED": "Your account did not have room for all of them. Delete billets you no longer need and try again.",
+      "ACTION": "Move all to my account"
+    }
   },
   "EDITOR": {
     "TITLE_LABEL": "Billet title (only for your overview)",
@@ -161,11 +179,15 @@
       "HELD": "Not saved",
       "LOCAL_STORAGE_FULL": "Not saved: storage full",
       "LOCAL_STORAGE_UNAVAILABLE": "Not saved: storage blocked",
-      "LOCAL_BILLET_LIMIT_REACHED": "Not saved: too many billets"
+      "LOCAL_BILLET_LIMIT_REACHED": "Not saved: too many billets",
+      "ACCOUNT_SAVED": "Saved",
+      "OFFLINE": "Offline – kept on this device",
+      "REJECTED": "Not saved – kept on this device",
+      "CONFLICT": "Conflict"
     },
     "SHARE": "Share",
     "SHARE_GUEST_HINT": "Sign in to share your billet.",
-    "SHARE_SOON": "Sharing is coming soon.",
+    "SHARE_DEVICE_HINT": "Move the billet into your account to share it.",
     "TABS": {
       "LABEL": "Edit",
       "PREVIEW": "Preview",
@@ -177,14 +199,26 @@
     },
     "NOT_FOUND_TITLE": "Billet not found",
     "NOT_FOUND_TEXT": "This billet does not exist in this browser (any more). It may have been deleted or created on another device.",
+    "NOT_FOUND_ACCOUNT_TEXT": "This billet is not in your account (any more). It may have been deleted.",
     "NOT_FOUND_LINK": "Go to my billets",
+    "LOAD_FAILED": "The billet could not be loaded.",
     "LEAVE_UNSAVED": "Your latest changes could not be saved. If you leave now, they are lost.",
     "REMOTE": {
       "CHANGED": "This billet was changed in another tab while you were working on it here.",
       "REMOVED": "This billet was deleted in another tab.",
       "LOAD_THEIRS": "Load the other version",
       "KEEP_MINE": "Keep my version",
-      "RESTORE": "Restore"
+      "RESTORE": "Restore",
+      "CONFLICT": "This billet was changed elsewhere while you were working on it here.",
+      "RELOAD": "Reload",
+      "BACKUP": "This device holds newer changes to this billet that are not saved yet.",
+      "DISCARD_BACKUP": "Discard"
+    },
+    "DEVICE": {
+      "TITLE": "This billet is only on this device",
+      "TEXT": "Move it into your account to share it and keep editing on any device.",
+      "FULL": "Your account has no room left. Delete a billet there, then you can move this one in.",
+      "TAKE_OVER": "Move to my account"
     },
     "PREVIEW": {
       "DEVICE": "Preview device",
@@ -407,6 +441,38 @@
       "TITLE_REQUIRED": "Give your billet a title.",
       "MAX_BLOCKS": "At most {{maxLength}} blocks.",
       "HEX_COLOR": "Enter a colour as #rrggbb."
+    }
+  },
+  "NEW_BILLET": {
+    "CREATING": "Creating your billet…",
+    "FULL_TITLE": "No room left in your account",
+    "FULL_TEXT": "You have reached the maximum number of billets. Delete one you no longer need, then try again.",
+    "FAILED": "Your billet could not be created."
+  },
+  "SHARE": {
+    "TITLE": "Share “{{title}}”",
+    "EXPLAIN": "Publishing gives your billet a link. It shows a snapshot: whatever you change afterwards stays private until you choose “Publish changes”.",
+    "RESHARE": "You have shared this billet before. If you publish it again, the earlier link works again too.",
+    "PUBLISH": "Publish",
+    "LINK_LABEL": "Link to your billet",
+    "LINK_HINT": "Anyone with this link can view your billet.",
+    "COPY": "Copy link",
+    "OPEN": "Open",
+    "NEW_TAB": "(opens in a new tab)",
+    "NATIVE": "Share…",
+    "CURRENT": "The link shows the current version. Whatever you change from now on stays private until you publish it.",
+    "CHANGED": "You have changed something since publishing. The link still shows the earlier version.",
+    "PUBLISH_CHANGES": "Publish changes",
+    "UNPUBLISH": "Stop sharing",
+    "UNPUBLISH_TITLE": "Stop sharing?",
+    "UNPUBLISH_MESSAGE": "The link will no longer show your billet. If you publish it again later, the same link works again.",
+    "BADGE_PUBLISHED": "Published",
+    "BADGE_CHANGED": "Unpublished changes",
+    "STATUS": {
+      "PUBLISHED": "Published. The link is ready.",
+      "UNPUBLISHED": "Your billet is no longer shared.",
+      "COPIED": "Link copied.",
+      "SELECTED": "The link is selected. Copy it with Ctrl+C (Mac: ⌘+C)."
     }
   },
   "AUTH": {
@@ -741,7 +807,8 @@
       "UNKNOWN_ERROR": "An unknown error occurred.",
       "LOCAL_BILLET_LIMIT_REACHED": "This device holds up to {{max}} billets. Delete one to create a new one.",
       "LOCAL_STORAGE_FULL": "This browser's storage is full. Delete a billet to make room.",
-      "LOCAL_STORAGE_UNAVAILABLE": "This browser does not allow saving (for example in private mode). Your billets cannot be stored here."
+      "LOCAL_STORAGE_UNAVAILABLE": "This browser does not allow saving (for example in private mode). Your billets cannot be stored here.",
+      "BILLET_NOT_SAVED": "The billet is not saved yet. You can publish it as soon as it is saved."
     },
     "SUCCESS": {
       "LOGIN_SUCCESS": "You are logged in.",
@@ -758,7 +825,11 @@
       "USER_UPDATED": "User saved.",
       "USER_DELETED": "User deleted.",
       "USER_ACTIVATED": "User unlocked.",
-      "USER_DEACTIVATED": "User locked."
+      "USER_DEACTIVATED": "User locked.",
+      "BILLET_TAKEN_OVER": "Your billet is now in your account.",
+      "BILLETS_IMPORTED": "Billets moved to your account: {{count}}.",
+      "BILLET_DUPLICATED": "Copy created.",
+      "LINK_COPIED": "Link copied."
     },
     "INFO": {
       "ACCOUNT_REACTIVATED": "Welcome back! The scheduled deletion of your account has been cancelled.",

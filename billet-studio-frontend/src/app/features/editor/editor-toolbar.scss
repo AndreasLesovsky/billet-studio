@@ -30,15 +30,27 @@
     }
 }
 
+// The save status above the publish badge, together no taller than a control.
 .editor-toolbar__status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
     min-inline-size: 9rem;
 
     > .ui-hint {
         display: inline-flex;
         align-items: center;
         gap: var(--ui-space-1);
+        line-height: var(--ui-leading-tight);
         white-space: nowrap;
     }
+}
+
+// An account billet's status keeps the width of its widest routine pair ("Saving …" over
+// "Unpublished changes"): the first edit of a published billet must not push Share onto a new row.
+.editor-toolbar__status--shared {
+    min-inline-size: 14rem;
 }
 
 .editor-toolbar__share {

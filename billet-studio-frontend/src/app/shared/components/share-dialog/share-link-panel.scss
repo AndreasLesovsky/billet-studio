@@ -1,0 +1,17 @@
+// Layout only; every visual comes from the ui-* classes.
+
+// The link and its copy button share a row while it is wide enough.
+.share-link-panel__link {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-2);
+
+    > .ui-input {
+        flex: 1 1 14rem;
+        min-inline-size: 0;
+    }
+}
+
+.share-link-panel__changes {
+    padding-block-start: var(--ui-space-2);
+}

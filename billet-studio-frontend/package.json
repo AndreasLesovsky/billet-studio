@@ -16,6 +16,9 @@
     "test": "ng test",
     "e2e": "playwright test",
     "e2e:parity": "playwright test e2e/parity.spec.ts",
+    "e2e:backend": "npm run e2e:db && playwright test -c playwright.backend.config.ts",
+    "e2e:db": "docker compose -f ../docker-compose.e2e.yml up -d --wait",
+    "e2e:down": "docker compose -f ../docker-compose.e2e.yml down",
     "format:html": "prettier --write \"src/**/*.html\"",
     "format:html:check": "prettier --check \"src/**/*.html\""
   },

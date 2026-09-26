@@ -22,7 +22,11 @@
       "DEACTIVATING": "Deaktiviert …",
       "SIGNING_IN": "Meldet an …",
       "SIGNING_UP": "Erstellt Konto …",
-      "SENDING": "Sendet …"
+      "SENDING": "Sendet …",
+      "TAKING_OVER": "Übernimmt …",
+      "DUPLICATING": "Dupliziert …",
+      "PUBLISHING": "Wird veröffentlicht …",
+      "UNPUBLISHING": "Wird zurückgezogen …"
     },
     "NO_RESULTS": "Keine Ergebnisse gefunden.",
     "YES": "Ja",
@@ -135,7 +139,7 @@
     "LEAD": "Alle Billets, die du gestaltet hast, an einem Ort.",
     "EMPTY_TITLE": "Noch keine Billets",
     "EMPTY_TEXT": "Sobald du ein Billet gestaltest, erscheint es hier. Ohne Konto bleiben deine Billets auf diesem Gerät.",
-    "DEVICE_NOTE": "Deine Billets werden in diesem Browser gespeichert, nur auf diesem Gerät. Bald kannst du sie auch in deinem Konto sichern.",
+    "DEVICE_NOTE": "Deine Billets werden in diesem Browser gespeichert, nur auf diesem Gerät. Mit einem Konto kannst du sie sichern und teilen.",
     "COUNT": "{{count}} von {{max}} Plätzen belegt.",
     "EDITED": "Bearbeitet {{when}}",
     "UNTITLED": "Ohne Titel",
@@ -143,7 +147,21 @@
     "COPY_TITLE": "{{title}} (Kopie)",
     "DELETE_TITLE": "Billet löschen?",
     "DELETE_NAMED": "„{{title}}“ löschen",
-    "DELETE_MESSAGE": "„{{title}}“ wird von diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen."
+    "DELETE_MESSAGE": "„{{title}}“ wird von diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.",
+    "ACCOUNT_TITLE": "In deinem Konto",
+    "DEVICE_TITLE": "Nur auf diesem Gerät",
+    "ACCOUNT_EMPTY_TEXT": "Sobald du ein Billet gestaltest, erscheint es hier, sicher in deinem Konto.",
+    "LOAD_FAILED": "Deine Billets konnten nicht geladen werden.",
+    "DELETE_ACCOUNT_MESSAGE": "„{{title}}“ wird aus deinem Konto gelöscht. Das lässt sich nicht rückgängig machen.",
+    "DELETE_PUBLISHED_MESSAGE": "„{{title}}“ wird aus deinem Konto gelöscht, und sein Link funktioniert nicht mehr. Das lässt sich nicht rückgängig machen.",
+    "IMPORT": {
+      "TITLE_ONE": "1 Billet liegt nur auf diesem Gerät",
+      "TITLE_OTHER": "{{count}} Billets liegen nur auf diesem Gerät",
+      "TEXT": "Im Konto kannst du deine Billets teilen und auf jedem Gerät weiterbearbeiten.",
+      "NO_ROOM": "Dafür fehlt in deinem Konto der Platz: {{free}} von {{max}} Plätzen sind frei. Lösche Billets, die du nicht mehr brauchst, dann passen alle hinein.",
+      "REFUSED": "In deinem Konto war nicht genug Platz für alle. Lösche Billets, die du nicht mehr brauchst, und versuch es noch einmal.",
+      "ACTION": "Alle ins Konto übernehmen"
+    }
   },
   "EDITOR": {
     "TITLE_LABEL": "Titel des Billets (nur für deine Übersicht)",
@@ -161,11 +179,15 @@
       "HELD": "Nicht gespeichert",
       "LOCAL_STORAGE_FULL": "Nicht gespeichert: Speicher voll",
       "LOCAL_STORAGE_UNAVAILABLE": "Nicht gespeichert: Speichern blockiert",
-      "LOCAL_BILLET_LIMIT_REACHED": "Nicht gespeichert: zu viele Billets"
+      "LOCAL_BILLET_LIMIT_REACHED": "Nicht gespeichert: zu viele Billets",
+      "ACCOUNT_SAVED": "Gespeichert",
+      "OFFLINE": "Offline – lokal gesichert",
+      "REJECTED": "Nicht gespeichert – lokal gesichert",
+      "CONFLICT": "Konflikt"
     },
     "SHARE": "Teilen",
     "SHARE_GUEST_HINT": "Melde dich an, um dein Billet zu teilen.",
-    "SHARE_SOON": "Teilen ist bald verfügbar.",
+    "SHARE_DEVICE_HINT": "Übernimm das Billet in dein Konto, um es zu teilen.",
     "TABS": {
       "LABEL": "Bearbeiten",
       "PREVIEW": "Vorschau",
@@ -177,14 +199,26 @@
     },
     "NOT_FOUND_TITLE": "Billet nicht gefunden",
     "NOT_FOUND_TEXT": "Dieses Billet gibt es in diesem Browser nicht (mehr). Vielleicht wurde es gelöscht oder auf einem anderen Gerät angelegt.",
+    "NOT_FOUND_ACCOUNT_TEXT": "Dieses Billet gibt es in deinem Konto nicht (mehr). Vielleicht wurde es gelöscht.",
     "NOT_FOUND_LINK": "Zu meinen Billets",
+    "LOAD_FAILED": "Das Billet konnte nicht geladen werden.",
     "LEAVE_UNSAVED": "Deine letzten Änderungen konnten nicht gespeichert werden. Wenn du jetzt gehst, sind sie verloren.",
     "REMOTE": {
       "CHANGED": "Dieses Billet wurde in einem anderen Tab geändert, während du hier daran gearbeitet hast.",
       "REMOVED": "Dieses Billet wurde in einem anderen Tab gelöscht.",
       "LOAD_THEIRS": "Andere Version laden",
       "KEEP_MINE": "Meine Version behalten",
-      "RESTORE": "Wiederherstellen"
+      "RESTORE": "Wiederherstellen",
+      "CONFLICT": "Dieses Billet wurde anderswo geändert, während du hier daran gearbeitet hast.",
+      "RELOAD": "Neu laden",
+      "BACKUP": "Auf diesem Gerät gibt es neuere Änderungen an diesem Billet, die noch nicht gespeichert sind.",
+      "DISCARD_BACKUP": "Verwerfen"
+    },
+    "DEVICE": {
+      "TITLE": "Dieses Billet liegt nur auf diesem Gerät",
+      "TEXT": "Übernimm es in dein Konto, um es zu teilen und auf jedem Gerät weiterzubearbeiten.",
+      "FULL": "In deinem Konto ist kein Platz mehr frei. Lösche dort ein Billet, dann kannst du dieses übernehmen.",
+      "TAKE_OVER": "Ins Konto übernehmen"
     },
     "PREVIEW": {
       "DEVICE": "Gerät der Vorschau",
@@ -407,6 +441,38 @@
       "TITLE_REQUIRED": "Gib deinem Billet einen Titel.",
       "MAX_BLOCKS": "Höchstens {{maxLength}} Blöcke.",
       "HEX_COLOR": "Gib eine Farbe als #rrggbb ein."
+    }
+  },
+  "NEW_BILLET": {
+    "CREATING": "Dein Billet wird angelegt …",
+    "FULL_TITLE": "Kein Platz mehr in deinem Konto",
+    "FULL_TEXT": "Du hast die Höchstzahl an Billets erreicht. Lösche eines, das du nicht mehr brauchst, und versuch es dann noch einmal.",
+    "FAILED": "Dein Billet konnte nicht angelegt werden."
+  },
+  "SHARE": {
+    "TITLE": "„{{title}}“ teilen",
+    "EXPLAIN": "Beim Veröffentlichen bekommt dein Billet einen Link. Er zeigt eine Momentaufnahme: Was du danach änderst, bleibt privat, bis du „Änderungen veröffentlichen“ wählst.",
+    "RESHARE": "Du hast dieses Billet schon einmal geteilt. Veröffentlichst du es wieder, funktioniert auch der frühere Link wieder.",
+    "PUBLISH": "Veröffentlichen",
+    "LINK_LABEL": "Link zu deinem Billet",
+    "LINK_HINT": "Alle, die diesen Link haben, können dein Billet ansehen.",
+    "COPY": "Link kopieren",
+    "OPEN": "Öffnen",
+    "NEW_TAB": "(öffnet in einem neuen Tab)",
+    "NATIVE": "Teilen …",
+    "CURRENT": "Der Link zeigt die aktuelle Fassung. Was du ab jetzt änderst, bleibt privat, bis du es veröffentlichst.",
+    "CHANGED": "Du hast seit dem Veröffentlichen etwas geändert. Der Link zeigt noch die frühere Fassung.",
+    "PUBLISH_CHANGES": "Änderungen veröffentlichen",
+    "UNPUBLISH": "Nicht mehr teilen",
+    "UNPUBLISH_TITLE": "Nicht mehr teilen?",
+    "UNPUBLISH_MESSAGE": "Der Link zeigt dein Billet dann nicht mehr. Veröffentlichst du es später wieder, funktioniert derselbe Link wieder.",
+    "BADGE_PUBLISHED": "Veröffentlicht",
+    "BADGE_CHANGED": "Unveröffentlichte Änderungen",
+    "STATUS": {
+      "PUBLISHED": "Veröffentlicht. Der Link ist bereit.",
+      "UNPUBLISHED": "Dein Billet wird nicht mehr geteilt.",
+      "COPIED": "Link kopiert.",
+      "SELECTED": "Der Link ist markiert. Kopier ihn mit Strg+C (Mac: ⌘+C)."
     }
   },
   "AUTH": {
@@ -741,7 +807,8 @@
       "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
       "LOCAL_BILLET_LIMIT_REACHED": "Auf diesem Gerät ist Platz für {{max}} Billets. Lösche eines, um ein neues anzulegen.",
       "LOCAL_STORAGE_FULL": "Der Speicher dieses Browsers ist voll. Lösche ein Billet, um Platz zu schaffen.",
-      "LOCAL_STORAGE_UNAVAILABLE": "Dieser Browser lässt kein Speichern zu (etwa im privaten Modus). Deine Billets können hier nicht gespeichert werden."
+      "LOCAL_STORAGE_UNAVAILABLE": "Dieser Browser lässt kein Speichern zu (etwa im privaten Modus). Deine Billets können hier nicht gespeichert werden.",
+      "BILLET_NOT_SAVED": "Das Billet ist noch nicht gespeichert. Veröffentlichen geht, sobald es gespeichert ist."
     },
     "SUCCESS": {
       "LOGIN_SUCCESS": "Du bist angemeldet.",
@@ -758,7 +825,11 @@
       "USER_UPDATED": "Benutzer gespeichert.",
       "USER_DELETED": "Benutzer gelöscht.",
       "USER_ACTIVATED": "Benutzer entsperrt.",
-      "USER_DEACTIVATED": "Benutzer gesperrt."
+      "USER_DEACTIVATED": "Benutzer gesperrt.",
+      "BILLET_TAKEN_OVER": "Dein Billet ist jetzt in deinem Konto.",
+      "BILLETS_IMPORTED": "Ins Konto übernommene Billets: {{count}}.",
+      "BILLET_DUPLICATED": "Kopie angelegt.",
+      "LINK_COPIED": "Link kopiert."
     },
     "INFO": {
       "ACCOUNT_REACTIVATED": "Willkommen zurück! Die geplante Löschung deines Kontos ist abgebrochen.",

@@ -1,0 +1,75 @@
+<ul
+  class="ui-grid billet-list__grid"
+  role="list"
+>
+  @for (card of cards(); track card.row.id) {
+    @let name = card.row.title || ('BILLETS.UNTITLED' | translate);
+    <li class="billet-list__item">
+      <app-billet-card
+        [card]="card.view"
+        [level]="3"
+      >
+        <button
+          type="button"
+          class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+          [attr.aria-label]="'BILLETS.DELETE_NAMED' | translate: { title: name }"
+          [title]="'COMMON.DELETE' | translate"
+          (click)="remove(card.row)"
+        >
+          <i
+            class="bi bi-trash"
+            aria-hidden="true"
+          ></i>
+        </button>
+        <button
+          type="button"
+          class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+          [title]="'BILLETS.DUPLICATE' | translate"
+          [disabled]="account.full() || duplicating() !== null"
+          [attr.aria-busy]="duplicating() === card.row.id"
+          [attr.aria-describedby]="account.full() ? countId() : null"
+          (click)="duplicate(card.row)"
+        >
+          <i
+            class="bi bi-copy"
+            aria-hidden="true"
+          ></i>
+          <span class="ui-visually-hidden"
+            >{{
+              (duplicating() === card.row.id ? 'COMMON.PENDING.DUPLICATING' : 'BILLETS.DUPLICATE')
+                | translate
+            }}
+            {{ name }}</span
+          >
+        </button>
+        <button
+          type="button"
+          class="ui-btn ui-btn--neutral ui-btn--sm billet-list__end"
+          aria-haspopup="dialog"
+          (click)="share(card.row)"
+        >
+          <i
+            class="bi bi-share"
+            aria-hidden="true"
+          ></i>
+          {{ 'EDITOR.SHARE' | translate }}
+          <span class="ui-visually-hidden">{{ name }}</span>
+        </button>
+        <a
+          class="ui-btn ui-btn--secondary ui-btn--sm"
+          [id]="card.view.linkId"
+          [routerLink]="['/billets', card.row.id, 'edit']"
+        >
+          <i
+            class="bi bi-pencil"
+            aria-hidden="true"
+          ></i>
+          {{ 'COMMON.EDIT' | translate }}
+          <span class="ui-visually-hidden">{{ name }}</span>
+        </a>
+      </app-billet-card>
+    </li>
+  }
+</ul>
+
+<app-share-dialog [(target)]="sharing" />

@@ -1,148 +1,135 @@
-@if (found()) {
-  <div class="editor">
-    <app-editor-toolbar
-      [billetForm]="billetForm"
-      [canUndo]="canUndo()"
-      [canRedo]="canRedo()"
-      [saveStatus]="saveStatus()"
-      [saveFailure]="saveFailure()"
-      [(previewMode)]="previewMode"
-      (undo)="undo()"
-      (redo)="redo()"
-      (replay)="replay()"
-    />
-
-    @if (remote(); as change) {
-      <app-editor-remote-notice
-        class="editor__remote"
-        [change]="change"
-        (loadTheirs)="loadTheirs()"
-        (keepMine)="keepMine()"
+@switch (session.phase()) {
+  @case ('ready') {
+    <div class="editor">
+      <app-editor-toolbar
+        [billetForm]="billetForm"
+        [canUndo]="canUndo()"
+        [canRedo]="canRedo()"
+        [saveIndicator]="session.saveIndicator()"
+        [shareMode]="session.shareMode()"
+        [returnUrl]="returnUrl()"
+        [shareFacts]="shareFacts()"
+        [(previewMode)]="previewMode"
+        (undo)="undo()"
+        (redo)="redo()"
+        (replay)="replay()"
+        (share)="openShare()"
       />
-    }
 
-    <div class="editor__workspace">
-      <div
-        class="editor__tabs"
-        role="tablist"
-        [class]="tabBarClass()"
-        [attr.aria-label]="'EDITOR.TABS.LABEL' | translate"
-        (keydown)="onTabKeydown($event)"
-      >
-        @for (tab of tabs(); track tab.id) {
-          <button
-            type="button"
-            role="tab"
-            [class]="tabClass()"
-            [id]="'editor-tab-' + tab.id"
-            [attr.aria-selected]="tab.selected"
-            [attr.aria-controls]="tab.controls"
-            [tabIndex]="tab.tabIndex"
-            (click)="selectTab(tab.id)"
-          >
-            <i
-              class="bi"
-              [class]="tab.icon"
-              aria-hidden="true"
-            ></i>
-            <span>{{ tab.labelKey | translate }}</span>
-          </button>
+      @if (deviceNotice()) {
+        <app-editor-device-notice
+          class="editor__notice"
+          [taking]="local?.takingOver() ?? false"
+          [full]="local?.accountFull() ?? false"
+          (takeOver)="takeOver()"
+        />
+      }
+
+      @if (session.notice(); as change) {
+        <app-editor-remote-notice
+          class="editor__notice"
+          [change]="change"
+          [resolving]="session.resolving()"
+          (loadTheirs)="resolve('theirs')"
+          (keepMine)="resolve('mine')"
+        />
+      }
+
+      <div class="editor__workspace">
+        <div
+          class="editor__tabs"
+          role="tablist"
+          [class]="tabBarClass()"
+          [attr.aria-label]="'EDITOR.TABS.LABEL' | translate"
+          (keydown)="onTabKeydown($event)"
+        >
+          @for (tab of tabs(); track tab.id) {
+            <button
+              type="button"
+              role="tab"
+              [class]="tabClass()"
+              [id]="'editor-tab-' + tab.id"
+              [attr.aria-selected]="tab.selected"
+              [attr.aria-controls]="tab.controls"
+              [tabIndex]="tab.tabIndex"
+              (click)="selectTab(tab.id)"
+            >
+              <i
+                class="bi"
+                [class]="tab.icon"
+                aria-hidden="true"
+              ></i>
+              <span>{{ tab.labelKey | translate }}</span>
+            </button>
+          }
+        </div>
+
+        <section
+          id="editor-panel-content"
+          class="editor__content"
+          [hidden]="!showContent()"
+          [attr.role]="contentPanel().role"
+          [attr.aria-labelledby]="contentPanel().labelledBy"
+          [attr.aria-label]="contentPanel().labelKey | translate"
+        >
+          <app-content-panel
+            [billetForm]="billetForm"
+            [document]="model()"
+          />
+        </section>
+
+        <section
+          id="editor-panel-preview"
+          class="ui-stage editor__preview"
+          [hidden]="!showPreview()"
+          [attr.role]="previewPanel().role"
+          [attr.aria-labelledby]="previewPanel().labelledBy"
+          [attr.aria-label]="previewPanel().labelKey | translate"
+        >
+          <app-preview-frame
+            [document]="model()"
+            [asset]="asset()"
+            [mode]="previewViewMode()"
+          />
+        </section>
+
+        @if (inspectorTab(); as tab) {
+          <app-editor-inspector
+            class="editor__inspector"
+            role="tabpanel"
+            [id]="'editor-panel-' + tab"
+            [attr.aria-labelledby]="'editor-tab-' + tab"
+            [tab]="tab"
+            [billetForm]="billetForm"
+            [document]="model()"
+            [previewColorMode]="previewColorMode()"
+          />
         }
       </div>
-
-      <section
-        id="editor-panel-content"
-        class="editor__content"
-        [hidden]="!showContent()"
-        [attr.role]="contentPanel().role"
-        [attr.aria-labelledby]="contentPanel().labelledBy"
-        [attr.aria-label]="contentPanel().labelKey | translate"
-      >
-        <app-content-panel
-          [billetForm]="billetForm"
-          [document]="model()"
-        />
-      </section>
-
-      <section
-        id="editor-panel-preview"
-        class="ui-stage editor__preview"
-        [hidden]="!showPreview()"
-        [attr.role]="previewPanel().role"
-        [attr.aria-labelledby]="previewPanel().labelledBy"
-        [attr.aria-label]="previewPanel().labelKey | translate"
-      >
-        <app-preview-frame
-          [document]="model()"
-          [asset]="asset()"
-          [mode]="previewViewMode()"
-        />
-      </section>
-
-      @if (inspectorTab(); as tab) {
-        <section
-          class="editor__inspector"
-          role="tabpanel"
-          [id]="'editor-panel-' + tab"
-          [attr.aria-labelledby]="'editor-tab-' + tab"
-        >
-          @switch (tab) {
-            @case ('design') {
-              <app-design-panel
-                [billetForm]="billetForm"
-                [document]="model()"
-                [previewColorMode]="previewColorMode()"
-              />
-            }
-            @case ('spacing') {
-              <app-spacing-panel
-                [billetForm]="billetForm"
-                [document]="model()"
-              />
-            }
-            @case ('scene') {
-              <app-scene-panel
-                [billetForm]="billetForm"
-                [document]="model()"
-              />
-            }
-            @case ('particles') {
-              <app-particles-panel
-                [billetForm]="billetForm"
-                [document]="model()"
-              />
-            }
-          }
-        </section>
-      }
     </div>
-  </div>
-} @else {
-  <div class="ui-container">
-    <div class="ui-page">
-      <section
-        class="ui-card"
-        aria-labelledby="editor-not-found"
-      >
-        <div class="ui-card__body ui-stack editor__missing">
-          <span
-            class="ui-brand-mark ui-brand-mark--lg"
-            aria-hidden="true"
-          ></span>
-          <h1
-            id="editor-not-found"
-            class="ui-card__title"
-          >
-            {{ 'EDITOR.NOT_FOUND_TITLE' | translate }}
-          </h1>
-          <p class="ui-hint">{{ 'EDITOR.NOT_FOUND_TEXT' | translate }}</p>
-          <a
-            class="ui-btn ui-btn--primary"
-            routerLink="/billets"
-            >{{ 'EDITOR.NOT_FOUND_LINK' | translate }}</a
-          >
-        </div>
-      </section>
-    </div>
-  </div>
+
+    <app-share-dialog [(target)]="sharing" />
+  }
+  @case ('loading') {
+    <p
+      class="ui-visually-hidden"
+      role="status"
+    >
+      {{ 'COMMON.LOADING' | translate }}
+    </p>
+    <app-editor-skeleton />
+  }
+  @case ('failed') {
+    <app-editor-message
+      textKey="EDITOR.LOAD_FAILED"
+      [retryable]="true"
+      (retry)="reload()"
+    />
+  }
+  @default {
+    <app-editor-message
+      titleKey="EDITOR.NOT_FOUND_TITLE"
+      [textKey]="missingTextKey"
+    />
+  }
 }

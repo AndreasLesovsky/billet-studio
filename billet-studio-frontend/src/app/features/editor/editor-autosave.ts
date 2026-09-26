@@ -15,11 +15,7 @@ import {
   LocalBilletError,
   type LocalBilletErrorCode,
 } from '../../core/services/local-billet-store';
-
-/** Quiet time after the last edit before it is written (CLAUDE.md section 23). */
-const SAVE_DELAY_MS = 1200;
-/** Longest an edit waits while typing goes on. */
-const SAVE_MAX_WAIT_MS = 10_000;
+import { createSaveTimer, flushOnPageLeave } from './save-timer';
 
 /** held: an edit waits while autosave is paused. */
 export type SaveStatus = 'saved' | 'pending' | 'held' | 'error';
@@ -55,8 +51,7 @@ export function createEditorAutosave({ model, save, enabled }: AutosaveOptions):
   const saved = signal(untracked(model));
   const failure = signal<LocalBilletErrorCode | null>(null);
   const paused = signal(false);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  let pendingSince: number | null = null;
+  const timer = createSaveTimer(() => flush());
 
   const status = computed<SaveStatus>(() => {
     if (failure()) return 'error';
@@ -64,17 +59,8 @@ export function createEditorAutosave({ model, save, enabled }: AutosaveOptions):
     return paused() ? 'held' : 'pending';
   });
 
-  function schedule(): void {
-    const now = Date.now();
-    pendingSince ??= now;
-    clearTimeout(timer);
-    const wait = Math.min(SAVE_DELAY_MS, SAVE_MAX_WAIT_MS - (now - pendingSince));
-    timer = setTimeout(() => flush(), Math.max(0, wait));
-  }
-
   function flush(force = false): boolean {
-    clearTimeout(timer);
-    pendingSince = null;
+    timer.cancel();
     const document = model();
     if (!enabled() || paused()) return document === saved();
     if (!force && document === saved() && failure() === null) return true;
@@ -91,23 +77,13 @@ export function createEditorAutosave({ model, save, enabled }: AutosaveOptions):
 
   effect(() => {
     const document = model();
-    if (enabled() && !paused() && document !== untracked(saved)) schedule();
+    if (enabled() && !paused() && document !== untracked(saved)) timer.touch();
   });
 
-  const view = inject(DOCUMENT).defaultView;
-  const abort = new AbortController();
-  const listen = (target: EventTarget | null | undefined, type: string, fn: (e: Event) => void) =>
-    target?.addEventListener(type, fn, { signal: abort.signal });
-  listen(view?.document, 'visibilitychange', () => {
-    if (view?.document.visibilityState === 'hidden') flush();
-  });
-  listen(view, 'pagehide', () => flush());
-  listen(view, 'beforeunload', (event) => {
-    if (!flush()) event.preventDefault();
-  });
+  const stopListening = flushOnPageLeave(inject(DOCUMENT).defaultView, flush);
   inject(DestroyRef).onDestroy(() => {
     flush();
-    abort.abort();
+    stopListening();
   });
 
   return {
@@ -115,8 +91,7 @@ export function createEditorAutosave({ model, save, enabled }: AutosaveOptions):
     failure: failure.asReadonly(),
     flush,
     markSaved(document: BilletDocument): void {
-      clearTimeout(timer);
-      pendingSince = null;
+      timer.cancel();
       saved.set(document);
       failure.set(null);
     },

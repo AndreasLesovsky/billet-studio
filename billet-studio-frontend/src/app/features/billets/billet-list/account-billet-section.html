@@ -1,0 +1,53 @@
+<h2 id="billet-list-account-title">{{ 'BILLETS.ACCOUNT_TITLE' | translate }}</h2>
+@switch (view()) {
+  @case ('loading') {
+    <app-billet-list-skeleton />
+  }
+  @case ('failed') {
+    <div
+      class="ui-alert ui-alert--danger"
+      role="alert"
+    >
+      <i
+        class="bi bi-exclamation-octagon"
+        aria-hidden="true"
+      ></i>
+      <div class="ui-stack ui-stack--sm">
+        <p>{{ 'BILLETS.LOAD_FAILED' | translate }}</p>
+        <div>
+          <button
+            type="button"
+            class="ui-btn ui-btn--neutral ui-btn--sm"
+            (click)="account.reload()"
+          >
+            <i
+              class="bi bi-arrow-clockwise"
+              aria-hidden="true"
+            ></i>
+            {{ 'COMMON.RETRY' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  @default {
+    <p
+      id="billet-list-account-count"
+      class="ui-hint"
+    >
+      {{ 'BILLETS.COUNT' | translate: { count: rows().length, max: max } }}
+    </p>
+    @if (view() === 'billets') {
+      <app-account-billet-grid
+        countId="billet-list-account-count"
+        [rows]="rows()"
+      />
+    } @else {
+      <app-billet-list-empty
+        textKey="BILLETS.ACCOUNT_EMPTY_TEXT"
+        titleId="billet-list-account-empty"
+        [level]="3"
+      />
+    }
+  }
+}

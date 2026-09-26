@@ -98,15 +98,21 @@
   </div>
 </div>
 
-<p class="editor-toolbar__status">
-  <span [class]="status().className">
+<p
+  class="editor-toolbar__status"
+  [class.editor-toolbar__status--shared]="shareFacts() !== null"
+>
+  <span [class]="saveIndicator().className">
     <i
       class="bi"
-      [class]="status().icon"
+      [class]="saveIndicator().icon"
       aria-hidden="true"
     ></i>
-    {{ status().key | translate }}
+    {{ saveIndicator().key | translate }}
   </span>
+  @if (shareFacts(); as facts) {
+    <app-publish-badge [facts]="facts" />
+  }
 </p>
 <p
   class="ui-visually-hidden"
@@ -120,9 +126,11 @@
 <div class="ui-cluster editor-toolbar__share">
   <button
     type="button"
-    class="ui-btn ui-btn--primary"
-    disabled
-    aria-describedby="editor-share-hint"
+    aria-haspopup="dialog"
+    [class]="shareView().className"
+    [disabled]="shareView().hintKey !== null"
+    [attr.aria-describedby]="shareView().hintKey ? 'editor-share-hint' : null"
+    (click)="share.emit()"
   >
     <i
       class="bi bi-share"
@@ -130,10 +138,25 @@
     ></i>
     {{ 'EDITOR.SHARE' | translate }}
   </button>
-  <p
-    id="editor-share-hint"
-    class="ui-hint"
-  >
-    {{ (isLoggedIn() ? 'EDITOR.SHARE_SOON' : 'EDITOR.SHARE_GUEST_HINT') | translate }}
-  </p>
+  @if (shareMode() === 'guest') {
+    <a
+      class="ui-btn ui-btn--secondary"
+      routerLink="/login"
+      [queryParams]="{ returnUrl: returnUrl() }"
+    >
+      <i
+        class="bi bi-box-arrow-in-right"
+        aria-hidden="true"
+      ></i>
+      {{ 'NAV.LOGIN' | translate }}
+    </a>
+  }
+  @if (shareView().hintKey; as hintKey) {
+    <p
+      id="editor-share-hint"
+      class="ui-hint"
+    >
+      {{ hintKey | translate }}
+    </p>
+  }
 </div>

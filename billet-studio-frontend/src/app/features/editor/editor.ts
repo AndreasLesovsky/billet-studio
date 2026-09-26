@@ -10,39 +10,34 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { form } from '@angular/forms/signals';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { createDocument, type BilletDocument } from '../../billet/billet-document';
 import { resolveBilletMode } from '../../billet/view/billet-view-style';
 import { mediaQuery, PREFERS_DARK } from '../../billet/view/media-query';
 import { AssetCatalogApi } from '../../core/services/asset-catalog-api';
-import { LocalBilletStore } from '../../core/services/local-billet-store';
-import { ConfirmationModalStore } from '../../core/stores/confirmation-modal-store';
 import { BreadcrumbService } from '../../shared/components/breadcrumb/breadcrumb-service';
-import { createEditorAutosave } from './editor-autosave';
+import { ShareDialog } from '../../shared/components/share-dialog/share-dialog';
+import type { ShareTarget } from '../../shared/components/share-dialog/share-state';
+import { AccountEditorSession } from './account-editor-session';
 import { EditorCommands } from './editor-commands';
+import { EditorDeviceNotice } from './editor-device-notice';
 import { createEditorHistory, historyShortcut, type HistoryAction } from './editor-history';
-import { EditorRemoteNotice, type RemoteChange } from './editor-remote-notice';
+import { injectEditorLayout, type EditorLayout } from './editor-layout';
+import { EditorMessage } from './editor-message';
+import { EditorRemoteNotice } from './editor-remote-notice';
 import { billetSchema } from './editor-schema';
+import type { EditorHost, EditorSession, NoticeChoice } from './editor-session';
+import { EditorSkeleton } from './editor-skeleton';
 import { EditorToolbar, type PreviewMode } from './editor-toolbar';
+import { LocalEditorSession } from './local-editor-session';
 import { ContentPanel } from './panels/content/content-panel';
-import { DesignPanel } from './panels/design/design-panel';
-import { ParticlesPanel } from './panels/particles/particles-panel';
-import { ScenePanel } from './panels/scene/scene-panel';
-import { SpacingPanel } from './panels/spacing/spacing-panel';
+import { EditorInspector, type InspectorTab } from './panels/editor-inspector';
 import { PreviewFrame } from './preview-frame/preview-frame';
 
-type EditorLayout = 'wide' | 'medium' | 'narrow';
-type InspectorTab = 'design' | 'spacing' | 'scene' | 'particles';
 type EditorTab = 'preview' | 'content' | InspectorTab;
-
-// The layout is decided here, once, and styled through the host class: three columns from 75rem,
-// two from md (48rem, src/styles/_breakpoints.scss), below that one panel at a time.
-const WIDE_QUERY = '(width >= 75rem)';
-const MEDIUM_QUERY = '(width >= 48rem)';
 
 interface TabOption {
   readonly id: EditorTab;
@@ -76,24 +71,25 @@ function panelSemantics(tab: EditorTab, isTabPanel: boolean) {
 }
 
 /**
- * The billet editor, /billets/local/:localId/edit. Its chrome is Studio like the rest of the site;
- * the billet's theme shows only in the preview (and on the published page). The form model IS the
- * document: every edit lands in `model`, the history takes it in, the autosave writes it to this
- * device and the preview shows it. Panels bind `billetForm` and ask for bigger steps through
- * EditorCommands. No <form> wraps them: the form spans every panel, autosaves and never submits.
+ * The billet editor: /billets/local/:localId/edit for a billet on this device, /billets/:id/edit
+ * for one in the account. Its chrome is Studio like the rest of the site; the billet's theme shows
+ * only in the preview (and on the published page). The form model IS the document: every edit
+ * lands in `model`, the history takes it in, the session saves it where the billet lives and the
+ * preview shows it. Panels bind `billetForm` and ask for bigger steps through EditorCommands. No
+ * <form> wraps them: the form spans every panel, autosaves and never submits.
  */
 @Component({
   selector: 'app-editor',
   imports: [
     ContentPanel,
-    DesignPanel,
+    EditorDeviceNotice,
+    EditorInspector,
+    EditorMessage,
     EditorRemoteNotice,
+    EditorSkeleton,
     EditorToolbar,
-    ParticlesPanel,
     PreviewFrame,
-    RouterLink,
-    ScenePanel,
-    SpacingPanel,
+    ShareDialog,
     TranslatePipe,
   ],
   templateUrl: './editor.html',
@@ -109,21 +105,15 @@ function panelSemantics(tab: EditorTab, isTabPanel: boolean) {
   },
 })
 export class Editor implements EditorCommands {
-  private readonly store = inject(LocalBilletStore);
   private readonly route = inject(ActivatedRoute);
   private readonly catalog = inject(AssetCatalogApi);
   private readonly translate = inject(TranslateService);
-  private readonly confirmation = inject(ConfirmationModalStore);
   private readonly breadcrumb = inject(BreadcrumbService);
   private readonly injector = inject(Injector);
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
 
-  protected readonly localId = signal(this.route.snapshot.paramMap.get('localId') ?? '');
-  private readonly stored = this.store.load(this.localId());
-  /** False for a localId this browser does not know: the page says so instead of editing. */
-  protected readonly found = signal(this.stored !== null);
-
-  readonly model = signal<BilletDocument>(this.stored ?? createDocument({ lang: 'de' }));
+  /** A placeholder until the session shows the billet (phase 'ready'). */
+  readonly model = signal<BilletDocument>(createDocument({ lang: 'de' }));
   readonly billetForm = form(this.model, billetSchema);
 
   protected readonly history = createEditorHistory(this.model);
@@ -131,22 +121,37 @@ export class Editor implements EditorCommands {
   protected readonly canUndo = this.history.canUndo;
   protected readonly canRedo = this.history.canRedo;
 
-  private readonly autosave = createEditorAutosave({
-    model: this.model,
-    save: (document) => this.store.save(this.localId(), document),
-    enabled: this.found,
-  });
-  protected readonly saveStatus = this.autosave.status;
-  protected readonly saveFailure = this.autosave.failure;
-  /** Another tab changed or removed this billet while it had edits here. */
-  protected readonly remote = signal<RemoteChange | null>(null);
+  /** The breadcrumb names the billet by its title, live while it is typed. */
+  private readonly crumbLabel = computed(
+    () => this.model().title.trim() || this.translate.instant('BREADCRUMB.EDIT_BILLET'),
+  );
 
-  private readonly wide = mediaQuery(WIDE_QUERY);
-  private readonly medium = mediaQuery(MEDIUM_QUERY);
-  protected readonly layout = computed<EditorLayout>(() => {
-    if (this.wide()) return 'wide';
-    return this.medium() ? 'medium' : 'narrow';
-  });
+  private readonly editorHost: EditorHost = {
+    model: this.model,
+    adopt: (document) => this.adopt(document),
+    commit: (update) => this.commit(update),
+  };
+  /** Where the billet lives, chosen by the route: this device, or the account. */
+  protected readonly local: LocalEditorSession | null = this.route.snapshot.paramMap.has('localId')
+    ? new LocalEditorSession(this.editorHost)
+    : null;
+  protected readonly account: AccountEditorSession | null = this.local
+    ? null
+    : new AccountEditorSession(this.editorHost);
+  protected readonly session: EditorSession = (this.local ?? this.account) as EditorSession;
+  /** A signed-in user in a billet of this device: the banner that takes it into the account. */
+  protected readonly deviceNotice = computed(() => this.local?.shareMode() === 'device');
+  protected readonly missingTextKey = this.local
+    ? 'EDITOR.NOT_FOUND_TEXT'
+    : 'EDITOR.NOT_FOUND_ACCOUNT_TEXT';
+  /** Where a guest's sign-in comes back to. */
+  protected readonly returnUrl = computed(() => (this.local ? this.local.returnUrl() : null));
+  /** An account billet's publish state, for the toolbar's badge. */
+  protected readonly shareFacts = computed(() => this.account?.shareTarget.facts() ?? null);
+  /** The share dialog's billet while it is open. */
+  protected readonly sharing = signal<ShareTarget | null>(null);
+
+  protected readonly layout = injectEditorLayout();
   private readonly narrow = computed(() => this.layout() === 'narrow');
   protected readonly tabBarClass = computed(() =>
     this.narrow() ? 'ui-editor-bar ui-editor-bar--bottom' : 'ui-tabs',
@@ -198,10 +203,13 @@ export class Editor implements EditorCommands {
     resolveBilletMode(this.previewViewMode() ?? this.model().colorMode, this.systemDark()),
   );
 
-  /** The slug as a string, so the 3D model is fetched again only when it really changes. */
+  /**
+   * The slug as a string, so the 3D model is fetched again only when it really changes - and only
+   * for the billet itself, never for the placeholder shown while it loads.
+   */
   private readonly modelSlug = computed(() => {
     const { scene } = this.model();
-    return scene.enabled ? scene.modelSlug : undefined;
+    return this.session.phase() === 'ready' && scene.enabled ? scene.modelSlug : undefined;
   });
   private readonly assetRequest = resource({
     params: () => this.modelSlug(),
@@ -211,26 +219,7 @@ export class Editor implements EditorCommands {
     this.assetRequest.hasValue() ? this.assetRequest.value() : null,
   );
 
-  /** The breadcrumb names the billet by its title, live while it is typed. */
-  private readonly crumbLabel = computed(
-    () => this.model().title.trim() || this.translate.instant('BREADCRUMB.EDIT_BILLET'),
-  );
-
   private readonly preview = viewChild(PreviewFrame);
-
-  constructor() {
-    afterNextRender(() => this.nameCrumb());
-
-    this.store.changedElsewhere.pipe(takeUntilDestroyed()).subscribe((localId) => {
-      if (this.found() && (localId === null || localId === this.localId())) {
-        this.onChangedElsewhere();
-      }
-    });
-    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const localId = params.get('localId') ?? '';
-      if (localId !== this.localId()) this.open(localId);
-    });
-  }
 
   /** EditorCommands: one undo step, autosaved like any edit. */
   commit(update: (document: BilletDocument) => BilletDocument): void {
@@ -245,9 +234,12 @@ export class Editor implements EditorCommands {
     this.step('redo');
   }
 
-  /** The app's history answers Ctrl/Cmd+Z and friends everywhere in the editor, text fields too. */
+  /**
+   * The app's history answers Ctrl/Cmd+Z and friends everywhere in the editor, text fields too -
+   * not in the share dialog, which sits in the editor but edits nothing.
+   */
   protected onShortcut(event: Event, action: HistoryAction | null): void {
-    if (!action) return;
+    if (!action || (event.target instanceof Element && event.target.closest('dialog'))) return;
     event.preventDefault();
     this.step(action);
   }
@@ -309,31 +301,26 @@ export class Editor implements EditorCommands {
     });
   }
 
-  /** Asked by the route's canDeactivate: the pending edit is written; only a failed write asks. */
+  /** Asked by the route's canDeactivate: the session secures the pending edit, or asks. */
   confirmLeave(): boolean | Promise<boolean> {
-    if (!this.found() || this.autosave.flush()) return true;
-    return this.confirmation.askConfirmation({
-      title: this.translate.instant('FORMS.UNSAVED_TITLE'),
-      message: this.translate.instant('EDITOR.LEAVE_UNSAVED'),
-      confirmLabel: this.translate.instant('FORMS.UNSAVED_DISCARD'),
-      cancelLabel: this.translate.instant('FORMS.UNSAVED_STAY'),
-      confirmVariant: 'danger',
-    });
+    return this.session.confirmLeave();
   }
 
-  /** Takes over another tab's version (dropping this tab's history). */
-  protected loadTheirs(): void {
-    const theirs = this.store.load(this.localId());
-    if (theirs) this.adopt(theirs);
+  protected async resolve(choice: NoticeChoice): Promise<void> {
+    await this.session.resolve(choice);
     this.afterNotice();
   }
 
-  /** Keeps this tab's version and writes it, over another tab's change or removal. */
-  protected keepMine(): void {
-    this.remote.set(null);
-    this.autosave.paused.set(false);
-    this.autosave.flush(true);
-    this.afterNotice();
+  protected takeOver(): void {
+    void this.local?.takeOver();
+  }
+
+  protected reload(): void {
+    if (this.account) this.account.reload();
+  }
+
+  protected openShare(): void {
+    if (this.account) this.sharing.set(this.account.shareTarget);
   }
 
   /** The notice goes away with the button just pressed: the focus goes to the billet's title. */
@@ -349,42 +336,14 @@ export class Editor implements EditorCommands {
   }
 
   /**
-   * Another tab saved or removed this billet. Without edits here its version is taken over; with
-   * edits, autosave holds and the user decides.
+   * The billet's new start: loaded, reloaded, or another tab's. Its title names the crumb, after
+   * the render, because the navigation that got here forgets the breadcrumb's labels.
    */
-  private onChangedElsewhere(): void {
-    const theirs = this.store.load(this.localId());
-    if (theirs !== null && JSON.stringify(theirs) === JSON.stringify(this.model())) {
-      this.remote.set(null);
-      this.autosave.paused.set(false);
-    } else if (theirs !== null && this.saveStatus() === 'saved' && this.remote() === null) {
-      this.adopt(theirs);
-    } else {
-      this.remote.set(theirs === null ? 'removed' : 'changed');
-      this.autosave.paused.set(true);
-    }
-  }
-
   private adopt(document: BilletDocument): void {
     this.model.set(document);
     this.history.reset();
-    this.autosave.markSaved(document);
-    this.remote.set(null);
-    this.autosave.paused.set(false);
-  }
-
-  /** The route's localId changed while this editor stayed: save the old billet, open the new. */
-  private open(localId: string): void {
-    this.autosave.flush();
-    const document = this.store.load(localId);
-    this.localId.set(localId);
-    this.found.set(document !== null);
-    if (document) this.adopt(document);
-    afterNextRender(() => this.nameCrumb(), { injector: this.injector });
-  }
-
-  /** Runs after the navigation has ended, which forgets the breadcrumb's labels. */
-  private nameCrumb(): void {
-    if (this.found()) this.breadcrumb.setDynamicLabel(this.crumbLabel);
+    afterNextRender(() => this.breadcrumb.setDynamicLabel(this.crumbLabel), {
+      injector: this.injector,
+    });
   }
 }

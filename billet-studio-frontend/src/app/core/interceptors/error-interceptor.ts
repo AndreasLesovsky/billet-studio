@@ -1,8 +1,8 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import type { ApiError } from '../models/models';
 import { MessageStore } from '../stores/message-store';
+import { apiErrorCode } from '../utils/api-error';
 import { ANSWERED_INLINE, SKIP_ERROR_TOAST } from './http-context-tokens';
 
 /** errorCode of a response that carried no ApiError body. */
@@ -44,10 +44,5 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 function errorCodeOf(error: HttpErrorResponse): string {
-  const body: unknown = error.error;
-  if (typeof body === 'object' && body !== null) {
-    const code: unknown = (body as Partial<ApiError>).errorCode;
-    if (typeof code === 'string' && code.length > 0) return code;
-  }
-  return UNKNOWN_ERROR;
+  return apiErrorCode(error) ?? UNKNOWN_ERROR;
 }

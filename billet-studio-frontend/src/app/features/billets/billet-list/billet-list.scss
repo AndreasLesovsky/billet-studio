@@ -1,4 +1,5 @@
-// Layout only; every visual comes from the ui-* classes, the swatch colours are theme data.
+// Layout only; every visual comes from the ui-* classes. Shared by the page, its grids and the
+// skeleton.
 @use '../../../../styles/breakpoints' as bp;
 
 .billet-list__header {
@@ -15,31 +16,16 @@
     --ui-grid-min: 17rem;
 }
 
-.billet-list__title {
-    overflow-wrap: anywhere;
+// The card fills its cell, so a row of cards shares one height.
+.billet-list__item {
+    display: grid;
 }
 
-.billet-list__meta {
-    gap: var(--ui-space-2) var(--ui-space-3);
+// A card's main actions (share, edit) stand apart from its icons, at the footer's end.
+.billet-list__end {
+    margin-inline-start: auto;
 }
 
-.billet-list__swatches {
-    display: flex;
-    gap: var(--ui-space-1);
-}
-
-.billet-list__actions {
-    justify-content: flex-start;
-
-    > :last-child {
-        margin-inline-start: auto;
-    }
-}
-
-.billet-list__empty {
-    align-items: center;
-    max-inline-size: 32rem;
-    margin-inline: auto;
-    padding-block: var(--ui-space-8);
-    text-align: center;
+.billet-list__skeleton-count {
+    inline-size: 9rem;
 }

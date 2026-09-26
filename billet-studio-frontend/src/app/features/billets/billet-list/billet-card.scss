@@ -1,0 +1,18 @@
+// Layout only; every visual comes from the ui-* classes, the swatch colours are theme data.
+
+.billet-card__title {
+    overflow-wrap: anywhere;
+}
+
+.billet-card__meta {
+    gap: var(--ui-space-2) var(--ui-space-3);
+}
+
+.billet-card__swatches {
+    display: flex;
+    gap: var(--ui-space-1);
+}
+
+.billet-card__actions {
+    justify-content: flex-start;
+}

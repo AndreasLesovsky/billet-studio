@@ -1,0 +1,76 @@
+<div class="editor">
+  <div class="ui-editor-bar ui-cluster editor-skeleton__bar">
+    <span class="ui-skeleton ui-skeleton--control editor-skeleton__title"></span>
+    <span class="ui-cluster editor-skeleton__tools">
+      <span class="ui-skeleton ui-skeleton--button ui-skeleton--icon"></span>
+      <span class="ui-skeleton ui-skeleton--button ui-skeleton--icon"></span>
+      <span class="ui-skeleton ui-skeleton--button editor-skeleton__modes"></span>
+      <span class="ui-skeleton ui-skeleton--button"></span>
+    </span>
+    <span class="ui-hint ui-skeleton ui-skeleton--text editor-skeleton__status"></span>
+    <span class="ui-skeleton ui-skeleton--button editor-skeleton__share"></span>
+  </div>
+
+  <div class="editor__workspace">
+    <div
+      class="editor__tabs"
+      [class]="tabBarClass()"
+    >
+      @for (tab of tabs(); track tab) {
+        <span class="ui-tab editor-skeleton__tab">
+          <span class="ui-skeleton ui-skeleton--text"></span>
+        </span>
+      }
+    </div>
+
+    <div class="editor__content">
+      <div class="ui-stack ui-stack--lg">
+        <div class="ui-card">
+          <div class="ui-card__header">
+            <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+          </div>
+          <div class="ui-card__body ui-stack">
+            <app-field-skeleton [hints]="2" />
+            <app-field-skeleton
+              [hints]="1"
+              [errorSlot]="false"
+            />
+          </div>
+        </div>
+        <div class="ui-card">
+          <div class="ui-card__header">
+            <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+          </div>
+          <div class="ui-card__body ui-stack">
+            <app-field-skeleton />
+            <app-field-skeleton />
+            <app-field-skeleton />
+            <app-field-skeleton />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (layout() !== 'narrow') {
+      <div class="ui-stage editor__preview editor-skeleton__preview">
+        <span class="ui-skeleton ui-skeleton--button editor-skeleton__device-bar"></span>
+        <span class="ui-skeleton editor-skeleton__device"></span>
+      </div>
+    }
+
+    @if (layout() === 'wide') {
+      <div class="editor__inspector">
+        <div class="ui-card">
+          <div class="ui-card__header">
+            <span class="ui-card__title ui-skeleton ui-skeleton--text ui-skeleton--short"></span>
+          </div>
+          <div class="ui-card__body ui-stack">
+            <app-field-skeleton [hints]="2" />
+            <app-field-skeleton [hints]="1" />
+            <app-field-skeleton />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -89,7 +89,7 @@ const SEED_MODELS: readonly SeedModel[] = [
 ];
 
 /** GET /v1/models as the backend answers it (ModelDto[], docs/api-contract.md). */
-const MODEL_CATALOG = SEED_MODELS.map(({ defaults, ...model }) => {
+export const MODEL_CATALOG = SEED_MODELS.map(({ defaults, ...model }) => {
   const [fitSize, yOffset, exposure, cameraDistance, cameraHeight, autoRotateSpeed] = defaults;
   return {
     ...model,
@@ -100,31 +100,40 @@ const MODEL_CATALOG = SEED_MODELS.map(({ defaults, ...model }) => {
   };
 });
 
+/** The refresh call sends credentials, so a wildcard origin would be refused. */
+export const CORS_HEADERS = {
+  'access-control-allow-origin': APP_ORIGIN,
+  'access-control-allow-credentials': 'true',
+};
+
+/** An ApiError body (docs/api-contract.md). */
+export function apiError(errorCode: string, status: number) {
+  return { errorCode, status, timestamp: new Date().toISOString() };
+}
+
+/** The model library's answer to a request, or undefined when the request is not for it. */
+export function modelLibraryAnswer(method: string, path: string): object | undefined {
+  if (method !== 'GET') return undefined;
+  if (/\/v1\/models\/?$/.test(path)) return MODEL_CATALOG;
+  const slug = /\/v1\/models\/([^/]+)$/.exec(path)?.[1];
+  return MODEL_CATALOG.find((m) => m.slug === slug);
+}
+
 /**
  * Stands in for the backend of a visitor who is not signed in: the model library answers, every
  * other /v1 request is 401 (the refresh on startup included), so the app runs as a guest.
  */
 export async function mockGuestApi(page: Page): Promise<void> {
   await page.route('**/v1/**', async (route) => {
-    // The refresh call sends credentials, so a wildcard origin would be refused.
-    const headers = {
-      'access-control-allow-origin': APP_ORIGIN,
-      'access-control-allow-credentials': 'true',
-    };
     const request = route.request();
-    const path = new URL(request.url()).pathname;
-    const slug = /\/v1\/models\/([^/]+)$/.exec(path)?.[1];
-    const model = MODEL_CATALOG.find((m) => m.slug === slug);
-
-    if (request.method() === 'GET' && /\/v1\/models\/?$/.test(path)) {
-      await route.fulfill({ json: MODEL_CATALOG, headers });
-    } else if (request.method() === 'GET' && model) {
-      await route.fulfill({ json: model, headers });
+    const models = modelLibraryAnswer(request.method(), new URL(request.url()).pathname);
+    if (models) {
+      await route.fulfill({ json: models, headers: CORS_HEADERS });
     } else {
       await route.fulfill({
         status: 401,
-        json: { errorCode: 'UNAUTHORIZED', status: 401, timestamp: new Date().toISOString() },
-        headers,
+        json: apiError('UNAUTHORIZED', 401),
+        headers: CORS_HEADERS,
       });
     }
   });

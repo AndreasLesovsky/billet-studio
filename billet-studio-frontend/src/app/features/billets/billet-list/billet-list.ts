@@ -1,133 +1,95 @@
-import { afterNextRender, Component, computed, ElementRef, inject, Injector } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-
-import { TEXT_LIMITS } from '../../../billet/billet-limits';
-import { truncateGraphemes } from '../../../billet/text/text-sanitize';
-import { TEMPLATES } from '../../../billet/templates/templates';
-import { LanguageService } from '../../../core/services/language-service';
 import {
-  LocalBilletError,
-  LocalBilletStore,
-  MAX_LOCAL_BILLETS,
-  type LocalBilletEntry,
-} from '../../../core/services/local-billet-store';
-import { ConfirmationModalStore } from '../../../core/stores/confirmation-modal-store';
+  afterNextRender,
+  Component,
+  computed,
+  DOCUMENT,
+  inject,
+  Injector,
+  signal,
+} from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+
+import type { BilletSummaryDto } from '../../../core/models/models';
+import { AuthApi } from '../../../core/services/auth-api';
+import { LocalBilletStore, MAX_LOCAL_BILLETS } from '../../../core/services/local-billet-store';
 import { MessageStore } from '../../../core/stores/message-store';
-import { billetPresetFor } from '../../../core/theme/billet-theme-presets.generated';
-import { ColorModeService } from '../../../core/theme/color-mode-service';
-import { injectCatalogPreviews, previewOf } from '../../../core/utils/model-previews';
-import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
-
-const cardLinkId = (entry: LocalBilletEntry) => `billet-list-edit-${entry.localId}`;
-
-/** A blank billet's stand-in for its model preview. */
-const BLANK_EMOJI = '💌';
-
-const MINUTE_MS = 60_000;
-/** Largest unit first; under a minute reads as "this minute". */
-const RELATIVE_UNITS: readonly (readonly [Intl.RelativeTimeFormatUnit, number])[] = [
-  ['day', 24 * 60 * MINUTE_MS],
-  ['hour', 60 * MINUTE_MS],
-  ['minute', MINUTE_MS],
-];
-
-function editedAgo(updatedAt: string, now: number, locale: string): string {
-  const elapsed = Math.max(0, now - Date.parse(updatedAt));
-  const [unit, size] = RELATIVE_UNITS.find(([, ms]) => elapsed >= ms) ?? RELATIVE_UNITS[2];
-  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(
-    -Math.floor(elapsed / size),
-    unit,
-  );
-}
+import { apiErrorCode } from '../../../core/utils/api-error';
+import { runPending } from '../../../core/utils/pending';
+import { AccountBilletSection } from './account-billet-section';
+import { AccountBillets } from './account-billets';
+import { NEW_BILLET_ID } from './billet-card';
+import { BilletImportNotice } from './billet-import-notice';
+import { BilletListEmpty } from './billet-list-empty';
+import { accountLinkId, importBatch, importOffer } from './billet-list-state';
+import { LocalBilletGrid, writeLocally } from './local-billet-grid';
 
 /**
- * "My billets": the billets stored in this browser, newest first, with their model, theme colours
- * and when they were last edited. Other tabs' changes show up by themselves (LocalBilletStore).
- * P7 adds the billets of the account.
+ * "My billets". A guest's are the billets stored in this browser. A signed-in user sees the
+ * account's billets (a skeleton while they load) and, below them, any this device still holds,
+ * with the notice that moves them all into the account - then the page's main action, so
+ * "New billet" steps back.
  */
 @Component({
   selector: 'app-billet-list',
-  imports: [AssetThumb, RouterLink, TranslatePipe],
+  imports: [
+    AccountBilletSection,
+    BilletImportNotice,
+    BilletListEmpty,
+    LocalBilletGrid,
+    RouterLink,
+    TranslatePipe,
+  ],
   templateUrl: './billet-list.html',
   styleUrl: './billet-list.scss',
+  providers: [AccountBillets],
 })
 export class BilletList {
   private readonly store = inject(LocalBilletStore);
-  private readonly colorMode = inject(ColorModeService);
-  private readonly language = inject(LanguageService);
-  private readonly translate = inject(TranslateService);
-  private readonly confirmation = inject(ConfirmationModalStore);
   private readonly messages = inject(MessageStore);
+  private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
-  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
+  private readonly account = inject(AccountBillets);
 
-  protected readonly max = MAX_LOCAL_BILLETS;
-  /** Every place is taken: a copy has no room (the count says so). */
-  protected readonly full = computed(() => this.store.list().length >= MAX_LOCAL_BILLETS);
+  protected readonly signedIn = inject(AuthApi).isLoggedIn;
+  protected readonly newBilletId = NEW_BILLET_ID;
+  protected readonly maxLocal = MAX_LOCAL_BILLETS;
+  protected readonly localCount = computed(() => this.store.list().length);
 
-  /** The billets are this device's; only their model previews come from the server. */
-  private readonly previews = injectCatalogPreviews();
+  /** Billets of this device a signed-in user can move into the account; null when there are none. */
+  protected readonly offer = computed(() =>
+    this.signedIn() ? importOffer(this.localCount(), this.account.rows()) : null,
+  );
+  protected readonly importing = signal(false);
+  /** The last import found the account without room for all of them. */
+  protected readonly importRefused = signal(false);
 
-  protected readonly cards = computed(() => {
-    const previews = this.previews();
-    const mode = this.colorMode.resolvedMode();
-    const locale = this.language.locale();
-    const now = Date.now();
-    return this.store.list().map((entry) => {
-      const { accent, accentSoft, background, ink } = billetPresetFor(entry.theme).palette[mode];
-      return {
-        entry,
-        emoji: entry.templateId ? TEMPLATES[entry.templateId].emoji : BLANK_EMOJI,
-        linkId: cardLinkId(entry),
-        preview: previewOf(previews, entry.modelSlug),
-        swatches: [accent, accentSoft, background, ink],
-        edited: editedAgo(entry.updatedAt, now, locale),
-      };
-    });
-  });
-
-  protected duplicate(entry: LocalBilletEntry): void {
-    const title = this.translate.instant('BILLETS.COPY_TITLE', { title: this.nameOf(entry) });
-    this.storeAction(() =>
-      this.store.duplicate(entry.localId, truncateGraphemes(title, TEXT_LIMITS.title)),
+  /** Moves this device's billets into the account (all or nothing); their device copies go. */
+  protected async importAll(): Promise<void> {
+    const { localIds, documents } = importBatch(this.store.list(), (localId) =>
+      this.store.load(localId),
     );
-  }
-
-  protected async remove(entry: LocalBilletEntry): Promise<void> {
-    const confirmed = await this.confirmation.askConfirmation({
-      title: this.translate.instant('BILLETS.DELETE_TITLE'),
-      message: this.translate.instant('BILLETS.DELETE_MESSAGE', { title: this.nameOf(entry) }),
-      confirmLabel: this.translate.instant('COMMON.DELETE'),
-      cancelLabel: this.translate.instant('COMMON.CANCEL'),
-      confirmVariant: 'danger',
-    });
-    if (!confirmed) return;
-    const entries = this.store.list();
-    const index = entries.findIndex((e) => e.localId === entry.localId);
-    const next = entries[index + 1] ?? entries[index - 1];
-    this.storeAction(() => this.store.remove(entry.localId));
-    // The card and its button are gone: focus the card that took its place, else "New billet".
-    afterNextRender(
-      () => {
-        const card = next && this.host.querySelector<HTMLElement>(`#${cardLinkId(next)}`);
-        (card ?? this.host.querySelector<HTMLElement>('#billet-list-new'))?.focus();
-      },
-      { injector: this.injector },
-    );
-  }
-
-  private nameOf(entry: LocalBilletEntry): string {
-    return entry.title || this.translate.instant('BILLETS.UNTITLED');
-  }
-
-  /** A write the device refused becomes its toast. */
-  private storeAction(action: () => unknown): void {
+    if (documents.length === 0) return;
+    this.importRefused.set(false);
+    let imported: BilletSummaryDto[];
     try {
-      action();
+      imported = await runPending(this.importing, () => this.account.import(documents));
     } catch (error) {
-      if (!(error instanceof LocalBilletError)) throw error;
-      this.messages.addMessage('error', error.code, undefined, { max: MAX_LOCAL_BILLETS });
+      // BILLET_LIMIT_REACHED is answered here; errorInterceptor has toasted anything else.
+      if (apiErrorCode(error) === 'BILLET_LIMIT_REACHED') {
+        this.importRefused.set(true);
+        this.account.reload();
+      }
+      return;
     }
+    writeLocally(this.messages, () => localIds.forEach((localId) => this.store.remove(localId)));
+    if (this.localCount() === 0) this.focusBillet(imported[0]);
+  }
+
+  /** The notice went with the button just pressed: the focus goes to the newest billet moved. */
+  private focusBillet({ id }: BilletSummaryDto): void {
+    afterNextRender(() => this.document.getElementById(accountLinkId(id))?.focus(), {
+      injector: this.injector,
+    });
   }
 }

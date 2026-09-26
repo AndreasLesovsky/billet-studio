@@ -1,0 +1,90 @@
+<div class="ui-field">
+  <label
+    class="ui-label"
+    for="share-dialog-link"
+    >{{ 'SHARE.LINK_LABEL' | translate }}</label
+  >
+  <div class="share-link-panel__link">
+    <input
+      #linkField
+      id="share-dialog-link"
+      class="ui-input"
+      readonly
+      aria-describedby="share-dialog-link-hint"
+      [value]="link()"
+      (focus)="linkField.select()"
+    />
+    <button
+      id="share-dialog-copy"
+      type="button"
+      class="ui-btn ui-btn--primary"
+      autofocus
+      (click)="copy(linkField)"
+    >
+      <i
+        class="bi bi-clipboard"
+        aria-hidden="true"
+      ></i>
+      {{ 'SHARE.COPY' | translate }}
+    </button>
+  </div>
+  <p
+    id="share-dialog-link-hint"
+    class="ui-hint"
+  >
+    {{ 'SHARE.LINK_HINT' | translate }}
+  </p>
+</div>
+
+<div class="ui-cluster">
+  <a
+    class="ui-btn ui-btn--neutral"
+    target="_blank"
+    rel="noopener"
+    [href]="link()"
+  >
+    <i
+      class="bi bi-box-arrow-up-right"
+      aria-hidden="true"
+    ></i>
+    {{ 'SHARE.OPEN' | translate }}
+    <span class="ui-visually-hidden">{{ 'SHARE.NEW_TAB' | translate }}</span>
+  </a>
+  @if (canShareNatively) {
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral"
+      (click)="shareNatively()"
+    >
+      <i
+        class="bi bi-share"
+        aria-hidden="true"
+      ></i>
+      {{ 'SHARE.NATIVE' | translate }}
+    </button>
+  }
+</div>
+
+<div class="ui-stack ui-stack--sm share-link-panel__changes">
+  <div class="ui-cluster">
+    <app-publish-badge [facts]="facts()" />
+  </div>
+  <p id="share-dialog-lead">
+    {{ (facts().hasUnpublishedChanges ? 'SHARE.CHANGED' : 'SHARE.CURRENT') | translate }}
+  </p>
+  <div>
+    <button
+      type="button"
+      class="ui-btn ui-btn--secondary"
+      [disabled]="!facts().hasUnpublishedChanges || publishing()"
+      [attr.aria-busy]="publishing()"
+      (click)="publishChanges.emit()"
+    >
+      <i
+        class="bi bi-cloud-upload"
+        aria-hidden="true"
+      ></i>
+      {{ (publishing() ? 'COMMON.PENDING.PUBLISHING' : 'SHARE.PUBLISH_CHANGES') | translate }}
+    </button>
+  </div>
+</div>

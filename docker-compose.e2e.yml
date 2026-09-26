@@ -1,0 +1,47 @@
+# =============================================================================
+# billet-studio e2e database
+# =============================================================================
+# A throwaway MariaDB for the Playwright suite against the real backend, fully parallel to the dev
+# stack: port 3307 instead of 3306, its own database, and the data directory in RAM. The dev
+# database db_billet_studio is never touched.
+#
+# Started by `npm run e2e:backend` in billet-studio-frontend (idempotent), see README.md
+# "E2E-Tests mit echtem Backend".
+#   up:   docker compose -f docker-compose.e2e.yml up -d --wait
+#   down: docker compose -f docker-compose.e2e.yml down
+#
+# CommerceX's e2e database uses host port 3307 as well: only one of the two stacks runs at a time.
+# =============================================================================
+
+services:
+  e2e-db:
+    image: mariadb:10.11
+    container_name: billet-studio-e2e-db
+    ports:
+      # Loopback only, and 3307 so the XAMPP MariaDB on 3306 is unaffected.
+      - "127.0.0.1:3307:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: e2e
+      MARIADB_DATABASE: db_billet_studio_e2e
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      # The image runs these in name order against MARIADB_DATABASE on first start - the same files
+      # the backend's Testcontainers ITs load. No sql/migrations: every migration is already folded
+      # into schema.sql and the seeds (sql/README.md), so a fresh database needs only these three.
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/seed_roles.sql:/docker-entrypoint-initdb.d/02-seed_roles.sql:ro
+      - ./sql/seed_models.sql:/docker-entrypoint-initdb.d/03-seed_models.sql:ro
+    tmpfs:
+      # The whole database lives in RAM: fast, and gone for good on `down`; the next `up` builds it
+      # again from the files above.
+      - /var/lib/mysql
+    healthcheck:
+      # The image ships this script; `up -d --wait` blocks on it, so the backend never starts against
+      # a database that is still running its init scripts.
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s

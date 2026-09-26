@@ -51,7 +51,7 @@ billet-studio/
 - **Java 25** (JDK)
 - **Node.js 26** (mit npm)
 - **XAMPP** mit MariaDB (lokale Datenbank)
-- **Docker** – optional, nur für die Backend-Integrationstests (Testcontainers startet eine Wegwerf-MariaDB) und später die e2e-Datenbank
+- **Docker** – optional, nur für die Backend-Integrationstests (Testcontainers startet eine Wegwerf-MariaDB) und die e2e-Tests mit echtem Backend
 
 ---
 
@@ -98,7 +98,23 @@ cd billet-studio-rest-service && ./mvnw test
 cd billet-studio-frontend
 npm test -- --no-watch          # Exit-Code prüfen, nicht nur "passed"
 npm run build
+npm run e2e                     # Playwright mit gemocktem Backend, ohne Docker
 ```
+
+### E2E-Tests mit echtem Backend
+
+Die Konto-Abläufe (Registrierung, Autosave mit Konflikt, Teilen-Link, Übernahme eines Gast-Billets, Löschen) laufen gegen das echte Backend und eine Wegwerf-Datenbank. Docker muss laufen.
+
+```bash
+cd billet-studio-frontend
+npm run e2e:backend             # startet die e2e-Datenbank und die Tests
+npm run e2e:down                # e2e-Datenbank wieder entfernen
+```
+
+- `e2e:backend` startet per [docker-compose.e2e.yml](docker-compose.e2e.yml) eine MariaDB 10.11 auf Port 3307 (`db_billet_studio_e2e`, aus `sql/schema.sql` + Seeds, Daten nur im RAM), dann das gebaute Backend-JAR auf Port 8081 und `ng serve` auf Port 4320. Deine Entwicklungsumgebung (4200, 8080, `db_billet_studio`) läuft ungestört weiter und wird nie angesprochen.
+- Die Tests starten das JAR aus `billet-studio-rest-service/target`, nicht `spring-boot:run`. Ist es älter als die Backend-Quellen, bricht der Lauf mit einem Hinweis ab; dann neu bauen: `mvnw.cmd -DskipTests package` (sonst `./mvnw`) in `billet-studio-rest-service`. Ein laufendes `spring-boot:run` kann dabei per devtools neu starten.
+- Die Datenbank bleibt zwischen den Läufen stehen (jeder Test registriert ein eigenes Konto), `e2e:down` verwirft sie. Port 3307 nutzt auch der CommerceX-e2e-Stack, also nicht beide gleichzeitig.
+- Backend-Logs der Läufe: `billet-studio-frontend/e2e/artifacts/backend/logs/`.
 
 ---
 

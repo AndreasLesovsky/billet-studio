@@ -1,0 +1,24 @@
+@switch (outcome()) {
+  @case ('creating') {
+    <p
+      class="ui-visually-hidden"
+      role="status"
+    >
+      {{ 'NEW_BILLET.CREATING' | translate }}
+    </p>
+    <app-editor-skeleton />
+  }
+  @case ('full') {
+    <app-editor-message
+      titleKey="NEW_BILLET.FULL_TITLE"
+      textKey="NEW_BILLET.FULL_TEXT"
+    />
+  }
+  @default {
+    <app-editor-message
+      textKey="NEW_BILLET.FAILED"
+      [retryable]="true"
+      (retry)="retry()"
+    />
+  }
+}

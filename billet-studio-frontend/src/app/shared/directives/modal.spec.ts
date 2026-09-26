@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { installDialogPolyfill } from '../../../test-helpers';
 import { Modal } from './modal';
@@ -149,6 +149,24 @@ describe('Modal', () => {
     await flush();
 
     expect(host.closed()).toBe(0);
+  });
+
+  it('an owner removed during the closing transition gets no closed (NG0953 regression)', async () => {
+    let finish!: () => void;
+    const finished = new Promise<void>((resolve) => (finish = resolve));
+    await setOpen(true);
+    Object.assign(dialog(), { getAnimations: () => [{ finished }] });
+    const warn = vi.spyOn(console, 'warn');
+
+    await setOpen(false);
+    await flush();
+    host.present.set(false);
+    await fixture.whenStable();
+    finish();
+    await flush();
+
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it('removing an open dialog closes it and gives focus back', async () => {

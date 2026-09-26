@@ -1,0 +1,53 @@
+<ul
+  class="ui-grid billet-list__grid"
+  role="list"
+>
+  @for (card of cards(); track card.entry.localId) {
+    @let name = card.entry.title || ('BILLETS.UNTITLED' | translate);
+    <li class="billet-list__item">
+      <app-billet-card
+        [card]="card.view"
+        [level]="level()"
+      >
+        <button
+          type="button"
+          class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+          [attr.aria-label]="'BILLETS.DELETE_NAMED' | translate: { title: name }"
+          [title]="'COMMON.DELETE' | translate"
+          (click)="remove(card.entry)"
+        >
+          <i
+            class="bi bi-trash"
+            aria-hidden="true"
+          ></i>
+        </button>
+        <button
+          type="button"
+          class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+          [title]="'BILLETS.DUPLICATE' | translate"
+          [disabled]="full()"
+          [attr.aria-describedby]="full() ? countId() : null"
+          (click)="duplicate(card.entry)"
+        >
+          <i
+            class="bi bi-copy"
+            aria-hidden="true"
+          ></i>
+          <span class="ui-visually-hidden">{{ 'BILLETS.DUPLICATE' | translate }} {{ name }}</span>
+        </button>
+        <a
+          class="ui-btn ui-btn--secondary ui-btn--sm billet-list__end"
+          [id]="card.view.linkId"
+          [routerLink]="['/billets/local', card.entry.localId, 'edit']"
+        >
+          <i
+            class="bi bi-pencil"
+            aria-hidden="true"
+          ></i>
+          {{ 'COMMON.EDIT' | translate }}
+          <span class="ui-visually-hidden">{{ name }}</span>
+        </a>
+      </app-billet-card>
+    </li>
+  }
+</ul>

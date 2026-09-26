@@ -30,12 +30,15 @@ export class Modal {
   readonly closed = output<void>();
 
   private returnFocusTo: HTMLElement | null = null;
+  /** The owner is gone (it navigated away while the dialog was closing): nothing to report to. */
+  private destroyed = false;
 
   constructor() {
     const abort = new AbortController();
     const { signal } = abort;
 
     inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
       abort.abort();
       if (this.dialog.open) {
         this.dialog.close();
@@ -124,6 +127,6 @@ export class Modal {
     const running = this.dialog.getAnimations?.({ subtree: true }) ?? [];
     await Promise.allSettled(running.map((animation) => animation.finished));
     // Reopened during the fade-out: the content now belongs to the next opening.
-    if (!this.dialog.open) this.closed.emit();
+    if (!this.dialog.open && !this.destroyed) this.closed.emit();
   }
 }

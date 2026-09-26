@@ -1,0 +1,117 @@
+<dialog
+  class="ui-dialog"
+  aria-labelledby="share-dialog-title"
+  aria-describedby="share-dialog-lead"
+  [appModal]="target() !== null"
+  (dismissed)="close()"
+  (closed)="onClosed()"
+>
+  <div class="ui-dialog__header">
+    <h2
+      id="share-dialog-title"
+      class="ui-dialog__title share-dialog__title"
+    >
+      {{ 'SHARE.TITLE' | translate: { title: title() || ('BILLETS.UNTITLED' | translate) } }}
+    </h2>
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      [disabled]="publishing()"
+      (click)="close()"
+    >
+      <i
+        class="bi bi-x-lg"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+
+  <div class="ui-dialog__body ui-stack">
+    @if (state().link; as link) {
+      <app-share-link-panel
+        [link]="link"
+        [title]="title()"
+        [facts]="facts()"
+        [publishing]="publishing()"
+        (publishChanges)="publish()"
+        (announce)="announce($event)"
+      />
+    } @else {
+      <p id="share-dialog-lead">{{ 'SHARE.EXPLAIN' | translate }}</p>
+      @if (state().reshare) {
+        <p class="ui-hint">{{ 'SHARE.RESHARE' | translate }}</p>
+      }
+    }
+
+    @if (failure(); as code) {
+      <div
+        class="ui-alert ui-alert--danger"
+        role="alert"
+      >
+        <i
+          class="bi bi-x-octagon-fill"
+          aria-hidden="true"
+        ></i>
+        <div>{{ 'MESSAGES.ERROR.' + code | translate }}</div>
+      </div>
+    }
+    <p
+      class="ui-visually-hidden"
+      role="status"
+    >
+      @if (status(); as key) {
+        {{ key | translate }}
+      }
+    </p>
+  </div>
+
+  <div class="ui-dialog__footer">
+    @if (state().link) {
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral share-dialog__unpublish"
+        [disabled]="publishing()"
+        (click)="unpublish()"
+      >
+        <i
+          class="bi bi-eye-slash"
+          aria-hidden="true"
+        ></i>
+        {{ 'SHARE.UNPUBLISH' | translate }}
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral"
+        [disabled]="publishing()"
+        (click)="close()"
+      >
+        {{ 'COMMON.CLOSE' | translate }}
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral"
+        [disabled]="publishing()"
+        (click)="close()"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        id="share-dialog-publish"
+        type="button"
+        class="ui-btn ui-btn--primary"
+        autofocus
+        [disabled]="publishing()"
+        [attr.aria-busy]="publishing()"
+        (click)="publish()"
+      >
+        <i
+          class="bi bi-globe2"
+          aria-hidden="true"
+        ></i>
+        {{ (publishing() ? 'COMMON.PENDING.PUBLISHING' : 'SHARE.PUBLISH') | translate }}
+      </button>
+    }
+  </div>
+</dialog>
