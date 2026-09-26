@@ -132,3 +132,16 @@ blob-report/
 .playwright/
 billet-studio-frontend/e2e/artifacts/
 billet-studio-frontend/e2e/.auth/
+
+
+############################################################
+#  BLENDER HERO BUILD (tools/blender/hero) - work file + check renders
+############################################################
+tools/blender/hero/.work/
+tools/blender/hero/.renders/
+
+
+############################################################
+#  HERO CAPTURES (tools/asset-pipeline/hero) - lossless PNGs, contact sheet, text crop
+############################################################
+tools/asset-pipeline/hero/.captures/

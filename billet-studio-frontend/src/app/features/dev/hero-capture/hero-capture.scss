@@ -1,0 +1,33 @@
+// Layout only. Every capture has a fixed CSS size (the script checks it): the A6 card as 420 x 592
+// per page, the phone screen 390 x 844 (a screen then grows below that window to a block
+// boundary, see screenHeightOf), the message banner 358 x 120.
+
+:host {
+    display: block;
+}
+
+.capture {
+    position: relative;
+    overflow: clip;
+}
+
+.capture--print-front {
+    inline-size: 26.25rem;
+    block-size: 37rem;
+}
+
+.capture--print-inside {
+    inline-size: 52.5rem;
+    block-size: 37rem;
+}
+
+.capture--screen,
+.capture--lock {
+    inline-size: 24.375rem;
+    block-size: 52.75rem;
+}
+
+.capture--notification {
+    inline-size: 22.375rem;
+    block-size: 7.5rem;
+}

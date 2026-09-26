@@ -1,0 +1,8 @@
+@use '../../../../styles/hero-capture';
+
+:host {
+    display: block;
+    block-size: 100%;
+}
+
+@include hero-capture.lock-screen;

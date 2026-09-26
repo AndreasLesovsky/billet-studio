@@ -6,33 +6,51 @@ import { guestGuard } from './core/guards/guest-guard';
 import { requireRole } from './core/guards/role-guard';
 import { unsavedChangesGuard } from './core/guards/unsaved-changes-guard';
 
+// Dev routes exist only in a development build: isDevMode() alone is a runtime call, so their lazy
+// chunks were still emitted. The optimizer defines ngDevMode as false in a production build; written
+// inline in each condition (a shared const is not folded), that drops the branch and its imports.
+
 // Visual QA of the design system; never part of a production build.
-const devRoutes: Routes = isDevMode()
-  ? [
-      {
-        path: 'dev/ui',
-        loadComponent: () => import('./features/dev/ui-kit/ui-kit').then((m) => m.UiKit),
-        data: { breadcrumb: 'BREADCRUMB.UI_KIT' },
-      },
-    ]
-  : [];
+const devRoutes: Routes =
+  (typeof ngDevMode === 'undefined' || ngDevMode) && isDevMode()
+    ? [
+        {
+          path: 'dev/ui',
+          loadComponent: () => import('./features/dev/ui-kit/ui-kit').then((m) => m.UiKit),
+          data: { breadcrumb: 'BREADCRUMB.UI_KIT' },
+        },
+      ]
+    : [];
 
 // Visual QA of the billet renderer (templates, the parity fixture), chrome-less like /b/:shareToken.
-const devBareRoutes: Routes = isDevMode()
-  ? [
-      {
-        path: 'dev/billet/:templateId',
-        loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
-        children: [
-          {
-            path: '',
-            loadComponent: () =>
-              import('./features/dev/billet-preview/billet-preview').then((m) => m.BilletPreview),
-          },
-        ],
-      },
-    ]
-  : [];
+const devBareRoutes: Routes =
+  (typeof ngDevMode === 'undefined' || ngDevMode) && isDevMode()
+    ? [
+        {
+          path: 'dev/billet/:templateId',
+          loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
+          children: [
+            {
+              path: '',
+              loadComponent: () =>
+                import('./features/dev/billet-preview/billet-preview').then((m) => m.BilletPreview),
+            },
+          ],
+        },
+        // The home page hero's textures, for tools/asset-pipeline/hero/capture-hero.mjs.
+        {
+          path: 'dev/hero-capture/:kind',
+          loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
+          children: [
+            {
+              path: '',
+              loadComponent: () =>
+                import('./features/dev/hero-capture/hero-capture').then((m) => m.HeroCapture),
+            },
+          ],
+        },
+      ]
+    : [];
 
 /**
  * Every page is lazy, the layouts too: the shared billet page must not pay for the app chrome.

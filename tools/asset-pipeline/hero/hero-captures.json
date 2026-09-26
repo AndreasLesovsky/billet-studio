@@ -1,0 +1,520 @@
+{
+  "entries": [
+    {
+      "kind": "print-front",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/print-front-valentinstag-de-light.a2f0bec4.webp",
+      "widthPx": 1050,
+      "heightPx": 1480,
+      "bytes": 27196,
+      "cssWidth": 420,
+      "cssHeight": 592,
+      "sceneRect": null
+    },
+    {
+      "kind": "print-front",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/print-front-valentinstag-en-light.023472eb.webp",
+      "widthPx": 1050,
+      "heightPx": 1480,
+      "bytes": 24696,
+      "cssWidth": 420,
+      "cssHeight": 592,
+      "sceneRect": null
+    },
+    {
+      "kind": "print-inside",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/print-inside-valentinstag-de-light.83337923.webp",
+      "widthPx": 2100,
+      "heightPx": 1480,
+      "bytes": 103498,
+      "cssWidth": 840,
+      "cssHeight": 592,
+      "sceneRect": null
+    },
+    {
+      "kind": "print-inside",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/print-inside-valentinstag-en-light.4726850e.webp",
+      "widthPx": 2100,
+      "heightPx": 1480,
+      "bytes": 86434,
+      "cssWidth": 840,
+      "cssHeight": 592,
+      "sceneRect": null
+    },
+    {
+      "kind": "screen",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/screen-valentinstag-de-light.024e8eca.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 28482,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.454439,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/screen-valentinstag-de-dark.1dd6698e.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 29692,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.454439,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/screen-valentinstag-en-light.93cd765f.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 27166,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.482487,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/screen-valentinstag-en-dark.54bd1536.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 28276,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.482487,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "geburtstag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/screen-geburtstag-de-light.09e6cde8.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 28736,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.422949,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "geburtstag",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/screen-geburtstag-de-dark.a1d9814c.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 30188,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.422949,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "geburtstag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/screen-geburtstag-en-light.04cd9321.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 32114,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.422949,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "geburtstag",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/screen-geburtstag-en-dark.f82a97fc.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 33640,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.422949,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "weihnachten",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/screen-weihnachten-de-light.a95fc4d9.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 33132,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.428836,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "weihnachten",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/screen-weihnachten-de-dark.bcc41797.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 36722,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.428836,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "weihnachten",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/screen-weihnachten-en-light.157e54ef.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 28388,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.435297,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "weihnachten",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/screen-weihnachten-en-dark.87b378f8.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 31450,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.435297,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "hochzeit",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/screen-hochzeit-de-light.de4b4c81.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 27530,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.442721,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "hochzeit",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/screen-hochzeit-de-dark.26d9948c.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 29814,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.442721,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "hochzeit",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/screen-hochzeit-en-light.4e6f63fb.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 27798,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.442721,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "hochzeit",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/screen-hochzeit-en-dark.7d9eb831.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 29172,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.442721,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "muttertag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/screen-muttertag-de-light.7d8cdc24.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 18094,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.46838,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "muttertag",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/screen-muttertag-de-dark.ea6ee4b8.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 18770,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.46838,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "muttertag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/screen-muttertag-en-light.8db76c14.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 15028,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.46838,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "screen",
+      "template": "muttertag",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/screen-muttertag-en-dark.9a7df615.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 15724,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": {
+        "x": 0,
+        "y": 0.46838,
+        "w": 1,
+        "h": 0.450237
+      }
+    },
+    {
+      "kind": "lock",
+      "template": null,
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/lock-de-light.d98df1d2.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 21094,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": null
+    },
+    {
+      "kind": "lock",
+      "template": null,
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/lock-de-dark.e02b0e4d.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 21156,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": null
+    },
+    {
+      "kind": "lock",
+      "template": null,
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/lock-en-light.f8abb29c.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 19282,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": null
+    },
+    {
+      "kind": "lock",
+      "template": null,
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/lock-en-dark.49f1f4de.webp",
+      "widthPx": 780,
+      "heightPx": 1688,
+      "bytes": 19306,
+      "cssWidth": 390,
+      "cssHeight": 844,
+      "sceneRect": null
+    },
+    {
+      "kind": "notification",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/textures/notification-valentinstag-de-light.1be47ad5.webp",
+      "widthPx": 716,
+      "heightPx": 240,
+      "bytes": 12180,
+      "cssWidth": 358,
+      "cssHeight": 120,
+      "sceneRect": null
+    },
+    {
+      "kind": "notification",
+      "template": "valentinstag",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/textures/notification-valentinstag-de-dark.1a8d0c61.webp",
+      "widthPx": 716,
+      "heightPx": 240,
+      "bytes": 12704,
+      "cssWidth": 358,
+      "cssHeight": 120,
+      "sceneRect": null
+    },
+    {
+      "kind": "notification",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/textures/notification-valentinstag-en-light.26127df4.webp",
+      "widthPx": 716,
+      "heightPx": 240,
+      "bytes": 11190,
+      "cssWidth": 358,
+      "cssHeight": 120,
+      "sceneRect": null
+    },
+    {
+      "kind": "notification",
+      "template": "valentinstag",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/textures/notification-valentinstag-en-dark.1118cb2e.webp",
+      "widthPx": 716,
+      "heightPx": 240,
+      "bytes": 11596,
+      "cssWidth": 358,
+      "cssHeight": 120,
+      "sceneRect": null
+    }
+  ]
+}

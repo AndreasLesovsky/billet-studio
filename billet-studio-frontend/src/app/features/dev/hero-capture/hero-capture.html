@@ -1,0 +1,40 @@
+@let current = spec();
+
+<div
+  #capture
+  id="capture"
+  class="capture"
+  [class]="current ? 'capture--' + current.kind : ''"
+  [style.block-size.px]="screenHeight()"
+>
+  @if (current && fontsLoaded()) {
+    @switch (current.kind) {
+      @case ('print-front') {
+        <app-hero-print-front [document]="current.document" />
+      }
+      @case ('print-inside') {
+        <app-hero-print-inside [document]="current.document" />
+      }
+      @case ('screen') {
+        <app-billet-view
+          [document]="current.document"
+          [model]="null"
+          [mode]="current.mode"
+          [animate]="false"
+          [particles]="false"
+          fill="frame"
+        />
+      }
+      @case ('lock') {
+        <app-hero-lock-screen [lang]="current.lang" />
+      }
+      @case ('notification') {
+        <app-hero-message
+          [document]="current.document"
+          [mode]="current.mode"
+          [templateName]="templateNameKey() | translate"
+        />
+      }
+    }
+  }
+</div>

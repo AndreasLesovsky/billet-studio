@@ -789,6 +789,13 @@
     "MODE": "Farbmodus des Billets",
     "REPLAY": "Einblendung wiederholen"
   },
+  "HERO_CAPTURE": {
+    "SENDER": "Nachricht",
+    "NOW": "jetzt",
+    "MESSAGE": "Ich hab dir etwas geschickt 💌",
+    "LINK_TITLE": "Billet · {{name}}",
+    "UNLOCK_HINT": "Zum Entsperren nach oben wischen"
+  },
   "MESSAGES": {
     "ERROR": {
       "UNAUTHORIZED": "Anmeldung fehlgeschlagen. Prüfe E-Mail-Adresse und Passwort.",

@@ -1,0 +1,60 @@
+// Layout only: the paper and frame colours are the billet palette's (document data), bound inline.
+// A page is one A6 face of the card (105 x 148 mm as 420 x 592 CSS px). It lays the billet out
+// wider than its type area and scales it down, so the type sits on the card at print size (the
+// billet's sizes follow its width, cqi); the flex box centres it.
+
+:host {
+    display: block;
+    block-size: 100%;
+}
+
+:host(.print-spread) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.print-page {
+    --_scale: 0.8;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 0;
+    block-size: 100%;
+    padding: 3rem 2.75rem;
+}
+
+// A calm zone on both sides of the fold, where the 3D heart rises.
+.print-page--left {
+    padding-inline-end: 4rem;
+}
+
+.print-page--right {
+    padding-inline-start: 4rem;
+}
+
+.print-page--front {
+    --_scale: 0.78;
+
+    padding: 2.5rem 2.25rem 2.75rem;
+}
+
+// The billet's frame fill (min-block-size: 100%) would pin it to the top; here it is as tall as
+// its content and centred.
+.print-page > .print-page__billet {
+    flex: none;
+    inline-size: calc(100% / var(--_scale));
+    min-block-size: auto;
+    transform: scale(var(--_scale));
+}
+
+// A fine printed frame inset from the card's edge.
+.print-page__rule {
+    position: absolute;
+    inset: 1rem;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.25rem;
+    pointer-events: none;
+}

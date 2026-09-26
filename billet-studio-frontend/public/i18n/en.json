@@ -789,6 +789,13 @@
     "MODE": "Billet colour mode",
     "REPLAY": "Replay the reveal"
   },
+  "HERO_CAPTURE": {
+    "SENDER": "Message",
+    "NOW": "now",
+    "MESSAGE": "I sent you something 💌",
+    "LINK_TITLE": "Billet · {{name}}",
+    "UNLOCK_HINT": "Swipe up to unlock"
+  },
   "MESSAGES": {
     "ERROR": {
       "UNAUTHORIZED": "Login failed. Please check your email address and password.",
