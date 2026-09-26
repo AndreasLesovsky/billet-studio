@@ -1,8 +1,7 @@
 import {
-  AmbientLight,
   AnimationMixer,
   Box3,
-  DirectionalLight,
+  type DirectionalLight,
   PerspectiveCamera,
   Scene,
   Vector3,
@@ -18,7 +17,7 @@ import {
   type StageSettings,
   type WheelZoom,
 } from './scene-math';
-import { buildRoomEnvironment } from './stage-environment';
+import { addBilletLights, buildRoomEnvironment } from './stage-environment';
 import { StageRuntime } from './stage-runtime';
 
 // Camera, lights and controls are the original card's (muttertag_threejs/index.html).
@@ -92,12 +91,7 @@ export class SceneStage {
     });
     buildRoomEnvironment(this.runtime.renderer, this.scene);
 
-    const key = new DirectionalLight(0xfff0e8, 0.4);
-    key.position.set(1.5, 3, 2.5);
-    const fill = new DirectionalLight(0xf0e8e0, 0.08);
-    fill.position.set(-2, 1, 1);
-    this.lights = [key, fill];
-    this.scene.add(new AmbientLight(0xfff8f4, 0.15), key, fill);
+    this.lights = addBilletLights(this.scene);
 
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;

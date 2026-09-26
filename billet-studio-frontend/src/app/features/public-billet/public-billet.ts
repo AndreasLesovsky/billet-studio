@@ -17,12 +17,8 @@ import { BilletView } from '../../billet/view/billet-view';
 import { siteName } from '../../core/environments/environment';
 import { LanguageService } from '../../core/services/language-service';
 import { PublicBilletApi } from '../../core/services/public-billet-api';
+import { splitCredit } from '../../core/utils/asset-credit';
 import { billetFontFaces, whenFontsReady } from './billet-fonts';
-
-interface AssetCredit {
-  readonly text: string;
-  readonly url: string | null;
-}
 
 /**
  * The recipient's page of a shared billet, /b/:shareToken (bare layout). The billet shows once its
@@ -94,10 +90,4 @@ export class PublicBillet {
 function pageTitle({ pageTitle, hero }: BilletDocument): string {
   const heroText = [hero.titleLine1, hero.titleLine2].filter((line) => line.trim()).join(' ');
   return pageTitle.trim() || heroText.trim() || siteName;
-}
-
-/** The asset pipeline writes '<title> by <author> (<licence>) <source url>'; the URL is the link. */
-function splitCredit(credit: string): AssetCredit {
-  const match = /^(.*\S)\s+(https?:\/\/\S+)$/.exec(credit);
-  return match ? { text: match[1], url: match[2] } : { text: credit, url: null };
 }

@@ -1,0 +1,28 @@
+// Layout only.
+
+.hero-preview {
+    display: grid;
+    gap: var(--ui-space-6);
+    justify-items: center;
+    padding: var(--ui-space-6) var(--ui-space-4);
+}
+
+// The stage at the requested aspect ratio, as large as the window allows.
+.hero-preview__stage {
+    --hero-stage-size: min(
+        100%,
+        calc((100svh - var(--ui-space-12) * 2) * var(--hero-stage-aspect, 1))
+    );
+
+    inline-size: 100%;
+}
+
+.hero-preview__chapters {
+    inline-size: min(100%, 36rem);
+}
+
+.hero-preview__state {
+    margin: 0;
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-xs);
+}

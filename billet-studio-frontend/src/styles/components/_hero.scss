@@ -1,0 +1,185 @@
+// ---- Home page hero: the 3D story's stage and its chapters (features/home/hero-story) ---------
+@use 'feedback';
+
+// The stage floats on the page: no panel, only a very faint violet glow behind the story.
+.ui-hero-stage {
+    isolation: isolate;
+
+    &::before {
+        position: absolute;
+        z-index: -1;
+        inset: 6%;
+        border-radius: 50%;
+        background: radial-gradient(
+            closest-side,
+            color-mix(in oklab, var(--ui-accent) 14%, transparent),
+            color-mix(in oklab, var(--ui-accent-2) 6%, transparent) 60%,
+            transparent
+        );
+        content: '';
+        pointer-events: none;
+    }
+}
+
+// Nothing of the story leaves 4..96 % of the frame; the soft edge is only a safety net, so a stray
+// pixel fades instead of ending on a hard line.
+.ui-hero-stage__canvas {
+    opacity: 0;
+    mask-image:
+        linear-gradient(to right, transparent, currentColor 2.5%, currentColor 97.5%, transparent),
+        linear-gradient(to bottom, transparent, currentColor 2.5%, currentColor 97.5%, transparent);
+    mask-composite: intersect;
+    transition: opacity var(--ui-duration-slow) var(--ui-ease);
+}
+
+.ui-hero-stage__canvas--shown {
+    opacity: 1;
+}
+
+// Until the first 3D frame: a quiet plate where the story will stand. Still while nothing loads
+// (reduced motion or a data saver before "Play animation"); gone in the no-3D fallback.
+.ui-hero-stage__placeholder {
+    @include feedback.skeleton-plane;
+
+    position: absolute;
+    inset: 18%;
+    border-radius: var(--ui-radius-xl);
+    opacity: 0.55;
+}
+
+.ui-hero-stage__placeholder--still {
+    background-image: none;
+    animation: none;
+}
+
+// "Drag to turn": once, in the idle phase; never announced (aria-hidden in the template).
+.ui-hero-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    margin: 0;
+    padding: var(--ui-space-1) var(--ui-space-3);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-pill);
+    background: color-mix(in oklab, var(--ui-surface-raised) 88%, transparent);
+    box-shadow: var(--ui-shadow-sm);
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-xs);
+    font-weight: var(--ui-font-weight-medium);
+    white-space: nowrap;
+    animation: ui-hero-fade-in var(--ui-duration-slow) var(--ui-ease) both;
+}
+
+.ui-hero-hint--leaving {
+    animation: ui-hero-fade-out var(--ui-duration-slow) var(--ui-ease) both;
+}
+
+// The attribution of the gift on the stage (CC-BY).
+.ui-hero-credit {
+    margin: 0;
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-xs);
+    line-height: var(--ui-leading-normal);
+}
+
+// ---- Chapters: the story's beats as text, the playing one marked --------------------------
+
+.ui-hero-chapters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ui-hero-chapter {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-3);
+    inline-size: 100%;
+    padding: var(--ui-space-2) var(--ui-space-3);
+    border: 0;
+    border-radius: var(--ui-radius-md);
+    background: none;
+    color: var(--ui-text);
+    font: inherit;
+    text-align: start;
+    transition: background-color var(--ui-duration-fast) var(--ui-ease);
+}
+
+button.ui-hero-chapter {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--ui-surface-sunken);
+    }
+}
+
+.ui-hero-chapter__index {
+    display: grid;
+    flex: none;
+    place-items: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    margin-block-start: 0.0625rem;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: 50%;
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+    font-weight: var(--ui-font-weight-strong);
+    font-variant-numeric: tabular-nums;
+    transition:
+        background-color var(--ui-duration-fast) var(--ui-ease),
+        border-color var(--ui-duration-fast) var(--ui-ease),
+        color var(--ui-duration-fast) var(--ui-ease);
+
+    [aria-current='step'] > & {
+        border-color: var(--ui-accent);
+        background-color: var(--ui-accent);
+        color: var(--ui-on-accent);
+    }
+}
+
+.ui-hero-chapter__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-inline-size: 0;
+}
+
+.ui-hero-chapter__title {
+    font-family: var(--ui-font-heading);
+    font-size: var(--ui-text-md);
+    font-weight: var(--ui-font-heading-weight);
+    line-height: var(--ui-leading-tight);
+
+    [aria-current='step'] & {
+        color: var(--ui-accent-ink);
+    }
+}
+
+.ui-hero-chapter__text {
+    color: var(--ui-text-muted);
+    font-size: var(--ui-text-sm);
+    line-height: var(--ui-leading-normal);
+}
+
+@keyframes ui-hero-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes ui-hero-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ui-hero-hint,
+    .ui-hero-hint--leaving {
+        animation: none;
+    }
+}

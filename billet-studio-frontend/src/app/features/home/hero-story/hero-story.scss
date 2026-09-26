@@ -1,0 +1,74 @@
+// Layout only; the stage's glow, edge mask, placeholder, hint and credit are styles/components/_hero.scss.
+
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ui-space-2);
+}
+
+// Square and wholly on screen: never taller than the viewport below the header. The dev page
+// (/dev/hero?aspect=) sets other proportions through the two custom properties.
+.hero-story__stage,
+.hero-story__bar {
+    inline-size: var(
+        --hero-stage-size,
+        min(100%, calc(100svh - var(--ui-header-height) - var(--ui-space-12)))
+    );
+}
+
+.hero-story__stage {
+    position: relative;
+    aspect-ratio: var(--hero-stage-aspect, 1);
+}
+
+.hero-story__scene {
+    position: absolute;
+    inset: 0;
+}
+
+.hero-story__canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    // Horizontal drags turn the gift, vertical swipes scroll the page (the stage sets it inline too).
+    touch-action: pan-y;
+}
+
+.hero-story__hint {
+    position: absolute;
+    inset-block-end: var(--ui-space-4);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    pointer-events: none;
+}
+
+.hero-story__overlay {
+    position: absolute;
+    inset-block-end: var(--ui-space-8);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+}
+
+// The credit and the controls under the stage; as tall as the controls from the start, so nothing
+// moves when they appear.
+.hero-story__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+    min-block-size: 2rem;
+}
+
+.hero-story__credit {
+    flex: 1;
+    min-inline-size: 0;
+    // Two lines from the start: credits wrap differently per gift on phones, and the idle cycle
+    // swaps the gift every few seconds, so a one-line reserve would move the page below.
+    min-block-size: 2lh;
+}
+
+.hero-story__controls {
+    flex: none;
+    gap: var(--ui-space-1);
+}

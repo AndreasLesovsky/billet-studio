@@ -49,6 +49,18 @@ const devBareRoutes: Routes =
             },
           ],
         },
+        // The home page's 3D story alone: inspection, and the poster capture.
+        {
+          path: 'dev/hero',
+          loadComponent: () => import('./layout/bare-layout/bare-layout').then((m) => m.BareLayout),
+          children: [
+            {
+              path: '',
+              loadComponent: () =>
+                import('./features/dev/hero-preview/hero-preview').then((m) => m.HeroPreview),
+            },
+          ],
+        },
       ]
     : [];
 

@@ -1,0 +1,119 @@
+<div class="ui-hero-stage hero-story__stage">
+  <!-- Without 3D (no WebGL, a failed load) the square stays empty: no image, nothing to describe. -->
+  <div
+    #container
+    class="hero-story__scene"
+    [attr.role]="figure()?.role"
+    [attr.aria-label]="figure()?.label | translate"
+    [attr.aria-describedby]="figure()?.describedBy"
+  >
+    @if (placeholder()) {
+      <div
+        class="ui-hero-stage__placeholder"
+        [class.ui-hero-stage__placeholder--still]="still()"
+        aria-hidden="true"
+      ></div>
+    }
+    <canvas
+      #canvas
+      class="ui-hero-stage__canvas hero-story__canvas"
+      [class.ui-hero-stage__canvas--shown]="ready()"
+      aria-hidden="true"
+    ></canvas>
+    @if (hint()) {
+      <p
+        class="ui-hero-hint hero-story__hint"
+        aria-hidden="true"
+        animate.leave="ui-hero-hint--leaving"
+      >
+        <i
+          class="bi bi-arrow-left-right"
+          aria-hidden="true"
+        ></i>
+        {{ 'HERO.DRAG_HINT' | translate }}
+      </p>
+    }
+  </div>
+  @if (!fallback()) {
+    <p
+      id="hero-story-description"
+      class="ui-visually-hidden"
+    >
+      {{ 'HERO.STAGE_DESCRIPTION' | translate }}
+    </p>
+  }
+
+  @if (showStart()) {
+    <button
+      type="button"
+      class="ui-btn ui-btn--secondary hero-story__overlay"
+      [disabled]="controller.starting()"
+      [attr.aria-busy]="controller.starting()"
+      (click)="start()"
+    >
+      <i
+        class="bi bi-play-fill"
+        aria-hidden="true"
+      ></i>
+      {{ startLabel() | translate }}
+    </button>
+  } @else if (startFailed()) {
+    <!-- "Play animation" was pressed but the 3D cannot run: say so where the button was. -->
+    <p
+      #unavailable
+      class="ui-hero-hint hero-story__overlay"
+      tabindex="-1"
+    >
+      {{ 'HERO.UNAVAILABLE' | translate }}
+    </p>
+  }
+</div>
+
+<div class="hero-story__bar">
+  <p class="ui-hero-credit hero-story__credit">
+    @if (controller.credit(); as credit) {
+      {{ 'HERO.CREDIT_PREFIX' | translate }}
+      @if (credit.url) {
+        <a
+          [href]="credit.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ credit.text }}</a
+        >
+      } @else {
+        {{ credit.text }}
+      }
+    }
+  </p>
+  @if (ready()) {
+    <div class="ui-cluster hero-story__controls">
+      <button
+        #toggleButton
+        type="button"
+        class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
+        [attr.aria-label]="toggleLabel() | translate"
+        [title]="toggleLabel() | translate"
+        (click)="toggle()"
+      >
+        <i
+          class="bi"
+          [class.bi-pause-fill]="controller.playing()"
+          [class.bi-play-fill]="!controller.playing()"
+          aria-hidden="true"
+        ></i>
+      </button>
+      <button
+        type="button"
+        class="ui-btn ui-btn--neutral ui-btn--icon ui-btn--sm"
+        [attr.aria-label]="'HERO.REPLAY' | translate"
+        [title]="'HERO.REPLAY' | translate"
+        (click)="controller.replay()"
+      >
+        <i
+          class="bi bi-arrow-counterclockwise"
+          aria-hidden="true"
+        ></i>
+      </button>
+    </div>
+  }
+</div>

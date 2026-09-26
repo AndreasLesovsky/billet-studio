@@ -21,7 +21,7 @@ import type { ModelAssetDto } from '../../core/models/models';
 import { LanguageService } from '../../core/services/language-service';
 import type { ColorMode } from '../../core/theme/theme-registry.generated';
 import type { BilletDocument } from '../billet-document';
-import { mediaQuery, PREFERS_REDUCED_MOTION } from '../view/media-query';
+import { mediaQuery, PREFERS_REDUCED_MOTION, prefersSaveData } from '../view/media-query';
 import { AssetCache } from './asset-cache';
 import { loadFraction, sameStageSettings, type StageSettings, type WheelZoom } from './scene-math';
 import type { SceneStage } from './scene-stage';
@@ -216,13 +216,6 @@ export class BilletScene {
     this.errorLogged = true;
     console.warn('Billet scene: 3D unavailable, keeping the preview image.', error);
   }
-}
-
-/** Chromium's Network Information API; other browsers never report a data saver. */
-function prefersSaveData(view: Window | null): boolean {
-  const navigator = view?.navigator as
-    (Navigator & { connection?: { saveData?: boolean } }) | undefined;
-  return navigator?.connection?.saveData === true;
 }
 
 /** macOS and iOS/iPadOS (an iPad reports itself as a Mac), where the zoom key is ⌘. */

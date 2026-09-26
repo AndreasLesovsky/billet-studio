@@ -5,39 +5,29 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthApi } from '../../core/services/auth-api';
 import { injectTemplateCards } from '../../core/utils/template-cards';
 import { AssetThumb } from '../../shared/components/asset-thumb/asset-thumb';
-
-interface Step {
-  readonly icon: string;
-  readonly titleKey: string;
-  readonly textKey: string;
-}
-
-const STEPS: readonly Step[] = [
-  {
-    icon: 'bi-grid-1x2',
-    titleKey: 'HOME.STEP_TEMPLATE_TITLE',
-    textKey: 'HOME.STEP_TEMPLATE_TEXT',
-  },
-  { icon: 'bi-palette', titleKey: 'HOME.STEP_DESIGN_TITLE', textKey: 'HOME.STEP_DESIGN_TEXT' },
-  { icon: 'bi-link-45deg', titleKey: 'HOME.STEP_SHARE_TITLE', textKey: 'HOME.STEP_SHARE_TEXT' },
-];
+import { HeroChapters } from './hero-story/hero-chapters';
+import { HeroStory } from './hero-story/hero-story';
+import { HeroStoryController } from './hero-story/hero-story-controller';
 
 /** The teaser row fits five cards; the gallery at /templates shows them all. */
 const TEASER_COUNT = 5;
 
 /**
- * Landing page: hero, a teaser row of templates (each starts a billet from its template), and how
- * it works. "New billet" leads to the template gallery.
+ * Landing page: the hero (headline, the story's chapters, the actions and the 3D story beside
+ * them) and a teaser row of templates (each starts a billet from its template). "New billet"
+ * leads to the template gallery.
  */
 @Component({
   selector: 'app-home',
-  imports: [AssetThumb, RouterLink, TranslatePipe],
+  imports: [AssetThumb, HeroChapters, HeroStory, RouterLink, TranslatePipe],
+  providers: [HeroStoryController],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home {
   protected readonly isLoggedIn = inject(AuthApi).isLoggedIn;
-  protected readonly steps = STEPS;
+  /** Without a built story the hero is text only, laid out in one column from the start. */
+  protected readonly staged = inject(HeroStoryController).available;
 
   private readonly templateCards = injectTemplateCards();
   protected readonly templates = computed(() => this.templateCards().slice(0, TEASER_COUNT));

@@ -1,0 +1,10 @@
+<div class="hero-preview">
+  <app-hero-story
+    class="hero-preview__stage"
+    [style.--hero-stage-aspect]="stageAspect()"
+  />
+  <app-hero-chapters class="hero-preview__chapters" />
+  @if (debug) {
+    <pre class="hero-preview__state">{{ state() }}</pre>
+  }
+</div>

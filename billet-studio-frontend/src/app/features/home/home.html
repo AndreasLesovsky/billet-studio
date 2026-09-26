@@ -2,23 +2,27 @@
   <div class="ui-page home">
     <section
       class="home__hero"
+      [class.home__hero--staged]="staged"
       aria-labelledby="home-title"
     >
-      <span class="ui-badge ui-badge--accent">
-        <i
-          class="bi bi-stars"
-          aria-hidden="true"
-        ></i>
-        {{ 'HOME.EYEBROW' | translate }}
-      </span>
-      <h1
-        id="home-title"
-        class="home__title"
-      >
-        {{ 'HOME.TITLE_LINE1' | translate }}
-        <span class="ui-heading-accent">{{ 'HOME.TITLE_ACCENT' | translate }}</span>
-      </h1>
-      <p class="ui-page__lead">{{ 'HOME.LEAD' | translate }}</p>
+      <div class="home__intro">
+        <span class="ui-badge ui-badge--accent">
+          <i
+            class="bi bi-stars"
+            aria-hidden="true"
+          ></i>
+          {{ 'HOME.EYEBROW' | translate }}
+        </span>
+        <h1
+          id="home-title"
+          class="home__title"
+        >
+          {{ 'HOME.TITLE_LINE1' | translate }}
+          <span class="ui-heading-accent">{{ 'HOME.TITLE_ACCENT' | translate }}</span>
+        </h1>
+        <p class="ui-page__lead">{{ 'HOME.LEAD' | translate }}</p>
+      </div>
+      <app-hero-chapters class="home__chapters" />
       <div class="ui-cluster home__actions">
         <a
           class="ui-btn ui-btn--primary ui-btn--lg"
@@ -44,6 +48,9 @@
           >
         }
       </div>
+      @if (staged) {
+        <app-hero-story class="home__stage" />
+      }
     </section>
 
     <section
@@ -85,35 +92,6 @@
           </li>
         }
       </ul>
-    </section>
-
-    <section
-      class="ui-stack"
-      aria-labelledby="home-steps"
-    >
-      <h2 id="home-steps">{{ 'HOME.STEPS_TITLE' | translate }}</h2>
-      <ol
-        class="ui-grid home__steps"
-        role="list"
-      >
-        @for (step of steps; track step.titleKey) {
-          <li class="ui-card">
-            <div class="ui-card__body ui-stack ui-stack--sm">
-              <span
-                class="ui-avatar"
-                aria-hidden="true"
-              >
-                <i
-                  class="bi"
-                  [class]="step.icon"
-                ></i>
-              </span>
-              <h3 class="ui-card__title">{{ step.titleKey | translate }}</h3>
-              <p class="ui-hint">{{ step.textKey | translate }}</p>
-            </div>
-          </li>
-        }
-      </ol>
     </section>
   </div>
 </div>
