@@ -56,6 +56,23 @@
     }
 }
 
+// An icon-only tab's name on hover and focus: a .ui-tooltip in the tab (its appTooltipAnchor),
+// shown only by a row that fits its width (styles/_tabs.scss) once its tabs are icons. It repeats
+// the name the tab's label gives it, so it is aria-hidden. The first tab's opens towards the row.
+.ui-tab__tip {
+    display: none;
+
+    .ui-tab:first-child > & {
+        inset-inline: 0 auto;
+    }
+
+    // A clicked or tapped tab keeps the focus: its name stays for keyboard focus only.
+    .ui-tab:focus:not(:focus-visible, :hover) > & {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 // ---- Breadcrumb: <nav aria-label="…"><ol class="ui-breadcrumb"><li>… -----------------------
 
 .ui-breadcrumb {

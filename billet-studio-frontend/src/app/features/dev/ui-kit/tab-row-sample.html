@@ -1,0 +1,46 @@
+<div class="ui-card tab-row">
+  <div
+    class="ui-tabs tab-row__tabs"
+    role="tablist"
+    [attr.aria-label]="'UI_KIT.TAB_FIT_LABEL' | translate"
+  >
+    @for (tab of tabs; track tab.id; let i = $index) {
+      <button
+        type="button"
+        class="ui-tab"
+        role="tab"
+        appTooltipAnchor
+        [id]="'kit-fit-tab-' + tab.id"
+        [attr.aria-controls]="'kit-fit-panel-' + tab.id"
+        [attr.aria-selected]="active() === tab.id"
+        [attr.tabindex]="active() === tab.id ? 0 : -1"
+        (click)="active.set(tab.id)"
+        (keydown)="onTabKeydown($event, i)"
+      >
+        <i
+          class="bi"
+          [class]="tab.icon"
+          aria-hidden="true"
+        ></i>
+        <span class="ui-tab__label">{{ tab.labelKey | translate }}</span>
+        <span
+          class="ui-tooltip ui-tab__tip"
+          aria-hidden="true"
+          >{{ tab.labelKey | translate }}</span
+        >
+      </button>
+    }
+  </div>
+  @for (tab of tabs; track tab.id) {
+    <div
+      class="ui-card__body"
+      role="tabpanel"
+      tabindex="0"
+      [id]="'kit-fit-panel-' + tab.id"
+      [attr.aria-labelledby]="'kit-fit-tab-' + tab.id"
+      [hidden]="active() !== tab.id"
+    >
+      {{ 'UI_KIT.TAB_FIT_PANEL' | translate: { tab: (tab.labelKey | translate) } }}
+    </div>
+  }
+</div>

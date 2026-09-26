@@ -1,0 +1,54 @@
+// A tab row that fits its own width at every size: the row decides, never the screen. Its owner
+// includes fit() on the row (a .ui-tabs, or the editor's bottom bar) with the widths, measured on
+// its longest German and English labels, below which the tabs
+//   - stack: icon above a smaller label, the tabs sharing the row equally;
+//   - show only their icons: the .ui-tab__label stays the tab's name, visually hidden, and the
+//     tab's .ui-tab__tip (a .ui-tooltip, the tab its appTooltipAnchor) shows it on hover and focus.
+// A row whose tabs are stacked anyway (.ui-tab--stacked) names only $icons-below. The looks and
+// colours stay with .ui-tab (components/_navigation.scss). Component SCSS uses it via
+// `@use '<relative path>/styles/tabs';` + `@include tabs.fit(...)` on the row's selector.
+
+/** Icon above a smaller label, sharing the row; the active line stays where the tab has it. */
+@mixin stacked-tab {
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.125rem;
+    min-inline-size: 0;
+    padding-inline: 0.125rem;
+    font-size: var(--ui-text-xs);
+
+    > .bi {
+        font-size: 1.125rem;
+    }
+}
+
+@mixin fit($icons-below, $stack-below: null) {
+    // The row never overflows at these widths, and a clipping row would cut the tooltips off.
+    overflow: visible;
+    container: ui-tabs / inline-size;
+
+    @if $stack-below {
+        @container ui-tabs (width < #{$stack-below}) {
+            > .ui-tab {
+                @include stacked-tab;
+            }
+        }
+    }
+
+    @container ui-tabs (width < #{$icons-below}) {
+        > .ui-tab > .ui-tab__label {
+            position: absolute;
+            inline-size: 1px;
+            block-size: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        > .ui-tab > .ui-tab__tip {
+            display: flex;
+        }
+    }
+}

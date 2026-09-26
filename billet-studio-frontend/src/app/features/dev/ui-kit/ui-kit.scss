@@ -97,6 +97,19 @@
     padding-block: var(--ui-space-4);
 }
 
+// A tooltip sample: what it shows, then its anchor at the row's end, where the tooltip (end-aligned
+// under the anchor) opens over the row's text.
+.kit__tip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-4);
+
+    > :last-child {
+        flex: none;
+    }
+}
+
 .kit__popover {
     display: flex;
     flex-direction: column;

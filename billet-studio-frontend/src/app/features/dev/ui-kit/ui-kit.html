@@ -596,6 +596,18 @@
               <button
                 type="button"
                 class="ui-btn ui-btn--neutral"
+                aria-haspopup="dialog"
+                (click)="sheetOpen.set(true)"
+              >
+                <i
+                  class="bi bi-layout-sidebar"
+                  aria-hidden="true"
+                ></i>
+                {{ 'UI_KIT.OPEN_SHEET' | translate }}
+              </button>
+              <button
+                type="button"
+                class="ui-btn ui-btn--neutral"
                 [cdkMenuTriggerFor]="menu"
               >
                 {{ 'NAV.OPEN_MENU' | translate }}
@@ -606,6 +618,78 @@
               </button>
             </div>
 
+            <!-- Tooltips: each anchor at the end of its row, where its tooltip (end-aligned) has room. -->
+            <div class="ui-stack ui-stack--sm">
+              <p class="ui-hint">{{ 'UI_KIT.TOOLTIP_LEAD' | translate }}</p>
+              <div class="kit__tip">
+                <span class="ui-hint">{{ 'UI_KIT.TOOLTIP_ON_BUTTON' | translate }}</span>
+                <span appTooltipAnchor>
+                  <button
+                    type="button"
+                    class="ui-btn ui-btn--neutral"
+                    aria-describedby="kit-tip-button"
+                  >
+                    <i
+                      class="bi bi-arrow-repeat"
+                      aria-hidden="true"
+                    ></i>
+                    {{ 'EDITOR.REPLAY' | translate }}
+                  </button>
+                  <span
+                    id="kit-tip-button"
+                    class="ui-tooltip"
+                    role="tooltip"
+                    >{{ 'UI_KIT.TOOLTIP_REPLAY' | translate }}</span
+                  >
+                </span>
+              </div>
+              <div class="kit__tip">
+                <span class="ui-hint">{{ 'UI_KIT.TOOLTIP_ON_DISABLED' | translate }}</span>
+                <span appTooltipAnchor>
+                  <button
+                    type="button"
+                    class="ui-btn ui-btn--primary"
+                    aria-disabled="true"
+                    aria-describedby="kit-tip-disabled"
+                  >
+                    <i
+                      class="bi bi-share"
+                      aria-hidden="true"
+                    ></i>
+                    {{ 'UI_KIT.BUTTON_SHARE' | translate }}
+                  </button>
+                  <span
+                    id="kit-tip-disabled"
+                    class="ui-tooltip"
+                    role="tooltip"
+                    >{{ 'EDITOR.SHARE_GUEST_HINT' | translate }}</span
+                  >
+                </span>
+              </div>
+              <div class="kit__tip">
+                <span class="ui-hint">{{ 'UI_KIT.TOOLTIP_ON_ICON' | translate }}</span>
+                <span appTooltipAnchor>
+                  <span
+                    class="ui-badge ui-badge--warning"
+                    role="img"
+                    tabindex="0"
+                    aria-labelledby="kit-tip-icon"
+                  >
+                    <i
+                      class="bi bi-wifi-off"
+                      aria-hidden="true"
+                    ></i>
+                  </span>
+                  <span
+                    id="kit-tip-icon"
+                    class="ui-tooltip"
+                    role="tooltip"
+                    >{{ 'EDITOR.SAVE_STATUS.OFFLINE' | translate }}</span
+                  >
+                </span>
+              </div>
+            </div>
+
             <div class="ui-popover kit__popover">
               <strong>{{ 'UI_KIT.POPOVER_TITLE' | translate }}</strong>
               <p>{{ 'UI_KIT.POPOVER_BODY' | translate }}</p>
@@ -613,6 +697,25 @@
           </div>
         </section>
       </div>
+
+      <!-- A tab row that fits its own width -->
+      <section
+        class="ui-card"
+        aria-labelledby="kit-tab-fit"
+      >
+        <div class="ui-card__header">
+          <h3
+            id="kit-tab-fit"
+            class="ui-card__title"
+          >
+            {{ 'UI_KIT.SECTION_TAB_FIT' | translate }}
+          </h3>
+        </div>
+        <div class="ui-card__body ui-stack">
+          <p class="ui-hint">{{ 'UI_KIT.TAB_FIT_LEAD' | translate }}</p>
+          <app-tab-row-sample />
+        </div>
+      </section>
 
       <!-- Table -->
       <section
@@ -915,6 +1018,67 @@
       </button>
     </div>
   </form>
+</dialog>
+
+<dialog
+  class="ui-dialog ui-dialog--sheet"
+  aria-labelledby="kit-sheet-title"
+  [appModal]="sheetOpen()"
+  (dismissed)="sheetOpen.set(false)"
+>
+  <div class="ui-dialog__header">
+    <h2
+      id="kit-sheet-title"
+      class="ui-dialog__title"
+    >
+      {{ 'EDITOR.TOOLS' | translate }}
+    </h2>
+    <button
+      type="button"
+      class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--sm"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      (click)="sheetOpen.set(false)"
+    >
+      <i
+        class="bi bi-x-lg"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+  <div class="ui-dialog__body ui-stack">
+    <p class="ui-hint">{{ 'UI_KIT.SHEET_BODY' | translate }}</p>
+    <div class="ui-field">
+      <label
+        class="ui-label"
+        for="kit-sheet-name"
+        >{{ 'UI_KIT.LABEL_NAME' | translate }}</label
+      >
+      <input
+        id="kit-sheet-name"
+        class="ui-input"
+        type="text"
+        [placeholder]="'UI_KIT.PLACEHOLDER_NAME' | translate"
+      />
+    </div>
+    <label class="ui-check">
+      <input
+        type="checkbox"
+        role="switch"
+        class="ui-switch"
+        checked
+      />
+      {{ 'UI_KIT.SWITCH_PARTICLES' | translate }}
+    </label>
+  </div>
+  <div class="ui-dialog__footer">
+    <button
+      type="button"
+      class="ui-btn ui-btn--neutral ui-btn--block"
+      (click)="sheetOpen.set(false)"
+    >
+      {{ 'COMMON.CLOSE' | translate }}
+    </button>
+  </div>
 </dialog>
 
 <ng-template #menu>

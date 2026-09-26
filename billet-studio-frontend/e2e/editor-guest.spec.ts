@@ -37,6 +37,25 @@ async function openMuttertag(page: Page): Promise<void> {
   }
 }
 
+/**
+ * The labels of the editor's tabs that are not shown in full: hidden, cut by their tab, or pushed
+ * out of the row. The row itself overflowing counts too.
+ */
+function truncatedTabs(page: Page) {
+  return page.getByRole('tablist', { name: 'Bearbeiten' }).evaluate((row) => {
+    const rowBox = row.getBoundingClientRect();
+    const cut = [...row.querySelectorAll('[role="tab"]')].flatMap((tab) => {
+      const box = tab.getBoundingClientRect();
+      const label = tab.querySelector('.ui-tab__label')!;
+      const labelBox = label.getBoundingClientRect();
+      const inside = labelBox.left >= box.left && labelBox.right <= box.right;
+      const whole = labelBox.width > 1 && label.scrollWidth <= label.clientWidth;
+      return inside && whole && box.right <= rowBox.right ? [] : [label.textContent!.trim()];
+    });
+    return row.scrollWidth > row.clientWidth ? [...cut, 'row overflows'] : cut;
+  });
+}
+
 /** The billet documents this browser stores, by their index entry's order (newest first). */
 function storedDocuments(page: Page) {
   return page.evaluate((indexKey) => {
@@ -184,6 +203,22 @@ test.describe('editor as a guest', () => {
 
     await page.getByRole('link', { name: 'Bearbeiten Muttertag für Mama' }).click();
     await expect(page).toHaveURL(EDIT_URL);
+  });
+
+  test('the tab row shows every label in full beside three columns and beside two', async ({
+    page,
+  }) => {
+    await openMuttertag(page);
+    const tabs = page.getByRole('tablist', { name: 'Bearbeiten' }).getByRole('tab');
+
+    for (const [width, count] of [
+      [1280, 4],
+      [870, 5],
+    ]) {
+      await page.setViewportSize({ width, height: 720 });
+      await expect(tabs).toHaveCount(count);
+      await expect.poll(() => truncatedTabs(page), `at ${width}px`).toEqual([]);
+    }
   });
 
   test('on a phone the bottom tabs switch between preview and content', async ({ page }) => {

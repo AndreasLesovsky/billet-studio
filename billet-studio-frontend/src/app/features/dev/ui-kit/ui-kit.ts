@@ -10,8 +10,12 @@ import {
 } from '../../../core/theme/theme-registry.generated';
 import { AssetThumb } from '../../../shared/components/asset-thumb/asset-thumb';
 import { ThemePicker } from '../../../shared/components/theme-picker/theme-picker';
+import { Modal } from '../../../shared/directives/modal';
+import { TooltipAnchor } from '../../../shared/directives/tooltip-anchor';
 import { BilletPresetSample } from './billet-preset-sample';
 import { EditorControlsSample } from './editor-controls-sample';
+import { moveTabFocus } from './roving-tabs';
+import { TabRowSample } from './tab-row-sample';
 
 type KitTab = 'content' | 'design' | 'scene';
 
@@ -89,22 +93,6 @@ const BUTTON_ROWS = BUTTON_STATES.map((state) => ({
   })),
 }));
 
-/** Index of the tab a key moves to (arrows wrap, Home/End jump), or null for other keys. */
-function targetTab(key: string, index: number, count: number): number | null {
-  switch (key) {
-    case 'ArrowRight':
-      return (index + 1) % count;
-    case 'ArrowLeft':
-      return (index - 1 + count) % count;
-    case 'Home':
-      return 0;
-    case 'End':
-      return count - 1;
-    default:
-      return null;
-  }
-}
-
 /**
  * Kitchen sink for visual QA (route dev/ui): every ui-* component class in the site (Studio) theme,
  * then the billet themes - the theme picker with its preset previews in light and in dark, and each
@@ -124,6 +112,9 @@ function targetTab(key: string, index: number, count: number): number | null {
     BilletPresetSample,
     EditorControlsSample,
     AssetThumb,
+    Modal,
+    TabRowSample,
+    TooltipAnchor,
   ],
   templateUrl: './ui-kit.html',
   styleUrl: './ui-kit.scss',
@@ -133,6 +124,7 @@ export class UiKit {
   protected readonly rows = SAMPLE_ROWS;
   protected readonly buttonRows = BUTTON_ROWS;
   protected readonly activeTab = signal<KitTab>('content');
+  protected readonly sheetOpen = signal(false);
   protected readonly spacing = signal(40);
   protected readonly themes = THEMES;
   protected readonly pickerModes = PICKER_MODES;
@@ -145,13 +137,7 @@ export class UiKit {
     this.spacing.set(Number((event.target as HTMLInputElement).value));
   }
 
-  /** Roving focus for the tablist (WAI-ARIA tabs pattern, automatic activation). */
   protected onTabKeydown(event: KeyboardEvent, index: number): void {
-    const next = targetTab(event.key, index, this.tabs.length);
-    if (next === null) return;
-    event.preventDefault();
-    this.activeTab.set(this.tabs[next].id);
-    const tablist = (event.currentTarget as HTMLElement).parentElement;
-    tablist?.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
+    moveTabFocus(event, this.tabs, index, this.activeTab);
   }
 }

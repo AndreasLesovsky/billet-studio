@@ -77,19 +77,13 @@
     inline-size: 6rem;
 }
 
-// A tab's label; a stacked tab (phones) shares the bar's width like the real ones and shows its
-// icon above its label.
+// A tab's icon and label. The row fits its width like the real one (editor.scss): side by side at
+// about a real tab's width, stacked sharing the row, or the icon alone.
 .editor-skeleton__tab {
+    inline-size: 5.5rem;
+
     > .ui-skeleton--text {
-        inline-size: 100%;
-    }
-
-    &:not(.ui-tab--stacked) {
-        inline-size: 6rem;
-    }
-
-    &.ui-tab--stacked > .ui-skeleton--text {
-        inline-size: 70%;
+        inline-size: min(100%, 2.5rem);
     }
 }
 

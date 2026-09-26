@@ -38,10 +38,8 @@
     >
       @for (tab of tabs(); track tab) {
         <span [class]="tabClass()">
-          @if (layout() === 'narrow') {
-            <span class="ui-skeleton ui-skeleton--circle editor-skeleton__tab-icon"></span>
-          }
-          <span class="ui-skeleton ui-skeleton--text"></span>
+          <span class="ui-skeleton ui-skeleton--circle editor-skeleton__tab-icon"></span>
+          <span class="ui-skeleton ui-skeleton--text ui-tab__label"></span>
         </span>
       }
     </div>

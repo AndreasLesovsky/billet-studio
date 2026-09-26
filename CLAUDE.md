@@ -504,7 +504,9 @@ Order of preference:
 
 - **rem only** - no `px` for sizes, spacing or font sizes (a `1px` hairline border is the exception).
 - Breakpoints for the app chrome are defined once in `src/styles/` and reused; never ad-hoc widths.
-  The billet renderer uses container queries instead (section 11).
+  The billet renderer uses container queries instead (section 11), and so does a tab row that fits
+  its own width (`styles/_tabs.scss`), whose thresholds are measured per row, not breakpoints
+  (Design system reference, "Tab rows that fit their width").
 - Dialogs are native `<dialog>` (`showModal()` gives focus trap, Esc and inertness). Popovers,
   dropdowns and menus use CDK Overlay. Toasts are our own `toast` component. Never hand-roll what
   these already give you.
@@ -868,6 +870,9 @@ vanishing button reads as "this feature is gone".
 - ✅ `<button [disabled]="!canUndo()">`
 - ❌ `@if (canUndo()) { <button> }`
 
+A disabled action that has to say why (the editor's Share for a guest) uses `aria-disabled` and a
+tooltip instead of `disabled` (Design system reference, "Disabled with a reason").
+
 Exception (inherited): when a state machine makes at most ONE of several terminal lifecycle actions
 applicable, those may be hidden instead - decide it explicitly and state it in the PR/phase notes.
 Conditional CONTENT (data blocks, optional cards) still uses `@if`; state-dependent input fields use
@@ -1225,10 +1230,44 @@ uses `-ink` on `-soft`.
   card whose link is `ui-card__link`), `ui-thumb` (+ `__emoji __img`, `--loaded`, `--pending`: a 3D
   model preview on a tinted plane, rendered only by `app-asset-thumb`; it shimmers while its catalog
   or image loads and shows the emoji only when there is no image; as a card's first child it is the
-  card's full-bleed top), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`, `--lg`),
+  card's full-bleed top), `ui-dialog` on a native `<dialog>` (+ `__header __title __body __footer`,
+  `--lg`, `--sheet`: "Dialogs and side sheets" below),
   `ui-menu` / `ui-menu__item` (+ `--danger`) / `ui-menu__check` (trailing tick of a checked
   `menuitemradio`) / `ui-menu__separator` / `ui-menu__label` and `ui-popover` for CDK overlay panels
   (`cdk.overlay()` is included globally), `ui-table-wrap` > `ui-table` (+ `__actions` cell).
+- **Dialogs and side sheets:** an app dialog is a native `<dialog class="ui-dialog">` driven by the
+  `Modal` directive (`shared/directives/modal.ts`): `[appModal]="open()"` +
+  `(dismissed)="open.set(false)"`. The owner keeps the state; the directive calls `showModal()` /
+  `close()` (focus trap, Esc, inert page), returns the focus to the opener, and turns Esc and a
+  backdrop click into a `dismissed` request the owner may refuse (while an action runs); `closed`
+  fires after the closing transition. `ui-dialog--sheet` is the same dialog as a side sheet: pinned
+  to the inline-start edge, full height (`100dvh`, safe-area padding at its foot), at most 20rem
+  wide, sliding in (reduced motion: a short fade), the body scrolling between header and footer.
+  Use it as a **tool drawer on phones** - the controls a one-row bar has no room for (the editor's
+  narrow toolbar, `editor-toolbar-sheet`) - never for a confirmation (a centred `ui-dialog`) or for
+  navigation. It opens on its close button; `autofocus` on a field opens it there instead, so no
+  keyboard pops up unasked.
+- **Tooltip:** `ui-tooltip-anchor` > the control + `ui-tooltip[role=tooltip]` with a short text.
+  The anchor is always the `appTooltipAnchor` directive (`shared/directives/tooltip-anchor.ts`),
+  which sets `ui-tooltip-anchor` and `--dismissed`; never write those classes by hand. The control
+  points at its tooltip: `aria-describedby` when the text adds to the control's name,
+  `aria-labelledby` when it IS the name (an icon-only status, `role="img"` + `tabindex="0"`, like
+  the medium toolbar's save status). Behaviour (WCAG 1.4.13): shown while the anchor is hovered or
+  holds the focus (a tap focuses too); it stays while the pointer moves onto it (its `::before`
+  bridges the gap); Esc anywhere hides it until the next hover or focus, without moving the pointer
+  or the focus. It opens below the anchor, end edges aligned, at most 16rem wide. **Never put
+  interactive content in a tooltip** (links, buttons, fields): it takes no focus and vanishes with
+  the pointer; an action belongs in a popover, a menu or the page. An icon button whose name says
+  it all keeps `aria-label` + `title` (undo/redo); a `ui-tooltip` is for text that keyboard and
+  touch users must reach too.
+- **Disabled with a reason** (a primary action that must explain itself: the editor's Share for a
+  guest or a device billet): `aria-disabled="true"` instead of `disabled`, so the button keeps the
+  focus and keyboard and screen-reader users reach it. It sits in an `appTooltipAnchor` beside a
+  `ui-tooltip[role=tooltip]` that says why, named by its `aria-describedby`. `ui-btn` draws
+  `aria-disabled` exactly like `:disabled` (the variant's muted colour, no hover). `aria-disabled`
+  blocks nothing, so the click handler returns early itself (`EditorToolbar.onShare()`). On a
+  phone the side sheet repeats the reason as a `ui-hint`. Plain `[disabled]` stays the default for
+  an action whose reason is obvious (undo with nothing to undo).
 - **Feedback:** `ui-alert` (+ `--info --success --warning --danger`, `__title`), `ui-badge`
   (+ `--accent --muted --success --warning --danger`), `ui-avatar` (+ `--sm --lg --xl`),
   `ui-toast-region` > `ui-toast` (+ variants, `__body`, `--leaving`). Toasts (only `app-toast`, a
@@ -1248,8 +1287,55 @@ uses `-ink` on `-soft`.
   wide), `--control`, `--button` (+ `--sm`, `--icon`), `--circle`, `--pill`; `ui-skeleton-lines`
   (a paragraph: lines without a gap); `ui-skeleton-band` (the sunken band of a billet-shaped
   skeleton). `app-field-skeleton` is a whole form field (`hints`, `errorSlot`).
-- **Navigation:** `ui-tabs` > `ui-tab` (`aria-selected` or `aria-current="page"`), `ui-breadcrumb`
-  (the `<ol>` inside a labelled `<nav>`), `ui-link`.
+- **Navigation:** `ui-tabs` > `ui-tab` (`aria-selected` or `aria-current="page"`; `__label` its
+  text, `__tip` its name as a tooltip once the row shows only icons), `ui-breadcrumb` (the `<ol>`
+  inside a labelled `<nav>`), `ui-link`.
+- **Tab rows that fit their width** (`src/styles/_tabs.scss`): a tab row decides by its OWN width,
+  never the screen's. The owner's SCSS does `@use '<relative path>/styles/tabs';` and
+  `@include tabs.fit($icons-below: …, $stack-below: …)` on the row's selector, which makes the row
+  `container: ui-tabs / inline-size` (and `overflow: visible`, so no tooltip is cut off). Tiers:
+  - roomy (from `$stack-below`): the content-sized `ui-tab`s side by side;
+  - stacked (below `$stack-below`, mixin `tabs.stacked-tab`): the icon above an xs label, the tabs
+    sharing the row equally (`flex: 1 1 0`), the same 2.75rem row height and bottom active line;
+  - icons (below `$icons-below`): the `ui-tab__label` is visually hidden but stays the tab's
+    accessible name, and the `ui-tab__tip` shows it on hover and `:focus-visible` (not on the plain
+    focus a click or tap leaves behind, which would leave it standing).
+
+  A row whose tabs are stacked anyway (`ui-tab--stacked`, the editor's phone bar) passes only
+  `$icons-below`. Each tab: `<button role="tab" appTooltipAnchor class="ui-tab">` >
+  `<i class="bi …" aria-hidden="true">` + `<span class="ui-tab__label">` +
+  `<span class="ui-tooltip ui-tab__tip" aria-hidden="true">` with the same text (inside the tab,
+  so the tablist owns only tabs; `aria-hidden` because it repeats the name). The first tab's tip
+  is start-aligned; in `ui-editor-bar--bottom` the tips open above. **The widths are measured, not
+  breakpoints:** per row, on its longest German AND English labels, in rem with a little headroom
+  (text scaling keeps the ratios). A container condition takes no variable, so each row passes its
+  own numbers (`editor.scss`: 4 tabs stack below 24rem and go icons-only below 16rem, 5 tabs
+  30.5 / 20rem, the phone bar icons-only below 22.5rem). To reuse it: that markup, the measured
+  widths, `tabs.fit` on the row; the looks stay in `_navigation.scss`. A row whose labels fit at
+  every width (the palette's light/dark tabs) needs none of it. Live: the ui-kit's resizable
+  "Tab row that fits its width".
+- **Editor chrome** (`components/_editor.scss`): `ui-editor-bar` (a band between two hairlines,
+  frosted where supported; the toolbar's host) + `--bottom` (the phone tab bar on the screen's
+  bottom edge; it lifts the toasts via `--ui-toast-offset-block-end`), `__tools` (the phone
+  toolbar's button to the side sheet) with `__alert` (a danger dot on its corner while a save
+  failed or is held; the words are the button's `aria-describedby`), `__error` (on
+  `app-field-error`: the field's message as a raised callout under the bar's one row, so the bar
+  never grows); `ui-tab--stacked` (icon above the label, the active line on top: the bottom bar's
+  tabs); `ui-stage`, `ui-device` (+ `--desktop`, `__screen`) for the preview; `ui-sortable` for the
+  CDK drag list.
+- **Editor toolbar tiers** (`app-editor-toolbar`, by the layout of `editor-layout.ts`: wide from
+  75rem, medium from md, narrow below): **one row at every width** - it never wraps, every control
+  is `--ui-control-height` tall, and only the title (then the save status) gives way.
+  - wide: the title field, undo/redo, the preview's colour mode and replay, the billet's language,
+    the save and publish status in words, sign-in for a guest, Share;
+  - medium: the title field, undo/redo, the status as icons (its words in a tooltip), Share, and
+    "More" (a CDK menu: colour mode and language as radio items, replay, sign-in);
+  - narrow: the tools button (the side sheet: the title field, the tools, the status in words, why
+    Share waits, sign-in), the title as a button that opens the sheet at its field, undo/redo,
+    Share as an icon.
+
+  A new toolbar control gets a place in every tier (the row, "More", the sheet); `editor-skeleton`
+  mirrors the row.
 - **Theme picker:** `ui-theme-option` / `__frame` / `__name` / `__check` (the option's Studio
   chrome: label, selection ring, name) and `ui-theme-card` (the outline of a card's mini billet;
   everything inside it is preset data bound inline), used by `app-theme-picker`.

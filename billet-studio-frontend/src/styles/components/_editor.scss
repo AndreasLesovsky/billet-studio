@@ -1,3 +1,5 @@
+@use '../tabs';
+
 // The editor's chrome (features/editor): toolbar and bottom tab bar, the preview stage and its
 // device frame, and the sortable block list. All of it is Studio, like the rest of the site; only
 // the billet inside the device frame shows the billet's theme.
@@ -68,27 +70,27 @@ $tab-bar-block-size: 3.25rem;
 
 // A tab with its icon above the label, the active line on top (bottom tab bar).
 .ui-tab--stacked {
-    flex: 1 1 0;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.125rem;
+    @include tabs.stacked-tab;
+
     min-block-size: $tab-bar-block-size;
-    min-inline-size: 0;
     padding-block: 0;
-    padding-inline: var(--ui-space-1);
     margin-block: -1px 0;
     border-block-start: 0.125rem solid transparent;
     border-block-end: 0;
     border-radius: 0;
-    font-size: var(--ui-text-xs);
-
-    > .bi {
-        font-size: 1.125rem;
-    }
 
     &[aria-selected='true'] {
         border-block-start-color: var(--ui-accent);
         color: var(--ui-accent-ink);
+    }
+}
+
+// The bar sits on the screen's bottom edge: its icon-only tabs' names open above them.
+.ui-editor-bar--bottom .ui-tab__tip {
+    inset-block: auto calc(100% + var(--ui-space-2));
+
+    &::before {
+        inset-block: 100% auto;
     }
 }
 

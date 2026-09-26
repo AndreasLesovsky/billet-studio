@@ -1,3 +1,5 @@
+@use '../../../styles/tabs';
+
 // Layout only; every visual comes from the ui-* classes. The host carries the layout the component
 // decided (editor--wide | --medium | --narrow), so the widths live in one place (editor.ts).
 
@@ -40,6 +42,16 @@
     grid-area: tabs;
 }
 
+// The tab row fits its own width (styles/_tabs.scss). Measured on the longest labels, German and
+// English: side by side, 4 tabs need 23.5rem and 5 tabs 29.8rem; stacked, a tab needs 3.7rem.
+:host(.editor--wide) .editor__tabs {
+    @include tabs.fit($stack-below: 24rem, $icons-below: 16rem);
+}
+
+:host(.editor--medium) .editor__tabs {
+    @include tabs.fit($stack-below: 30.5rem, $icons-below: 20rem);
+}
+
 // What sits above the editor: the site header with its hairline and the breadcrumb row (its top
 // padding and one line of .ui-breadcrumb text, shared/components/breadcrumb).
 $above-editor: calc(
@@ -57,6 +69,12 @@ $above-editor: calc(
     .editor__workspace {
         grid-template-rows: auto minmax(0, 1fr);
         padding-inline: var(--ui-space-6);
+    }
+
+    // Icon-only tabs' names reach over the panel below.
+    .editor__tabs {
+        position: relative;
+        z-index: 1;
     }
 
     // Positioned, so what is positioned inside (visually hidden labels, the live region) scrolls
@@ -111,6 +129,8 @@ $above-editor: calc(
     }
 
     .editor__tabs {
+        @include tabs.fit($icons-below: 22.5rem);
+
         position: sticky;
         z-index: 10;
         inset-block-end: 0;

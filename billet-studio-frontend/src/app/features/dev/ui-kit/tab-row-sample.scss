@@ -1,0 +1,19 @@
+// Layout only; the box is a .ui-card, the row .ui-tabs.
+@use '../../../../styles/tabs';
+
+:host {
+    display: block;
+}
+
+// The box the reader resizes by its corner; the tab row inside fits the box, never the screen.
+.tab-row {
+    min-inline-size: 12rem;
+    max-inline-size: 100%;
+    overflow: hidden;
+    resize: horizontal;
+}
+
+// The editor's widths for these five tabs (features/editor/editor.scss, .editor--medium).
+.tab-row__tabs {
+    @include tabs.fit($stack-below: 30.5rem, $icons-below: 20rem);
+}

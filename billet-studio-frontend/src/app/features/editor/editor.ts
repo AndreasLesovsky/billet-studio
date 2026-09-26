@@ -21,6 +21,7 @@ import { AssetCatalogApi } from '../../core/services/asset-catalog-api';
 import { BreadcrumbService } from '../../shared/components/breadcrumb/breadcrumb-service';
 import { ShareDialog } from '../../shared/components/share-dialog/share-dialog';
 import type { ShareTarget } from '../../shared/components/share-dialog/share-state';
+import { TooltipAnchor } from '../../shared/directives/tooltip-anchor';
 import { AccountEditorSession } from './account-editor-session';
 import { EditorCommands } from './editor-commands';
 import { EditorDeviceNotice } from './editor-device-notice';
@@ -91,6 +92,7 @@ function panelSemantics(tab: EditorTab, isTabPanel: boolean) {
     EditorToolbar,
     PreviewFrame,
     ShareDialog,
+    TooltipAnchor,
     TranslatePipe,
   ],
   templateUrl: './editor.html',
