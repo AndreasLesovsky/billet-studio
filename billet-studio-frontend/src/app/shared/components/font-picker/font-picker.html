@@ -65,7 +65,7 @@
         [style.font-family]="font.stack"
         [style.font-weight]="font.weight"
       >
-        {{ previewText() ?? ('CONTROLS.FONT.PREVIEW_DEFAULT' | translate) }}
+        {{ previewText() || font.family }}
       </p>
     }
 

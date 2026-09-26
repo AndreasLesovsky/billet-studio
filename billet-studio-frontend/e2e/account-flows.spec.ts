@@ -56,7 +56,7 @@ const test = base.extend<{ pageErrors: Error[]; visitor: BrowserContext }>({
 test.use(BROWSER);
 
 const ACCOUNT_EDIT_URL = /\/billets\/\d+\/edit$/;
-const FIRST_PARAGRAPH = /^Du warst immer da/;
+const FIRST_PARAGRAPH = /^Mit dir fühlt sich/;
 const FIRST_EDIT = 'Danke, dass du immer für mich da bist.';
 const SECOND_EDIT = 'Und danke für jeden Sonntag am Telefon.';
 
@@ -139,7 +139,7 @@ test('a billet from a template saves itself, and a tab that saved late gets the 
   request,
 }) => {
   await signUpAndIn(page, request);
-  await useTemplate(page, 'Muttertag');
+  await useTemplate(page, 'Valentinstag');
   await expect(page).toHaveURL(ACCOUNT_EDIT_URL);
   await expect(blockText(page, 0)).toHaveValue(FIRST_PARAGRAPH);
 
@@ -177,13 +177,13 @@ test('a share link shows the published snapshot to anyone, until changes are pub
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await signUpAndIn(page, request);
-  await useTemplate(page, 'Muttertag');
+  await useTemplate(page, 'Valentinstag');
   await expect(page).toHaveURL(ACCOUNT_EDIT_URL);
   expect((await editFirstBlock(page, FIRST_EDIT)).status()).toBe(200);
 
   // Publish, then copy the link.
   await toolbar(page).getByRole('button', { name: 'Teilen' }).click();
-  const dialog = page.getByRole('dialog', { name: '„Muttertag für Mama“ teilen' });
+  const dialog = page.getByRole('dialog', { name: '„Valentinstag“ teilen' });
   await dialog.getByRole('button', { name: 'Veröffentlichen' }).click();
   const link = dialog.getByRole('textbox', { name: 'Link zu deinem Billet' });
   await expect(link).toHaveValue(/^http:\/\/localhost:4320\/b\/[\w-]{22}$/);

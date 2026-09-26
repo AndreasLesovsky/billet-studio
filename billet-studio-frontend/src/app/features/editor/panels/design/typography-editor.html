@@ -55,6 +55,7 @@
         <app-font-picker
           [value]="role.fontId"
           [label]="'EDITOR.DESIGN.FONT' | translate"
+          [previewText]="samples()[role.key]"
           (valueChange)="pickFont(role.key, $event)"
         />
         <div class="typography-editor__row">

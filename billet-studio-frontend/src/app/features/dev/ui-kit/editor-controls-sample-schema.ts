@@ -13,15 +13,15 @@ export interface ControlsSampleModel {
   icon: string;
 }
 
-/** The Muttertag card's values. */
+/** The Geburtstag card's values. */
 export const SAMPLE_CONTROLS_MODEL: ControlsSampleModel = {
-  accent: '#c8614a',
-  ink: '#2a1f1a',
+  accent: '#b9532a',
+  ink: '#3b2418',
   titleSize: 1,
   gutter: 8,
-  titleFont: 'cormorant-garamond',
-  modelSlug: 'flower-bouquet',
-  icon: '🌸',
+  titleFont: 'abril-fatface',
+  modelSlug: 'birthday-cake',
+  icon: '🎂',
 };
 
 // The range sliders read their bounds from these rules through [formField].

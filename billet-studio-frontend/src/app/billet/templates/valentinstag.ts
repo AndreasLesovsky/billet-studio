@@ -3,7 +3,7 @@ import { defineTemplate, SEPARATOR } from './template';
 export const VALENTINSTAG = defineTemplate({
   nameKey: 'TEMPLATES.VALENTINSTAG',
   themeId: 'sakura',
-  modelSlug: 'heart-emoji',
+  modelSlug: 'beating-heart',
   emoji: '💝',
   divider: 'heart',
   particles: 'heart',

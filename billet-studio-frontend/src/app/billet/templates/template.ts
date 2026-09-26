@@ -45,13 +45,13 @@ const SEED_DEFAULTS = {
     cameraHeight: 0.1,
     autoRotateSpeed: 0.45,
   },
-  'heart-emoji': {
-    fitSize: 1.5,
-    yOffset: -0.05,
-    exposure: 0.65,
+  'beating-heart': {
+    fitSize: 1.6,
+    yOffset: -0.08,
+    exposure: 0.6,
     cameraDistance: 2.8,
     cameraHeight: 0.1,
-    autoRotateSpeed: 0.55,
+    autoRotateSpeed: 0.45,
   },
   'birthday-cake': {
     fitSize: 2,
@@ -86,7 +86,10 @@ const SCENE_ARIA_LABEL: Record<SceneModelSlug, Record<BilletLang, string>> = {
     de: '3D Blumenstrauß, interaktiv drehbar',
     en: '3D flower bouquet, drag to rotate',
   },
-  'heart-emoji': { de: '3D Herz, interaktiv drehbar', en: '3D heart, drag to rotate' },
+  'beating-heart': {
+    de: '3D schlagendes Herz, interaktiv drehbar',
+    en: '3D beating heart, drag to rotate',
+  },
   'birthday-cake': {
     de: '3D Geburtstagstorte, interaktiv drehbar',
     en: '3D birthday cake, drag to rotate',

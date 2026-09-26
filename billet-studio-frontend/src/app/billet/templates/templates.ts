@@ -7,19 +7,19 @@ import { WEIHNACHTEN } from './weihnachten';
 
 /** Picker order. A complete document from one: createDocument({ templateId, lang }). */
 export const TEMPLATE_IDS = [
-  'muttertag',
   'valentinstag',
   'geburtstag',
   'weihnachten',
   'hochzeit',
+  'muttertag',
 ] as const;
 
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
 export const TEMPLATES: Readonly<Record<TemplateId, BilletTemplate>> = {
-  muttertag: MUTTERTAG,
   valentinstag: VALENTINSTAG,
   geburtstag: GEBURTSTAG,
   weihnachten: WEIHNACHTEN,
   hochzeit: HOCHZEIT,
+  muttertag: MUTTERTAG,
 };

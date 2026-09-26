@@ -66,10 +66,10 @@ export class BilletPreview {
   protected readonly lang = signal<BilletLang>('de');
   protected readonly mode = signal<BilletViewMode>('auto');
 
-  /** An unknown id shows the parity fixture. */
+  /** An unknown id shows the first template. */
   protected readonly previewId = computed<PreviewId>(() => {
     const id = this.templateId();
-    return PREVIEWS.find((preview) => preview.id === id)?.id ?? 'parity';
+    return PREVIEWS.find((preview) => preview.id === id)?.id ?? TEMPLATE_IDS[0];
   });
 
   protected readonly document = computed(() => previewDocument(this.previewId(), this.lang()));

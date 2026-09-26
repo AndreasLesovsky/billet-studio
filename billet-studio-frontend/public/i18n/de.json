@@ -76,8 +76,8 @@
   },
   "THEME_PICKER": {
     "LABEL": "Theme",
-    "SAMPLE_TITLE": "Mama",
-    "SAMPLE_BODY": "Danke für alles."
+    "SAMPLE_ACCENT": "Hallo",
+    "SAMPLE_BODY": "Deine Worte, schön gesetzt."
   },
   "THEMES": {
     "ROSE": "Rosé",
@@ -110,7 +110,7 @@
     "THEME": "Farbwelt:",
     "USE": "Vorlage verwenden",
     "DESCRIPTION": {
-      "MUTTERTAG": "Ein Blumenstrauß und ein großes Danke an Mama.",
+      "MUTTERTAG": "Ein Blumenstrauß und ein herzliches Dankeschön zum Muttertag.",
       "VALENTINSTAG": "Ein Herz und ein paar liebe Zeilen für deinen Lieblingsmenschen.",
       "GEBURTSTAG": "Torte, Konfetti und die besten Wünsche fürs neue Lebensjahr.",
       "WEIHNACHTEN": "Eine Schneekugel voller Winterzauber für die Menschen, die du liebst.",
@@ -123,10 +123,10 @@
     "EYEBROW": "Digitale Billets mit 3D-Motiv",
     "TITLE_LINE1": "Deine Worte,",
     "TITLE_ACCENT": "mit einem Geschenk in 3D.",
-    "LEAD": "Wähle eine Vorlage, schreib deine Worte und leg ein 3D-Motiv hinein – einen Blumenstrauß, eine Torte, ein Herz. Wer dein Billet öffnet, dreht es mit dem Finger und entdeckt es von allen Seiten. Geteilt per Link, ganz ohne App.",
+    "LEAD": "Wähle eine Vorlage, schreib deine Worte und leg ein 3D-Motiv hinein – ein schlagendes Herz, eine Torte, eine Schneekugel. Wer dein Billet öffnet, dreht es mit dem Finger und entdeckt es von allen Seiten. Geteilt per Link, ganz ohne App.",
     "STEPS_TITLE": "So funktioniert’s",
     "STEP_TEMPLATE_TITLE": "Vorlage wählen",
-    "STEP_TEMPLATE_TEXT": "Muttertag, Geburtstag, Hochzeit – du startest mit einer fertigen Gestaltung.",
+    "STEP_TEMPLATE_TEXT": "Valentinstag, Geburtstag, Hochzeit – du startest mit einer fertigen Gestaltung.",
     "STEP_DESIGN_TITLE": "Gestalten",
     "STEP_DESIGN_TEXT": "Texte, Farben, Schriften und das 3D-Modell passt du im Editor an.",
     "STEP_SHARE_TITLE": "Per Link teilen",
@@ -722,8 +722,8 @@
     "LABEL_EMAIL": "E-Mail",
     "HINT_EMAIL_INVALID": "Beispiel für ein ungültiges Feld.",
     "LABEL_OCCASION": "Anlass",
-    "OCCASION_MOTHERS_DAY": "Muttertag",
     "OCCASION_BIRTHDAY": "Geburtstag",
+    "OCCASION_VALENTINES": "Valentinstag",
     "OCCASION_WEDDING": "Hochzeit",
     "LABEL_MESSAGE": "Nachricht",
     "PLACEHOLDER_MESSAGE": "Schreib ein paar liebe Worte …",
@@ -772,13 +772,13 @@
     "COLUMN_TITLE": "Titel",
     "COLUMN_STATUS": "Status",
     "COLUMN_UPDATED": "Geändert",
-    "CARD_TITLE": "Muttertagskarte",
-    "CARD_BODY": "Ein Strauß Tulpen, warme Farben und ein paar liebe Zeilen.",
+    "CARD_TITLE": "Geburtstagskarte",
+    "CARD_BODY": "Eine Torte mit Kerzen, kräftige Farben und ein paar gute Wünsche.",
     "CARD_NEW_BODY": "Starte mit einer Vorlage oder einem leeren Blatt.",
     "PRESET_TITLE": "Billet-Voreinstellung",
-    "PRESET_SAMPLE_TITLE": "Mama",
-    "PRESET_SAMPLE_EMPHASIS": "Danke",
-    "PRESET_SAMPLE_BODY": "für alles, was kein Buch lehrt – und für deine Geduld."
+    "PRESET_SAMPLE_TITLE": "Alles Gute",
+    "PRESET_SAMPLE_EMPHASIS": "Auf dich",
+    "PRESET_SAMPLE_BODY": "und ein Jahr voller guter Tage – die Torte wartet schon."
   },
   "BILLET_PREVIEW": {
     "TOOLBAR": "Billet-Vorschau",
@@ -889,7 +889,6 @@
     "FONT": {
       "PANEL": "Schrift wählen",
       "NONE": "Keine Schrift gewählt",
-      "PREVIEW_DEFAULT": "Für Mama",
       "SEARCH": "Schrift suchen",
       "SEARCH_PLACEHOLDER": "Schrift suchen …",
       "CATEGORIES": "Schriftstil",

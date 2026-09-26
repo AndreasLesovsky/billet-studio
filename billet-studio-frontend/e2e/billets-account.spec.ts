@@ -39,7 +39,7 @@ test.describe('billets in the account', () => {
 
     // A guest starts a billet on this device, then signs in and lands on "Meine Billets".
     await page.goto('/templates');
-    await page.getByRole('link', { name: 'Vorlage verwenden Muttertag' }).click();
+    await page.getByRole('link', { name: 'Vorlage verwenden Valentinstag' }).click();
     await expect(page).toHaveURL(/\/billets\/local\/[0-9a-f]+\/edit$/);
     await page.goto('/login');
     await page.getByLabel('E-Mail', { exact: true }).fill('anna@example.com');
@@ -51,16 +51,14 @@ test.describe('billets in the account', () => {
     await notice.getByRole('button', { name: 'Alle ins Konto übernehmen' }).click();
     await expect(notice).toBeHidden();
     const account = page.getByRole('region', { name: 'In deinem Konto' });
-    await expect(account.getByRole('heading', { level: 3 })).toHaveText(['Muttertag für Mama']);
-    await expect(
-      account.getByRole('link', { name: 'Bearbeiten Muttertag für Mama' }),
-    ).toBeFocused();
+    await expect(account.getByRole('heading', { level: 3 })).toHaveText(['Valentinstag']);
+    await expect(account.getByRole('link', { name: 'Bearbeiten Valentinstag' })).toBeFocused();
     await expect(page.getByRole('heading', { name: 'Nur auf diesem Gerät' })).toBeHidden();
     expect(await localBillets(page)).toEqual([]);
 
     // Publish from the list, then copy the link.
-    await account.getByRole('button', { name: 'Teilen Muttertag für Mama' }).click();
-    const listDialog = page.getByRole('dialog', { name: '„Muttertag für Mama“ teilen' });
+    await account.getByRole('button', { name: 'Teilen Valentinstag' }).click();
+    const listDialog = page.getByRole('dialog', { name: '„Valentinstag“ teilen' });
     await listDialog.getByRole('button', { name: 'Veröffentlichen' }).click();
     const link = listDialog.getByRole('textbox', { name: 'Link zu deinem Billet' });
     await expect(link).toHaveValue(new RegExp(`/b/${SHARE_TOKEN}$`));
@@ -74,18 +72,22 @@ test.describe('billets in the account', () => {
     await expect(account.locator('app-billet-card').getByText('Veröffentlicht')).toBeVisible();
 
     // An edit is an unpublished change at once; publishing it saves it first.
-    await account.getByRole('link', { name: 'Bearbeiten Muttertag für Mama' }).click();
+    await account.getByRole('link', { name: 'Bearbeiten Valentinstag' }).click();
     const toolbar = page.locator('app-editor-toolbar');
     await expect(toolbar.getByText('Veröffentlicht')).toBeVisible();
-    await page.getByRole('textbox', { name: 'Titel des Billets' }).fill('Für die beste Mama');
+    await page
+      .getByRole('textbox', { name: 'Titel des Billets' })
+      .fill('Für meinen Lieblingsmenschen');
     await expect(toolbar.getByText('Unveröffentlichte Änderungen')).toBeVisible();
     await toolbar.getByRole('button', { name: 'Teilen' }).click();
-    const editorDialog = page.getByRole('dialog', { name: '„Für die beste Mama“ teilen' });
+    const editorDialog = page.getByRole('dialog', {
+      name: '„Für meinen Lieblingsmenschen“ teilen',
+    });
     const publishChanges = editorDialog.getByRole('button', { name: 'Änderungen veröffentlichen' });
     await publishChanges.click();
     await expect(publishChanges).toBeDisabled();
     const [billet] = backend.billets.values();
-    expect(billet.published?.title).toBe('Für die beste Mama');
+    expect(billet.published?.title).toBe('Für meinen Lieblingsmenschen');
     expect(backend.requests.slice(-2)).toEqual([
       `PUT /v1/billets/${billet.id}`,
       `POST /v1/billets/${billet.id}/publish`,

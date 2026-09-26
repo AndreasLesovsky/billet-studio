@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { EMPHASIS_COLORS, FONT_ROLES, type FontRole } from '../../../../billet/billet-document';
 import { NUMBER_LIMITS } from '../../../../billet/billet-limits';
+import { roleSamples } from '../../../../billet/role-texts';
 import { fontStack } from '../../../../billet/typography';
 import { LanguageService } from '../../../../core/services/language-service';
 import { billetPresetFor } from '../../../../core/theme/billet-theme-presets.generated';
@@ -59,6 +60,9 @@ export class TypographyEditor extends EditorPanel {
     color,
     labelKey: EMPHASIS_KEYS[color],
   }));
+
+  /** The font pickers' sample lines: the billet's own text per role. It follows typing. */
+  protected readonly samples = computed(() => roleSamples(this.document()));
 
   // Slices of the document: typing in the content panel changes neither, so nothing below reruns.
   private readonly typography = computed(() => this.document().typography);

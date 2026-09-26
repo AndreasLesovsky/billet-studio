@@ -119,7 +119,7 @@ export class FontPicker implements FormValueControl<string> {
   /** Visible label text; or name the control with `ariaLabelledby`. */
   readonly label = input('');
   readonly ariaLabelledby = input<string | null>(null);
-  /** The sample line in the popover; defaults to a translated greeting. */
+  /** The sample line in the popover; without one (or an empty one) it is the family's name. */
   readonly previewText = input<string | null>(null);
   /** Focus left the control: marks a bound field as touched. */
   readonly touch = output<void>();

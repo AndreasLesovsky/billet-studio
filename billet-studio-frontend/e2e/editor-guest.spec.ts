@@ -9,8 +9,8 @@ import { withoutWebGl } from './support/scene';
 
 test.use({ locale: 'de-DE' });
 
-const FIRST_PARAGRAPH = /^Du warst immer da/;
-const SECOND_PARAGRAPH = /^Danke für alles/;
+const FIRST_PARAGRAPH = /^Mit dir fühlt sich/;
+const SECOND_PARAGRAPH = /^Ich liebe unsere/;
 const EDIT_URL = /\/billets\/local\/[0-9a-z]+\/edit$/;
 const INDEX_KEY = 'billet-studio.local.index';
 
@@ -21,18 +21,18 @@ const blockText = (page: Page, index: number) =>
   blockCards(page).nth(index).getByRole('textbox', { name: 'Text', exact: true });
 
 /** A phone's toolbar shows the title as a button that opens its field in the side sheet. */
-const PHONE_TITLE = 'Titel bearbeiten: Muttertag für Mama';
+const PHONE_TITLE = 'Titel bearbeiten: Valentinstag';
 
-/** /templates → "Vorlage verwenden" on Muttertag → the new billet's editor. */
-async function openMuttertag(page: Page): Promise<void> {
+/** /templates → "Vorlage verwenden" on Valentinstag → the new billet's editor. */
+async function openValentinstag(page: Page): Promise<void> {
   await page.goto('/templates');
-  await page.getByRole('link', { name: 'Vorlage verwenden Muttertag' }).click();
+  await page.getByRole('link', { name: 'Vorlage verwenden Valentinstag' }).click();
   await expect(page).toHaveURL(EDIT_URL);
   if ((page.viewportSize()?.width ?? 0) < 768) {
     await expect(page.getByRole('button', { name: PHONE_TITLE })).toBeVisible();
   } else {
     await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
-      'Muttertag für Mama',
+      'Valentinstag',
     );
   }
 }
@@ -83,9 +83,9 @@ test.describe('editor as a guest', () => {
   test('a template becomes a billet on this device, and its text edits show in the preview', async ({
     page,
   }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
 
-    await expect(preview(page).locator('h1')).toHaveText(/Für\s*Mama/);
+    await expect(preview(page).locator('h1')).toHaveText(/Für dich,\s*mein Herz/);
     await expect(previewBlocks(page).first()).toHaveText(FIRST_PARAGRAPH);
     await expect(page.locator('app-editor-toolbar').getByText('Lokal gespeichert')).toBeVisible();
 
@@ -94,7 +94,7 @@ test.describe('editor as a guest', () => {
   });
 
   test('picking another theme recolours the preview, never the editor', async ({ page }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
     const colours = () =>
       preview(page).evaluate((view) => {
         const style = getComputedStyle(view);
@@ -110,20 +110,20 @@ test.describe('editor as a guest', () => {
         const inspector = getComputedStyle(editor.querySelector('.editor__inspector .ui-card')!);
         return [inspector.backgroundColor, inspector.color, inspector.fontFamily, tab.color];
       });
-    const rose = await colours();
+    const sakura = await colours();
 
     await page.getByRole('tab', { name: 'Design' }).click();
     const studio = await chrome();
     await page.getByRole('button', { name: 'Theme wählen' }).click();
     await page.locator('label.ui-theme-option', { hasText: 'Mitternacht' }).click();
 
-    await expect.poll(async () => (await colours()).background).not.toBe(rose.background);
-    await expect.poll(async () => (await colours()).accent).not.toBe(rose.accent);
+    await expect.poll(async () => (await colours()).background).not.toBe(sakura.background);
+    await expect.poll(async () => (await colours()).accent).not.toBe(sakura.accent);
     expect(await chrome()).toEqual(studio);
   });
 
   test('a block moves down by keyboard and keeps the focus on its button', async ({ page }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
     const down = blockCards(page).first().getByRole('button', { name: 'Nach unten' });
 
     await down.focus();
@@ -139,7 +139,7 @@ test.describe('editor as a guest', () => {
   test('Ctrl+Z in a text field undoes the editor history step by step, and redo brings it back', async ({
     page,
   }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
     const edited = 'Du bist die Beste.';
 
     await blockText(page, 0).fill(edited);
@@ -165,50 +165,52 @@ test.describe('editor as a guest', () => {
   });
 
   test('an edit is still there after a reload, also one made just before it', async ({ page }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
 
-    await page.getByRole('textbox', { name: 'Titel des Billets' }).fill('Für die beste Mama');
+    await page
+      .getByRole('textbox', { name: 'Titel des Billets' })
+      .fill('Für meinen Lieblingsmenschen');
     await expect
       .poll(async () => (await storedDocuments(page))[0].title)
-      .toBe('Für die beste Mama');
+      .toBe('Für meinen Lieblingsmenschen');
     // Still within the autosave's wait: leaving the page writes it.
     await blockText(page, 0).fill('Neu geschrieben.');
     await page.reload();
 
     await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
-      'Für die beste Mama',
+      'Für meinen Lieblingsmenschen',
     );
     await expect(blockText(page, 0)).toHaveValue('Neu geschrieben.');
     await expect(previewBlocks(page).first()).toHaveText('Neu geschrieben.');
   });
 
   test('"Meine Billets" lists the billet, duplicates it and deletes the copy', async ({ page }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
     await page.goto('/billets');
 
     const titles = page.locator('app-billet-list h2');
-    await expect(titles).toHaveText(['Muttertag für Mama']);
+    await expect(titles).toHaveText(['Valentinstag']);
     await expect(page.getByText('1 von 20 Plätzen belegt.')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Duplizieren Muttertag für Mama' }).click();
-    await expect(titles).toHaveText(['Muttertag für Mama (Kopie)', 'Muttertag für Mama']);
+    await page.getByRole('button', { name: 'Duplizieren Valentinstag' }).click();
+    await expect(titles).toHaveText(['Valentinstag (Kopie)', 'Valentinstag']);
 
-    await page.getByRole('button', { name: '„Muttertag für Mama (Kopie)“ löschen' }).click();
+    await page.getByRole('button', { name: '„Valentinstag (Kopie)“ löschen' }).click();
     const dialog = page.getByRole('alertdialog', { name: 'Billet löschen?' });
     await dialog.getByRole('button', { name: 'Löschen' }).click();
 
     await expect(dialog).toBeHidden();
-    await expect(titles).toHaveText(['Muttertag für Mama']);
+    await expect(titles).toHaveText(['Valentinstag']);
     expect(await storedDocuments(page)).toHaveLength(1);
 
-    await page.getByRole('link', { name: 'Bearbeiten Muttertag für Mama' }).click();
+    await page.getByRole('link', { name: 'Bearbeiten Valentinstag' }).click();
     await expect(page).toHaveURL(EDIT_URL);
   });
 
   test('the tab row shows every label in full beside three columns and beside two', async ({
     page,
   }) => {
-    await openMuttertag(page);
+    await openValentinstag(page);
     const tabs = page.getByRole('tablist', { name: 'Bearbeiten' }).getByRole('tab');
 
     for (const [width, count] of [
@@ -223,7 +225,7 @@ test.describe('editor as a guest', () => {
 
   test('on a phone the bottom tabs switch between preview and content', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openMuttertag(page);
+    await openValentinstag(page);
 
     const tabs = page.getByRole('tablist', { name: 'Bearbeiten' });
     const content = page.locator('#editor-panel-content');
@@ -247,18 +249,18 @@ test.describe('editor as a guest', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openMuttertag(page);
+    await openValentinstag(page);
 
     await page.getByRole('button', { name: PHONE_TITLE }).click();
     const sheet = page.getByRole('dialog', { name: 'Werkzeuge' });
     const title = sheet.getByRole('textbox', { name: 'Titel des Billets' });
     await expect(title).toBeFocused();
-    await title.fill('Für die beste Mama');
+    await title.fill('Für meinen Lieblingsmenschen');
     await page.keyboard.press('Escape');
 
     await expect(sheet).toBeHidden();
     await expect(
-      page.getByRole('button', { name: 'Titel bearbeiten: Für die beste Mama' }),
+      page.getByRole('button', { name: 'Titel bearbeiten: Für meinen Lieblingsmenschen' }),
     ).toBeFocused();
   });
 
@@ -267,7 +269,7 @@ test.describe('editor as a guest', () => {
     context,
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await openMuttertag(page);
+    await openValentinstag(page);
     const textarea = blockText(page, 0);
 
     await page.evaluate(() => navigator.clipboard.writeText('Liebe\tGrüße\r\nvon mir\r'));

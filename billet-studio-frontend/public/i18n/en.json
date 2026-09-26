@@ -76,8 +76,8 @@
   },
   "THEME_PICKER": {
     "LABEL": "Theme",
-    "SAMPLE_TITLE": "Mom",
-    "SAMPLE_BODY": "Thank you for everything."
+    "SAMPLE_ACCENT": "Hello",
+    "SAMPLE_BODY": "Your words, beautifully set."
   },
   "THEMES": {
     "ROSE": "Rose",
@@ -110,7 +110,7 @@
     "THEME": "Colour scheme:",
     "USE": "Use template",
     "DESCRIPTION": {
-      "MUTTERTAG": "A bouquet of flowers and a big thank-you to Mom.",
+      "MUTTERTAG": "A bouquet of flowers and a warm thank-you for Mother's Day.",
       "VALENTINSTAG": "A heart and a few loving lines for your favourite person.",
       "GEBURTSTAG": "Cake, confetti and the very best wishes for the year ahead.",
       "WEIHNACHTEN": "A snow globe full of winter magic for the people you love.",
@@ -123,10 +123,10 @@
     "EYEBROW": "Digital billets with a 3D motif",
     "TITLE_LINE1": "Your words,",
     "TITLE_ACCENT": "with a gift in 3D.",
-    "LEAD": "Pick a template, write your words and place a 3D gift inside – a bouquet, a cake, a heart. Whoever opens your billet turns it with a finger and discovers it from every side. Shared by link, no app needed.",
+    "LEAD": "Pick a template, write your words and place a 3D gift inside – a beating heart, a cake, a snow globe. Whoever opens your billet turns it with a finger and discovers it from every side. Shared by link, no app needed.",
     "STEPS_TITLE": "How it works",
     "STEP_TEMPLATE_TITLE": "Pick a template",
-    "STEP_TEMPLATE_TEXT": "Mother’s Day, birthday, wedding – you start from a finished design.",
+    "STEP_TEMPLATE_TEXT": "Valentine’s Day, birthday, wedding – you start from a finished design.",
     "STEP_DESIGN_TITLE": "Make it yours",
     "STEP_DESIGN_TEXT": "Adjust the text, colours, fonts and the 3D model in the editor.",
     "STEP_SHARE_TITLE": "Share with a link",
@@ -722,8 +722,8 @@
     "LABEL_EMAIL": "Email",
     "HINT_EMAIL_INVALID": "Example of an invalid field.",
     "LABEL_OCCASION": "Occasion",
-    "OCCASION_MOTHERS_DAY": "Mother's Day",
     "OCCASION_BIRTHDAY": "Birthday",
+    "OCCASION_VALENTINES": "Valentine's Day",
     "OCCASION_WEDDING": "Wedding",
     "LABEL_MESSAGE": "Message",
     "PLACEHOLDER_MESSAGE": "Write a few kind words…",
@@ -772,13 +772,13 @@
     "COLUMN_TITLE": "Title",
     "COLUMN_STATUS": "Status",
     "COLUMN_UPDATED": "Updated",
-    "CARD_TITLE": "Mother's Day card",
-    "CARD_BODY": "A bunch of tulips, warm colours and a few kind lines.",
+    "CARD_TITLE": "Birthday card",
+    "CARD_BODY": "A cake with candles, bold colours and a few good wishes.",
     "CARD_NEW_BODY": "Start from a template or a blank page.",
     "PRESET_TITLE": "Billet preset",
-    "PRESET_SAMPLE_TITLE": "Mom",
-    "PRESET_SAMPLE_EMPHASIS": "Thank you",
-    "PRESET_SAMPLE_BODY": "for everything no book could teach me – and for all your patience."
+    "PRESET_SAMPLE_TITLE": "Happy birthday",
+    "PRESET_SAMPLE_EMPHASIS": "Here’s to you",
+    "PRESET_SAMPLE_BODY": "and a year full of good days – the cake is waiting."
   },
   "BILLET_PREVIEW": {
     "TOOLBAR": "Billet preview",
@@ -889,7 +889,6 @@
     "FONT": {
       "PANEL": "Choose a font",
       "NONE": "No font selected",
-      "PREVIEW_DEFAULT": "For Mom",
       "SEARCH": "Search fonts",
       "SEARCH_PLACEHOLDER": "Search fonts …",
       "CATEGORIES": "Font style",

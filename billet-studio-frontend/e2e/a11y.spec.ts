@@ -86,18 +86,18 @@ async function expectAccessible(page: Page, state: string): Promise<void> {
   expect(await violations(page), state).toEqual([]);
 }
 
-/** /templates → "Vorlage verwenden" on Muttertag → the new billet's editor. */
-async function openMuttertag(page: Page): Promise<void> {
+/** /templates → "Vorlage verwenden" on Valentinstag → the new billet's editor. */
+async function openValentinstag(page: Page): Promise<void> {
   await page.goto('/templates');
-  await page.getByRole('link', { name: 'Vorlage verwenden Muttertag' }).click();
+  await page.getByRole('link', { name: 'Vorlage verwenden Valentinstag' }).click();
   // A phone's toolbar shows the title as a button that opens its field in the side sheet.
   if ((page.viewportSize()?.width ?? 0) < 768) {
     await expect(
-      page.getByRole('button', { name: 'Titel bearbeiten: Muttertag für Mama' }),
+      page.getByRole('button', { name: 'Titel bearbeiten: Valentinstag' }),
     ).toBeVisible();
   } else {
     await expect(page.getByRole('textbox', { name: 'Titel des Billets' })).toHaveValue(
-      'Muttertag für Mama',
+      'Valentinstag',
     );
   }
 }
@@ -137,19 +137,19 @@ test.describe('accessibility', () => {
     });
 
     test('/billets with a billet on this device, and its delete confirmation', async ({ page }) => {
-      await openMuttertag(page);
+      await openValentinstag(page);
       await page.goto('/billets');
-      await expect(page.locator('app-billet-list h2')).toHaveText(['Muttertag für Mama']);
+      await expect(page.locator('app-billet-list h2')).toHaveText(['Valentinstag']);
       await expectAccessible(page, 'device billets');
 
-      await page.getByRole('button', { name: '„Muttertag für Mama“ löschen' }).click();
+      await page.getByRole('button', { name: '„Valentinstag“ löschen' }).click();
       await expect(page.getByRole('alertdialog', { name: 'Billet löschen?' })).toBeVisible();
       await expectAccessible(page, 'delete confirmation');
     });
 
     test('the editor on a phone, and its tools side sheet', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
-      await openMuttertag(page);
+      await openValentinstag(page);
       await expectAccessible(page, 'phone, content tab');
 
       await page.getByRole('tab', { name: 'Vorschau' }).click();
@@ -163,7 +163,7 @@ test.describe('accessibility', () => {
 
     test('the editor on a tablet, and its "More" menu', async ({ page }) => {
       await page.setViewportSize({ width: 1024, height: 768 });
-      await openMuttertag(page);
+      await openValentinstag(page);
       await page.getByRole('button', { name: 'Mehr' }).click();
       await expect(page.getByRole('menu')).toBeVisible();
       await expectAccessible(page, 'tablet, "More" menu');
@@ -174,7 +174,7 @@ test.describe('accessibility', () => {
         page,
       }) => {
         await page.emulateMedia({ colorScheme });
-        await openMuttertag(page);
+        await openValentinstag(page);
         await expectAccessible(page, 'content tab');
 
         await page.getByRole('tab', { name: 'Design' }).click();
@@ -182,12 +182,12 @@ test.describe('accessibility', () => {
         await expect(page.getByRole('group', { name: 'Theme', exact: true })).toBeVisible();
         await expectAccessible(page, 'design tab, theme picker open');
 
-        await page.getByRole('button', { name: 'Akzent #c8614a' }).click();
+        await page.getByRole('button', { name: 'Akzent #c2456f' }).click();
         await expect(page.getByRole('dialog', { name: 'Akzent' })).toBeVisible();
         await expectAccessible(page, 'design tab, colour picker open');
         await page.keyboard.press('Escape');
 
-        await page.getByRole('button', { name: 'Schrift Cormorant Garamond' }).first().click();
+        await page.getByRole('button', { name: 'Schrift Playfair Display' }).first().click();
         await expect(page.getByRole('dialog')).toBeVisible();
         await expectAccessible(page, 'design tab, font picker open');
       });
@@ -197,7 +197,7 @@ test.describe('accessibility', () => {
   test('signed in: the billet list and the share dialog', async ({ page }) => {
     await new AccountBackend().install(page);
     await withoutWebGl(page);
-    await openMuttertag(page);
+    await openValentinstag(page);
     await page.goto('/login');
     await page.getByLabel('E-Mail', { exact: true }).fill('anna@example.com');
     await page.getByLabel('Passwort', { exact: true }).fill('Test-Passwort-1');
@@ -209,11 +209,11 @@ test.describe('accessibility', () => {
 
     await notice.getByRole('button', { name: 'Alle ins Konto übernehmen' }).click();
     const account = page.getByRole('region', { name: 'In deinem Konto' });
-    await expect(account.getByRole('heading', { level: 3 })).toHaveText(['Muttertag für Mama']);
+    await expect(account.getByRole('heading', { level: 3 })).toHaveText(['Valentinstag']);
     await expectAccessible(page, 'list with an account billet');
 
-    await account.getByRole('button', { name: 'Teilen Muttertag für Mama' }).click();
-    const dialog = page.getByRole('dialog', { name: '„Muttertag für Mama“ teilen' });
+    await account.getByRole('button', { name: 'Teilen Valentinstag' }).click();
+    const dialog = page.getByRole('dialog', { name: '„Valentinstag“ teilen' });
     await expect(dialog.getByRole('button', { name: 'Veröffentlichen' })).toBeVisible();
     await expectAccessible(page, 'share dialog, not published');
 

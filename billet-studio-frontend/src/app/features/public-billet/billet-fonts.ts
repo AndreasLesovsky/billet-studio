@@ -1,4 +1,5 @@
-import { FONT_ROLES, type BilletDocument, type FontRole } from '../../billet/billet-document';
+import { FONT_ROLES, type BilletDocument } from '../../billet/billet-document';
+import { roleTexts } from '../../billet/role-texts';
 import { fontStack } from '../../billet/typography';
 
 /** The longest the page holds the billet back for its fonts; a slow font then swaps in. */
@@ -15,18 +16,8 @@ export interface FontFaceRequest {
  * needed italic (cards, notes, *emphasis*). The characters pick the unicode-range subsets to load.
  */
 export function billetFontFaces(document: BilletDocument): FontFaceRequest[] {
-  const { hero, scene, blocks, signature, typography } = document;
-  const blockTexts = (...types: string[]) =>
-    blocks.filter((block) => types.includes(block.type)).map((block) => block.text);
-  const texts: Record<FontRole, string[]> = {
-    title: [hero.titleLine1],
-    titleAccent: [hero.titleLine2],
-    heading: blockTexts('heading'),
-    body: blockTexts('paragraph', 'card', 'note'),
-    signature: [signature.name],
-    ui: [hero.label, hero.sub, scene.enabled ? scene.hint : '', signature.sub],
-  };
-
+  const { typography } = document;
+  const texts = roleTexts(document);
   const faces = new Map<string, string>();
   for (const role of FONT_ROLES) {
     const text = texts[role].join('');

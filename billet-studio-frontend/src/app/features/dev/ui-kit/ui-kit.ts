@@ -44,13 +44,13 @@ const TABS: readonly TabDef[] = [
 
 const SAMPLE_ROWS = [
   {
-    titleKey: 'UI_KIT.OCCASION_MOTHERS_DAY',
+    titleKey: 'UI_KIT.OCCASION_BIRTHDAY',
     statusKey: 'UI_KIT.STATUS_PUBLISHED',
     badge: 'ui-badge--success',
     updatedAt: '2026-05-08T09:30:00Z',
   },
   {
-    titleKey: 'UI_KIT.OCCASION_BIRTHDAY',
+    titleKey: 'UI_KIT.OCCASION_VALENTINES',
     statusKey: 'UI_KIT.STATUS_DRAFT',
     badge: 'ui-badge--muted',
     updatedAt: '2026-06-14T17:05:00Z',
