@@ -109,19 +109,13 @@
 // ---- Toast region as a manual popover -------------------------------------------------------
 
 // In the top layer, so a toast raised while a modal <dialog> is open shows above it. These undo the
-// UA popover box; the placement stays .ui-toast-region's.
+// rest of the UA popover box; .ui-toast-region sets its inset, size and margin itself.
 .ui-toast-region[popover] {
-    inset-block-start: auto;
-    margin: 0;
     padding: 0;
     overflow: visible;
     border: 0;
     background: none;
     color: inherit;
-
-    @include bp.down(sm) {
-        inline-size: auto;
-    }
 }
 
 // ---- Password toggle (shared/directives/password-toggle.ts) ---------------------------------

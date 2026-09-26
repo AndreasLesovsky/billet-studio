@@ -98,7 +98,7 @@ public class BilletService {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet()));
         return rows.stream()
-            .map(row -> new BilletSummaryDto(row.id(), row.title(), row.modelSlug(),
+            .map(row -> new BilletSummaryDto(row.id(), row.title(), row.theme(), row.modelSlug(),
                 previewOf(row.modelSlug(), previews),
                 row.published(), Boolean.TRUE.equals(row.hasUnpublishedChanges()), row.shareToken(),
                 row.publishedAt(), row.createdAt(), row.updatedAt()))
@@ -184,9 +184,9 @@ public class BilletService {
         List<Billet> billets = billetRepository.saveAll(checked.stream().map(c -> newBillet(owner, c)).toList());
         log.info("Billets imported: count={}, userId={}", billets.size(), owner.getId());
         return new BilletImportResponse(billets.stream()
-            .map(billet -> new BilletSummaryDto(billet.getId(), billet.getTitle(), billet.getModelSlug(),
-                previewOf(billet.getModelSlug(), previews), false, false, null, null, billet.getCreatedAt(),
-                billet.getUpdatedAt()))
+            .map(billet -> new BilletSummaryDto(billet.getId(), billet.getTitle(), billet.getTheme(),
+                billet.getModelSlug(), previewOf(billet.getModelSlug(), previews), false, false, null, null,
+                billet.getCreatedAt(), billet.getUpdatedAt()))
             .toList());
     }
 
@@ -205,9 +205,7 @@ public class BilletService {
         CheckedDocument checked = check(document, "document");
         requireModel(checked);
 
-        billet.setDocument(checked.json());
-        billet.setTitle(checked.document().title());
-        billet.setModelSlug(checked.modelSlug());
+        copyDocument(billet, checked);
         flush(billet);
         return new BilletSaveResponse(billet.getVersion(), billet.getUpdatedAt(), billet.hasUnpublishedChanges());
     }
@@ -337,10 +335,16 @@ public class BilletService {
     private Billet newBillet(User owner, CheckedDocument checked) {
         Billet billet = new Billet();
         billet.setUser(userRepository.getReferenceById(owner.getId()));
+        copyDocument(billet, checked);
+        return billet;
+    }
+
+    /** The draft and the columns the list reads instead of it. */
+    private static void copyDocument(Billet billet, CheckedDocument checked) {
         billet.setDocument(checked.json());
         billet.setTitle(checked.document().title());
+        billet.setTheme(checked.document().theme());
         billet.setModelSlug(checked.modelSlug());
-        return billet;
     }
 
     private static BilletDetailDto toDetail(Billet billet, BilletDocument document, ModelDto model) {

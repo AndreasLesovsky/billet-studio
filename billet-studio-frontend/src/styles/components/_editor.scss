@@ -14,9 +14,19 @@
     }
 }
 
+// The bottom tab bar's height without its safe-area padding: its tabs' height (their raised top
+// edge covers the bar's hairline), set above their content's so the bar is exactly this tall.
+$tab-bar-block-size: 3.25rem;
+
 .ui-editor-bar--bottom {
     border-block-start: 1px solid var(--ui-border);
     border-block-end: 0;
+}
+
+// The bar sits on the screen's bottom edge (phones, editor.scss), so the toasts - a top-layer
+// popover outside the editor - rise above it (.ui-toast-region). The editor skeleton's bar too.
+:root:has(.ui-editor-bar--bottom) {
+    --ui-toast-offset-block-end: calc(#{$tab-bar-block-size} + env(safe-area-inset-bottom, 0rem));
 }
 
 // A tab with its icon above the label, the active line on top (bottom tab bar).
@@ -25,7 +35,9 @@
     flex-direction: column;
     justify-content: center;
     gap: 0.125rem;
+    min-block-size: $tab-bar-block-size;
     min-inline-size: 0;
+    padding-block: 0;
     padding-inline: var(--ui-space-1);
     margin-block: -1px 0;
     border-block-start: 0.125rem solid transparent;
@@ -60,6 +72,13 @@
     border-radius: 2.75rem;
     background-color: var(--ui-border-strong);
     box-shadow: var(--ui-shadow-lg);
+
+    // The screen is focusable (the keyboard scrolls it). The device clips an outline and the preview
+    // zoom scales it down, so the whole bezel takes the focus ring's colour instead.
+    &:has(> .ui-device__screen:focus-visible) {
+        border-color: var(--ui-focus-ring);
+        background-color: var(--ui-focus-ring);
+    }
 }
 
 .ui-device--desktop {
@@ -75,6 +94,11 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
+
+    // Replaced by the bezel (.ui-device above).
+    &:focus-visible {
+        outline: none;
+    }
 }
 
 // ---- Sortable list (CDK drag and drop, preview kept in the list) ----------------------------

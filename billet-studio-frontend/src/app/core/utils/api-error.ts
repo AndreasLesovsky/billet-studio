@@ -10,3 +10,11 @@ export function apiErrorCode(error: unknown): string | null {
   const code: unknown = (body as Partial<ApiError>).errorCode;
   return typeof code === 'string' && code.length > 0 ? code : null;
 }
+
+/**
+ * The request got no answer at all (status 0): offline, the server down, or aborted. errorInterceptor
+ * leaves it unsaid, so an action the user started has to say it failed.
+ */
+export function isUnreachable(error: unknown): boolean {
+  return error instanceof HttpErrorResponse && error.status === 0;
+}

@@ -112,9 +112,9 @@ ModelDefaultsDto  { fitSize, yOffset, exposure, cameraDistance, cameraHeight, au
 ModelDto          { slug, nameDe, nameEn, occasion, fileUrl, previewUrl, fileSizeBytes, credit: string | null,
                     active: boolean, defaults: ModelDefaultsDto }
                   fileUrl / previewUrl = app.models.base-url + file_path / preview_path (absolute URLs)
-BilletSummaryDto  { id, title, modelSlug: string | null, previewUrl: string | null, published: boolean,
-                    hasUnpublishedChanges: boolean, shareToken: string | null, publishedAt: string | null,
-                    createdAt, updatedAt }
+BilletSummaryDto  { id, title, theme: string | null, modelSlug: string | null, previewUrl: string | null,
+                    published: boolean, hasUnpublishedChanges: boolean, shareToken: string | null,
+                    publishedAt: string | null, createdAt, updatedAt }
 BilletDetailDto   { id, version: number, document: BilletDocument, model: ModelDto | null, published: boolean,
                     hasUnpublishedChanges: boolean, shareToken: string | null, publishedAt: string | null,
                     createdAt, updatedAt }
@@ -132,6 +132,8 @@ PublicBilletDto     { document: BilletDocument, model: ModelDto | null, publishe
   draft JSON differs from the snapshot.
 - `model` is resolved from `document.scene.modelSlug` (also inactive models) when `scene.enabled`,
   else null. A slug that does not exist on write → 400 `UNKNOWN_MODEL`.
+- `BilletSummaryDto.theme` is the draft's `document.theme` (stored beside the document, like `title`
+  and `modelSlug`); null only for a billet stored before that column existed and not backfilled.
 - The share link is built by the frontend: `<frontendUrl>/b/<shareToken>`.
 
 ### `/v1/billets` (authenticated, owner only — another user's id is always 404 `BILLET_NOT_FOUND`)
@@ -160,6 +162,14 @@ are serialised, so a billet only ever gets one share token.
 |---|---|---|
 | GET | `` | 200 `ModelDto[]` — active only, ordered by `position` |
 | GET | `/{slug}` | 200 `ModelDto` (also inactive) / 404 `MODEL_NOT_FOUND` |
+
+### `/files/models/**` (public, static, optional)
+
+Outside `/v1`: the model files themselves, served only while `app.models.directory`
+(`MODELS_DIRECTORY`) is set; `app.models.base-url` then points at `https://<api-host>/files/`
+(README "Modelle vom Backend ausliefern"). GET only; `.glb` (`model/gltf-binary`) and `.webp`
+(`image/webp`), `Cache-Control: max-age=31536000, public, immutable`, CORS as for the API. Any
+other file, or no directory configured: 404 `NOT_FOUND`; a path with `..` (also encoded): 400.
 
 ### `/v1/public/billets` (public)
 

@@ -24,7 +24,7 @@ export interface BilletCardView {
   readonly title: string;
   readonly emoji: string;
   readonly preview: ModelPreview;
-  /** The theme's colours; empty where the list does not know the theme (an account billet). */
+  /** The theme's colours in the site's mode; empty where the theme is not known. */
   readonly swatches: readonly string[];
   /** "5 minutes ago", in the interface language. */
   readonly edited: string;
@@ -53,16 +53,28 @@ function editedAgo(updatedAt: string, now: number, locale: string): string {
   );
 }
 
+/** accent, accentSoft, background and ink of the theme's billet palette; none without a theme. */
+function themeSwatches(theme: string | null, mode: ColorMode): readonly string[] {
+  if (theme === null) return [];
+  const { accent, accentSoft, background, ink } = billetPresetFor(theme).palette[mode];
+  return [accent, accentSoft, background, ink];
+}
+
 export const accountLinkId = (id: number) => `billet-list-account-${id}`;
 export const localLinkId = (localId: string) => `billet-list-edit-${localId}`;
 
-/** An account billet's card; its preview comes with the summary. */
-export function accountCardOf(row: BilletSummaryDto, now: number, locale: string): BilletCardView {
+/** An account billet's card: its theme's colours; its preview comes with the summary. */
+export function accountCardOf(
+  row: BilletSummaryDto,
+  mode: ColorMode,
+  now: number,
+  locale: string,
+): BilletCardView {
   return {
     title: row.title,
     emoji: BLANK_EMOJI,
     preview: { src: row.previewUrl, pending: false },
-    swatches: [],
+    swatches: themeSwatches(row.theme, mode),
     edited: editedAgo(row.updatedAt, now, locale),
     facts: shareFactsOf(row),
     linkId: accountLinkId(row.id),
@@ -77,12 +89,11 @@ export function localCardOf(
   now: number,
   locale: string,
 ): BilletCardView {
-  const { accent, accentSoft, background, ink } = billetPresetFor(entry.theme).palette[mode];
   return {
     title: entry.title,
     emoji: entry.templateId ? TEMPLATES[entry.templateId].emoji : BLANK_EMOJI,
     preview: previewOf(previews, entry.modelSlug),
-    swatches: [accent, accentSoft, background, ink],
+    swatches: themeSwatches(entry.theme, mode),
     edited: editedAgo(entry.updatedAt, now, locale),
     facts: NOT_SHARED,
     linkId: localLinkId(entry.localId),
@@ -95,6 +106,7 @@ export function summaryOf(billet: BilletDetailDto): BilletSummaryDto {
   return {
     id,
     title: document.title,
+    theme: document.theme,
     modelSlug: document.scene.enabled ? document.scene.modelSlug : null,
     previewUrl: model?.previewUrl ?? null,
     ...shareFactsOf(billet),

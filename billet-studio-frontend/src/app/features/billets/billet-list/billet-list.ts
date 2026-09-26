@@ -75,7 +75,8 @@ export class BilletList {
     try {
       imported = await runPending(this.importing, () => this.account.import(documents));
     } catch (error) {
-      // BILLET_LIMIT_REACHED is answered here; errorInterceptor has toasted anything else.
+      // BILLET_LIMIT_REACHED is answered here; anything else has been toasted, by errorInterceptor
+      // or - for no answer at all - by AccountBillets.
       if (apiErrorCode(error) === 'BILLET_LIMIT_REACHED') {
         this.importRefused.set(true);
         this.account.reload();

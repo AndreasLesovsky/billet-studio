@@ -64,6 +64,22 @@ describe('Toast', () => {
     expect(toasts()[0].classList).toContain('ui-toast--danger');
   });
 
+  it('draws the list of the newest toast at the edge, and keeps it there while that toast leaves', () => {
+    const atEdge = () => root().querySelector('.toast-list--edge')?.getAttribute('aria-live');
+    store.showSessionWarning('SESSION_ENDING', Date.now() + 5 * 60_000);
+    render();
+    expect(atEdge()).toBe('assertive');
+
+    store.addMessage('success', 'SAVED');
+    render();
+    expect(atEdge()).toBe('polite');
+
+    // Swapping the lists now would pull the leaving toast across the warning.
+    store.removeMessage(store.messages().at(-1)!.id);
+    render();
+    expect(atEdge()).toBe('polite');
+  });
+
   it('an ordinary toast leaves by itself after AUTO_DISMISS_MS', () => {
     store.addMessage('success', 'SAVED');
     render();

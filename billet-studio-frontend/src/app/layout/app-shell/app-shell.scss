@@ -18,13 +18,14 @@
     }
 }
 
-// The global activity bar lies on the header's bottom border, over the active tab's underline; it
-// moves with the header and never takes layout space.
+// The global activity bar hangs just below the header's bottom border (100% is the header's padding
+// box, 1px its border), over the page's top edge: the active tab's underline on that border stays
+// whole. It moves with the header and never takes layout space.
 .shell__progress {
     position: absolute;
     z-index: 1;
+    inset-block-start: calc(100% + 1px);
     inset-inline: 0;
-    inset-block-end: -1px;
 }
 
 // Phones: brand + tools, the navigation as its own row below. From md: one row.

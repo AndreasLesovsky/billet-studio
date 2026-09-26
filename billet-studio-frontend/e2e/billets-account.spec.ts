@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { AccountBackend, SHARE_TOKEN } from './support/account-api';
+import { withoutWebGl } from './support/scene';
 
 // A guest's billet goes into the account at sign-in, is published and shared, and an edit made in
 // the editor is published as a change - saved first, so the link shows what the editor shows.
@@ -23,6 +24,7 @@ test.describe('billets in the account', () => {
     page.on('pageerror', (error) => pageErrors.push(error));
     backend = new AccountBackend();
     await backend.install(page);
+    await withoutWebGl(page);
   });
 
   test.afterEach(() => {

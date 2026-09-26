@@ -4,9 +4,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { isLoading } from '../../../core/interceptors/loading-interceptor';
 
 /**
- * The global activity bar: thin, indeterminate, on the site header's bottom edge (the app shell
- * places it). loadingInterceptor owns when it shows (after 300 ms, at least 400 ms); this only
- * renders it, and it is the only component that reads isLoading. Idle it is transparent and hidden
+ * The global activity bar: thin, indeterminate, just below the site header's bottom border (the app
+ * shell places it). loadingInterceptor owns when it shows (after 300 ms, at least 400 ms); this only
+ * renders it, and it is the only component that reads isLoading. Idle it is invisible and hidden
  * from assistive tech; it never takes layout space.
  */
 @Component({

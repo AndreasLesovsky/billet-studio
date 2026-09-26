@@ -1,5 +1,5 @@
 <section
-  class="ui-toast-region toast-region"
+  class="ui-toast-region"
   popover="manual"
   [attr.aria-label]="'COMMON.NOTIFICATIONS' | translate"
 >
@@ -7,12 +7,14 @@
     <ol
       class="toast-list"
       role="list"
+      [class.toast-list--edge]="list.edge"
       [attr.aria-live]="list.live"
     >
       @for (toast of list.toasts; track toast.id) {
         <li
           class="ui-toast"
           [class]="'ui-toast--' + toast.variant"
+          animate.leave="ui-toast--leaving"
           (pointerenter)="hold(toast.id, 'pointer')"
           (pointerleave)="release(toast.id, 'pointer')"
           (focusin)="hold(toast.id, 'focus')"

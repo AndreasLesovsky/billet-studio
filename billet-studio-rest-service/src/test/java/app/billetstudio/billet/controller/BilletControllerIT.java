@@ -500,8 +500,11 @@ class BilletControllerIT extends WebITBase {
 
         ObjectNode otherModel = lowerCase.deepCopy();
         node(otherModel, "/scene").put("modelSlug", OTHER_MODEL);
+        otherModel.put("theme", "midnight");
         MvcResult modelChanged = save(anna, id, body(caseOnly).get("version").asLong(), otherModel);
         assertThat(status(modelChanged)).isEqualTo(200);
+        assertThat(summaryOf(anna, id).get("theme").asString()).as("the list shows the draft's theme")
+            .isEqualTo("midnight");
 
         JsonNode stillShared = body(publicBillet(token));
         assertThat(stillShared.at("/document/hero/titleLine2").asString()).isEqualTo("Mama");

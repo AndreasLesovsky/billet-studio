@@ -1,18 +1,19 @@
-// Placement only; every visual comes from .ui-toast-region / .ui-toast.
-@use '../../../../styles/breakpoints' as bp;
+// Layout only; placement and every visual come from .ui-toast-region / .ui-toast.
 
-// Phones: along the bottom edge, where the thumb is (.ui-toast-region's default). From sm up: top
-// right, under the header.
-.ui-toast-region.toast-region {
-    @include bp.up(sm) {
-        inset-block: calc(var(--ui-header-height) + var(--ui-space-3)) auto;
-    }
-}
-
+// Both live regions share one stack. Each list runs oldest to newest, and the list that holds the
+// newest toast lies at the bottom edge (`edge`, toast.ts), so the newest toast is nearest the edge.
 .toast-list {
     display: flex;
     flex-direction: column;
-    gap: var(--ui-space-2);
+}
+
+.toast-list--edge {
+    order: 1;
+}
+
+// Space above every toast rather than a gap, so an empty list adds none.
+.toast-list > .ui-toast {
+    margin-block-start: var(--ui-space-2);
 }
 
 .toast__countdown {

@@ -78,6 +78,8 @@ public class SecurityConfig {
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(SWAGGER_PATHS).permitAll()
                 .requestMatchers("/uploads/**", "/actuator/health").permitAll()
+                // Served by WebConfig only while app.models.directory is set; a 404 otherwise.
+                .requestMatchers(HttpMethod.GET, "/files/models/**").permitAll()
                 // Everything under /v1/auth authorises itself: login by credentials, refresh and logout by
                 // the refresh cookie. None of them may require a working access token.
                 .requestMatchers("/v1/auth/**").permitAll()

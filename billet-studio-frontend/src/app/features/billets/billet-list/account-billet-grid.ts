@@ -5,6 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { BilletSummaryDto } from '../../../core/models/models';
 import { LanguageService } from '../../../core/services/language-service';
 import { ConfirmationModalStore } from '../../../core/stores/confirmation-modal-store';
+import { ColorModeService } from '../../../core/theme/color-mode-service';
 import { runPendingFor } from '../../../core/utils/pending';
 import { ShareDialog } from '../../../shared/components/share-dialog/share-dialog';
 import type { ShareTarget } from '../../../shared/components/share-dialog/share-state';
@@ -24,6 +25,7 @@ import { accountCardOf, accountLinkId } from './billet-list-state';
 })
 export class AccountBilletGrid {
   protected readonly account = inject(AccountBillets);
+  private readonly colorMode = inject(ColorModeService);
   private readonly language = inject(LanguageService);
   private readonly translate = inject(TranslateService);
   private readonly confirmation = inject(ConfirmationModalStore);
@@ -34,9 +36,10 @@ export class AccountBilletGrid {
   readonly countId = input.required<string>();
 
   protected readonly cards = computed(() => {
+    const mode = this.colorMode.resolvedMode();
     const locale = this.language.locale();
     const now = Date.now();
-    return this.rows().map((row) => ({ row, view: accountCardOf(row, now, locale) }));
+    return this.rows().map((row) => ({ row, view: accountCardOf(row, mode, now, locale) }));
   });
 
   /** The billet whose copy is being made; the other copies wait. */
@@ -48,7 +51,7 @@ export class AccountBilletGrid {
     try {
       await runPendingFor(this.duplicating, row.id, () => this.account.duplicate(row.id));
     } catch {
-      // errorInterceptor has said why.
+      // errorInterceptor has said why, or AccountBillets that there was no answer.
     }
   }
 

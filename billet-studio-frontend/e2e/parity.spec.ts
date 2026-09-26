@@ -4,13 +4,15 @@ import { writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 
 import { mockBilletApi, PARITY_DOCUMENT, publicBillet } from './support/billet-api';
+import { withoutWebGl } from './support/scene';
 
 // The Muttertag document on the public page vs. the snapshot of the live card
 // (e2e/fixtures/muttertag-original, CLAUDE.md §11): same boxes, same type, same pixels. Both pages
-// render without their entrance, without petals and with the 3D area masked - the canvas is empty
-// in the snapshot (no GLB) and the model spins in ours.
+// render without their entrance, without petals and with the 3D area masked, so neither draws 3D:
+// the snapshot's three.js (from its CDN) is blocked and ours runs without WebGL.
 
 const ORIGINAL_URL = 'http://localhost:4321/index.html';
+const ORIGINAL_THREE = 'https://cdn.jsdelivr.net/**';
 const OURS_URL = '/b/parity-token';
 
 const VIEWPORTS = [
@@ -229,15 +231,19 @@ function geometryDiffs(original: (Measure | null)[], ours: (Measure | null)[]): 
 /** Both pages must have the card's faces, or the comparison would be one of fallback fonts. */
 const CARD_FACES = ['Cormorant Garamond normal', 'Cormorant Garamond italic', 'Jost normal'];
 
-/** Applies the test CSS and waits for the fonts; answers the faces that loaded. */
-async function settle(page: Page, css: string): Promise<string[]> {
+/** The faces the page has loaded, as `family style`. */
+function loadedFaces(): string[] {
+  return [...document.fonts]
+    .filter((face) => face.status === 'loaded')
+    .map((face) => `${face.family.replaceAll('"', '')} ${face.style}`);
+}
+
+/** Applies the test CSS and waits until the card's faces are in (the snapshot's from Google Fonts). */
+async function settle(page: Page, css: string): Promise<void> {
   await page.addStyleTag({ content: css });
-  return page.evaluate(async () => {
-    await document.fonts.ready;
-    return [...document.fonts]
-      .filter((face) => face.status === 'loaded')
-      .map((face) => `${face.family.replaceAll('"', '')} ${face.style}`);
-  });
+  await expect
+    .poll(() => page.evaluate(loadedFaces), { message: 'the card faces load', timeout: 15_000 })
+    .toEqual(expect.arrayContaining(CARD_FACES));
 }
 
 async function screenshot(page: Page, mask: Locator): Promise<PNG> {
@@ -276,14 +282,16 @@ for (const viewport of VIEWPORTS) {
 
       test('the Muttertag billet matches the live card', async ({ page, context }, testInfo) => {
         const original = await context.newPage();
-        await original.goto(ORIGINAL_URL, { waitUntil: 'networkidle' });
-        expect(await settle(original, ORIGINAL_CSS)).toEqual(expect.arrayContaining(CARD_FACES));
+        await original.route(ORIGINAL_THREE, (route) => route.abort('blockedbyclient'));
+        await original.goto(ORIGINAL_URL);
+        await settle(original, ORIGINAL_CSS);
 
         await mockBilletApi(page, { 'parity-token': publicBillet(PARITY_DOCUMENT) });
+        await withoutWebGl(page);
         await page.goto(OURS_URL);
+        // The page shows the billet only once its fonts are in (public-billet.ts).
         await expect(page.locator('app-billet-view .signature-sub')).toBeVisible();
-        await page.waitForLoadState('networkidle');
-        expect(await settle(page, OURS_CSS)).toEqual(expect.arrayContaining(CARD_FACES));
+        await settle(page, OURS_CSS);
 
         const probes = (side: 'original' | 'ours') => PAIRS.map((pair) => pair[side]);
         const diffs = geometryDiffs(

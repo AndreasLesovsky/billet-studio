@@ -2,7 +2,11 @@ import type { Page, Route } from '@playwright/test';
 
 import { apiError, CORS_HEADERS, MODEL_CATALOG, modelLibraryAnswer } from './guest-api';
 
-type BilletDocument = { title: string; scene: { enabled: boolean; modelSlug: string } };
+type BilletDocument = {
+  title: string;
+  theme: string;
+  scene: { enabled: boolean; modelSlug: string };
+};
 
 interface StoredBillet {
   readonly id: number;
@@ -149,11 +153,12 @@ export class AccountBackend {
   }
 
   private summary(billet: StoredBillet) {
-    const { scene, title } = billet.document;
+    const { scene, title, theme } = billet.document;
     const modelSlug = scene.enabled ? scene.modelSlug : null;
     return {
       id: billet.id,
       title,
+      theme,
       modelSlug,
       previewUrl: MODEL_CATALOG.find((m) => m.slug === modelSlug)?.previewUrl ?? null,
       ...this.shareFacts(billet),

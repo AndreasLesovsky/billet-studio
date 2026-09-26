@@ -17,7 +17,7 @@ import { LoadingBar } from '../../shared/components/loading-bar/loading-bar';
 /**
  * The chrome around every page except the shared billet (see BareLayout): header with wordmark,
  * main navigation, language switch, colour-mode menu and account menu, and the global activity bar
- * on its bottom edge; the breadcrumb above the routed page; a minimal footer. The site has one
+ * just below it; the breadcrumb above the routed page; a minimal footer. The site has one
  * fixed design (the Studio theme), so the header offers the colour mode only, never a theme.
  */
 @Component({

@@ -9,11 +9,10 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import type { BilletDocument } from '../../billet/billet-document';
 import type { BilletSaveResponse } from '../../core/models/models';
-import { apiErrorCode } from '../../core/utils/api-error';
+import { apiErrorCode, isUnreachable } from '../../core/utils/api-error';
 import { removeBackup, writeBackup } from './billet-backup';
 import { createSaveTimer, flushOnPageLeave } from './save-timer';
 
@@ -49,8 +48,6 @@ export interface SaveCoordinatorOptions {
 }
 
 const isConflict = (error: unknown) => apiErrorCode(error) === 'BILLET_MODIFIED_ELSEWHERE';
-/** Status 0: the request never got an answer (no network, server down, blocked). */
-const isUnreachable = (error: unknown) => error instanceof HttpErrorResponse && error.status === 0;
 
 /**
  * Saves one account billet (CLAUDE.md section 23): shortly after each edit and at least every

@@ -46,17 +46,21 @@ billet-studio/
 ├── billet-studio-frontend/        Angular 22, zoneless, Signal Forms, vitest
 │   ├── src/app/core/              services (*-api.ts), interceptors, guards, stores, forms, utils,
 │   │                              models (= API DTOs only)
-│   ├── src/app/features/          routed pages (auth, account, admin, editor, billet-list, public-billet)
+│   ├── src/app/features/          routed pages (home, templates, auth, account, admin, editor,
+│   │                              billets/billet-list, public-billet, not-found, dev = dev builds only)
 │   ├── src/app/shared/            reusable components / directives
 │   ├── src/app/layout/            app-shell, bare layout
 │   ├── src/app/billet/            the renderer: document, migration, markup, palette, view, particles, scene
 │   ├── src/styles/                token + CSS component layer (the only place colors are applied)
 │   ├── public/i18n/               de.json, en.json
 │   ├── public/models/             optimized GLBs + WebP previews (pipeline output)
-│   └── public/fonts/              woff2 fonts (pipeline output)
+│   ├── public/fonts/              woff2 fonts (pipeline output)
+│   └── e2e/                       Playwright: mocked suite, parity, axe, backend suite (section 21)
 ├── billet-studio-rest-service/    Spring Boot 4, package app.billetstudio: auth/, shared/, catalog/, billet/
 ├── sql/                           schema.sql, seed_*.sql, migrations/ - the USER runs them
+├── docs/                          api-contract.md, billet-document.md, fixtures/ (Muttertag document)
 ├── tools/asset-pipeline/          own package.json; generates models, previews, fonts, seed_models.sql
+├── docker-compose.e2e.yml         throwaway MariaDB (3307) for the backend e2e suite
 ├── CLAUDE.md  README.md  .env.example
 ```
 
@@ -79,8 +83,13 @@ Read-only sources outside the repo (never modify anything there):
   skeleton from the component's own resource for its data, a pending button for an action. No
   component reads the global `isLoading`.
 - DE and EN i18n files always have identical keys.
+- **No unnecessary tests** (user rule, section 21): a test guards behaviour that can realistically
+  break and would hurt; when in doubt, leave it out and say so.
+- **The user's dev stack is his** (frontend 4200, backend 8080, `db_billet_studio` on 3306): never
+  stopped, never a test target. Tests run on Testcontainers and the e2e ports 4320 / 4321 / 8081 /
+  3307 (section 21).
 - `npm test -- --no-watch` is judged by its **exit code**.
-- Commit locally per verified phase; **no push** until the user links a remote.
+- Commit per verified phase and push it to `origin main`; never force-push (section 25).
 
 ---
 
@@ -466,7 +475,8 @@ Two token families that never touch each other:
 - Color values exist only in `themes.json` (Studio + billet presets) and in billet palettes
   (document data and templates). No hex/rgb/hsl literals in component SCSS or templates. Preset or
   palette colours shown outside a billet (the theme picker's mini billets, template and palette
-  swatches, the dev ui-kit's preset samples) are data and bound inline.
+  swatches, the billet list's theme swatches in the site's `resolvedMode()`, the dev ui-kit's preset
+  samples) are data and bound inline.
 - The CSS component layer in `src/styles/` (`ui-btn`, `ui-field`, `ui-card`, `ui-tabs`, `ui-switch`,
   `ui-range`, `ui-dialog`, `ui-toast`, `ui-menu`, `ui-skeleton`, …) is the only place that applies
   `--ui-*` colors. Component classes are prefixed `ui-`.
@@ -588,8 +598,9 @@ The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document
   both sides in the same commit.
 
 ### Error handling architecture - CRITICAL
-Three layers handle errors and feedback globally. No error toasts in components; what a component
-shows while loading or saving follows "Loading states" (section 20).
+Three layers handle errors and feedback globally. No error toasts in components (one sanctioned
+exception: "Status 0" below); what a component shows while loading or saving follows "Loading
+states" (section 20).
 
 **Backend:** `GlobalExceptionHandler` (extends `ResponseEntityExceptionHandler`) returns
 `ApiError { errorCode, status, timestamp }` for everything, including framework errors (malformed
@@ -620,6 +631,14 @@ through the interceptor again → deadlock (no translations, an endless activity
 
 **Components** `await` service calls. They `try/catch` only when they must react (revert UI, offer
 "reload / keep mine" on a 409); otherwise the toast is already there.
+
+**Status 0 (no answer at all)** - offline, server down, or a request aborted by navigation - is
+NOT toasted by `errorInterceptor` (an aborted request is no error to show). An action the user
+started that would otherwise fail silently wraps its call and, on `isUnreachable(error)`
+(`core/utils/api-error.ts`), adds `MESSAGES.ERROR.SERVER_UNREACHABLE` and rethrows - today the
+billet list's import, duplicate, delete and unpublish (`AccountBillets.answered`). This is the one
+sanctioned error toast outside the interceptor; it still uses a `MESSAGES.ERROR` code. A flow that
+shows its failures inline (the share dialog, the editor's save status) needs none.
 
 **Adding an error code:** exception (extends `ApiException`) → handled by `GlobalExceptionHandler` →
 `MESSAGES.ERROR.<CODE>` in `de.json` AND `en.json`.
@@ -657,9 +676,19 @@ through the interceptor again → deadlock (no translations, an endless activity
   database or executes SQL - no `mysql` CLI, no JDBC scripts, no phpMyAdmin automation, not even
   read-only queries. After delivering SQL, tell the user which files to run, in which order.
 - Hibernate `ddl-auto` stays **`none`** in every profile.
-- Fresh install: `sql/schema.sql` + `sql/seed_roles.sql` + `sql/seed_models.sql`.
+- Fresh install: `sql/schema.sql` + `sql/seed_roles.sql` + `sql/seed_models.sql` - never the
+  migrations (their changes are already folded in). An existing database runs only the migrations
+  newer than it, in date order.
 - A schema change is a new file `sql/migrations/<YYYY-MM-DD>_<name>.sql` **and** the same change
   folded into `schema.sql`, in one commit.
+- Every change to catalog DATA (new model, changed scene defaults, rebuilt GLB with a new size) updates
+  `sql/seed_models.sql` (fresh databases) AND ships a dated `sql/migrations/<YYYY-MM-DD>_<name>.sql`
+  with only the changed rows, so the user never has to re-run the whole seed (user rule).
+- A migration's header names its target database, what it changes, when it is needed, whether it
+  must run BEFORE a backend built from the same change starts (a new column the backend reads), and
+  anything MariaDB-only. Make it safe to run twice where SQL allows (`ADD COLUMN IF NOT EXISTS`,
+  a backfill limited to rows still `NULL`, `UPDATE … WHERE slug = …`), and leave `version` /
+  `updated_at` alone in backfills (open editors keep their draft version).
 - Target MariaDB 10.4 (XAMPP), stay MySQL 8.0.16+ compatible; mark anything MariaDB-only in the file
   header.
 - InnoDB, `utf8mb4` / `utf8mb4_unicode_ci`. Constraint names are table-prefixed:
@@ -683,18 +712,20 @@ through the interceptor again → deadlock (no translations, an endless activity
 - Sources are **read-only**: `digital-card-template/`, `muttertag_threejs/` (bouquet),
   `Basisrezept/fonts`, `commerce-x/.../public/fonts`. The pipeline reads from them and writes only
   into this repo.
-- Output: `public/models/<slug>.v<n>.glb` + WebP preview; meshopt + WebP textures, max 2048 px;
-  ≤ 6 MB per model (bouquet ≤ 8 MB). Changing a model's content bumps `v<n>` (cache busting) and
-  regenerates the seed.
+- Output: `public/models/<slug>.v<n>.glb` + `public/models/previews/<slug>.v<n>.webp`; meshopt +
+  WebP textures, max 2048 px; ≤ 6 MB per model (bouquet ≤ 8 MB). Changing a model's content bumps
+  `v<n>` (cache busting: the files are served `immutable`, so a URL never changes its content) and
+  regenerates the seed plus a catalog migration (section 15). New Blender models: the checklist in
+  `tools/asset-pipeline/README.md`.
 - `tbl_models` stores relative paths only; where the files are served from is
-  `app.models.base-url` (`MODELS_BASE_URL`). Moving the files never needs SQL.
+  `app.models.base-url` (`MODELS_BASE_URL`). Moving the files never needs SQL. The backend serves
+  them itself once `app.models.directory` (`MODELS_DIRECTORY`) is set: `GET /files/models/**`,
+  runbook in README "Modelle vom Backend ausliefern".
 - Slugs are permanent (billet documents reference them). Credits come from the GLB's `asset.extras`.
+- While the backend serves the models, a new version's files are copied to `MODELS_DIRECTORY`
+  BEFORE its SQL runs, or the catalog points at a file that is not there yet.
 
 ---
-
-- Every change to catalog DATA (new model, changed scene defaults, rebuilt GLB with a new size) updates
-  `sql/seed_models.sql` (fresh databases) AND ships a dated `sql/migrations/<YYYY-MM-DD>_<name>.sql`
-  with only the changed rows, so the user never has to re-run the whole seed (user rule).
 
 ## 17. Internationalization (i18n)
 
@@ -750,12 +781,13 @@ Accepted exception: register answers 409 `EMAIL_ALREADY_EXISTS` (sign-up UX), li
   PUT/PATCH/DELETE bodies unbounded, before authentication (pinned by `ServletContainerTest`).
 - Rate-limit buckets are keyed by `ClientIp.rateLimitKey`: IPv4 address, IPv6 /64, IPv4-mapped IPv6 as
   IPv4; audit logs keep the full IP. Buckets that refilled are swept every 10 minutes.
-- Every free-text field of the billet document carries `@NoControlCharacters` (only `
-` allowed;
-  tab, CR, other C0 and DEL are `VALIDATION_ERROR`). The editor strips `
-` and turns tabs into spaces
-  on input, and shortens text only at code-point/grapheme boundaries.
+- Every free-text field of the billet document carries `@NoControlCharacters` (only `\n` allowed;
+  tab, CR, other C0 and DEL are `VALIDATION_ERROR`). The editor strips `\r` and turns tabs into
+  spaces on input, and shortens text only at code-point/grapheme boundaries.
 - The first publish of a billet takes a pessimistic row lock, so a billet only ever gets one share token.
+- `/files/models/**` (`WebConfig`) exists only while `app.models.directory` is set - a blank value never
+  falls back to a directory (it would publish the working directory) - and serves only `.glb` / `.webp`
+  from it (`ModelFilesTest`).
 
 ### Application rules
 - No HTML-string sinks (section 11). User content is text, always.
@@ -790,6 +822,11 @@ When in doubt about a file, treat it as forbidden and ask.
 ## 19. Accessibility
 
 - MUST pass all axe checks and WCAG 2.2 AA: focus management, contrast, ARIA, keyboard operation.
+  `e2e/a11y.spec.ts` runs axe (wcag2a, wcag2aa, wcag21aa) on every page and on the states that add
+  UI (menus, dialogs, pickers, the editor on a phone, `/b/:token` in both modes). A new page or
+  overlay gets a scan there; an exception goes into its `ACCEPTED` list with rule, target and reason.
+- A scrolling area whose content may have nothing to focus is itself focusable (`tabindex="0"`,
+  a role and a label), like the editor preview's device screen.
 - **rem only**; the UI must survive 200 % zoom and text scaling.
 - Every interaction works by keyboard: drag-and-drop block sorting has move up/down buttons; the
   color picker's saturation field and hue slider are arrow-key operable; dialogs return focus to
@@ -839,7 +876,7 @@ Three kinds of waiting, each with its own indicator and its own source (user dec
 
 | What waits | Indicator | Driven by |
 |---|---|---|
-| Global activity (any request) | thin indeterminate bar on the site header's bottom edge (`app-loading-bar`, `.ui-progress`) | `isLoading` of `loadingInterceptor` (after 300 ms, ≥ 400 ms) |
+| Global activity (any request) | thin indeterminate bar just below the site header's bottom border (`app-loading-bar`, `.ui-progress`) | `isLoading` of `loadingInterceptor` (after 300 ms, ≥ 400 ms) |
 | A component's backend data | skeletons in the data's place (`.ui-skeleton*`, `app-field-skeleton`, the thumb's `pending`) | the component's OWN source: `resource()` / `httpResource()` (`isLoading()`, `hasValue()`, `error()`) or its own ready signal |
 | A user action (save, upload, delete, a dialog's confirm) | its button: disabled in its variant colour, `aria-busy`, pending label (`COMMON.PENDING.*`) | a local signal per action, run as `runPending(saving, () => api.save(dto))` (`core/utils/pending.ts`) |
 
@@ -867,6 +904,17 @@ Three kinds of waiting, each with its own indicator and its own source (user dec
   label `{{ (saving() ? 'COMMON.PENDING.SAVING' : 'X.SAVE') | translate }}` (a `computed` when the
   keys themselves vary); `ui-btn` swaps the leading icon for a spinner. A dialog that runs the action
   cannot be dismissed meanwhile; the confirmation dialog takes a `pendingLabel`.
+
+### Toasts and the activity bar (placement)
+- Toasts come only from `MessageStore` (section 13) through `app-toast`, a top-layer popover. They
+  sit at the bottom - centred on phones, bottom right from `md` - never at the top, where the
+  editor's action bar is. A new toast raises the region above an open modal `<dialog>`, so a failure
+  inside a confirmation dialog is seen. A bar fixed to the screen's bottom lifts them with
+  `--ui-toast-offset-block-end` (the editor's phone tab bar). Details: Design system reference,
+  "Feedback".
+- The activity bar hangs just below the site header's bottom border, over the page's top edge: it
+  takes no layout space and never covers the active tab's underline (Design system reference,
+  "Loading").
 
 ---
 
@@ -906,11 +954,36 @@ named test accounts), never a test fixture and never touched with SQL.
 
 ### Backend (JUnit 5)
 - Unit tests with Mockito; integration tests `*IT` with MockMvc + Testcontainers MariaDB (Docker).
-- Run `mvnw.cmd test` (Windows) / `./mvnw test`; a phase is green only when the whole suite is.
+- Run `mvnw.cmd test` (Windows) / `./mvnw test`; a phase is green only when the whole suite is,
+  with the ITs really run (Testcontainers' "Found Docker environment", `Skipped: 0`; section 18).
+- Behaviour only a real servlet container shows (the `/error` forward, container mime types,
+  response headers after Spring Security) is tested with `RANDOM_PORT` (`ServletContainerTest`,
+  `ModelFilesTest`), not MockMvc.
+- Building the backend (`test`, `package`) writes `target/classes`, which a running
+  `spring-boot:run` with devtools watches: the user's dev backend may restart. Acceptable; say so.
 
 ### e2e (Playwright)
 - Parity test (Muttertag template vs. original), guest flow, login/import/publish flow, session
-  flows. Run output (`test-results/`, `playwright-report/`) is never committed.
+  flows, axe (`a11y.spec.ts`). Run output (`test-results/`, `playwright-report/`, `e2e/artifacts/`)
+  is never committed.
+- Two stacks, both beside a running dev stack and never touching it:
+  - `npm run e2e` (`playwright.config.ts`): **mocked** - the specs answer every `/v1` request
+    themselves (`e2e/support/*-api.ts`); `ng serve` on 4320, the live card's snapshot on 4321. No
+    Docker, no backend. Projects `chromium` and `parity` (one worker).
+  - `npm run e2e:backend` (`playwright.backend.config.ts`): the account flows (`BACKEND_SPECS`,
+    today `account-flows.spec.ts`) against the **real backend** - MariaDB 10.11 from
+    `docker-compose.e2e.yml` on 3307 (`db_billet_studio_e2e` in RAM, built from `schema.sql` +
+    seeds, no migrations), the built jar on 8081 (run from `e2e/artifacts/backend/`, so no
+    `.env.local` feeds it; refused when older than the backend sources) and `ng serve` on 4320.
+    Requests to 8080 are blocked. `npm run e2e:down` removes the database.
+  - After a backend change rebuild the jar (`mvnw -DskipTests package`) before `e2e:backend`; after
+    a schema change run `e2e:down` first, because a running e2e database keeps its old schema.
+- Stable under parallel workers (headless Chromium renders WebGL in software): reduced motion for
+  every spec (`playwright.config.ts`), and a spec that asserts nothing about the 3D calls
+  `withoutWebGl(page)` (`e2e/support/scene.ts`; the scene keeps its preview image). The parity spec
+  runs in its own one-worker project. `ng serve` runs without watch and HMR, so an edit made during
+  a run never reloads a page mid-test.
+- Wait on app state (web-first assertions, `expect.poll`), never on `networkidle` or a fixed timeout.
 
 ### When to skip tests
 CSS/theme-only changes (the contrast spec still runs), one-line typo or i18n fixes, pure markup
@@ -959,10 +1032,11 @@ Ignore findings in files you did not touch. Skip for CSS/theme-only changes and 
 
 ## 25. Git
 
-- Local repository. **Commit after each verified phase** (tests/build green, user check done), plus
-  follow-up fix commits as needed, e.g. `P1: port auth module`.
-- **No `git push` and no `git remote add`** - the user links a remote himself; until then everything
-  stays local.
+- **Commit after each verified phase** (tests/build green, user check done), plus follow-up fix
+  commits as needed, e.g. `P1: port auth module`.
+- Remote `origin` = `github.com/AndreasLesovsky/billet-studio` (linked by the user). After a verified
+  phase commit: `git push origin main` (user decision). Never force-push, no other branches, no
+  other remotes (`git remote add` stays the user's).
 - Never commit secrets or local state: `.env.local`, `.env.production`, uploads, logs and DB dumps
   are gitignored - keep it that way. `public/env.js` is tracked only as the empty local placeholder;
   it never holds real values in the repo.
@@ -1059,7 +1133,10 @@ stale `billet-studio.theme` key from earlier builds is ignored).
   (ink) and a sample word in the titleAccent face and `accent`, a body line in the body face and
   `inkSoft`, and four dots in the first `particleColors`. Those colours and fonts are preset data,
   bound inline (font stacks from `billet/typography.ts`); the card's outline, selection ring and
-  name are Studio. An unknown value shows the default theme checked without writing back.
+  name are Studio. The card is `aria-hidden` (a picture of the preset; the radio is named by the
+  Studio label), so its sample word's contrast (preset `accent` on `accentSoft`, ≥ 3:1) is an
+  accepted exception in `e2e/a11y.spec.ts`. An unknown value shows the default theme checked
+  without writing back.
 - `ColorModeMenu` (`app-color-mode-menu`): the header's icon button + CDK menu of
   `menuitemradio` items (i18n `COLOR_MODE.*`).
 - Billet presets: every theme in `themes.json` carries a `billet` block (`light`/`dark`
@@ -1134,9 +1211,18 @@ uses `-ink` on `-soft`.
   (`cdk.overlay()` is included globally), `ui-table-wrap` > `ui-table` (+ `__actions` cell).
 - **Feedback:** `ui-alert` (+ `--info --success --warning --danger`, `__title`), `ui-badge`
   (+ `--accent --muted --success --warning --danger`), `ui-avatar` (+ `--sm --lg --xl`),
-  `ui-toast-region` > `ui-toast` (+ variants, `__body`).
+  `ui-toast-region` > `ui-toast` (+ variants, `__body`, `--leaving`). Toasts (only `app-toast`, a
+  top-layer popover) sit at the bottom: centred on phones (< md, full width minus the gutters,
+  at most 32rem), bottom right from md (24rem) - never at the top, where the editor's action bar
+  is. Newest nearest the edge (the list of the newest arrival lies there; a leaving toast never
+  reorders the stack). They rise in from the bottom and sink out (`animate.leave`), reduced
+  motion: fade only. A bar fixed to the bottom of the screen sets `--ui-toast-offset-block-end`
+  on `:root` to lift them above it (the editor's phone tab bar does, `_editor.scss`).
 - **Loading** (section 20, "Loading states"): `ui-progress` (+ `--active`, `__bar`,
-  `__bar--short`; only in `app-loading-bar`; reduced motion: one slowly pulsing bar); `ui-skeleton`
+  `__bar--short`; only in `app-loading-bar`; transparent track, only the moving segments show;
+  the app shell hangs it full width just below the header's bottom border, sticky with the header
+  and over the page's top edge, so it never covers the active tab's underline and takes no layout
+  space; reduced motion: one slowly pulsing bar in the same place); `ui-skeleton`
   (a faint ink tint with a shimmer, readable on any plane in both modes) + `--text` (one line in the
   type of the class it is combined with, e.g. `ui-hint`), `--short` / `--medium` (40 / 70 %
   wide), `--control`, `--button` (+ `--sm`, `--icon`), `--circle`, `--pill`; `ui-skeleton-lines`

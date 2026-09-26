@@ -230,7 +230,8 @@
       "ZOOM_FIT": "Fit to view",
       "ZOOM_LEVEL": "{{percent}}%",
       "ZOOM_FIT_LABEL": "{{percent}}% – fit to view",
-      "ZOOM_STATUS": "Zoom {{percent}}%"
+      "ZOOM_STATUS": "Zoom {{percent}}%",
+      "SCREEN": "Billet preview"
     },
     "CONTENT": {
       "PAGE": "Page",
@@ -805,6 +806,7 @@
       "MODEL_NOT_FOUND": "3D model not found.",
       "SESSION_EXPIRED": "Your session has expired. Please log in again.",
       "UNKNOWN_ERROR": "An unknown error occurred.",
+      "SERVER_UNREACHABLE": "No connection to the server. Please check your internet connection and try again.",
       "LOCAL_BILLET_LIMIT_REACHED": "This device holds up to {{max}} billets. Delete one to create a new one.",
       "LOCAL_STORAGE_FULL": "This browser's storage is full. Delete a billet to make room.",
       "LOCAL_STORAGE_UNAVAILABLE": "This browser does not allow saving (for example in private mode). Your billets cannot be stored here.",

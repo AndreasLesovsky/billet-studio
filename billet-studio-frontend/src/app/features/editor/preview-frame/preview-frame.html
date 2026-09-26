@@ -88,7 +88,13 @@
       [class.preview__frame--desktop]="device() === 'desktop'"
       [style.--preview-zoom]="zoom()"
     >
-      <div class="ui-device__screen">
+      <!-- Scrolls the billet, which may have nothing to focus: the keyboard scrolls it from here. -->
+      <div
+        class="ui-device__screen"
+        role="region"
+        tabindex="0"
+        [attr.aria-label]="'EDITOR.PREVIEW.SCREEN' | translate"
+      >
         <app-billet-view
           [document]="document()"
           [model]="asset()"

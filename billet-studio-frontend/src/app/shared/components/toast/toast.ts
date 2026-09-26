@@ -7,6 +7,7 @@ import {
   computed,
   effect,
   inject,
+  linkedSignal,
   signal,
   untracked,
 } from '@angular/core';
@@ -93,7 +94,8 @@ class DismissTimer {
  *
  * Two live regions that exist before any toast does, because content inserted into a region that
  * appears at the same moment is not reliably announced: errors and warnings interrupt (assertive),
- * success and info wait their turn (polite).
+ * success and info wait their turn (polite). Visually they form one stack at the bottom of the
+ * screen with the newest toast nearest the edge.
  */
 @Component({
   selector: 'app-toast',
@@ -107,12 +109,38 @@ export class Toast {
   private readonly timers = new Map<number, DismissTimer>();
   private readonly now = signal(Date.now());
 
-  /** Tracked by `live` in the template, so each region stays the same element for good. */
+  /**
+   * Whether the urgent list is drawn at the stack's edge: it is when the newest toast went into it.
+   * Only an arriving toast moves the edge; a leaving one keeps the stack in place, so it animates
+   * out where it was instead of the lists swapping under it.
+   */
+  private readonly urgentAtEdge = linkedSignal<AppMessage[], boolean>({
+    source: this.store.messages,
+    computation: (list, previous) => {
+      const newest = list.at(-1);
+      const arrived = newest !== undefined && newest.id > (previous?.source.at(-1)?.id ?? 0);
+      return arrived ? URGENT.has(VARIANTS[newest.type].variant) : (previous?.value ?? false);
+    },
+  });
+
+  /**
+   * Tracked by `live` in the template, so each region stays the same element for good. `edge`
+   * marks the list drawn nearest the screen's edge.
+   */
   protected readonly lists = computed(() => {
     const toasts = this.store.messages().map(toView);
+    const urgentAtEdge = this.urgentAtEdge();
     return [
-      { live: 'assertive', toasts: toasts.filter((t) => URGENT.has(t.variant)) },
-      { live: 'polite', toasts: toasts.filter((t) => !URGENT.has(t.variant)) },
+      {
+        live: 'assertive',
+        edge: urgentAtEdge,
+        toasts: toasts.filter((t) => URGENT.has(t.variant)),
+      },
+      {
+        live: 'polite',
+        edge: !urgentAtEdge,
+        toasts: toasts.filter((t) => !URGENT.has(t.variant)),
+      },
     ] as const;
   });
   private readonly counting = computed(() =>

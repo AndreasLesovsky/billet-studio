@@ -33,7 +33,7 @@ public interface BilletRepository extends JpaRepository<Billet, Long> {
      * their collation (utf8mb4_unicode_ci) calls "Mama" and "mama" equal, and a changed letter case is still an
      * unpublished change.
      */
-    @Query("SELECT new app.billetstudio.billet.repository.BilletSummaryRow(b.id, b.title, b.modelSlug, "
+    @Query("SELECT new app.billetstudio.billet.repository.BilletSummaryRow(b.id, b.title, b.theme, b.modelSlug, "
         + "b.shareToken, b.publishedAt, b.createdAt, b.updatedAt, "
         + "CASE WHEN b.publishedDocument IS NULL THEN false "
         + "WHEN function('md5', b.document) = function('md5', b.publishedDocument) THEN false "

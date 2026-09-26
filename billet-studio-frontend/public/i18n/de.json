@@ -230,7 +230,8 @@
       "ZOOM_FIT": "Einpassen",
       "ZOOM_LEVEL": "{{percent}} %",
       "ZOOM_FIT_LABEL": "{{percent}} % – Einpassen",
-      "ZOOM_STATUS": "Zoom {{percent}} %"
+      "ZOOM_STATUS": "Zoom {{percent}} %",
+      "SCREEN": "Vorschau des Billets"
     },
     "CONTENT": {
       "PAGE": "Seite",
@@ -805,6 +806,7 @@
       "MODEL_NOT_FOUND": "3D-Modell nicht gefunden.",
       "SESSION_EXPIRED": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
       "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
+      "SERVER_UNREACHABLE": "Keine Verbindung zum Server. Prüfe deine Internetverbindung und versuch es noch einmal.",
       "LOCAL_BILLET_LIMIT_REACHED": "Auf diesem Gerät ist Platz für {{max}} Billets. Lösche eines, um ein neues anzulegen.",
       "LOCAL_STORAGE_FULL": "Der Speicher dieses Browsers ist voll. Lösche ein Billet, um Platz zu schaffen.",
       "LOCAL_STORAGE_UNAVAILABLE": "Dieser Browser lässt kein Speichern zu (etwa im privaten Modus). Deine Billets können hier nicht gespeichert werden.",

@@ -4,6 +4,8 @@ import type { BilletDocument } from '../../../billet/billet-document';
 import type { BilletSummaryDto } from '../../../core/models/models';
 import { AuthApi } from '../../../core/services/auth-api';
 import { BilletApi, MAX_ACCOUNT_BILLETS } from '../../../core/services/billet-api';
+import { MessageStore } from '../../../core/stores/message-store';
+import { isUnreachable } from '../../../core/utils/api-error';
 import {
   ShareFailure,
   shareFactsOf,
@@ -20,6 +22,7 @@ import { summaryOf, type AccountRows } from './billet-list-state';
 export class AccountBillets {
   private readonly api = inject(BilletApi);
   private readonly auth = inject(AuthApi);
+  private readonly messages = inject(MessageStore);
 
   private readonly request = resource({
     params: () => this.auth.user()?.id,
@@ -44,19 +47,19 @@ export class AccountBillets {
 
   /** All or nothing; the new billets go on top of the list, and are returned newest first. */
   async import(documents: BilletDocument[]): Promise<BilletSummaryDto[]> {
-    const { billets } = await this.api.import(documents);
+    const { billets } = await this.answered(this.api.import(documents));
     const newestFirst = [...billets].reverse();
     this.update((rows) => [...newestFirst, ...rows]);
     return newestFirst;
   }
 
   async duplicate(id: number): Promise<void> {
-    const copy = await this.api.duplicate(id);
+    const copy = await this.answered(this.api.duplicate(id));
     this.update((rows) => [summaryOf(copy), ...rows]);
   }
 
   async remove(id: number): Promise<void> {
-    await this.api.remove(id);
+    await this.answered(this.api.remove(id));
     this.update((rows) => rows.filter((row) => row.id !== id));
   }
 
@@ -89,8 +92,22 @@ export class AccountBillets {
   }
 
   private async unpublish(id: number): Promise<void> {
-    await this.api.unpublish(id);
+    await this.answered(this.api.unpublish(id));
     this.patch(id, { published: false, hasUnpublishedChanges: false, publishedAt: null });
+  }
+
+  /**
+   * A request that got no answer (status 0) is one errorInterceptor leaves unsaid, so the action
+   * says it failed here; the caller still gets the error. Publish needs none: the share dialog shows
+   * its failures itself.
+   */
+  private async answered<T>(request: Promise<T>): Promise<T> {
+    try {
+      return await request;
+    } catch (error) {
+      if (isUnreachable(error)) this.messages.addMessage('error', 'SERVER_UNREACHABLE');
+      throw error;
+    }
   }
 
   private patch(id: number, changes: Partial<BilletSummaryDto>): void {

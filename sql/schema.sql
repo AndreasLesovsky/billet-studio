@@ -132,6 +132,7 @@ CREATE TABLE IF NOT EXISTS `tbl_billets` (
   `id`                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id`            BIGINT UNSIGNED NOT NULL,
   `title`              VARCHAR(120)    NOT NULL COMMENT 'Copy of document.title for list queries',
+  `theme`              VARCHAR(40)     NULL DEFAULT NULL COMMENT 'Copy of document.theme (theme id) for the list''s colour swatches; NULL = unknown, the list shows none',
   `model_slug`         VARCHAR(60)     NULL DEFAULT NULL COMMENT 'Copy of document.scene.modelSlug for list queries; no FK, a retired model must not block a billet',
   `document`           LONGTEXT        NOT NULL COMMENT 'Draft billet document (JSON), current schemaVersion only',
   `published_document` LONGTEXT        NULL DEFAULT NULL COMMENT 'Snapshot served by the public link; NULL = not published',

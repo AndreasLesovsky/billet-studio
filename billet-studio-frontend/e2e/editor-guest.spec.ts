@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { mockGuestApi } from './support/guest-api';
+import { withoutWebGl } from './support/scene';
 
 // A guest's way through the editor: a template becomes a billet on this device, edits show in the
 // preview, the history undoes them, the billet survives a reload and is managed in "Meine Billets".
@@ -46,6 +47,7 @@ test.describe('editor as a guest', () => {
     pageErrors = [];
     page.on('pageerror', (error) => pageErrors.push(error));
     await mockGuestApi(page);
+    await withoutWebGl(page);
   });
 
   test.afterEach(() => {

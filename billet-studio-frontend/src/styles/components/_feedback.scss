@@ -125,8 +125,9 @@
     }
 }
 
-// Indeterminate, Material style: a long and a short accent segment sweep across a faint accent
-// track. Each keyframe is a left/right pair written as translate + scale of a full-width bar.
+// Indeterminate, Material style: a long and a short accent segment sweep across a transparent
+// track, so only the moving segments show. Each keyframe is a left/right pair written as
+// translate + scale of a full-width bar.
 @keyframes ui-progress-long {
     0% {
         transform: translateX(-35%) scaleX(0.35);
@@ -155,12 +156,12 @@
     }
 }
 
-// Transparent while idle (the component also hides it from assistive tech); fades in once active.
+// Invisible while idle (the component also hides it from assistive tech); fades in once active.
+// No track colour: it lies over the page's top edge (layout/app-shell), which stays readable.
 .ui-progress {
     position: relative;
     overflow: hidden;
     block-size: 0.1875rem;
-    background-color: var(--ui-accent-soft);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--ui-duration-base) var(--ui-ease);
@@ -349,27 +350,55 @@
 
 // ---- Toast ----------------------------------------------------------------------------------
 
+// A toast rises from the bottom edge and sinks back towards it (.ui-toast--leaving); under reduced
+// motion it only fades.
 @keyframes ui-toast-in {
     from {
         opacity: 0;
-        transform: translateY(0.5rem) scale(0.98);
+        transform: translateY(100%);
     }
 }
 
+@keyframes ui-toast-out {
+    to {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+@keyframes ui-toast-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes ui-toast-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+// Phones: bottom centre, the full width minus the gutters. From md: bottom right, a corner no page
+// keeps an action in (the editor's actions are in its top toolbar). A bar fixed to the bottom of
+// the screen lifts the stack by --ui-toast-offset-block-end (the editor's phone tab bar,
+// _editor.scss).
 .ui-toast-region {
     position: fixed;
     z-index: 1100;
-    inset-block-end: var(--ui-space-4);
+    inset-block: auto calc(var(--ui-space-4) + var(--ui-toast-offset-block-end, 0rem));
     inset-inline: var(--ui-space-4);
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: var(--ui-space-2);
+    inline-size: auto;
+    max-inline-size: 32rem;
+    margin: 0 auto;
     pointer-events: none;
 
-    @include bp.up(sm) {
-        inset-inline-start: auto;
+    @include bp.up(md) {
+        inset-block-end: calc(var(--ui-space-6) + var(--ui-toast-offset-block-end, 0rem));
+        inset-inline: auto var(--ui-space-6);
         inline-size: 24rem;
+        margin: 0;
     }
 }
 
@@ -394,6 +423,24 @@
 
     > .bi {
         @extend %ui-status-icon;
+    }
+}
+
+// On its way out (app-toast's animate.leave): no longer a target.
+.ui-toast--leaving {
+    pointer-events: none;
+    animation: ui-toast-out var(--ui-duration-base) ease-in forwards;
+}
+
+// The durations above are 0 under reduced motion; a short fade (not motion) still marks the change.
+// !important outranks the global animation reset in _base.scss.
+@media (prefers-reduced-motion: reduce) {
+    .ui-toast {
+        animation: ui-toast-fade-in 150ms linear !important;
+    }
+
+    .ui-toast--leaving {
+        animation: ui-toast-fade-out 150ms linear forwards !important;
     }
 }
 

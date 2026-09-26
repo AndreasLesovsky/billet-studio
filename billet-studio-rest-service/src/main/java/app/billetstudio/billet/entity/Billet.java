@@ -56,6 +56,10 @@ public class Billet {
     @Column(nullable = false, length = 120)
     private String title;
 
+    /** Copy of document.theme for list queries. */
+    @Column(length = 40)
+    private String theme;
+
     /** Copy of document.scene.modelSlug while the scene is enabled, else null. */
     @Column(name = "model_slug", length = 60)
     private String modelSlug;

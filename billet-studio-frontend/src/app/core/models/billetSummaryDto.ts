@@ -10,6 +10,7 @@
 export interface BilletSummaryDto {
   id: number;
   title: string;
+  theme: string | null;
   modelSlug: string | null;
   previewUrl: string | null;
   published: boolean;
