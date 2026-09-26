@@ -16,6 +16,7 @@ import json
 import math
 import os
 import sys
+import time
 from dataclasses import dataclass, field
 
 import bpy
@@ -27,6 +28,9 @@ WORK_DIR = os.path.join(HERO_DIR, ".work")
 RENDERS_DIR = os.path.join(HERO_DIR, ".renders")
 IMAGES_DIR = os.path.join(HERO_DIR, "images")
 TESTDATA_DIR = os.path.join(HERO_DIR, "testdata")
+BLENDER_TOOLS_DIR = os.path.dirname(HERO_DIR)  # tools/blender
+# the only folders a build may write to (all gitignored); generated textures go to images/ only
+OUTPUT_DIRS = (".work", ".renders", "images")
 
 STAGES = ("card", "phone", "story", "bake", "export")
 
@@ -67,7 +71,37 @@ class Ctx:
 def make_context(args: argparse.Namespace) -> Ctx:
     for d in (WORK_DIR, RENDERS_DIR, IMAGES_DIR):
         os.makedirs(d, exist_ok=True)
-    return Ctx(args=args, scene=bpy.context.scene)
+    ctx = Ctx(args=args, scene=bpy.context.scene)
+    ctx.info["run_start"] = time.time() - 1.0  # file-system timestamps may be coarse
+    return ctx
+
+
+def generated_image_path(filename: str) -> str:
+    """Path for a generated texture: always images/ (gitignored), never anywhere else."""
+    if os.path.basename(filename) != filename or not filename.lower().endswith(".png"):
+        raise ValueError(f"generated image must be a bare .png file name: {filename!r}")
+    os.makedirs(IMAGES_DIR, exist_ok=True)
+    return os.path.join(IMAGES_DIR, filename)
+
+
+def output_hygiene(since: float) -> dict:
+    """What this run wrote outside the output folders (.work, .renders, images), plus every
+    __pycache__ under tools/blender. Both lists must be empty."""
+    stray = []
+    for root, dirs, files in os.walk(HERO_DIR):
+        rel = os.path.relpath(root, HERO_DIR)
+        if rel.split(os.sep)[0] in OUTPUT_DIRS:
+            dirs[:] = []
+            continue
+        for f in files:
+            p = os.path.join(root, f)
+            if os.path.getmtime(p) >= since:
+                stray.append(os.path.relpath(p, HERO_DIR).replace(os.sep, "/"))
+    pycache = [os.path.relpath(os.path.join(r, d), BLENDER_TOOLS_DIR).replace(os.sep, "/")
+               for r, ds, _f in os.walk(BLENDER_TOOLS_DIR) for d in ds if d == "__pycache__"]
+    images = sorted(os.listdir(IMAGES_DIR)) if os.path.isdir(IMAGES_DIR) else []
+    return {"files_written_outside_output_dirs": sorted(stray), "pycache_dirs": sorted(pycache),
+            "images_dir": images, "output_dirs": list(OUTPUT_DIRS)}
 
 
 def log(msg: str) -> None:
@@ -251,9 +285,10 @@ def image_to_numpy(img: bpy.types.Image) -> np.ndarray:
 def save_numpy_png(arr: np.ndarray, path: str, name: str = "tmp_save") -> None:
     """Write an RGBA/RGB float array [rows(bottom-up), cols, C] (values 0..1) as 8-bit PNG."""
     h, w = arr.shape[:2]
-    if arr.shape[2] == 3:
+    has_alpha = arr.shape[2] == 4  # an RGB array is written as an RGB PNG (no constant alpha)
+    if not has_alpha:
         arr = np.concatenate([arr, np.ones((h, w, 1), dtype=arr.dtype)], axis=2)
-    img = bpy.data.images.new(name, width=w, height=h, alpha=True, float_buffer=False)
+    img = bpy.data.images.new(name, width=w, height=h, alpha=has_alpha, float_buffer=False)
     try:
         img.colorspace_settings.name = "Non-Color"  # store values 1:1
     except TypeError:
@@ -358,18 +393,31 @@ def _slope_rms(h: np.ndarray) -> float:
     return float(np.sqrt((dx ** 2 + dy ** 2).mean()))
 
 
-def paper_fibre_normal_map(path: str, size: int = 1024, tile_mm: float = 60.0,
-                           seed: int = 20260926, rms_slope: float = 0.14) -> dict:
+def paper_fibre_normal_map(path: str, size: int = 512, tile_mm: float = 60.0,
+                           seed: int = 20260926, band_slopes: dict | None = None) -> dict:
     """Tileable uncoated card-stock normal map (OpenGL / glTF convention, +Y = up in UV).
 
-    The tile covers tile_mm x tile_mm of card. The height field mixes four bands, weighted by
-    their share of the surface slope, so that something survives at every viewing distance:
-      cockle     1-6 mm undulation   (still visible at hero scale, where one screen pixel
-                                      covers several texels and the fine bands mip away)
+    The tile covers tile_mm x tile_mm of card (512 px: 0.117 mm per texel; the web build stays
+    small). The height field mixes four bands; each band is scaled to its own RMS surface slope
+    (the tilt of the normals, independent of the texel size), so that something survives at
+    every viewing distance:
+      cockle     1-6 mm undulation   (gentle: at twice this slope the card looked hammered /
+                                      crumpled under raking light and at hero scale)
       mottle     0.2-0.6 mm clouds   (felt-like tooth in close-ups)
-      grain      ~0.05 mm noise
+      grain      finest noise, 0.1 mm (defined in mm; at 512 px / 60 mm = 0.117 mm per texel
+                 the H2 0.05 mm grain is not representable - accepted: at hero scale one
+                 screen pixel covers far more than 0.1 mm of card, and a smaller tile would
+                 repeat the cockle band visibly on the 105 mm panels)
       fibres     0.4-1.4 mm strokes, mostly isotropic, low amplitude
-    Every operation wraps around, so the tile is seamless. Returns the band weights."""
+    Every operation wraps around, so the tile is seamless. Fixed seed: every run writes the same
+    map. Returns the band slopes and the resulting total RMS slope."""
+    # H2 used weights 0.42/0.30/0.16/0.12 normalised to a total RMS slope of 0.14, i.e. band
+    # slopes 0.106/0.076/0.040/0.030. H3 halves the cockle band, eases the mottle band a little
+    # (0.076 -> 0.06: faint streaks on saturated prints in raking-light macros) and keeps grain
+    # and fibres.
+    slopes = dict(band_slopes or {"cockle": 0.053, "mottle": 0.060, "grain": 0.040,
+                                  "fibres": 0.030})
+    grain_mm = 0.1
     rng = np.random.default_rng(seed)
     n = size
     px_mm = tile_mm / n
@@ -381,9 +429,9 @@ def paper_fibre_normal_map(path: str, size: int = 1024, tile_mm: float = 60.0,
 
     cockle = band(0.9, 3.0)
     mottle = band(0.18, 0.6)
-    grain = _gauss_blur_periodic(rng.normal(0.0, 1.0, (n, n)), 0.9)
+    grain = _gauss_blur_periodic(rng.normal(0.0, 1.0, (n, n)), grain_mm / px_mm)
     fib = np.zeros((n, n), dtype=np.float64)
-    count = int(9000 * (n / 1024) ** 2)
+    count = int(9000 * (n / 1024) ** 2)  # same fibre density per mm^2 at any size
     cx, cy = rng.uniform(0, n, count), rng.uniform(0, n, count)
     ang = np.where(rng.random(count) < 0.25, rng.normal(0.0, 0.5, count),
                    rng.uniform(0, math.pi, count))
@@ -397,18 +445,18 @@ def paper_fibre_normal_map(path: str, size: int = 1024, tile_mm: float = 60.0,
         np.add.at(fib, (ys, xs), amp[i])
     fib = _gauss_blur_periodic(fib, 0.6)
 
-    weights = {"cockle": 0.42, "mottle": 0.30, "grain": 0.16, "fibres": 0.12}
     h = np.zeros((n, n))
     for name, comp in (("cockle", cockle), ("mottle", mottle), ("grain", grain), ("fibres", fib)):
-        h += weights[name] * (comp - comp.mean()) / (_slope_rms(comp) + 1e-12)
+        h += slopes[name] * (comp - comp.mean()) / (_slope_rms(comp) + 1e-12)
     dx = (np.roll(h, -1, axis=1) - np.roll(h, 1, axis=1)) * 0.5
     dy = (np.roll(h, -1, axis=0) - np.roll(h, 1, axis=0)) * 0.5
-    k = rms_slope / (_slope_rms(h) + 1e-12)
-    nx, ny, nz = -k * dx, -k * dy, np.ones_like(h)
+    nx, ny, nz = -dx, -dy, np.ones_like(h)
     ln = np.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
     rgb = np.stack([nx / ln, ny / ln, nz / ln], axis=2) * 0.5 + 0.5
     save_numpy_png(rgb.astype(np.float32), path, name="paper_normal_gen")
-    return {"size_px": n, "tile_mm": tile_mm, "rms_slope": rms_slope, "band_weights": weights}
+    return {"size_px": n, "tile_mm": tile_mm, "texel_mm": px_mm, "grain_sigma_mm": grain_mm,
+            "seed": seed, "band_rms_slopes": slopes, "png": "RGB 8-bit",
+            "total_rms_slope": _slope_rms(h)}
 
 
 # --------------------------------------------------------------------------------------------

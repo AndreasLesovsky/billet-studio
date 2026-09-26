@@ -155,7 +155,7 @@ def build_card(ctx: Ctx) -> None:
 # ---------------------------------------------------------------------------------------------
 
 def _materials(ctx: Ctx) -> dict:
-    normal_path = os.path.join(ctx.images_dir, "paper_normal.png")
+    normal_path = common.generated_image_path("paper_normal.png")
     ctx.info["paper_normal"] = common.paper_fibre_normal_map(normal_path,
                                                              tile_mm=PAPER_TILE_M * 1000)
     nimg = common.load_image(normal_path, "Non-Color", "paper_normal")
