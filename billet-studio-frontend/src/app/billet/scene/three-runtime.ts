@@ -4,8 +4,9 @@ import { Injectable } from '@angular/core';
 export type ThreeBundle = typeof import('./three-bundle');
 
 /**
- * Loads the three.js chunk on first use. Nothing outside `three-bundle.ts` and `scene-stage.ts`
- * may import three at runtime (type imports only), or it leaves the lazy chunk.
+ * Loads the three.js chunk on first use. Nothing outside `three-bundle.ts` and the stage modules
+ * behind it (`scene-stage.ts`, `stage-runtime.ts`, `stage-environment.ts`) may import three at
+ * runtime (type imports only), or it leaves the lazy chunk.
  */
 @Injectable({ providedIn: 'root' })
 export class ThreeRuntime {

@@ -1,34 +1,28 @@
 import {
-  ACESFilmicToneMapping,
   AmbientLight,
   AnimationMixer,
   Box3,
   DirectionalLight,
   PerspectiveCamera,
-  PMREMGenerator,
   Scene,
-  SRGBColorSpace,
   Vector3,
-  WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 import type { AssetInstance } from './asset-cache';
 import {
   cameraPosition,
   fitTransform,
-  frameSeconds,
   orbitLimits,
   type FitBox,
   type StageSettings,
   type WheelZoom,
 } from './scene-math';
+import { buildRoomEnvironment } from './stage-environment';
+import { StageRuntime } from './stage-runtime';
 
-// Camera, lights, environment and controls are the original card's (muttertag_threejs/index.html).
+// Camera, lights and controls are the original card's (muttertag_threejs/index.html).
 const FOV = 42;
-const ENVIRONMENT_SIGMA = 0.04;
-const MAX_PIXEL_RATIO = 2;
 
 export interface StageOptions {
   readonly canvas: HTMLCanvasElement;
@@ -51,36 +45,26 @@ interface ShownAsset {
 }
 
 /**
- * One billet's WebGL scene and its single context. Model and settings change in place; the
- * renderer lives until `dispose`. Frames are drawn only while something moves (auto-rotation,
- * damping, an animation) and the canvas is on screen in a visible tab.
+ * One billet's 3D scene: camera, lights, orbit controls and the shown model, drawn by a
+ * StageRuntime that owns the renderer, its single context and the render-on-demand loop. Model
+ * and settings change in place; the renderer lives until `dispose`. Frames are drawn only while
+ * something moves (auto-rotation, damping, an animation) and the canvas is on screen in a visible
+ * tab.
  */
 export class SceneStage {
   private readonly canvas: HTMLCanvasElement;
   private readonly container: HTMLElement;
-  private readonly renderer: WebGLRenderer;
+  private readonly runtime: StageRuntime;
   private readonly scene = new Scene();
   private readonly camera = new PerspectiveCamera(FOV, 1, 0.01, 100);
   private readonly controls: OrbitControls;
   private readonly lights: readonly DirectionalLight[];
-  private readonly listeners = new AbortController();
-  private readonly resizeObserver: ResizeObserver;
-  private readonly visibilityObserver: IntersectionObserver;
   private settings: StageSettings;
   private reducedMotion: boolean;
   private wheelZoom: WheelZoom;
   private readonly onPlainWheel: () => void;
-  private magnification = 1;
   private model: ShownAsset | null = null;
-  private width = 0;
-  private height = 0;
-  private onScreen = false;
-  private contextLost = false;
   private pointerHeld = false;
-  private running = false;
-  private needsRender = true;
-  private lastFrame: number | null = null;
-  private disposed = false;
 
   constructor(options: StageOptions) {
     this.canvas = options.canvas;
@@ -91,13 +75,22 @@ export class SceneStage {
     this.onPlainWheel = options.onPlainWheel;
 
     // Throws when WebGL is unavailable - before anything else exists that would need disposing.
-    this.renderer = new WebGLRenderer({ canvas: this.canvas, alpha: true, antialias: true });
-    this.renderer.debug.checkShaderErrors = options.debug;
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
-    this.renderer.outputColorSpace = SRGBColorSpace;
-    this.renderer.toneMapping = ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = this.settings.exposure;
-    this.buildEnvironment();
+    this.runtime = new StageRuntime({
+      canvas: this.canvas,
+      container: this.container,
+      debug: options.debug,
+      exposure: this.settings.exposure,
+      update: (seconds) => this.update(seconds),
+      draw: () => this.runtime.renderer.render(this.scene, this.camera),
+      hasMotion: () => this.hasMotion(),
+      onResize: (width, height) => {
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+      },
+      onContextRestored: () => buildRoomEnvironment(this.runtime.renderer, this.scene),
+      releaseScene: () => this.release(),
+    });
+    buildRoomEnvironment(this.runtime.renderer, this.scene);
 
     const key = new DirectionalLight(0xfff0e8, 0.4);
     key.position.set(1.5, 3, 2.5);
@@ -115,19 +108,11 @@ export class SceneStage {
     this.controls.enabled = options.interactive;
     // OrbitControls sets 'none' on connect; pan-y lets a phone scroll the page past the scene.
     this.canvas.style.touchAction = 'pan-y';
-    this.controls.addEventListener('change', this.invalidate);
+    this.controls.addEventListener('change', this.runtime.invalidate);
     this.placeCamera(0);
     this.updateMotion();
     this.listen();
-
-    this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(this.container);
-    this.visibilityObserver = new IntersectionObserver((entries) => {
-      this.onScreen = entries[entries.length - 1].isIntersecting;
-      this.invalidate();
-    });
-    this.visibilityObserver.observe(this.container);
-    this.resize();
+    this.runtime.start();
   }
 
   /**
@@ -136,7 +121,7 @@ export class SceneStage {
    */
   async show(instance: AssetInstance): Promise<void> {
     this.clear();
-    if (this.disposed) {
+    if (this.runtime.disposed) {
       instance.release();
       return;
     }
@@ -148,10 +133,10 @@ export class SceneStage {
     this.applyFit();
     this.scene.add(instance.root);
 
-    await this.compile();
+    await this.runtime.compile(this.scene, this.camera);
     if (this.model?.instance !== instance) return;
-    this.invalidate();
-    this.renderNow();
+    this.runtime.invalidate();
+    this.runtime.renderNow();
   }
 
   /** Removes and releases the shown model. */
@@ -163,13 +148,13 @@ export class SceneStage {
     model.mixer?.stopAllAction();
     model.mixer?.uncacheRoot(model.instance.root);
     model.instance.release();
-    this.invalidate();
+    this.runtime.invalidate();
   }
 
   applySettings(next: StageSettings): void {
     const previous = this.settings;
     this.settings = { ...next };
-    this.renderer.toneMappingExposure = next.exposure;
+    this.runtime.setExposure(next.exposure);
     if (next.fitSize !== previous.fitSize || next.yOffset !== previous.yOffset) this.applyFit();
     if (
       next.cameraDistance !== previous.cameraDistance ||
@@ -194,83 +179,31 @@ export class SceneStage {
     this.wheelZoom = wheelZoom;
   }
 
-  /**
-   * The canvas is shown magnified by a CSS transform (the editor's preview zoom): it renders that
-   * many more pixels, up to MAX_PIXEL_RATIO, so the model stays sharp. A shrunk canvas keeps its
-   * device pixel ratio.
-   */
+  /** How much a CSS transform (the editor's preview zoom) magnifies the canvas. */
   setMagnification(magnification: number): void {
-    this.magnification = Math.max(1, magnification);
-    this.resize();
+    this.runtime.setMagnification(magnification);
   }
 
   dispose(): void {
-    if (this.disposed) return;
-    this.disposed = true;
-    this.stopLoop();
-    this.listeners.abort();
-    this.resizeObserver.disconnect();
-    this.visibilityObserver.disconnect();
-    this.controls.removeEventListener('change', this.invalidate);
+    this.runtime.dispose();
+  }
+
+  /** Runs inside `runtime.dispose`, after the loop stopped and before the renderer is disposed. */
+  private release(): void {
+    this.controls.removeEventListener('change', this.runtime.invalidate);
     this.clear();
     this.controls.dispose();
     this.scene.environment?.dispose();
     this.scene.environment = null;
     this.lights.forEach((light) => light.dispose());
-    this.renderer.dispose();
-    // Frees the GPU context now instead of at garbage collection, so remounting a scene never
-    // stacks contexts.
-    this.renderer.forceContextLoss();
   }
 
-  private readonly invalidate = (): void => {
-    this.needsRender = true;
-    this.syncLoop();
-  };
-
-  private readonly frame = (time: number): void => {
-    const seconds = frameSeconds(this.lastFrame, time);
-    this.lastFrame = time;
+  /** One frame of controls and animation; true when either moved the picture. */
+  private update(seconds: number): boolean {
     const moved = this.controls.update(seconds);
     const mixer = this.animatedMixer();
     mixer?.update(seconds);
-    if (moved || mixer || this.needsRender) this.render();
-    else if (!this.hasMotion()) this.stopLoop();
-  };
-
-  private render(): void {
-    this.needsRender = false;
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  /** Draws synchronously, e.g. right after a resize cleared the drawing buffer. */
-  private renderNow(): void {
-    if (!this.contextLost && this.width > 0 && this.height > 0) this.render();
-  }
-
-  private syncLoop(): void {
-    const canRun =
-      !this.disposed &&
-      !this.contextLost &&
-      this.onScreen &&
-      document.visibilityState === 'visible' &&
-      this.width > 0 &&
-      this.height > 0;
-    if (!canRun) this.stopLoop();
-    else if (this.needsRender || this.hasMotion()) this.startLoop();
-  }
-
-  private startLoop(): void {
-    if (this.running) return;
-    this.running = true;
-    this.lastFrame = null;
-    this.renderer.setAnimationLoop(this.frame);
-  }
-
-  private stopLoop(): void {
-    if (!this.running) return;
-    this.running = false;
-    this.renderer.setAnimationLoop(null);
+    return moved || mixer !== null;
   }
 
   private hasMotion(): boolean {
@@ -283,7 +216,7 @@ export class SceneStage {
   }
 
   private listen(): void {
-    const signal = this.listeners.signal;
+    const signal = this.runtime.signal;
     const hold = (held: boolean) => () => this.holdPointer(held);
     this.canvas.addEventListener('pointerdown', hold(true), { signal });
     this.canvas.addEventListener('pointerup', hold(false), { signal });
@@ -300,11 +233,6 @@ export class SceneStage {
       capture: true,
       signal,
     });
-    this.canvas.addEventListener('webglcontextlost', (event) => this.loseContext(event), {
-      signal,
-    });
-    this.canvas.addEventListener('webglcontextrestored', () => this.restoreContext(), { signal });
-    document.addEventListener('visibilitychange', () => this.invalidate(), { signal });
   }
 
   private gateWheel(event: WheelEvent): void {
@@ -321,7 +249,7 @@ export class SceneStage {
   private updateMotion(): void {
     this.controls.autoRotate = this.settings.autoRotate && !this.reducedMotion && !this.pointerHeld;
     this.controls.autoRotateSpeed = this.settings.autoRotateSpeed;
-    this.invalidate();
+    this.runtime.invalidate();
   }
 
   private applyFit(): void {
@@ -333,7 +261,7 @@ export class SceneStage {
     );
     this.model.instance.root.scale.setScalar(scale);
     this.model.instance.root.position.set(...position);
-    this.invalidate();
+    this.runtime.invalidate();
   }
 
   private azimuth(): number {
@@ -350,69 +278,6 @@ export class SceneStage {
     this.camera.position.set(...cameraPosition(azimuth, cameraDistance, cameraHeight));
     this.controls.target.set(0, 0, 0);
     this.controls.update(0);
-  }
-
-  private resize(): void {
-    const width = this.container.clientWidth;
-    const height = this.container.clientHeight;
-    const ratio = Math.min(devicePixelRatio * this.magnification, MAX_PIXEL_RATIO);
-    if (width === this.width && height === this.height && ratio === this.renderer.getPixelRatio()) {
-      return;
-    }
-    this.width = width;
-    this.height = height;
-    if (width > 0 && height > 0) {
-      this.renderer.setPixelRatio(ratio);
-      this.renderer.setSize(width, height, false);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
-      this.renderNow();
-    }
-    this.invalidate();
-  }
-
-  private async compile(): Promise<void> {
-    try {
-      // compileAsync looks the extension up with get(), which warns where it is missing (Firefox).
-      if (this.renderer.extensions.has('KHR_parallel_shader_compile')) {
-        await this.renderer.compileAsync(this.scene, this.camera);
-      } else {
-        this.renderer.compile(this.scene, this.camera);
-      }
-    } catch {
-      // The first render compiles instead.
-    }
-  }
-
-  private loseContext(event: Event): void {
-    event.preventDefault();
-    this.contextLost = true;
-    this.stopLoop();
-  }
-
-  /** three restores its own GPU state; what it cannot know is the PMREM environment we baked. */
-  private restoreContext(): void {
-    this.contextLost = false;
-    this.buildEnvironment();
-    this.invalidate();
-  }
-
-  private buildEnvironment(): void {
-    // PMREM's shader trips an ANGLE (Windows) optimisation note that three reports as a warning
-    // while diagnostics are on; it is not ours to fix, so they pause for it.
-    const diagnostics = this.renderer.debug.checkShaderErrors;
-    this.renderer.debug.checkShaderErrors = false;
-    const generator = new PMREMGenerator(this.renderer);
-    const room = new RoomEnvironment();
-    const previous = this.scene.environment;
-    try {
-      this.scene.environment = generator.fromScene(room, ENVIRONMENT_SIGMA).texture;
-    } finally {
-      this.renderer.debug.checkShaderErrors = diagnostics;
-      room.dispose();
-      generator.dispose();
-    }
-    previous?.dispose();
   }
 }
 
