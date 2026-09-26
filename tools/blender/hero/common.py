@@ -29,8 +29,10 @@ RENDERS_DIR = os.path.join(HERO_DIR, ".renders")
 IMAGES_DIR = os.path.join(HERO_DIR, "images")
 TESTDATA_DIR = os.path.join(HERO_DIR, "testdata")
 BLENDER_TOOLS_DIR = os.path.dirname(HERO_DIR)  # tools/blender
-# the only folders a build may write to (all gitignored); generated textures go to images/ only
-OUTPUT_DIRS = (".work", ".renders", "images")
+EXPORT_DIR = os.path.join(HERO_DIR, "export")
+# the only folders a build may write to; generated textures go to images/ only. All are
+# gitignored except export/ (the raw story GLB is the committed input of the asset pipeline).
+OUTPUT_DIRS = (".work", ".renders", "images", "export")
 
 STAGES = ("card", "phone", "story", "bake", "export")
 
@@ -154,6 +156,84 @@ def collection(name: str, parent: bpy.types.Collection | None = None) -> bpy.typ
     if coll.name not in parent.children:
         parent.children.link(coll)
     return coll
+
+
+def layer_collection(name: str, root=None):
+    """The view layer's LayerCollection of the collection `name` (None if it is not linked)."""
+    root = root or bpy.context.view_layer.layer_collection
+    if root.collection.name == name:
+        return root
+    for child in root.children:
+        found = layer_collection(name, child)
+        if found is not None:
+            return found
+    return None
+
+
+# --------------------------------------------------------------------------------------------
+# Animation (Blender 5 layered actions: F-curves live in the action's channelbag of a slot)
+# --------------------------------------------------------------------------------------------
+
+def action_fcurves(action: bpy.types.Action) -> list:
+    """Every F-curve of an action, whatever layer / strip / slot it is in."""
+    out = []
+    for layer in action.layers:
+        for strip in layer.strips:
+            for bag in strip.channelbags:
+                out.extend(bag.fcurves)
+    return out
+
+
+def ensure_action(obj, name: str | None = None) -> bpy.types.Action:
+    """The object's action (created and assigned when missing)."""
+    ad = obj.animation_data or obj.animation_data_create()
+    if ad.action is None:
+        ad.action = bpy.data.actions.new(name or f"{obj.name}Action")
+    return ad.action
+
+
+def key_channel(obj, data_path: str, index: int, frames: np.ndarray, values: np.ndarray,
+                group: str | None = None, interpolation: str = "LINEAR") -> bpy.types.FCurve:
+    """Keys one channel at the given frames (replacing its keys). Interior points of runs of equal
+    values are dropped (the run's first and last key stay, so LINEAR keeps it exactly constant)."""
+    action = ensure_action(obj)
+    fc = action.fcurve_ensure_for_datablock(obj, data_path, index=index, group_name=group or obj.name)
+    fc.keyframe_points.clear()
+    frames = np.asarray(frames, dtype=np.float64)
+    values = np.asarray(values, dtype=np.float64)
+    keep = np.ones(len(values), dtype=bool)
+    if len(values) > 2:
+        same_prev = np.abs(values[1:-1] - values[:-2]) < 1e-12
+        same_next = np.abs(values[1:-1] - values[2:]) < 1e-12
+        keep[1:-1] = ~(same_prev & same_next)
+    f, v = frames[keep], values[keep]
+    fc.keyframe_points.add(len(f))
+    co = np.empty(len(f) * 2, dtype=np.float32)
+    co[0::2], co[1::2] = f, v
+    fc.keyframe_points.foreach_set("co", co)
+    ip = fc.keyframe_points[0].bl_rna.properties["interpolation"].enum_items[interpolation].value
+    fc.keyframe_points.foreach_set("interpolation", [ip] * len(f))
+    fc.update()
+    return fc
+
+
+def key_transform(obj, frames: np.ndarray, loc: np.ndarray | None = None,
+                  quat: np.ndarray | None = None, scale: np.ndarray | None = None) -> None:
+    """Per-frame keys for location / rotation_quaternion (made hemisphere-continuous) / scale."""
+    if loc is not None:
+        for i in range(3):
+            key_channel(obj, "location", i, frames, loc[:, i])
+    if quat is not None:
+        q = np.array(quat, dtype=np.float64)
+        for k in range(1, len(q)):
+            if np.dot(q[k], q[k - 1]) < 0.0:
+                q[k] = -q[k]
+        obj.rotation_mode = "QUATERNION"
+        for i in range(4):
+            key_channel(obj, "rotation_quaternion", i, frames, q[:, i])
+    if scale is not None:
+        for i in range(3):
+            key_channel(obj, "scale", i, frames, scale[:, i])
 
 
 def new_empty(name: str, coll: bpy.types.Collection, display: str = "PLAIN_AXES",
@@ -683,6 +763,35 @@ def _draw_text(canvas: np.ndarray, text: str, x0: int, y_top: int, scale: int, c
                     canvas[y_top + ry * scale:y_top + (ry + 1) * scale,
                            x + rx * scale:x + (rx + 1) * scale] = color
         x += 6 * scale
+
+
+def page_background(size: int) -> np.ndarray:
+    """The home page behind the hero stage (light mode), top-down sRGB [size, size, 3]: white
+    with the stage's faint violet glow (a radial gradient, inset 6 %, closest side: accent 14 %
+    -> accent-2 6 % at 60 % -> transparent; approximated in sRGB)."""
+    accent = np.array([0x62, 0x46, 0xea]) / 255.0
+    accent2 = np.array([0xa3, 0x95, 0xf7]) / 255.0
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size * 0.44)
+    w1 = np.interp(r, [0.0, 0.6, 1.0], [0.14, 0.0, 0.0])
+    w2 = np.interp(r, [0.0, 0.6, 1.0], [0.0, 0.06, 0.0])
+    bg = np.ones((size, size, 3))
+    bg = bg * (1 - w1[..., None]) + accent * w1[..., None]
+    bg = bg * (1 - w2[..., None]) + accent2 * w2[..., None]
+    return bg
+
+
+def composite_on_page(rgba_png: str, out_png: str) -> None:
+    """A film-transparent render (straight alpha, display sRGB) composited over page_background,
+    written as an RGB PNG: how the canvas looks on the page."""
+    img = bpy.data.images.load(rgba_png, check_existing=False)
+    px = image_to_numpy(img)[::-1]  # top-down
+    bpy.data.images.remove(img)
+    h, w = px.shape[:2]
+    bg = page_background(w)[:h]
+    a = px[..., 3:4]
+    out = px[..., :3] * a + bg * (1 - a)
+    save_numpy_png(out[::-1].astype(np.float32).copy(), out_png, name="page_comp")
 
 
 def contact_sheet(items: list[tuple[str, str]], out_path: str, cols: int = 4, tile: int = 512,

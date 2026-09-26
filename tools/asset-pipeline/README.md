@@ -34,6 +34,9 @@ Node 22 oder neuer. `node_modules/` ist per `.gitignore` ausgeschlossen, `packag
 | `npm run models:compare` | Qualitätsprüfung: Quelle und optimiertes Modell gleich rendern und vergleichen (siehe unten) |
 | `npm run hero:gifts` | leichte Geschenk-Modelle für den 3D-Hero der Startseite bauen (siehe unten) |
 | `npm run hero:compare` | leichte Hero-Geschenke neben der Katalog-Version rendern (`hero/.captures/gifts-compare.png`) |
+| `npm run hero:story` | den Blender-Export der Hero-Story optimieren, prüfen und veröffentlichen, danach `hero:assets` (siehe unten) |
+| `npm run hero:story-verify` | nur prüfen: veröffentlichte Story gegen Vertrag und Roh-Export |
+| `npm run hero:story-check` | die veröffentlichte Story in three.js wie die Laufzeit abspielen (`hero/.captures/story-check.png`) |
 | `npm run fonts` | Fonts neu bauen (`fonts/merge-fonts.mjs`) |
 | `npm run fonts:check` | nur prüfen, ob die Font-Ausgaben vollständig sind (kein Netz, keine Schreibzugriffe) |
 
@@ -160,6 +163,46 @@ bei 320 CSS-px × DPR 2, in vier gleichmäßig verteilten Drehwinkeln (der Hero 
 schreibt `hero/.captures/gifts-compare.png` (pro Geschenk der schlechteste Winkel: Katalog | leicht |
 Differenz, mit Dateigrößen) plus `gifts-compare-<slug>.png` mit allen vier Winkeln. Nach jeder Änderung
 am Manifest ansehen.
+
+## Hero-Story
+
+Die 3D-Story der Startseite (Vertrag: `docs/hero-story.md`) baut Blender per Skript
+(`tools/blender/hero/`, `--stage export`) und legt den Roh-Export eingecheckt unter
+`tools/blender/hero/export/hero-story.glb` ab. Die Pipeline läuft danach ohne Blender:
+
+- `npm run hero:story` (`hero/optimize-hero-story.mjs`): eine **struktur-erhaltende** Kette, nicht die
+  Katalog-Kette: `dedup` nur für Accessoren, Meshes und Texturen (Materialien findet die Laufzeit über
+  ihre Namen), `weld`, `resample` (Toleranz 1e-5), 16 × 16-Platzhalter in den Slots, die die Laufzeit
+  ersetzt (`M_Print_Front`, `M_Print_Inside` Grundfarbe, `M_Screen` Emission), `BLEND` auf
+  `M_Shadow_*`, WebP pro Slot (Papier-Normal-Map 256 px, Handy-AO 512 px, Schatten 256 px), `prune`
+  mit `keepLeaves` / `keepAttributes` / `keepExtras` / `keepSolidTextures` (leere Knoten wie `Cam`,
+  `Fx_*`, `GiftSlot` bleiben), meshopt Stufe `medium` (Positionen 14, Normalen 10, UVs 12 Bit;
+  Animationsdaten verlustfrei). **Kein** `flatten`, `join`, `instance` oder `simplify`. `quantize`
+  hängt das Mesh eines animierten Knotens (die Schatten-Patches der Karte drehen mit ihr) an einen
+  Kindknoten, der `<Knoten>_Mesh` heißt.
+- Geprüft wird vor dem Schreiben (`hero/verify-hero-story.mjs`): `extras.heroStory` wie `parseStoryMeta`
+  der Laufzeit, Pflicht-Knoten, genau ein Clip `Story` mit der Story-Dauer, jede `Shadow_<Name>` mit
+  `M_Shadow_<Name>` (BLEND), die Platzhalter, `TEXCOORD_0/1` wo Materialien sie lesen, keine
+  `KHR_materials_*`-Erweiterung (three.js würde auf `MeshPhysicalMaterial` wechseln), der Skin von
+  `Card_Spine` (`Spine_00`..`Spine_16`), die Dock-Extras, der Khronos-Validator (0 Fehler), **≤ 600 KB**
+  und die Posen: an Stützstellen alle 0,25 s die Weltmatrizen der animierten Knoten und die
+  Welt-Bounding-Boxen aller Meshes (Karte nach dem Skinning) gegen den Roh-Export, **≤ 0,2 mm**; am Ende
+  des Clips ist `GiftSlot` gleich `Phone_ScreenDock`.
+- Ausgabe: `public/hero/story.<8 Zeichen Inhalts-Hash>.glb` (alte Hashes werden gelöscht) und
+  `hero/hero-story.json` (Datei, Bytes, Dreiecke, geparste Story-Meta, Knoten, Texturen, Prüfwerte).
+  Danach schreibt `hero:assets` die Asset-Tabelle der Laufzeit neu. Exit-Code 1 und nichts geschrieben,
+  wenn eine Prüfung scheitert.
+- `npm run hero:story-check` (`hero/check-story.mjs` + `hero/story-check.html`): spielt die
+  veröffentlichte Story in headless Chromium so ab wie die Laufzeit (Kamera aus `Cam` / `CamTarget` mit
+  dem Story-FOV, pausierter Clip auf die Zeit gesetzt, Drucktexturen, einfacher unbeleuchteter
+  Bildschirm: Sperrbildschirm mit dem Nachrichten-Banner (`Fx_Notif`, Größe aus der Aufnahme wie im
+  Bildschirm-Shader der Laufzeit) → Billet, Karten- und Schatten-Fx, das leichte Herz unter `GiftSlot`
+  per `fitTransform` mit seinem Clip auf der Story-Zeit, ACES, RoomEnvironment und die Lichter der
+  Laufzeit), rendert in einer einzigen Seite dieselben Zeitpunkte wie der Blender-Kontaktbogen (alle
+  0,5 s) nach `hero/.captures/story-check.png` und die Vollbild-Zeitpunkte (0 / 2,4 / 4,6 / 7,2 / 8,8 /
+  10 s) als `story-check-t<t>.png` und vergleicht die Positionen der Knoten und die Fx-Werte mit Blenders
+  Referenz (`tools/blender/hero/.renders/story/checks.json`, Toleranz 0,5 mm). Für Licht-Versuche:
+  `npm run hero:story-check -- --hero-exposure=0.8 --tone-mapping=neutral` (eigene Dateinamen).
 
 ## Fonts
 

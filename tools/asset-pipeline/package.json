@@ -18,7 +18,10 @@
     "hero:capture": "node hero/capture-hero.mjs && node hero/generate-hero-assets.mjs",
     "hero:gifts": "node hero/build-hero-gifts.mjs && node hero/generate-hero-assets.mjs",
     "hero:compare": "node hero/compare-hero-gifts.mjs",
-    "hero:assets": "node hero/generate-hero-assets.mjs"
+    "hero:assets": "node hero/generate-hero-assets.mjs",
+    "hero:story": "node hero/optimize-hero-story.mjs && node hero/generate-hero-assets.mjs",
+    "hero:story-verify": "node hero/verify-hero-story.mjs",
+    "hero:story-check": "node hero/check-story.mjs"
   },
   "devDependencies": {
     "@gltf-transform/cli": "4.5.0",

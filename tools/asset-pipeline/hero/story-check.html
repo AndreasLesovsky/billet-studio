@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hero story check</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #fff;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <!-- Paths resolve against the check-story.mjs static server: / = tools/asset-pipeline,
+         /public/ = billet-studio-frontend/public. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <script type="module">
+      // Loads the optimised story GLB the way the home page's hero does (docs/hero-story.md,
+      // features/home/hero-story/hero-stage.ts): camera from Cam / CamTarget with the authored FOV,
+      // the paused clip scrubbed to a time, print textures on cloned print materials, a simple unlit
+      // screen (lock screen with the message banner sliding in by Fx_Notif -> billet page by
+      // Fx_Billet, x Fx_Wake; the banner placed from the notification's CSS size like the
+      // runtime's screen shader, without its glass sheen), the card fading by Fx_CardFade, the
+      // shadows by Fx_Shadow_*, the light heart under GiftSlot -> giftSpin -> giftFit with the
+      // catalog's fitTransform (its own clip at the story time, like the runtime's gift mixer),
+      // the runtime's renderer, environment and lights.
+      // Query: story, heart, front, inside, lock, notification, billet (URLs), bannerW, bannerH
+      // (the notification's CSS size), fit, y, exposure (the gift's scene defaults), size (px).
+      // window.__render(t) resolves with { png, nodes, fx }.
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+      import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+      const params = new URLSearchParams(location.search);
+      const num = (key, fallback) => (params.has(key) ? Number(params.get(key)) : fallback);
+      const size = num('size', 768);
+      // the runtime's HERO_EXPOSURE (hero-stage.ts); ?heroExposure= for experiments only
+      const HERO_EXPOSURE = num('heroExposure', 1);
+
+      const SCREEN_VERTEX = /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`;
+      // the runtime's banner: the notification's CSS size, centred, 16 px below the top of the
+      // 390 x 844 window; it slides down from above the top edge and fades in with Fx_Notif
+      const WINDOW = { width: 390, height: 844, bannerTop: 16 };
+      const SCREEN_FRAGMENT = /* glsl */ `
+        uniform sampler2D uLock;
+        uniform sampler2D uNotification;
+        uniform sampler2D uBilletMap;
+        uniform float uWake;
+        uniform float uNotif;
+        uniform float uBillet;
+        uniform vec4 uBanner;
+        varying vec2 vUv;
+        void main() {
+          vec3 lock = texture2D(uLock, vUv).rgb;
+          float slide = (1.0 - uNotif) * (uBanner.y + uBanner.w);
+          vec2 bannerUv = (vUv - vec2(uBanner.x, uBanner.y - slide)) / uBanner.zw;
+          vec2 inside = step(vec2(0.0), bannerUv) * step(bannerUv, vec2(1.0));
+          vec4 banner = texture2D(uNotification, clamp(bannerUv, 0.0, 1.0));
+          lock = mix(lock, banner.rgb, banner.a * inside.x * inside.y * uNotif);
+          vec3 color = mix(lock, texture2D(uBilletMap, vUv).rgb, uBillet) * uWake;
+          gl_FragColor = vec4(color, 1.0);
+          #include <colorspace_fragment>
+        }`;
+
+      try {
+        const canvas = document.getElementById('stage');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+        renderer.setPixelRatio(1);
+        renderer.setSize(size, size);
+        renderer.setClearColor(0xffffff, 1);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        // the runtime's ACES Filmic; ?toneMapping=neutral for experiments only
+        renderer.toneMapping =
+          params.get('toneMapping') === 'neutral'
+            ? THREE.NeutralToneMapping
+            : THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = HERO_EXPOSURE;
+
+        const scene = new THREE.Scene();
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+        pmrem.dispose();
+        const key = new THREE.DirectionalLight(0xfff0e8, 0.4);
+        key.position.set(1.5, 3, 2.5);
+        const fill = new THREE.DirectionalLight(0xf0e8e0, 0.08);
+        fill.position.set(-2, 1, 1);
+        scene.add(new THREE.AmbientLight(0xfff8f4, 0.15), key, fill);
+
+        const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+        const textureLoader = new THREE.TextureLoader();
+        const loadTexture = async (url) => {
+          const texture = await textureLoader.loadAsync(url);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.flipY = false;
+          texture.anisotropy = 8;
+          return texture;
+        };
+        const [gltf, heartGltf, front, inside, lock, notification, billet] = await Promise.all([
+          loader.loadAsync(params.get('story')),
+          loader.loadAsync(params.get('heart')),
+          loadTexture(params.get('front')),
+          loadTexture(params.get('inside')),
+          loadTexture(params.get('lock')),
+          loadTexture(params.get('notification')),
+          loadTexture(params.get('billet')),
+        ]);
+        const root = gltf.scene;
+        scene.add(root);
+        const meta = JSON.parse(root.userData.heroStory);
+        const node = (name) => {
+          const found = root.getObjectByName(name);
+          if (!found) throw new Error(`node ${name} missing`);
+          return found;
+        };
+        const fx = new Map();
+        root.traverse((o) => {
+          if (o.name.startsWith('Fx_')) fx.set(o.name.slice(3), o);
+        });
+        const fxValue = (name, fallback = 1) =>
+          fx.has(name) ? Math.min(1, Math.max(0, fx.get(name).position.x)) : fallback;
+
+        // materials: card clones (fade), prints, shadows (opacity x Fx), the screen
+        const screen = new THREE.ShaderMaterial({
+          vertexShader: SCREEN_VERTEX,
+          fragmentShader: SCREEN_FRAGMENT,
+          toneMapped: false,
+          uniforms: {
+            uLock: { value: lock },
+            uNotification: { value: notification },
+            uBilletMap: { value: billet },
+            uWake: { value: 0 },
+            uNotif: { value: 0 },
+            uBillet: { value: 0 },
+            uBanner: {
+              value: new THREE.Vector4(
+                (1 - num('bannerW', 358) / WINDOW.width) / 2,
+                WINDOW.bannerTop / WINDOW.height,
+                num('bannerW', 358) / WINDOW.width,
+                num('bannerH', 120) / WINDOW.height,
+              ),
+            },
+          },
+        });
+        const cardMaterials = new Set();
+        const shadows = [];
+        const clones = new Map();
+        const cloneOf = (m) => {
+          if (!clones.has(m)) clones.set(m, m.clone());
+          return clones.get(m);
+        };
+        node('Card').traverse((o) => {
+          if (!o.isMesh) return;
+          o.material = cloneOf(o.material);
+          cardMaterials.add(o.material);
+          if (o.material.name === 'M_Print_Front') o.material.map = front;
+          if (o.material.name === 'M_Print_Inside') o.material.map = inside;
+          o.material.needsUpdate = true;
+        });
+        root.traverse((o) => {
+          if (!o.isMesh) return;
+          if (o.material.name === 'M_Screen') o.material = screen;
+          else if (o.material.name.startsWith('M_Shadow_')) {
+            o.material = cloneOf(o.material);
+            const name = o.material.name.slice('M_Shadow_'.length);
+            shadows.push({ material: o.material, base: o.material.opacity, fx: `Shadow_${name}` });
+          }
+        });
+
+        // the gift: GiftSlot -> giftSpin -> giftFit -> gift (fitTransform in billet units)
+        const gift = heartGltf.scene;
+        const box = new THREE.Box3().setFromObject(gift);
+        const center = box.getCenter(new THREE.Vector3());
+        const maxDim = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+        const scale = num('fit', 1.6) / maxDim;
+        const giftFit = new THREE.Object3D();
+        giftFit.scale.setScalar(scale);
+        giftFit.position.set(-center.x * scale, -center.y * scale + num('y', -0.08), -center.z * scale);
+        const factor = num('exposure', 0.6) / HERO_EXPOSURE;
+        gift.traverse((o) => {
+          if (!o.isMesh) return;
+          o.material = o.material.clone();
+          o.material.color?.multiplyScalar(factor);
+          o.material.emissive?.multiplyScalar(factor);
+          if (typeof o.material.envMapIntensity === 'number') o.material.envMapIntensity *= factor;
+        });
+        giftFit.add(gift);
+        const giftSpin = new THREE.Object3D();
+        giftSpin.add(giftFit);
+        node('GiftSlot').add(giftSpin);
+        const heartMixer = new THREE.AnimationMixer(gift);
+        heartGltf.animations.forEach((clip) => heartMixer.clipAction(clip).play());
+
+        // the story clip, paused and scrubbed
+        const clip = gltf.animations.find((c) => c.name === meta.clip);
+        if (!clip) throw new Error(`clip ${meta.clip} missing`);
+        const mixer = new THREE.AnimationMixer(root);
+        const action = mixer.clipAction(clip);
+        action.setLoop(THREE.LoopOnce, 1);
+        action.clampWhenFinished = true;
+        action.play();
+        action.paused = true;
+
+        const camera = new THREE.PerspectiveCamera(meta.fovDeg, meta.aspect, 0.01, 50);
+        const tmp = new THREE.Vector3();
+        const world = (name) => node(name).getWorldPosition(tmp).toArray().map((v) => Number(v.toFixed(6)));
+
+        renderer.compile(scene, camera);
+        window.__meta = meta;
+        window.__render = async (t) => {
+          action.time = t;
+          mixer.update(0);
+          heartMixer.setTime(t);
+          const fade = fxValue('CardFade');
+          for (const m of cardMaterials) {
+            const transparent = fade < 1;
+            if (m.transparent !== transparent) {
+              m.transparent = transparent;
+              m.needsUpdate = true;
+            }
+            m.opacity = fade;
+            m.visible = fade > 0.001;
+          }
+          for (const s of shadows) s.material.opacity = s.base * fxValue(s.fx);
+          screen.uniforms.uWake.value = fxValue('Wake');
+          screen.uniforms.uNotif.value = fxValue('Notif');
+          screen.uniforms.uBillet.value = fxValue('Billet');
+          root.updateMatrixWorld(true);
+          camera.position.copy(node('Cam').getWorldPosition(new THREE.Vector3()));
+          camera.up.set(0, 1, 0);
+          camera.lookAt(node('CamTarget').getWorldPosition(new THREE.Vector3()));
+          camera.updateProjectionMatrix();
+          renderer.render(scene, camera);
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          renderer.render(scene, camera);
+          const nodes = {};
+          for (const name of ['Cam', 'CamTarget', 'GiftSlot', 'Phone', 'Card', 'Phone_ScreenDock'])
+            nodes[name] = world(name);
+          nodes.GiftSlotScale = Number(node('GiftSlot').getWorldScale(tmp).x.toFixed(6));
+          const values = {};
+          for (const name of fx.keys()) values[name] = Number(fx.get(name).position.x.toFixed(6));
+          return { png: canvas.toDataURL('image/png'), nodes, fx: values };
+        };
+        window.__ready = true;
+      } catch (error) {
+        window.__error = String(error?.stack ?? error);
+      }
+    </script>
+  </body>
+</html>

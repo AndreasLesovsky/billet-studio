@@ -1,0 +1,197 @@
+{
+  "file": "hero/story.0767edd6.glb",
+  "bytes": 237964,
+  "triangles": 10782,
+  "source": "tools/blender/hero/export/hero-story.glb",
+  "sourceBytes": 1405060,
+  "sourceSha256": "a7abc76d4815f390759049729a35851c23ed6b38eeac040947e02383e25cdc76",
+  "story": {
+    "version": 1,
+    "fps": 30,
+    "duration": 10,
+    "clip": "Story",
+    "aspect": 1,
+    "fovDeg": 30,
+    "beats": [
+      {
+        "id": "write",
+        "start": 0,
+        "end": 3.6
+      },
+      {
+        "id": "gift",
+        "start": 3.6,
+        "end": 6.2
+      },
+      {
+        "id": "share",
+        "start": 6.2,
+        "end": 10
+      }
+    ],
+    "gates": {
+      "screens": 6.2
+    },
+    "marks": {
+      "land": 8.6
+    },
+    "gift": {
+      "templateId": "valentinstag"
+    }
+  },
+  "nodes": [
+    "Cam",
+    "CamTarget",
+    "Card_Back",
+    "Card_Front",
+    "Card_Hinge",
+    "Spine_00",
+    "Spine_01",
+    "Spine_02",
+    "Spine_03",
+    "Spine_04",
+    "Spine_05",
+    "Spine_06",
+    "Spine_07",
+    "Spine_08",
+    "Spine_09",
+    "Spine_10",
+    "Spine_11",
+    "Spine_12",
+    "Spine_13",
+    "Spine_14",
+    "Spine_15",
+    "Spine_16",
+    "Card_Spine",
+    "Card_Rig",
+    "Card",
+    "Fx_Billet",
+    "Fx_CardFade",
+    "Fx_Notif",
+    "Fx_Shadow_CardOpen",
+    "Fx_Shadow_CardTent",
+    "Fx_Shadow_Phone",
+    "Fx_Wake",
+    "GiftSlot",
+    "Phone_Body",
+    "Phone_PunchHole",
+    "Phone_Screen",
+    "Phone_ScreenDock",
+    "Phone",
+    "Shadow_CardOpen",
+    "Shadow_CardTent",
+    "Shadow_Phone",
+    "Shadow_CardOpen_Mesh",
+    "Shadow_CardTent_Mesh",
+    "Shadow_Phone_Mesh"
+  ],
+  "shadows": [
+    "Shadow_CardOpen",
+    "Shadow_CardTent",
+    "Shadow_Phone"
+  ],
+  "meshChildren": [
+    "Shadow_CardOpen_Mesh",
+    "Shadow_CardTent_Mesh",
+    "Shadow_Phone_Mesh"
+  ],
+  "blendMaterials": [
+    "M_Shadow_CardOpen",
+    "M_Shadow_CardTent",
+    "M_Shadow_Phone"
+  ],
+  "textures": [
+    {
+      "name": "paper_normal",
+      "size": [
+        256,
+        256
+      ],
+      "bytes": 18980,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "placeholder_M_Print_Inside",
+      "size": [
+        16,
+        16
+      ],
+      "bytes": 38,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "phone_ao",
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 8384,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "placeholder_M_Screen",
+      "size": [
+        16,
+        16
+      ],
+      "bytes": 34,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "shadow_cardopen",
+      "size": [
+        256,
+        150
+      ],
+      "bytes": 8770,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "shadow_cardtent",
+      "size": [
+        256,
+        145
+      ],
+      "bytes": 10396,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "shadow_phone",
+      "size": [
+        256,
+        148
+      ],
+      "bytes": 17568,
+      "mimeType": "image/webp"
+    }
+  ],
+  "extensionsUsed": [
+    "EXT_meshopt_compression",
+    "EXT_texture_webp",
+    "KHR_mesh_quantization",
+    "KHR_texture_transform"
+  ],
+  "verify": {
+    "sizeLimitKB": 600,
+    "poseToleranceMm": 0.2,
+    "poses": {
+      "samples": 44,
+      "worst": {
+        "nodeMm": 0.15240740645949133,
+        "nodeDeg": 0.0021925040222221305,
+        "boundsMm": 0.03533841519756664,
+        "fx": 0
+      },
+      "where": {
+        "nodeDeg": "Spine_04 @ 2.75s",
+        "boundsMm": "Shadow_CardOpen @ 2s",
+        "nodeMm": "CamTarget @ 3.75s"
+      }
+    },
+    "landingMaxMatrixDiff": 8.485566742322259e-9,
+    "validator": {
+      "errors": 0,
+      "warnings": 9
+    }
+  }
+}

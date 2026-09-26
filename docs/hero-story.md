@@ -82,8 +82,8 @@ The glTF scene carries `extras.heroStory` as a JSON **string** (Blender scene cu
     { "id": "gift",  "start": 3.6, "end": 6.2 },
     { "id": "share", "start": 6.2, "end": 10.0 }
   ],
-  "gates": { "screens": 6.4 },
-  "marks": { "land": 9.2 },
+  "gates": { "screens": 6.2 },
+  "marks": { "land": 8.6 },
   "gift": { "templateId": "valentinstag" }
 }
 ```

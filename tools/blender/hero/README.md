@@ -13,13 +13,28 @@ Blender scene.
 
 | Option | Meaning |
 | --- | --- |
-| `--stage card\|phone\|story\|bake\|export` | what to build. `card` = the card alone, `phone` = card + phone side by side (both checked); the others print "not implemented yet" and exit 0 |
-| `--render` | also write Eevee check renders and a contact sheet (`.renders/<stage>/`) |
-| `--textures DIR` | real print textures `print_front.png` (A6 portrait) and `print_inside.png` (inside spread, 2:1.41; left half = cover inside, right half = back inside). Default: the orientation test prints in `testdata/` |
+| `--stage card\|phone\|story\|bake\|export` | what to build. `card` = the card alone, `phone` = card + phone side by side (both checked), `story` = card + phone + the hero story (H4), `bake` = the story + the Cycles shadow bakes, `export` = the story + `export/hero-story.glb` |
+| `--render` | also write Eevee check renders and a contact sheet (`.renders/<stage>/`; `bake` renders the story) |
+| `--textures DIR` | card / phone stages: real print textures `print_front.png` (A6 portrait) and `print_inside.png` (inside spread, 2:1.41; left half = cover inside, right half = back inside). Default: the orientation test prints in `testdata/`. The story stages always use the real Valentinstag DE prints from `tools/asset-pipeline/hero/.captures/` |
 
 Exit code 0 means the build ran and every numeric self-check passed. Any failed check or Python
 error gives exit code 1, and `.work/hero.blend` is only saved when the checks pass (an open Blender
 that reloads the file on change never sees a broken build).
+
+The story chain (after a change to the choreography, the card or the phone):
+
+```bat
+set B="C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup -P tools\blender\hero\build.py --
+%B% --stage bake --render      & rem shadows for the new poses, story checks, renders
+%B% --stage export             & rem export/hero-story.glb (committed pipeline input)
+cd tools\asset-pipeline && npm run hero:story && npm run hero:story-check
+```
+
+`bake` is needed whenever a shadow's pose changes (the card's turn at 0.5 s / 3.4 s, the phone's rest
+pose, a patch's size or AO distance); the camera framing includes the baked shadows, so `bake`
+refits the camera afterwards. Run one Blender at a time (and nothing else heavy next to it): a
+`story` / `bake` / `export` run takes about half a minute, `--render` about two and a half minutes
+(Eevee on the GPU).
 
 ## Stages
 
@@ -27,7 +42,9 @@ that reloads the file on change never sees a broken build).
 | --- | --- | --- |
 | `card` | `build_card.py` | H2: folded A6 card, rigid hinge `Card_Hinge`, UVs, materials, checks |
 | `phone` | `build_phone.py` | H3: brand-less smartphone, 390:844 screen, `Phone_ScreenDock`, baked AO, checks |
-| `story` / `bake` / `export` | `build_story.py`, `bake.py`, `export.py` | H4 (planned) |
+| `story` | `build_story.py` | H4: the 10 s story (choreography, runtime camera, `GiftSlot`, `Fx_*`, markers, shadow patches, heart stand-in, preview screen), per-frame checks |
+| `bake` | `bake.py` | H4: contact-shadow patches baked with Cycles (AO -> alpha) into `images/shadow_*.png` |
+| `export` | `export.py` | H4: visual keys for drivers / constraints, `heroStory` from the markers, `export/hero-story.glb`, read-back checks |
 
 Shared helpers (argument parsing, scene reset, materials with nodes looked up by type, image I/O,
 Eevee/Cycles setup, studio, cameras, contact sheet, JSON) live in `common.py`.
@@ -95,11 +112,101 @@ Eevee/Cycles setup, studio, cameras, contact sheet, JSON) live in `common.py`.
   as occlusion through the `glTF Material Output` node group on every body material. The phone stage
   exports `.work/phone_check.glb` and reads it back to verify this.
 
+## Story conventions (details in the `build_story.py` docstring, contract: `docs/hero-story.md`)
+
+- Timeline: 30 fps, frames 0..300 = 0..10 s, the scene is named `Story` (the glTF exporter names the
+  SCENE-mode clip after it). Markers `beat:write` 0, `beat:gift` 3.6, `beat:share` 6.2,
+  `gate:screens` 6.2 (frame 186: the share chapter starts before the display needs any screen
+  texture, `Fx_Wake` rises from 6.3 s; the ~60 KB of screens load while the card and the heart play,
+  so autoplay does not wait for them), `mark:land` 8.6 (frame 258: the heart reaches
+  `Phone_ScreenDock`). `export.py` writes `scene['heroStory']` from them (`build_story.story_meta`).
+- Every story object is keyed **per frame** (LINEAR between frames) from analytic motion functions
+  (`Motion` in `build_story.py`: smootherstep eases, clamped cubic and C2 quintic Hermite splines,
+  cubic Beziers walked by arc length, so a path's speed follows its ease however its control points
+  are spread), so the file, the renders and the glTF clip show the same film. Nothing moves linearly;
+  everything starts and ends at rest (checked at the end; no jerk spikes on the camera, the phone and
+  the card).
+- Story (one beat after the other, never stacked):
+  - write 0-3.6 s: the tented card (18 deg) turns towards the viewer from the first frames and opens
+    to 150 deg (0.85-2.15 s, a 2.5 deg overshoot that settles by 2.6 s) while the camera dollies in
+    by 18 % of its distance; the open spread with its words holds under the still-moving camera.
+  - gift 3.6-6.2 s: the heart peeks out of the fold (3.62 s), pops (`GiftSlot` scale 0 -> 0.3 -> 1.12
+    -> 0.955 -> 1 x 0.034, peak 4.45 s) and stands in front of the fold like a pop-up element,
+    floating gently; the camera widens slowly to make room for the phone.
+  - share 6.2-10 s: the phone rises screen first 150 mm in front of the card, left of the heart (it
+    grows out of the ground with its bottom 10 mm above it, comes forward and turns 24 deg to the
+    front, 6.1-6.95 s; the screen lights up while it rises, `Fx_Wake` 6.3-6.65 s); the message
+    slides in (`Fx_Notif` 6.8-7.15 s) while the camera pushes in (the phone 0.62 of the frame height
+    by 7.8 s) and is held unobstructed for 0.5 s; the heart dips, flies out towards the viewer and
+    in from the front right below the banner and lands on the dock at 8.6 s with a small pop (from
+    the landing on `GiftSlot`'s world transform is computed from the phone's pose x the dock's local
+    matrix, i.e. it IS the dock's); the card closes where it stands (7.95-8.4 s, its cover swinging
+    away from the phone, in view), lifts, comes towards the viewer along the line of sight (right of
+    the phone, never behind it), takes on the phone's yaw and lean, shrinks to 0.49 and glides in
+    from the front right onto the upper part of the screen (arrives 8.95 s, 6 mm in front of the
+    glass, inside the display outline and above the landed heart, its title block on the billet
+    page's title block), then sinks to 0.8 mm while it dissolves (`Fx_CardFade` 9.12-9.4 s) and the
+    page, which started under it as the card reached the banner (`Fx_Billet` 8.6 s: 12 % by 9.02 s),
+    crossfades in with it (to 1 by 9.38 s); the camera reaches the idle composition at 9.35 s.
+  - rest pose: the phone 72 % of the frame height, yaw 0, leaning back 6 deg; the camera 4 deg to
+    its right and 1 deg below its screen normal, so the heart (26.7 mm in front of the glass) stays
+    centred on the display (checked).
+  - The heart's own clip (a double beat, then a half turn, every 1.625 s) plays on the gift's mixer,
+    which the runtime advances with the story clock: the pop peak (loop phase 1.2 s) and the landing
+    (0.475 s) sit in its face-on phases; it is edge-on during 0.6-1.13 s of every loop (e.g.
+    8.73-9.26 s, while the card glides in).
+- Runtime camera: `Cam` / `CamTarget` (the Blender `RenderCam` only follows them by constraints and is
+  not exported); `Cam` carries `fovDeg` 30, `aspect` 1 and, for a Blender that appends the file's
+  objects, `heroFrameRange` [0, 300] and `heroFps` 30. The camera is a sequence of composed shots
+  (`CAMERA_KEYS`: time, azimuth, elevation, subjects, fill or the phone's height) joined by C2
+  quintic splines on target, angles and log distance; a smooth safety envelope (nothing closer to the
+  frame edge than 5 %) only guards the in-betweens. One arc: the dolly in on the card, a gentle widen
+  for the phone, one push-in from the message to the idle composition (peak about 120 mm/s, checked
+  against 125 mm/s).
+- `Fx_<Name>` empties carry their value in `location.x`: `Wake`, `Notif`, `Billet`, `CardFade`,
+  `Shadow_CardTent`, `Shadow_CardOpen`, `Shadow_Phone`.
+- `Shadow_<Name>` patches lie 0.2 mm below the invisible ground (the card's bottom edge covers them),
+  `M_Shadow_<Name>` = black with the baked alpha (`bake.py`: Cycles AO, alpha = opacity x
+  clamp(gain x (1 - AO)) ^ gamma, faded to 0 at the patch border). The card patches ride with the
+  card's turn until it lifts; the phone patch follows the phone's ground position, yaw and scale
+  while it rises (baked at its rest pose) and fades in with it.
+- Not exported (collection `HeroPreview`): `RenderCam`, the studio lights and world, the heart stand-in
+  (the light hero GLB from `public/hero/gifts/` under `GiftSlot` -> `HeartPreview_Spin` ->
+  `HeartPreview_Fit` with the runtime's `fitTransform`, its own animation looping, its whole outgoing
+  light scaled by the gift's exposure like the runtime's compensation, opaque) and `M_ScreenPreview`
+  (lock -> message -> billet from the Fx values through drivers, plus the runtime shader's faint
+  glass sheen). Card and shadow
+  materials fade by drivers on the Fx empties. All drivers use simple expressions and reference
+  objects by ID, so they keep working when the objects are appended into another file (checked).
+- Checks (`.renders/story/checks.json`), per frame: every visible exported mesh, the visible part of
+  each shadow and the heart stand-in (all poses of its own animation) inside 4-96 % of the runtime
+  frame; no interpenetration (BVH overlap) and the minimum distances card / heart / phone; the
+  message banner unobstructed by heart and card from the message until `Fx_Billet` starts (and held
+  at least 0.5 s before the heart launches); the phone at least 0.6 of the frame height at 7.8 s; the
+  card inside the display outline from 0.2 s before it dissolves, and never behind the phone while it
+  covers it once it has been clear of it (no depth flip); the heart's facing (the angle between its
+  broad side and the view, at most 30 deg at the pop peak and the landing) and its headroom (at least
+  9 % below the frame top outside the pop); the landing (`GiftSlot` == dock); the rest pose (phone
+  70-80 % of the frame height; the heart inside the display with a 2 % margin at rest scale, inside
+  it at every beat pose, its centre within 0.02 of the display's); speeds, accelerations and jerk per
+  object, the camera at most 125 mm/s; the screens gate (no screen Fx before it); a camera speed
+  profile; reference positions (glTF axes) for `npm run hero:story-check`.
+- Export (`export.py`, in memory after hero.blend is saved): the spine bones' drivers sampled into
+  keys, all drivers removed, the preview collection deleted, export materials restored (card alpha 1,
+  shadow alpha straight from the texture, `M_Screen` placeholder, 16 x 16 print placeholders), static
+  transforms read at a frame where the card and the phone have unit scale (frame 0 would cost the
+  hidden, scaled-down phone's children precision), SCENE animation mode, forced sampling, extras on,
+  no cameras / lights / pointer animation / Draco. The GLB is read back (`.renders/export/checks.json`).
+
 ## Output
 
 | Path | Content |
 | --- | --- |
 | `.work/hero.blend` | the built scene (gitignored), open it to inspect |
+| `export/hero-story.glb` | the raw story export (**committed**: the input of `npm run hero:story`) |
+| `.renders/story/contact.png`, `t_*.png`, `full_*.png` | story renders every 0.5 s (labelled contact sheet) and full-size frames at 0, 2.4, 4.6, 7.2, 8.8, 10.0 s, composited over the page background |
+| `.renders/story/checks.json`, `.renders/export/checks.json` | story / export checks |
+| `images/shadow_*.png` | baked contact-shadow patches (RGBA, black + alpha) |
 | `.renders/card/*.png` | check renders (gitignored); `spine_tint_*` colour the cover red, back blue, spine green |
 | `.renders/card/contact.png` + `contact.json` | labelled contact sheet + legend |
 | `.renders/card/checks.json` | numeric self-checks (`passed`, `failures`, dimensions, fold, UVs, overlaps, ...) |
@@ -109,8 +216,8 @@ Eevee/Cycles setup, studio, cameras, contact sheet, JSON) live in `common.py`.
 | `images/phone_ao.png` | baked phone AO |
 
 `images/` is the only folder for generated textures; every run checks that nothing else was written
-outside `.work/`, `.renders/` and `images/` and that no `__pycache__` exists under `tools/blender`
-(`build.py` sets `sys.dont_write_bytecode`).
+outside `.work/`, `.renders/`, `images/` and `export/` (the export stage's GLB) and that no
+`__pycache__` exists under `tools/blender` (`build.py` sets `sys.dont_write_bytecode`).
 
 ## Test textures
 
