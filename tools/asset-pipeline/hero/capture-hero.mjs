@@ -18,13 +18,14 @@
 // it started. The app runs as a guest (every /v1 request answers 401). Exit 1 on any capture error
 // or when a template's scene area differs between light and dark.
 // Usage: npm run hero:capture
-import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import sharp from 'sharp';
+
+import { CAPTURE_PORT, mockGuestApi, startAppServer, stopAppServer } from './lib/app-server.mjs';
 
 const HERO_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_DIR = resolve(HERO_DIR, '..', '..', '..');
@@ -34,10 +35,7 @@ const TEXTURES_DIR = join(FRONTEND_DIR, 'public', 'hero', 'textures');
 const TEXTURES_PUBLIC_PATH = 'hero/textures';
 const MANIFEST_PATH = join(HERO_DIR, 'hero-captures.json');
 
-// Not the developer's 4200, not the e2e ports 4320/4321.
-const PORT = 4330;
-const APP_URL = `http://localhost:${PORT}`;
-const SERVER_TIMEOUT_MS = 300_000;
+const APP_URL = `http://localhost:${CAPTURE_PORT}`;
 const CAPTURE_TIMEOUT_MS = 60_000;
 const CONCURRENCY = 4;
 
@@ -97,66 +95,7 @@ function captureList() {
   return list;
 }
 
-// ===== The app server =====
-
-async function answers(url) {
-  try {
-    await fetch(url, { signal: AbortSignal.timeout(2_000) });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/** ng serve on PORT (npm start runs the generators first); null when one already answers. */
-async function startServer() {
-  if (await answers(APP_URL)) {
-    console.log(`Using the server that already answers on ${APP_URL}.`);
-    return null;
-  }
-  console.log(`Starting ng serve on ${APP_URL} ...`);
-  const windows = process.platform === 'win32';
-  // One command string: npm is a .cmd on Windows and needs the shell there.
-  const child = spawn(`npm start -- --port ${PORT} --no-hmr --no-live-reload`, {
-    cwd: FRONTEND_DIR,
-    shell: true,
-    detached: !windows,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-  let tail = '';
-  const keep = (chunk) => (tail = (tail + chunk).slice(-4_000));
-  child.stdout.on('data', keep);
-  child.stderr.on('data', keep);
-  const started = Date.now();
-  while (Date.now() - started < SERVER_TIMEOUT_MS) {
-    if (child.exitCode !== null) throw new Error(`ng serve exited (${child.exitCode}):\n${tail}`);
-    if (await answers(APP_URL)) return child;
-    await new Promise((done) => setTimeout(done, 1_000));
-  }
-  stopServer(child);
-  throw new Error(`ng serve did not answer within ${SERVER_TIMEOUT_MS / 1000} s:\n${tail}`);
-}
-
-/** Stops the process tree this script spawned, never anything else. */
-function stopServer(child) {
-  if (!child || child.exitCode !== null) return;
-  if (process.platform === 'win32') {
-    spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
-  } else {
-    try {
-      process.kill(-child.pid, 'SIGTERM');
-    } catch {
-      // Already gone.
-    }
-  }
-}
-
 // ===== Capturing =====
-
-const CORS_HEADERS = {
-  'access-control-allow-origin': APP_URL,
-  'access-control-allow-credentials': 'true',
-};
 
 /** As in a browser without WebGL: the screen's scene area stays empty either way (no model). */
 function withoutWebGl() {
@@ -176,15 +115,7 @@ async function capture(browser, spec) {
     reducedMotion: 'reduce',
   });
   try {
-    // A guest: the refresh on startup and everything else is 401, like e2e's mockGuestApi.
-    await context.route('**/v1/**', (route) =>
-      route.fulfill({
-        status: 401,
-        contentType: 'application/json',
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ errorCode: 'UNAUTHORIZED', status: 401, timestamp: '2026-01-01T00:00:00Z' }),
-      }),
-    );
+    await mockGuestApi(context, APP_URL);
     await context.addInitScript(withoutWebGl);
     const page = await context.newPage();
     const pageErrors = [];
@@ -455,9 +386,9 @@ async function writeTextCrop(results) {
 async function main() {
   mkdirSync(CAPTURES_DIR, { recursive: true });
   const specs = captureList();
-  const server = await startServer();
+  const server = await startAppServer(FRONTEND_DIR, APP_URL);
   const stop = () => {
-    stopServer(server);
+    stopAppServer(server);
     process.exit(130);
   };
   process.once('SIGINT', stop);
@@ -467,7 +398,7 @@ async function main() {
     console.log(`Capturing ${specs.length} textures ...`);
     outcome = await captureAll(specs);
   } finally {
-    stopServer(server);
+    stopAppServer(server);
   }
   const errors = [...outcome.errors, ...sceneRectErrors(outcome.results)];
   if (errors.length) {

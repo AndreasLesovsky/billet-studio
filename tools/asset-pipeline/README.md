@@ -8,7 +8,11 @@ Erzeugt alles, was billet-studio an Binär-Assets ausliefert, und die dazugehör
 | `billet-studio-frontend/public/models/previews/<slug>.v<n>.webp` | `models/render-previews.mjs` |
 | `sql/seed_models.sql` | `models/generate-seed-models.mjs` |
 | `billet-studio-frontend/public/fonts/**`, Font-Katalog | `fonts/merge-fonts.mjs` |
+| `billet-studio-frontend/public/hero/textures/<name>.<hash>.webp`, `hero/hero-captures.json` | `hero/capture-hero.mjs` |
 | `billet-studio-frontend/public/hero/gifts/<slug>.<hash>.glb`, `hero/hero-gifts.json` | `hero/build-hero-gifts.mjs` |
+| `billet-studio-frontend/public/hero/story.<hash>.glb`, `hero/hero-story.json` | `hero/optimize-hero-story.mjs` |
+| `billet-studio-frontend/public/hero/posters/<name>.<hash>.webp`, `hero/hero-posters.json` | `hero/capture-hero-posters.mjs` |
+| `hero-assets.generated.ts`, `hero-home.generated.ts` (in `src/app/features/home/hero-story/`) | `hero/generate-hero-assets.mjs` |
 
 Diese Dateien werden **nie von Hand** kopiert oder bearbeitet. Wer etwas ändern will, ändert das Manifest
 (oder das Skript) und lässt die Pipeline erneut laufen.
@@ -32,11 +36,14 @@ Node 22 oder neuer. `node_modules/` ist per `.gitignore` ausgeschlossen, `packag
 | `npm run models:previews` | WebP-Vorschaubilder rendern (headless Chromium, SwiftShader) |
 | `npm run models:seed` | `sql/seed_models.sql` neu schreiben |
 | `npm run models:compare` | Qualitätsprüfung: Quelle und optimiertes Modell gleich rendern und vergleichen (siehe unten) |
-| `npm run hero:gifts` | leichte Geschenk-Modelle für den 3D-Hero der Startseite bauen (siehe unten) |
+| `npm run hero:capture` | Texturen des 3D-Heros aus dem echten Renderer aufnehmen, danach `hero:assets` (siehe unten) |
+| `npm run hero:gifts` | leichte Geschenk-Modelle für den 3D-Hero der Startseite bauen, danach `hero:assets` (siehe unten) |
 | `npm run hero:compare` | leichte Hero-Geschenke neben der Katalog-Version rendern (`hero/.captures/gifts-compare.png`) |
 | `npm run hero:story` | den Blender-Export der Hero-Story optimieren, prüfen und veröffentlichen, danach `hero:assets` (siehe unten) |
 | `npm run hero:story-verify` | nur prüfen: veröffentlichte Story gegen Vertrag und Roh-Export |
 | `npm run hero:story-check` | die veröffentlichte Story in three.js wie die Laufzeit abspielen (`hero/.captures/story-check.png`) |
+| `npm run hero:posters` | Start- und End-Poster des Heros aus dem Canvas der Laufzeit aufnehmen, danach `hero:assets` (siehe unten) |
+| `npm run hero:assets` | nur die Asset-Tabellen der Laufzeit aus den Hero-Manifesten neu schreiben |
 | `npm run fonts` | Fonts neu bauen (`fonts/merge-fonts.mjs`) |
 | `npm run fonts:check` | nur prüfen, ob die Font-Ausgaben vollständig sind (kein Netz, keine Schreibzugriffe) |
 
@@ -134,6 +141,44 @@ als GLB, Manifest, `preview.html` und Render-Skript sind.
    `mysql -u root -p db_billet_studio < sql/seed_models.sql`). Die Datei ist idempotent und kann
    jederzeit erneut eingespielt werden. Claude führt nie SQL aus.
 
+## Hero-Texturen
+
+`npm run hero:capture` (`hero/capture-hero.mjs`) nimmt Druck (vorn, innen), Display-Seiten aller
+Vorlagen, Sperrbildschirm und Nachricht mit dem **echten Renderer** auf: die Dev-Route
+`/dev/hero-capture/:kind` zeichnet sie mit `BilletView` in fester CSS-Größe, Playwright fotografiert
+sie (DPR 2, Druck 2,5), je Sprache × Farbmodus (Druck nur hell). Die Seite wartet, bis jede Schrift
+wirklich geladen ist, es wird also nie eine Ersatzschrift eingebacken.
+
+- Ausgabe: `public/hero/textures/<name>.<8 Zeichen Inhalts-Hash>.webp` (veraltete werden gelöscht),
+  `hero/hero-captures.json` (mit dem normierten 3D-Bereich jeder Display-Seite), verlustfreie PNGs,
+  Kontaktbogen und 1:1-Textausschnitt in `hero/.captures/` (gitignored). Exit-Code 1 und nichts
+  geschrieben, wenn eine Aufnahme scheitert oder der 3D-Bereich hell und dunkel verschieden liegt.
+
+## Hero-Poster
+
+`npm run hero:posters` (`hero/capture-hero-posters.mjs`) liest die Poster aus dem Canvas der
+Laufzeit selbst (`/dev/hero?capture&t=0|end`, `preserveDrawingBuffer`, `toDataURL`): ein Poster ist
+genau das Bild, mit dem der Canvas einblendet, transparent um die Story herum. 512 CSS-px bei DPR 2 =
+1024 px, WebP mit Alpha (Qualität 82, Alpha 90). Eine Chromium-Seite, die Aufnahmen nacheinander
+(WebGL in SwiftShader).
+
+- Start-Poster (t = 0, nur die Karte) je Sprache, End-Poster (Ruhezustand, das Display folgt dem
+  Farbmodus) je Sprache × Farbmodus.
+- Ausgabe: `public/hero/posters/<name>.<8 Zeichen Inhalts-Hash>.webp` (veraltete werden gelöscht),
+  `hero/hero-posters.json`, verlustfreie `hero/.captures/poster-<name>.png`. Exit-Code 1 und nichts
+  geschrieben, wenn die Bühne nicht bereit wird, kein WebGL hat oder der Canvas nicht 1024 px misst.
+- Nach jeder Änderung an Story, Texturen oder Geschenken zuletzt laufen lassen, sonst passt ein
+  Poster nicht mehr zu seinem Bild.
+
+## Server der Hero-Aufnahmen
+
+`hero:capture` und `hero:posters` brauchen die laufende App (Dev-Routen gibt es nur in `ng serve`).
+Beide nehmen Port **4330** (nicht 4200 des Entwicklers, nicht die e2e-Ports 4320/4321) und starten dort
+selbst `ng serve`, wenn nichts antwortet, und beenden nur, was sie gestartet haben
+(`hero/lib/app-server.mjs`). `hero:posters` nimmt mit `HERO_APP_URL` einen schon laufenden Server,
+z. B. `set HERO_APP_URL=http://localhost:4200` (Windows) vor `npm run hero:posters`. Jede
+`/v1`-Anfrage beantwortet die Aufnahme selbst mit 401 (Gast); kein Backend wird angesprochen.
+
 ## Hero-Geschenke
 
 Der 3D-Hero der Startseite zeigt pro Anlass ein Geschenk mit etwa 150–300 CSS-px (DPR 2). Dafür baut
@@ -197,12 +242,23 @@ Die 3D-Story der Startseite (Vertrag: `docs/hero-story.md`) baut Blender per Skr
   dem Story-FOV, pausierter Clip auf die Zeit gesetzt, Drucktexturen, einfacher unbeleuchteter
   Bildschirm: Sperrbildschirm mit dem Nachrichten-Banner (`Fx_Notif`, Größe aus der Aufnahme wie im
   Bildschirm-Shader der Laufzeit) → Billet, Karten- und Schatten-Fx, das leichte Herz unter `GiftSlot`
-  per `fitTransform` mit seinem Clip auf der Story-Zeit, ACES, RoomEnvironment und die Lichter der
-  Laufzeit), rendert in einer einzigen Seite dieselben Zeitpunkte wie der Blender-Kontaktbogen (alle
+  per `fitTransform` mit seinem Clip auf der Story-Zeit, RoomEnvironment und die Lichter der
+  Laufzeit; Tone-Mapping ACES als Standard der Prüfseite, die Laufzeit nutzt Neutral: mit
+  `--tone-mapping=neutral` zeigt die Prüfseite deren Farben), rendert in einer einzigen Seite dieselben Zeitpunkte wie der Blender-Kontaktbogen (alle
   0,5 s) nach `hero/.captures/story-check.png` und die Vollbild-Zeitpunkte (0 / 2,4 / 4,6 / 7,2 / 8,8 /
   10 s) als `story-check-t<t>.png` und vergleicht die Positionen der Knoten und die Fx-Werte mit Blenders
   Referenz (`tools/blender/hero/.renders/story/checks.json`, Toleranz 0,5 mm). Für Licht-Versuche:
   `npm run hero:story-check -- --hero-exposure=0.8 --tone-mapping=neutral` (eigene Dateinamen).
+
+## Hero-Asset-Tabellen
+
+`npm run hero:assets` (`hero/generate-hero-assets.mjs`) schreibt aus `hero-captures.json`,
+`hero-gifts.json`, `hero-story.json` und `hero-posters.json` die beiden Tabellen der Laufzeit:
+`hero-assets.generated.ts` (alles; nur der Lazy-Chunk des Heros importiert sie) und
+`hero-home.generated.ts` (was die Startseite vor dem Chunk braucht: Story-URL, Poster, Credits).
+Ohne `hero-story.json` zeigt der Hero kein 3D, ohne `hero-posters.json` einen Platzhalter statt
+Poster. Exit-Code 1 und nichts geschrieben, wenn ein Manifest unvollständig ist oder eine Datei
+nennt, die nicht in `public/` liegt. Alle erzeugenden Hero-Skripte rufen es am Ende auf.
 
 ## Fonts
 

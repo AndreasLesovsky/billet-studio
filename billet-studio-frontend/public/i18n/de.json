@@ -142,7 +142,8 @@
     "PLAY_ANIMATION": "Animation abspielen",
     "DRAG_HINT": "Zum Drehen ziehen",
     "CREDIT_PREFIX": "3D-Modell:",
-    "UNAVAILABLE": "Animation auf diesem Gerät nicht verfügbar"
+    "UNAVAILABLE": "Animation auf diesem Gerät nicht verfügbar",
+    "POSTER_ALT": "Ein Handy zeigt ein digitales Billet zum Valentinstag, davor steht ein rotes Herz in 3D."
   },
   "BILLETS": {
     "TITLE": "Meine Billets",

@@ -19,7 +19,7 @@ import {
 } from '../../home/hero-story/hero-story-controller';
 import { afterFrames } from '../hero-capture/hero-capture-ready';
 
-/** What a capture or an inspection script waits for (H7 poster capture). */
+/** What a capture or an inspection script waits for (capture-hero-posters.mjs). */
 interface HeroStoryProbe {
   readonly ready: boolean;
   readonly status: string;
@@ -65,11 +65,12 @@ function parseOptions(params: ParamMap): HeroStoryOptions {
 }
 
 /**
- * Dev only (/dev/hero): the home page's 3D story alone, for inspection and the coming poster
- * capture. `t` fixes the story time (paused; `end` = the idle pose), `aspect` the stage's
- * width / height (the authored frame must stay whole), `lang` / `mode` the textures, `debug`
- * three's shader checks plus the stage's state and GPU memory, `capture` a readable drawing
- * buffer, `story` another story GLB (a raw export under test). window.__heroStory reports when the requested frame is drawn.
+ * Dev only (/dev/hero): the home page's 3D story alone, for inspection and the poster capture.
+ * `t` fixes the story time (paused; `end` = the idle pose), `aspect` the stage's width / height
+ * (the authored frame must stay whole), `lang` / `mode` the textures, `debug` three's shader
+ * checks plus the stage's state and GPU memory, `capture` a readable drawing buffer and a stage as
+ * wide as the window, `story` another story GLB (a raw export under test). window.__heroStory
+ * reports when the requested frame is drawn.
  */
 @Component({
   selector: 'app-hero-preview',
@@ -89,6 +90,7 @@ export class HeroPreview {
 
   protected readonly controller = inject(HeroStoryController);
   protected readonly debug = !!inject(HERO_STORY_OPTIONS).debug;
+  protected readonly capture = !!inject(HERO_STORY_OPTIONS).capture;
   protected readonly stageAspect = computed(() => {
     const aspect = Number(this.aspect());
     return Number.isFinite(aspect) && aspect > 0 ? aspect : 1;

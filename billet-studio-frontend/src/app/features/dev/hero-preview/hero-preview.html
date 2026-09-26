@@ -1,4 +1,7 @@
-<div class="hero-preview">
+<div
+  class="hero-preview"
+  [class.hero-preview--capture]="capture"
+>
   <app-hero-story
     class="hero-preview__stage"
     [style.--hero-stage-aspect]="stageAspect()"

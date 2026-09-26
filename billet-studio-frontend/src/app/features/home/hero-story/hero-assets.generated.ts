@@ -46,8 +46,6 @@ type ByMode<T> = Readonly<Record<HeroMode, T>>;
 export interface HeroAssets {
   /** null until the story GLB is built: the hero shows no 3D. */
   readonly story: HeroStoryAsset | null;
-  /** The start and end posters (H7). */
-  readonly posters: null;
   readonly printFront: ByLang<HeroTexture>;
   readonly printInside: ByLang<HeroTexture>;
   readonly lock: ByLang<ByMode<HeroTexture>>;
@@ -61,7 +59,6 @@ export const HERO_ASSETS: HeroAssets = {
     url: '/hero/story.0767edd6.glb',
     bytes: 237964,
   },
-  posters: null,
   printFront: {
     de: {
       url: '/hero/textures/print-front-valentinstag-de-light.a2f0bec4.webp',

@@ -21,7 +21,8 @@
     "hero:assets": "node hero/generate-hero-assets.mjs",
     "hero:story": "node hero/optimize-hero-story.mjs && node hero/generate-hero-assets.mjs",
     "hero:story-verify": "node hero/verify-hero-story.mjs",
-    "hero:story-check": "node hero/check-story.mjs"
+    "hero:story-check": "node hero/check-story.mjs",
+    "hero:posters": "node hero/capture-hero-posters.mjs && node hero/generate-hero-assets.mjs"
   },
   "devDependencies": {
     "@gltf-transform/cli": "4.5.0",

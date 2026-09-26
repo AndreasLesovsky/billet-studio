@@ -48,6 +48,9 @@ billet-studio/
 │   │                              models (= API DTOs only)
 │   ├── src/app/features/          routed pages (home, templates, auth, account, admin, editor,
 │   │                              billets/billet-list, public-billet, not-found, dev = dev builds only)
+│   ├── src/app/features/home/hero-story/  the home page's 3D story: stage, chapters, controller,
+│   │                              timeline/framing (pure), lazy hero chunk (hero-bundle.ts →
+│   │                              hero-stage.ts), generated asset tables (docs/hero-story.md)
 │   ├── src/app/shared/            reusable components / directives
 │   ├── src/app/layout/            app-shell, bare layout
 │   ├── src/app/billet/            the renderer: document, migration, markup, palette, view, particles, scene
@@ -55,11 +58,17 @@ billet-studio/
 │   ├── public/i18n/               de.json, en.json
 │   ├── public/models/             optimized GLBs + WebP previews (pipeline output)
 │   ├── public/fonts/              woff2 fonts (pipeline output)
+│   ├── public/hero/               story GLB, textures, light gifts, posters (hero pipeline output,
+│   │                              content-hashed names)
 │   └── e2e/                       Playwright: mocked suite, parity, axe, backend suite (section 21)
 ├── billet-studio-rest-service/    Spring Boot 4, package app.billetstudio: auth/, shared/, catalog/, billet/
 ├── sql/                           schema.sql, seed_*.sql, migrations/ - the USER runs them
-├── docs/                          api-contract.md, billet-document.md, fixtures/ (Muttertag document)
-├── tools/asset-pipeline/          own package.json; generates models, previews, fonts, seed_models.sql
+├── docs/                          api-contract.md, billet-document.md, hero-story.md (Blender ↔ runtime
+│                                  contract of the hero), fixtures/ (Muttertag document)
+├── tools/asset-pipeline/          own package.json; generates models, previews, fonts, seed_models.sql,
+│                                  and the hero's assets (hero/)
+├── tools/blender/hero/            Blender Python scripts (headless CLI) that build the hero story;
+│                                  export/hero-story.glb is the committed raw export
 ├── docker-compose.e2e.yml         throwaway MariaDB (3307) for the backend e2e suite
 ├── CLAUDE.md  README.md  .env.example
 ```
@@ -78,7 +87,7 @@ Read-only sources outside the repo (never modify anything there):
 - **One `BilletView`** renders both the editor preview and the public page.
 - **UI tokens (`--ui-*`, Studio only) and billet tokens (`--billet-*`) never mix.** A theme is a
   billet design preset: it styles the billet, never the UI (the editor's chrome included).
-- **One live WebGL context**; three.js only in a lazy chunk.
+- **One live WebGL context per page**; three.js only in a lazy chunk.
 - **Loading has three sources** (section 20, "Loading states"): the global bar for activity, a
   skeleton from the component's own resource for its data, a pending button for an action. No
   component reads the global `isLoading`.
@@ -87,7 +96,7 @@ Read-only sources outside the repo (never modify anything there):
   break and would hurt; when in doubt, leave it out and say so.
 - **The user's dev stack is his** (frontend 4200, backend 8080, `db_billet_studio` on 3306): never
   stopped, never a test target. Tests run on Testcontainers and the e2e ports 4320 / 4321 / 8081 /
-  3307 (section 21).
+  3307 (section 21); the hero captures on 4330 (section 16).
 - `npm test -- --no-watch` is judged by its **exit code**.
 - Commit per verified phase and push it to `origin main`; never force-push (section 25).
 
@@ -574,13 +583,28 @@ The renderer lives in `src/app/billet/` (`billet-document.ts`, `migrate-document
 
 - npm `three` only, loaded with a dynamic `import()` inside `afterNextRender`. three.js must never
   reach the initial bundle (bundle budget enforces it).
-- **Exactly one live WebGL context.** The asset library and pickers show WebP previews, never extra
-  canvases. Switching the model reuses the renderer.
+- **Exactly one live WebGL context per page.** The asset library and pickers show WebP previews,
+  never extra canvases. Switching the model reuses the renderer. The home page's only canvas is the
+  hero; no page shows the hero and a billet scene together.
 - GLBs are meshopt-compressed with WebP textures: `GLTFLoader` + `MeshoptDecoder`. No Draco.
 - `asset-cache.ts` keeps one load promise per URL (pattern: `window_three_prototype/js/viewer.js`,
   `preloadModel`) and evicts a failed promise so a retry reloads. Cached assets are shared: a scene
   clones what it mutates (`SkeletonUtils.clone` for skinned/animated assets), and disposing a scene
   must never break the next use of a cached asset.
+- `billet/scene/stage-runtime.ts` (`StageRuntime`) owns renderer, pixel ratio (≤ 2), observers,
+  loop gating, context loss / restore and dispose. It has two owners: `SceneStage` (the billet scene)
+  and `HeroStage` (the home hero, `features/home/hero-story/`, in its own lazy chunk
+  `hero-bundle.ts` loaded by `HeroRuntime` like `ThreeRuntime`). A change to it is checked against
+  both (parity test for the billet, `/dev/hero` for the hero).
+- **The hero** follows `docs/hero-story.md` (the contract with the Blender build; change both sides
+  together). It renders with **Neutral tone mapping** (ACES washes the printed card's pale pink out;
+  the billet scene keeps ACES), the phone's display is a `ShaderMaterial` with `toneMapped: false`
+  (billet colours exactly as in the real billet). The story clip is never played freely: each frame
+  sets `action.time` and calls `mixer.update(0)`. Its posters are frames of the runtime itself
+  (`hero:posters`): the start poster while the 3D loads (the canvas fades in over it), the end poster
+  for reduced motion / saved data (with "Play animation"), no WebGL or a failed load, and a later
+  visit in the same session. Pause/replay exist only while an animation does (documented exception
+  to section 20 in `hero-story.ts`).
 - Render loop via `renderer.setAnimationLoop`; paused by `IntersectionObserver` when off-screen;
   sized by `ResizeObserver`; animated models run an `AnimationMixer` with delta time.
 - Handle `webglcontextlost` (`preventDefault`, pause) and `webglcontextrestored` (rebuild what three
@@ -737,6 +761,33 @@ shows its failures inline (the share dialog, the editor's save status) needs non
 - Slugs are permanent (billet documents reference them). Credits come from the GLB's `asset.extras`.
 - While the backend serves the models, a new version's files are copied to `MODELS_DIRECTORY`
   BEFORE its SQL runs, or the catalog points at a file that is not there yet.
+
+### The hero's assets (`tools/asset-pipeline/hero/`, `tools/blender/hero/`)
+
+Everything under `public/hero/` and both `hero-*.generated.ts` files come from these scripts only,
+with content-hashed file names (`<name>.<hash8>.<ext>`, stale hashes are removed; served
+`immutable`), never from `tbl_models` or the seed. Contract: `docs/hero-story.md`.
+
+- **Blender stages** (headless CLI, never the user's open Blender; one Blender at a time):
+  `"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup -P
+  tools/blender/hero/build.py -- --stage card|phone|story|bake|export [--render]`. The scripts are
+  the source of truth; `export` writes the committed raw export `tools/blender/hero/export/hero-story.glb`.
+- **npm scripts** in `tools/asset-pipeline/` (the generating ones end with `hero:assets`):
+  - `hero:capture` - print, screen, lock and message textures from the real renderer
+    (`/dev/hero-capture/:kind`) → `public/hero/textures/`, `hero/hero-captures.json`;
+  - `hero:gifts` - light gift GLBs from the catalog sources → `public/hero/gifts/`, `hero/hero-gifts.json`;
+  - `hero:story` - the structure-preserving optimisation + verification of the raw export →
+    `public/hero/story.<hash8>.glb`, `hero/hero-story.json`; `hero:story-check` plays it in plain
+    three.js against Blender's reference positions;
+  - `hero:posters` - the start / end posters from the runtime's canvas (`/dev/hero?capture&t=0|end`)
+    → `public/hero/posters/`, `hero/hero-posters.json`;
+  - `hero:assets` - writes `hero-assets.generated.ts` (lazy hero chunk) and `hero-home.generated.ts`
+    (home chunk: story URL, posters, credits) from the manifests; exit 1 on an incomplete manifest.
+- Rebuild order after a story change: Blender stages → `hero:story` → `hero:capture` →
+  `hero:gifts` → `hero:posters` (the posters show everything else, so they come last).
+- The capture scripts run the app on **port 4330** (`ng serve`, started only when nothing answers
+  there and stopped afterwards); `hero:posters` takes `HERO_APP_URL` to reuse a running dev server
+  instead. They mock every `/v1` request with 401 (a guest) and never reach a backend.
 
 ---
 
@@ -1003,6 +1054,10 @@ named test accounts), never a test fixture and never touched with SQL.
     Requests to 8080 are blocked. `npm run e2e:down` removes the database.
   - After a backend change rebuild the jar (`mvnw -DskipTests package`) before `e2e:backend`; after
     a schema change run `e2e:down` first, because a running e2e database keeps its old schema.
+- Port 4330 belongs to the hero capture scripts (`hero:capture`, `hero:posters`, section 16), so a
+  capture and an e2e run never share a server.
+- `e2e/home.spec.ts` pins the hero's stills (reduced motion: end poster + "Play animation"; no
+  WebGL: end poster, no controls); the 3D itself is checked on `/dev/hero`, not in the suite.
 - Stable under parallel workers (headless Chromium renders WebGL in software): reduced motion for
   every spec (`playwright.config.ts`), and a spec that asserts nothing about the 3D calls
   `withoutWebGl(page)` (`e2e/support/scene.ts`; the scene keeps its preview image). The parity spec

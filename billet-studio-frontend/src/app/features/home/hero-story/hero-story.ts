@@ -12,6 +12,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { HeroStoryController } from './hero-story-controller';
@@ -22,12 +23,15 @@ const NEAR_VIEWPORT = '50% 0px';
 const IDLE_FALLBACK_MS = 200;
 const IDLE_TIMEOUT_MS = 2000;
 const HINT_MS = 4000;
+/** The posters' pixel size (capture-hero-posters.mjs: 512 CSS px at device pixel ratio 2). */
+const POSTER_PX = 1024;
 
 /**
- * The hero's stage: a reserved square in which the canvas fades in over a quiet placeholder once
- * the first 3D frame is drawn, the story's controls and the credit of the gift on it. The 3D loads
- * after the first render, when the browser is idle and the stage is near the viewport; it
- * autoplays once at least half of it is visible (HeroStoryController).
+ * The hero's stage: a reserved square in which the canvas fades in over the poster (the first frame
+ * or the idle pose; a quiet placeholder while none is built) once the first 3D frame is drawn, the
+ * story's controls and the credit of the gift on it. The 3D loads after the first render, when the
+ * browser is idle and the stage is near the viewport; it autoplays once at least half of it is
+ * visible (HeroStoryController).
  *
  * Pause/play and replay exist only while an animation does: they are rendered once the 3D is
  * ready, never disabled in its place. This is a deliberate exception to "disabled, not hidden"
@@ -36,7 +40,7 @@ const HINT_MS = 4000;
  */
 @Component({
   selector: 'app-hero-story',
-  imports: [TranslatePipe],
+  imports: [NgOptimizedImage, TranslatePipe],
   templateUrl: './hero-story.html',
   styleUrl: './hero-story.scss',
 })
@@ -50,10 +54,15 @@ export class HeroStory {
   private readonly unavailable = viewChild<ElementRef<HTMLElement>>('unavailable');
   private readonly injector = inject(Injector);
 
+  protected readonly posterSize = POSTER_PX;
   protected readonly ready = computed(() => this.controller.status() === 'ready');
   protected readonly fallback = computed(() => this.controller.status() === 'fallback');
-  /** Until the first 3D frame; never in the fallback, where no frame is coming. */
-  protected readonly placeholder = computed(() => !this.ready() && !this.fallback());
+  /** Until the first 3D frame, where no poster is built; never in the fallback. */
+  protected readonly placeholder = computed(
+    () => !this.ready() && !this.fallback() && !this.controller.poster(),
+  );
+  /** The stage describes the story while it may play; the fallback's still describes itself. */
+  protected readonly posterAlt = computed(() => (this.fallback() ? 'HERO.POSTER_ALT' : ''));
   /** Nothing loads until "Play animation": the placeholder stands still. */
   protected readonly still = computed(() => this.controller.status() === 'gated');
   /** The stage as an image with its text alternative; nothing to describe in the fallback. */

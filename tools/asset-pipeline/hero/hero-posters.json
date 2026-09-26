@@ -1,0 +1,58 @@
+{
+  "entries": [
+    {
+      "kind": "start",
+      "lang": "de",
+      "mode": null,
+      "file": "hero/posters/start-de.d0583dd1.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 16582
+    },
+    {
+      "kind": "start",
+      "lang": "en",
+      "mode": null,
+      "file": "hero/posters/start-en.93eebb53.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 15978
+    },
+    {
+      "kind": "end",
+      "lang": "de",
+      "mode": "light",
+      "file": "hero/posters/end-de-light.ea3721d7.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 27032
+    },
+    {
+      "kind": "end",
+      "lang": "de",
+      "mode": "dark",
+      "file": "hero/posters/end-de-dark.b6003401.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 28358
+    },
+    {
+      "kind": "end",
+      "lang": "en",
+      "mode": "light",
+      "file": "hero/posters/end-en-light.695a0e6f.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 26804
+    },
+    {
+      "kind": "end",
+      "lang": "en",
+      "mode": "dark",
+      "file": "hero/posters/end-en-dark.c494c135.webp",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "bytes": 27878
+    }
+  ]
+}

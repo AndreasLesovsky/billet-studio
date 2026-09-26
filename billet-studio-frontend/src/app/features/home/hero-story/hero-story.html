@@ -1,5 +1,5 @@
 <div class="ui-hero-stage hero-story__stage">
-  <!-- Without 3D (no WebGL, a failed load) the square stays empty: no image, nothing to describe. -->
+  <!-- Without 3D (no WebGL, a failed load) only the end poster remains, described by its alt. -->
   <div
     #container
     class="hero-story__scene"
@@ -7,6 +7,17 @@
     [attr.aria-label]="figure()?.label | translate"
     [attr.aria-describedby]="figure()?.describedBy"
   >
+    @if (controller.poster(); as poster) {
+      <img
+        class="ui-hero-stage__poster hero-story__layer"
+        [class.ui-hero-stage__poster--covered]="ready()"
+        [ngSrc]="poster"
+        [width]="posterSize"
+        [height]="posterSize"
+        [alt]="posterAlt() | translate"
+        priority
+      />
+    }
     @if (placeholder()) {
       <div
         class="ui-hero-stage__placeholder"
@@ -16,7 +27,7 @@
     }
     <canvas
       #canvas
-      class="ui-hero-stage__canvas hero-story__canvas"
+      class="ui-hero-stage__canvas hero-story__layer hero-story__canvas"
       [class.ui-hero-stage__canvas--shown]="ready()"
       aria-hidden="true"
     ></canvas>

@@ -16,7 +16,8 @@ phone cycles through the occasions. This file is the single contract between
 | Story manifest | `tools/asset-pipeline/hero/hero-story.json` | `npm run hero:story` |
 | Textures (print, screens, lock, notification) | `public/hero/textures/*.<hash8>.webp` + `hero/hero-captures.json` | `npm run hero:capture` |
 | Light gifts | `public/hero/gifts/<slug>.<hash8>.glb` + `hero/hero-gifts.json` | `npm run hero:gifts` |
-| Runtime asset table | `src/app/features/home/hero-story/hero-assets.generated.ts` + `hero-home.generated.ts` | `npm run hero:assets` (reads the three manifests; `hero:capture` and `hero:gifts` run it at their end, `hero:story` must too) |
+| Posters | `public/hero/posters/<name>.<hash8>.webp` + `hero/hero-posters.json` | `npm run hero:posters` |
+| Runtime asset table | `src/app/features/home/hero-story/hero-assets.generated.ts` + `hero-home.generated.ts` | `npm run hero:assets` (reads the manifests; `hero:capture`, `hero:gifts`, `hero:story` and `hero:posters` run it at their end) |
 
 ### Story manifest (`hero-story.json`)
 
@@ -29,6 +30,21 @@ phone cycles through the occasions. This file is the single contract between
 - `bytes`: its size, a positive number.
 - Further keys are allowed and ignored. Anything else makes `hero:assets` exit 1 without writing,
   and the home page keeps showing the hero without 3D.
+
+### Posters
+
+Stills of the runtime itself, read from the canvas of `/dev/hero?capture&t=0|end` (512 CSS px at
+device pixel ratio 2 = 1024 px square, WebP with alpha: the page shows through around the story):
+
+| Poster | Frame | Variants | Shown |
+|---|---|---|---|
+| `start-<lang>` | t = 0 (only the printed card, always light) | de, en | while the 3D loads for a story that will autoplay; the canvas fades in over it |
+| `end-<lang>-<mode>` | the idle pose (the phone's screen follows the site's mode) | de, en × light, dark | reduced motion / saved data (with "Play animation"), no WebGL or a failed load (for good, with the poster's alt text), a later visit in the same session; until the canvas is ready |
+
+`hero-home.generated.ts` carries them (`posters: null` without a capture: a placeholder plate
+stands in). The poster shown first has `priority` (NgOptimizedImage, `fetchpriority="high"`); the
+stage's square is reserved, so nothing shifts. After a change to the story, the textures or the
+gifts' look, run `hero:posters` again, or a poster no longer matches the frame it stands for.
 
 ## Units and axes
 

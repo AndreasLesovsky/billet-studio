@@ -142,7 +142,8 @@
     "PLAY_ANIMATION": "Play animation",
     "DRAG_HINT": "Drag to turn",
     "CREDIT_PREFIX": "3D model:",
-    "UNAVAILABLE": "Animation not available on this device"
+    "UNAVAILABLE": "Animation not available on this device",
+    "POSTER_ALT": "A phone shows a digital Valentine’s Day billet with a red 3D heart standing in front of it."
   },
   "BILLETS": {
     "TITLE": "My billets",

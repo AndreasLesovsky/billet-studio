@@ -38,11 +38,13 @@ billet-studio/
 │   │   ├── layout/               App-Shell, schlichtes Layout
 │   │   └── billet/               Renderer (Editor-Vorschau und öffentliche Seite = dieselbe Ansicht)
 │   ├── public/models/            GLBs + Vorschaubilder (Ausgabe der Asset-Pipeline)
+│   ├── public/hero/              3D-Hero der Startseite: Story, Texturen, Geschenke, Poster (Pipeline-Ausgabe)
 │   └── e2e/                      Playwright-Tests (gemockt, Parität, axe, echtes Backend)
 ├── billet-studio-rest-service/   Spring Boot, Paket app.billetstudio (auth, shared, catalog, billet)
 ├── sql/                          schema.sql, Seeds, migrations/ – spielst du selbst ein
-├── docs/                         API-Vertrag, Billet-Dokument, Muttertag-Referenzdokument
-├── tools/asset-pipeline/         Skripte für GLBs, Vorschaubilder, Schriften, seed_models.sql
+├── docs/                         API-Vertrag, Billet-Dokument, Hero-Story-Vertrag, Muttertag-Referenzdokument
+├── tools/asset-pipeline/         Skripte für GLBs, Vorschaubilder, Schriften, seed_models.sql, Hero-Assets
+├── tools/blender/hero/           Blender-Python-Skripte der Hero-Story (headless), Roh-Export
 ├── docker-compose.e2e.yml        Wegwerf-MariaDB für die e2e-Tests mit echtem Backend
 ├── CLAUDE.md                     Entwicklungsstandards
 ├── README.md
@@ -177,6 +179,38 @@ npm run fonts                     # Schriften neu bauen
 
 ---
 
+## Hero
+
+Die Startseite spielt eine kurze 3D-Story: Eine Valentinstagskarte klappt auf, ein schlagendes Herz
+springt heraus, ein Handy empfängt den Link, die Karte gleitet ins Display und wird zum echten Billet;
+danach wechselt das Handy durch die Anlässe. Vertrag zwischen Blender und Laufzeit:
+[docs/hero-story.md](docs/hero-story.md); Laufzeit: `billet-studio-frontend/src/app/features/home/hero-story/`.
+
+Alles unter `public/hero/` entsteht per Skript, mit Inhalts-Hash im Dateinamen. Neu bauen, in dieser
+Reihenfolge (jeder Schritt braucht die vorigen; nur, was sich geändert hat, und ab dort alles danach):
+
+```bat
+set B="C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup -P tools\blender\hero\build.py --
+%B% --stage bake --render         & rem Blender: Story, Schatten-Bakes, Prüfbilder
+%B% --stage export                & rem tools/blender/hero/export/hero-story.glb (eingecheckt)
+cd tools\asset-pipeline
+npm run hero:story                & rem optimieren + prüfen → public/hero/story.<hash>.glb
+npm run hero:story-check          & rem optional: in three.js gegen Blenders Positionen
+npm run hero:capture              & rem Druck-, Display-, Sperr- und Nachrichten-Texturen
+npm run hero:gifts                & rem leichte Geschenke
+npm run hero:posters              & rem Start- und End-Poster aus dem Canvas der Laufzeit
+```
+
+- Jeder erzeugende Schritt endet mit `hero:assets`, das die Asset-Tabellen der Laufzeit
+  (`hero-assets.generated.ts`, `hero-home.generated.ts`) neu schreibt.
+- `hero:capture` und `hero:posters` starten `ng serve` auf Port **4330**, wenn dort nichts antwortet,
+  und beenden nur, was sie selbst gestartet haben. `hero:posters` nimmt mit `HERO_APP_URL`
+  (z. B. `set HERO_APP_URL=http://localhost:4200`) einen laufenden Dev-Server.
+- Einzelheiten: [tools/blender/hero/README.md](tools/blender/hero/README.md) und
+  [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md).
+
+---
+
 ## Modelle vom Backend ausliefern
 
 Heute liefert die Angular-App die 3D-Modelle mit aus (`billet-studio-frontend/public/models/`: die GLBs und `previews/` mit den WebP-Vorschaubildern). `tbl_models` speichert nur relative Pfade (`models/<slug>.v<n>.glb`, `models/previews/<slug>.v<n>.webp`), und das Backend macht daraus mit `MODELS_BASE_URL` die absoluten URLs, die Editor und `/b/:token` laden. Später liegen die Dateien auf dem Server neben dem Spring-Boot-Backend. Der Umzug heißt: Dateien kopieren, zwei Werte setzen – **keine Datenbankänderung, kein SQL**.
@@ -259,6 +293,14 @@ location ^~ /models/ {
     # brotli off;   # nur mit geladenem brotli-Modul
 }
 
+# 3D-Hero der Startseite: jeder Dateiname trägt einen Inhalts-Hash, eine URL ändert nie ihren Inhalt.
+location ^~ /hero/ {
+    types { model/gltf-binary glb; image/webp webp; }
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    gzip off;
+    # brotli off;   # nur mit geladenem brotli-Modul
+}
+
 # Geteilte Billets sind private Grüße: nicht indexieren. Die Seite setzt zusätzlich <meta name="robots">,
 # das sehen aber nur Crawler, die JavaScript ausführen.
 location ^~ /b/ {
@@ -293,7 +335,7 @@ Jede Phase wird umgesetzt, geprüft und dann lokal committet.
 | **P6** Editor (Gast) | Editor mit Undo/Redo, Panels für Inhalt, Design, Abstände, 3D und Partikel, eigene Picker (Farbe, Schrift, Modell, Emoji), Speicherung im Browser | erledigt |
 | **P7** Server-Speicherung | Autosave mit Konflikterkennung, Billet-Liste, Import der Gast-Billets, Teilen-Dialog (veröffentlichen, aktualisieren, zurückziehen), e2e gegen das echte Backend (Docker Compose) | erledigt |
 | **P8** Härtung + Doku | fallow-Audit, Bundle-Budgets (three.js nur im Lazy-Chunk), axe-Prüfung aller Seiten und Dialoge (`e2e/a11y.spec.ts`), stabile parallele e2e-Läufe, Sicherheitsdurchsicht, Theme-Farbfelder in „Meine Billets“ (`tbl_billets.theme`), Toasts unten und über Dialogen, Modelle optional vom Backend ausliefern (`MODELS_DIRECTORY`) mit Runbook, nginx-Hinweise, Blender-Export-Checkliste, README/CLAUDE.md | erledigt (Lighthouse offen) |
-| **Hero-Story C** (eigener Folgeplan) | Home-Hero als Sequenz: Das Billet steht → klappt auf → schwebt in ein Handy-Mockup, auf dessen Display das echte Billet läuft (Video-Textur). Modelle (stehend, liegend, Handy) und die Aufklapp-Animation kommen aus Blender, in mehreren Iterationen | zurückgestellt, nach P8 |
+| **Hero-Story** | 3D-Story im Home-Hero: Valentinstag als Paradebeispiel, Texturen aus dem echten Renderer, Karte, Handy und Choreografie per Blender-Python (headless) mit Bakes und Export, struktur-erhaltende Optimierung, leichte Geschenke, Laufzeit mit Kapiteln, Pause/Replay, Ruhezustand mit Anlass-Wechsel und Drehen, Start-/End-Poster aus dem Canvas, reduzierte Bewegung / Datensparmodus / ohne WebGL, LCP-Messung, `e2e/home.spec.ts` | erledigt |
 
 ---
 

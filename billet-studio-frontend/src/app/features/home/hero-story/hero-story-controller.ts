@@ -33,9 +33,12 @@ import type { HeroPhase } from './hero-timeline';
  * - `waiting`: the 3D loads once the stage is near the viewport;
  * - `gated`: reduced motion or a data saver: nothing loads until "Play animation";
  * - `loading`, `ready`;
- * - `fallback`: no story, no WebGL or a failed load: the chapters stand alone, no controls.
+ * - `fallback`: no story, no WebGL or a failed load: the end poster and the chapters, no controls.
  */
 type HeroStatus = 'waiting' | 'gated' | 'loading' | 'ready' | 'fallback';
+
+/** The story's first frame (it will play from there) or its idle pose (it will not, or already did). */
+type HeroPosterKind = 'start' | 'end';
 
 /** The dev page's inspection switches (/dev/hero?t&lang&mode&debug&capture). */
 export interface HeroStoryOptions {
@@ -87,6 +90,8 @@ export class HeroStoryController {
   readonly available = this.storyUrl !== null;
 
   private readonly statusState = signal<HeroStatus>(this.initialStatus());
+  /** Fixed per page: the poster must not change while the 3D loads behind it. */
+  private readonly posterKind = this.initialPosterKind();
   private readonly beatState = signal(0);
   private readonly playingState = signal(false);
   private readonly phaseState = signal<HeroPhase>('story');
@@ -116,6 +121,17 @@ export class HeroStoryController {
     }),
     { equal: (a, b) => a.lang === b.lang && a.mode === b.mode },
   );
+  /**
+   * The still that stands in for the 3D until its first frame (the canvas fades in over it), and
+   * for good where there is none: the idle pose without WebGL or after a failed load.
+   */
+  readonly poster = computed(() => {
+    const posters = HERO_HOME.posters;
+    const kind = this.status() === 'fallback' ? 'end' : this.posterKind;
+    if (!posters || !kind) return null;
+    const { lang, mode } = this.variant();
+    return kind === 'start' ? posters.start[lang] : posters.end[lang][mode];
+  });
   private host: StageHost | null = null;
   private booting = false;
   private halfVisible = false;
@@ -211,6 +227,19 @@ export class HeroStoryController {
     if (!this.available) return 'fallback';
     if (this.options.time !== undefined) return 'waiting';
     return this.reducedMotion() || this.saveData ? 'gated' : 'waiting';
+  }
+
+  /**
+   * The start poster where the story will autoplay from its first frame; the end poster where it
+   * waits for "Play animation" or a later visit starts in the idle phase. A dev time other than the
+   * two ends has none.
+   */
+  private initialPosterKind(): HeroPosterKind | null {
+    const { time } = this.options;
+    if (time === 0) return 'start';
+    if (time === 'end') return 'end';
+    if (time !== undefined) return null;
+    return this.statusState() === 'gated' || readSeen() ? 'end' : 'start';
   }
 
   private async boot(): Promise<void> {
@@ -324,7 +353,7 @@ export class HeroStoryController {
     this.statusState.set('fallback');
     if (this.errorLogged) return;
     this.errorLogged = true;
-    console.warn('Hero story: 3D unavailable, showing the chapters only.', error);
+    console.warn('Hero story: 3D unavailable, the hero stays still.', error);
   }
 
   private markSeen(): void {

@@ -27,10 +27,16 @@
     inset: 0;
 }
 
-.hero-story__canvas {
+// The poster and the canvas cover the same square, the canvas on top.
+.hero-story__layer {
+    position: absolute;
+    inset: 0;
     display: block;
     inline-size: 100%;
     block-size: 100%;
+}
+
+.hero-story__canvas {
     // Horizontal drags turn the gift, vertical swipes scroll the page (the stage sets it inline too).
     touch-action: pan-y;
 }

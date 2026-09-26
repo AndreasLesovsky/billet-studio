@@ -1,8 +1,8 @@
 # Hero build (Blender, headless)
 
-Script-built models for the animated home-page hero. The Python scripts are the source of truth.
-Every run starts from Blender's factory startup, builds from scratch and never touches your open
-Blender scene.
+Script-built models for the animated home-page hero (live on the home page; contract with the
+runtime: `docs/hero-story.md`). The Python scripts are the source of truth. Every run starts from
+Blender's factory startup, builds from scratch and never touches your open Blender scene.
 
 ## Run
 
@@ -28,7 +28,14 @@ set B="C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory
 %B% --stage bake --render      & rem shadows for the new poses, story checks, renders
 %B% --stage export             & rem export/hero-story.glb (committed pipeline input)
 cd tools\asset-pipeline && npm run hero:story && npm run hero:story-check
+npm run hero:posters           & rem the start / end posters show the new story
 ```
+
+The whole hero rebuild order: Blender stages -> `hero:story` -> `hero:capture` -> `hero:gifts` ->
+`hero:posters` (README "Hero"). Textures and gifts need a new run only when their own inputs change
+(a template, a gift model); the posters come last because they show all of it. The story stages
+read the Valentinstag DE prints from `tools/asset-pipeline/hero/.captures/` (gitignored), so a fresh
+clone runs `hero:capture` once before `story` / `bake` / `export`.
 
 `bake` is needed whenever a shadow's pose changes (the card's turn at 0.5 s / 3.4 s, the phone's rest
 pose, a patch's size or AO distance); the camera framing includes the baked shadows, so `bake`

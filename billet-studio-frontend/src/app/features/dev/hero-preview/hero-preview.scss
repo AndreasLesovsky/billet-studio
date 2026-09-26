@@ -17,6 +17,16 @@
     inline-size: 100%;
 }
 
+.hero-preview--capture {
+    padding: 0;
+
+    // A poster capture (tools/asset-pipeline/hero/capture-hero-posters.mjs): the stage is exactly
+    // as wide as the window, so the window's width in CSS px is the poster's.
+    .hero-preview__stage {
+        --hero-stage-size: 100%;
+    }
+}
+
 .hero-preview__chapters {
     inline-size: min(100%, 36rem);
 }

@@ -22,13 +22,17 @@
 }
 
 // Nothing of the story leaves 4..96 % of the frame; the soft edge is only a safety net, so a stray
-// pixel fades instead of ending on a hard line.
-.ui-hero-stage__canvas {
-    opacity: 0;
+// pixel fades instead of ending on a hard line. The poster is a frame of the canvas: same edge.
+.ui-hero-stage__canvas,
+.ui-hero-stage__poster {
     mask-image:
         linear-gradient(to right, transparent, currentColor 2.5%, currentColor 97.5%, transparent),
         linear-gradient(to bottom, transparent, currentColor 2.5%, currentColor 97.5%, transparent);
     mask-composite: intersect;
+}
+
+.ui-hero-stage__canvas {
+    opacity: 0;
     transition: opacity var(--ui-duration-slow) var(--ui-ease);
 }
 
@@ -36,7 +40,15 @@
     opacity: 1;
 }
 
-// Until the first 3D frame: a quiet plate where the story will stand. Still while nothing loads
+// The first frame or the idle pose until the 3D is drawn. The canvas is transparent around the
+// story, so once it has faded in over the poster, the poster goes (and returns at once if the 3D
+// fails later).
+.ui-hero-stage__poster--covered {
+    visibility: hidden;
+    transition: visibility 0s linear var(--ui-duration-slow);
+}
+
+// Until the first 3D frame, where no poster is built: a quiet plate where the story will stand. Still while nothing loads
 // (reduced motion or a data saver before "Play animation"); gone in the no-3D fallback.
 .ui-hero-stage__placeholder {
     @include feedback.skeleton-plane;
