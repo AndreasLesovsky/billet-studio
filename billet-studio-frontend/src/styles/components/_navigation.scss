@@ -21,6 +21,9 @@
     border-start-start-radius: var(--ui-radius-sm);
     border-start-end-radius: var(--ui-radius-sm);
     background: none;
+    // The tab overlaps the row's baseline by 1px (margin above): its hover fill stops above the
+    // bottom border, so the baseline stays visible.
+    background-clip: padding-box;
     color: var(--ui-text-muted);
     font-family: inherit;
     font-size: var(--ui-text-sm);
