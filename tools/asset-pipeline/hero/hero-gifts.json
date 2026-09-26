@@ -1,0 +1,101 @@
+{
+  "gifts": [
+    {
+      "templateId": "valentinstag",
+      "slug": "beating-heart",
+      "file": "hero/gifts/beating-heart.a254f675.glb",
+      "bytes": 25532,
+      "triangles": 4800,
+      "textures": 0,
+      "maxTexturePx": 0,
+      "animations": [
+        "Take 001"
+      ],
+      "credit": "PUMPING HEART MODEL by omarelone (CC-BY-4.0) https://sketchfab.com/3d-models/pumping-heart-model-6f815b9822dc479eae0a17b8dcab9c75",
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "templateId": "geburtstag",
+      "slug": "birthday-cake",
+      "file": "hero/gifts/birthday-cake.6721f86c.glb",
+      "bytes": 459752,
+      "triangles": 40000,
+      "textures": 1,
+      "maxTexturePx": 1024,
+      "animations": [],
+      "credit": "Birthday Cake by Taylor (CC-BY-4.0) https://sketchfab.com/3d-models/birthday-cake-054d99bef15c4905b9f7ffe95ce9a08a",
+      "scene": {
+        "fitSize": 2,
+        "yOffset": -0.08,
+        "exposure": 0.85,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "templateId": "hochzeit",
+      "slug": "champagne-bottle",
+      "file": "hero/gifts/champagne-bottle.ea0a63b6.glb",
+      "bytes": 170468,
+      "triangles": 1036,
+      "textures": 3,
+      "maxTexturePx": 1024,
+      "animations": [],
+      "credit": "Champagne Bottle by ethan_garden (CC-BY-4.0) https://sketchfab.com/3d-models/champagne-bottle-1ce8a43374bf4057b757dc635351042b",
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "templateId": "weihnachten",
+      "slug": "snow-globe",
+      "file": "hero/gifts/snow-globe.5b3963ff.glb",
+      "bytes": 551256,
+      "triangles": 49482,
+      "textures": 4,
+      "maxTexturePx": 512,
+      "animations": [],
+      "credit": "Christmas Ball by Ivanix88 (CC-BY-4.0) https://sketchfab.com/3d-models/christmas-ball-36868988285f4b60b3e389e1aa1bab3f",
+      "scene": {
+        "fitSize": 1.35,
+        "yOffset": 0.07,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    },
+    {
+      "templateId": "muttertag",
+      "slug": "flower-bouquet",
+      "file": "hero/gifts/flower-bouquet.79f51c7f.glb",
+      "bytes": 758412,
+      "triangles": 59794,
+      "textures": 20,
+      "maxTexturePx": 256,
+      "animations": [],
+      "credit": "Flower Bouquet by icecool (CC-BY-4.0) https://sketchfab.com/3d-models/flower-bouquet-48e92013548247a9ad486dc13110c9b4",
+      "scene": {
+        "fitSize": 1.6,
+        "yOffset": -0.08,
+        "exposure": 0.6,
+        "cameraDistance": 2.8,
+        "cameraHeight": 0.1,
+        "autoRotateSpeed": 0.45
+      }
+    }
+  ]
+}

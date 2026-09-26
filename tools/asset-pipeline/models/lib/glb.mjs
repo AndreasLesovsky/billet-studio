@@ -20,6 +20,14 @@ export function readGlbJson(path) {
   }
 }
 
+/** The JSON chunk of GLB bytes already in memory. */
+export function parseGlbJson(bytes) {
+  const glb = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  if (glb.readUInt32LE(0) !== GLB_MAGIC) throw new Error('not a GLB file');
+  if (glb.readUInt32LE(16) !== CHUNK_JSON) throw new Error('first chunk is not JSON');
+  return JSON.parse(glb.toString('utf8', 20, 20 + glb.readUInt32LE(12)));
+}
+
 // Sketchfab writes "Name (https://...)"; the URL part is dropped so the credit stays short.
 const stripTrailingUrl = (value) =>
   String(value ?? '')

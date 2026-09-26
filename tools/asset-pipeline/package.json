@@ -15,7 +15,9 @@
     "models:compare": "node models/render-previews.mjs --compare",
     "fonts": "node fonts/merge-fonts.mjs",
     "fonts:check": "node fonts/merge-fonts.mjs --check",
-    "hero:capture": "node hero/capture-hero.mjs"
+    "hero:capture": "node hero/capture-hero.mjs",
+    "hero:gifts": "node hero/build-hero-gifts.mjs",
+    "hero:compare": "node hero/compare-hero-gifts.mjs"
   },
   "devDependencies": {
     "@gltf-transform/cli": "4.5.0",

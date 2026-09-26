@@ -1,0 +1,52 @@
+{
+  "outputDir": "../../../billet-studio-frontend/public/hero/gifts",
+  "publicPath": "hero/gifts",
+  "gifts": [
+    {
+      "templateId": "valentinstag",
+      "slug": "beating-heart",
+      "sizeLimitKB": 30
+    },
+    {
+      "templateId": "geburtstag",
+      "slug": "birthday-cake",
+      "maxTextureSize": 1024,
+      "textureQuality": 80,
+      "stripUnlitNormals": true,
+      "simplify": { "ratio": 0.08, "error": 0.01 },
+      "sizeLimitKB": 500
+    },
+    {
+      "templateId": "hochzeit",
+      "slug": "champagne-bottle",
+      "maxTextureSize": 1024,
+      "textureQuality": 85,
+      "losslessNormals": true,
+      "normalTextureSize": 512,
+      "sizeLimitKB": 250
+    },
+    {
+      "templateId": "weihnachten",
+      "slug": "snow-globe",
+      "maxTextureSize": 512,
+      "textureQuality": 70,
+      "losslessNormals": true,
+      "normalTextureSize": 256,
+      "sizeLimitKB": 560
+    },
+    {
+      "templateId": "muttertag",
+      "slug": "flower-bouquet",
+      "maxTextureSize": 256,
+      "textureQuality": 70,
+      "stripUnlitNormals": true,
+      "simplify": {
+        "ratio": 0.15,
+        "error": 0.007,
+        "flags": ["Permissive"],
+        "keepMaterials": ["Stems"]
+      },
+      "sizeLimitKB": 760
+    }
+  ]
+}

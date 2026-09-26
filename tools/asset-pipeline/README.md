@@ -8,6 +8,7 @@ Erzeugt alles, was billet-studio an Binär-Assets ausliefert, und die dazugehör
 | `billet-studio-frontend/public/models/previews/<slug>.v<n>.webp` | `models/render-previews.mjs` |
 | `sql/seed_models.sql` | `models/generate-seed-models.mjs` |
 | `billet-studio-frontend/public/fonts/**`, Font-Katalog | `fonts/merge-fonts.mjs` |
+| `billet-studio-frontend/public/hero/gifts/<slug>.<hash>.glb`, `hero/hero-gifts.json` | `hero/build-hero-gifts.mjs` |
 
 Diese Dateien werden **nie von Hand** kopiert oder bearbeitet. Wer etwas ändern will, ändert das Manifest
 (oder das Skript) und lässt die Pipeline erneut laufen.
@@ -31,6 +32,8 @@ Node 22 oder neuer. `node_modules/` ist per `.gitignore` ausgeschlossen, `packag
 | `npm run models:previews` | WebP-Vorschaubilder rendern (headless Chromium, SwiftShader) |
 | `npm run models:seed` | `sql/seed_models.sql` neu schreiben |
 | `npm run models:compare` | Qualitätsprüfung: Quelle und optimiertes Modell gleich rendern und vergleichen (siehe unten) |
+| `npm run hero:gifts` | leichte Geschenk-Modelle für den 3D-Hero der Startseite bauen (siehe unten) |
+| `npm run hero:compare` | leichte Hero-Geschenke neben der Katalog-Version rendern (`hero/.captures/gifts-compare.png`) |
 | `npm run fonts` | Fonts neu bauen (`fonts/merge-fonts.mjs`) |
 | `npm run fonts:check` | nur prüfen, ob die Font-Ausgaben vollständig sind (kein Netz, keine Schreibzugriffe) |
 
@@ -127,6 +130,36 @@ als GLB, Manifest, `preview.html` und Render-Skript sind.
 6. **Datenbank**: `sql/seed_models.sql` spielst **du** ein (phpMyAdmin oder
    `mysql -u root -p db_billet_studio < sql/seed_models.sql`). Die Datei ist idempotent und kann
    jederzeit erneut eingespielt werden. Claude führt nie SQL aus.
+
+## Hero-Geschenke
+
+Der 3D-Hero der Startseite zeigt pro Anlass ein Geschenk mit etwa 150–300 CSS-px (DPR 2). Dafür baut
+`npm run hero:gifts` leichte Fassungen der fünf Katalog-Modelle, **aus den Quell-GLBs** (nicht aus
+`public/models`, sonst würden die Texturen zweimal verlustbehaftet kodiert) mit derselben
+Transform-Liste wie der Katalog (`models/lib/optimize.mjs`):
+
+- `hero/hero.manifest.json`: `templateId` → Katalog-`slug`, pro Geschenk `sizeLimitKB` und die
+  Abweichungen vom Katalog: `maxTextureSize`, `textureQuality`, `losslessNormals`, `simplify`
+  (`ratio`, `error`, optional `flags` für meshoptimizer, z. B. `Permissive`, und `keepMaterials`:
+  Materialien, deren Primitive unvereinfacht bleiben, etwa die dünnen Stiele des Straußes),
+  `normalTextureSize` (Größe der verlustfreien Normal-Maps) und `stripUnlitNormals` (entfernt `NORMAL`
+  bei `KHR_materials_unlit`-Materialien; erst damit lassen sich Scans wie Torte und Strauß vereinfachen).
+  Quelle, `excludeMaterials`, `opaqueMaterials`, Credit und Szenen-Standardwerte kommen aus
+  `models/models.manifest.json`. Animierte Modelle werden nie vereinfacht (das schlagende Herz bleibt
+  eine unveränderte Kopie der Katalog-Einstellungen). Die Schneekugel wird nicht vereinfacht: ihr
+  Toon-Umriss ist eine invertierte Hülle mit derselben Topologie wie das Innere; getrennt vereinfacht
+  passen beide nicht mehr zusammen (dunkle Flocken, schwarzer Kamin).
+- Ausgabe: `public/hero/gifts/<slug>.<8 Zeichen Inhalts-Hash>.glb` (veraltete Hashes werden gelöscht)
+  und `hero/hero-gifts.json` (Datei, Bytes, Dreiecke, Texturen, Animations-Clips, Credit,
+  Szenen-Standardwerte). Nichts davon landet in `seed_models.sql`.
+- Exit-Code 1 und **nichts geschrieben**, wenn ein Geschenk sein `sizeLimitKB` reißt oder `verify()`
+  scheitert (verlorene Animation oder Erweiterung).
+
+`npm run hero:compare` rendert jedes leichte Geschenk neben der Katalog-Version mit `models/preview.html`
+bei 320 CSS-px × DPR 2, in vier gleichmäßig verteilten Drehwinkeln (der Hero dreht das Geschenk), und
+schreibt `hero/.captures/gifts-compare.png` (pro Geschenk der schlechteste Winkel: Katalog | leicht |
+Differenz, mit Dateigrößen) plus `gifts-compare-<slug>.png` mit allen vier Winkeln. Nach jeder Änderung
+am Manifest ansehen.
 
 ## Fonts
 
