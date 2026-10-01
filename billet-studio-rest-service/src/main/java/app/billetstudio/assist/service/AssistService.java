@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import app.billetstudio.assist.dto.AssistBilletDto;
 import app.billetstudio.assist.dto.AssistReply;
 import app.billetstudio.assist.dto.AssistRequest;
 import app.billetstudio.assist.dto.AssistStatus;
@@ -97,15 +98,21 @@ public class AssistService {
         }
         questionnaire.validate(request.conversation());
         client.awaitReady();
+        AssistBilletDto offered = BilletQuestionnaire.offered(request.conversation());
         Map<String, String> answers;
+        String written = null;
         acquireSlot();
         try {
             answers = client.answer(questionnaire.questionnaire(catalog.listActive()),
                 questionnaire.state(request.conversation()));
+            if (BilletQuestionnaire.needsMessageLanguage(offered, answers)) {
+                written = client.answer(questionnaire.messageLanguageQuestionnaire(),
+                    questionnaire.messageState(request.conversation())).get("messageLanguage");
+            }
         } finally {
             slot.release();
         }
-        return questionnaire.merge(BilletQuestionnaire.offered(request.conversation()), answers);
+        return questionnaire.merge(offered, answers, written);
     }
 
     private void acquireSlot() {

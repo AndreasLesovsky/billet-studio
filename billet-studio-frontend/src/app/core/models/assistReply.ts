@@ -11,6 +11,6 @@ import { AssistBilletDto } from './assistBilletDto';
 
 export interface AssistReply {
   billet: AssistBilletDto;
-  /** ASSIST.NOTES.<code>: OFF_TOPIC, NOTHING_RECOGNISED, NO_CHANGE, PARTICLES_ / MODEL_NOT_SUPPORTED. */
+  /** ASSIST.NOTES.<code>: OFF_TOPIC, NOTHING_RECOGNISED, NO_CHANGE, MODEL_NOT_SUPPORTED. */
   notes: string[];
 }

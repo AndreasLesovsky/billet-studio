@@ -1179,7 +1179,9 @@ Before a phase is committed:
   before the state, real question names as JSON keys, `reasoning` first (maxLength 300), an enum per
   question, temperature 0, num_ctx 12288, one prompt for both languages. Schema, request and state are
   built as Jackson trees (records would be sorted alphabetically). Change none of it without running
-  `AssistEval` again. No question asks for an exact number or an order; amounts are relative steps.
+  `AssistEval` again (last result in `docs/assist.md`: 22/22). No question asks for an exact number
+  or an order; amounts are relative steps. The language a message is written in is its own
+  one-question call (`messageLanguage`), never a label among the seven.
 - **Privacy:** never log the user's messages or the model's reasoning (the backend logs
   `app.billetstudio` at DEBUG into a file); only labels leave the service.
 - **The GPU:** the status probe never loads the model; it loads when someone focuses the input

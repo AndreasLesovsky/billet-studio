@@ -258,7 +258,7 @@ cd billet-studio-rest-service
 mvnw.cmd test -Dtest=AssistEval     # ./mvnw elsewhere
 ```
 
-`AssistEval` runs German and English sentences, follow-ups, unsupported wishes and off-topic messages through the real questionnaire, client and merge, and prints the Ollama version, the model digest, the hit rate per question and the latency. It is not part of `mvnw test` and skips itself when no Ollama answers. `ASSIST_EVAL_URL` and `ASSIST_EVAL_MODEL` override the defaults.
+`AssistEval` runs German and English sentences, follow-ups, unsupported wishes and off-topic messages through the real questionnaire, client and merge, and prints the Ollama version, the model digest, the hit rate per question and the latency. It is not part of `mvnw test` and skips itself when no Ollama answers. `ASSIST_EVAL_URL` and `ASSIST_EVAL_MODEL` override the defaults. The last result and what it changed: [docs/assist.md](docs/assist.md), "Measuring".
 
 ---
 
@@ -432,7 +432,7 @@ Each phase is implemented, verified and then committed.
 | **P7** Server storage | Autosave with conflict detection, billet list, import of guest billets, share dialog (publish, update, unpublish), e2e against the real backend (Docker Compose) | done |
 | **P8** Hardening + docs | fallow audit, bundle budgets (three.js only in the lazy chunk), axe checks of every page and dialog (`e2e/a11y.spec.ts`), stable parallel e2e runs, security review, theme swatches in "Meine Billets" (`tbl_billets.theme`), toasts at the bottom and above dialogs, models optionally served by the backend (`MODELS_DIRECTORY`) with runbook, nginx notes, Blender export checklist, README/CLAUDE.md | done (Lighthouse open) |
 | **Hero story** | 3D story in the home hero: Valentine's Day as the showcase, textures from the real renderer, card, phone and choreography in Blender Python (headless) with bakes and export, structure-preserving optimisation, light gifts, runtime with chapters, pause/replay, idle state with occasion changes and rotation, start/end posters from the canvas, reduced motion / data saver / no WebGL, LCP measurement, `e2e/home.spec.ts` | done |
-| **Assistant** | A billet from one sentence: start params for `/billets/new` (A1), package `assist` with a Java port of the jev questionnaire and an Ollama client, status/warm-up/question endpoints (A2), chat on the home page and in the gallery with an offer widget (A3), docs (A4), measurement against Ollama (A5) | A1–A4 implemented, A5 open |
+| **Assistant** | A billet from one sentence: start params for `/billets/new` (A1), package `assist` with a Java port of the jev questionnaire and an Ollama client, status/warm-up/question endpoints (A2), chat on the home page and in the gallery with an offer widget (A3), docs (A4), measurement against Ollama (A5) | A1–A5 implemented (22/22 measured turns right) |
 
 ---
 

@@ -164,7 +164,6 @@
       "OFF_TOPIC": "Dabei kann ich nicht helfen. Beschreib mir das Billet, das du beginnen möchtest: Anlass, Stimmung, Farben oder ein 3D-Motiv.",
       "NOTHING_RECOGNISED": "Daraus habe ich nichts Bestimmtes herausgelesen, darum beginnt es leer. Nenn mir Anlass, Stimmung, Farben oder ein Motiv.",
       "NO_CHANGE": "Daran ändert sich nichts. Sag mir, was anders werden soll.",
-      "PARTICLES_NOT_SUPPORTED": "Diese Partikel gibt es nicht, es bleibt bei den bisherigen. Möglich sind Blütenblätter, Schneeflocken, Blätter, Konfetti und Herzen.",
       "MODEL_NOT_SUPPORTED": "Dieses 3D-Motiv gibt es nicht in der Bibliothek, es bleibt beim bisherigen. Alle Motive findest du im Editor."
     },
     "STATUS": {

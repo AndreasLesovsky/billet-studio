@@ -2,7 +2,7 @@
   "preamble": "`conversation` is a chat in which a person describes the billet they want to start, a digital greeting card; the last entry is the new message. `billet` in an assistant entry is the start configuration offered so far.",
   "questions": {
     "template": {
-      "instructions": "Which template should the billet start from? Answer KEEP unless the new message names an occasion or asks for a different template.",
+      "instructions": "Which occasion template should the billet start from? Choose by the occasion alone: colours, mood, objects and particles the person wants do not count here, the other questions take them. Answer KEEP unless the new message names an occasion or asks for a different template.",
       "criteria": {
         "KEEP": "The new message names no occasion and does not ask for a different template.",
         "valentinstag": "Valentine's Day, love for a partner or sweetheart (Valentinstag, Liebe).",
@@ -11,22 +11,52 @@
         "hochzeit": "A wedding or a wedding anniversary (Hochzeit, Hochzeitstag).",
         "muttertag": "Mother's Day, thanks to a mother (Muttertag).",
         "BLANK": "A greeting card for an occasion none of these templates is made for, such as a farewell, a baptism, a thank-you, get well soon or Easter, or a blank start (andere Anlässe, leeres Billet).",
-        "NOT_SUPPORTED": "The new message is not about a greeting card at all: a question, small talk or a different task."
+        "NOT_SUPPORTED": "The new message is not about a greeting card at all: a question, small talk or a different task. A message that describes a card, its occasion or its look is always about a greeting card."
       },
       "defaultLooks": {
-        "valentinstag": { "theme": "sakura", "model": "beating-heart", "particles": "heart", "divider": "heart" },
-        "geburtstag": { "theme": "peach", "model": "birthday-cake", "particles": "confetti", "divider": "star" },
-        "weihnachten": { "theme": "midnight", "model": "snow-globe", "particles": "snowflake", "divider": "star" },
-        "hochzeit": { "theme": "dune", "model": "champagne-bottle", "particles": "petal", "divider": "diamond" },
-        "muttertag": { "theme": "rose", "model": "flower-bouquet", "particles": "petal", "divider": "diamond" },
-        "BLANK": { "theme": "rose", "model": "flower-bouquet", "particles": "petal", "divider": "diamond" }
+        "valentinstag": {
+          "theme": "sakura",
+          "model": "beating-heart",
+          "particles": "heart",
+          "divider": "heart"
+        },
+        "geburtstag": {
+          "theme": "peach",
+          "model": "birthday-cake",
+          "particles": "confetti",
+          "divider": "star"
+        },
+        "weihnachten": {
+          "theme": "midnight",
+          "model": "snow-globe",
+          "particles": "snowflake",
+          "divider": "star"
+        },
+        "hochzeit": {
+          "theme": "dune",
+          "model": "champagne-bottle",
+          "particles": "petal",
+          "divider": "diamond"
+        },
+        "muttertag": {
+          "theme": "rose",
+          "model": "flower-bouquet",
+          "particles": "petal",
+          "divider": "diamond"
+        },
+        "BLANK": {
+          "theme": "rose",
+          "model": "flower-bouquet",
+          "particles": "petal",
+          "divider": "diamond"
+        }
       }
     },
     "theme": {
-      "instructions": "Which design theme fits the look the conversation asks for? Light or dark does not count here, that is `colorMode`. Answer KEEP unless the new message says something about colours, mood or style. TEMPLATE_DEFAULT is the template's own theme.",
+      "instructions": "Which colour theme (Farbwelt) fits the look the conversation asks for? Light or dark does not count here, that is `colorMode`. Words about colours, mood, style or feel (elegant, chic, cosy, warm, calm, colourful, playful, romantic, in grey, in purple ...) ask for the theme that fits them best. Answer KEEP unless the new message has such words.",
       "criteria": {
-        "KEEP": "The new message says nothing about colours, mood or style.",
-        "TEMPLATE_DEFAULT": "The look the template comes with.",
+        "KEEP": "The new message has no words about colours, mood, style or feel.",
+        "TEMPLATE_DEFAULT": "Only when the person asks for the template's own look again.",
         "rose": "Cream with dusty rose and a classic serif; tender, heartfelt, classic (Creme und Altrosé; zärtlich, herzlich, klassisch).",
         "sage": "Soft sage green; calm, natural, gentle (Salbeigrün; ruhig, natürlich, sanft).",
         "midnight": "Night blue with gold and fine lettering; elegant, festive, chic (Nachtblau mit Gold; elegant, festlich, schick).",
@@ -55,8 +85,7 @@
         "snowflake": "Snowflakes (Schneeflocken).",
         "leaf": "Leaves (Blätter, Laub).",
         "confetti": "Confetti (Konfetti).",
-        "heart": "Little floating hearts (Herzchen).",
-        "NOT_SUPPORTED": "Particles are named, but none of those listed here, such as stars or bubbles."
+        "heart": "Little floating hearts (Herzchen)."
       }
     },
     "divider": {
@@ -82,12 +111,11 @@
       }
     },
     "lang": {
-      "instructions": "In which language should the texts of the billet be? A language named for the billet always counts. Otherwise only the first message that describes the billet counts, by the language it is written in; later messages change the language only when they name one. Answer KEEP unless the new message decides the language this way.",
+      "instructions": "Does the new message name a language for the texts of the billet? Answer KEEP unless it names one; the language the message is written in does not count here.",
       "criteria": {
-        "KEEP": "The new message does not decide the language.",
-        "UI_LANGUAGE": "The language cannot be told: none is named, and the description is written in neither German nor English.",
-        "de": "German (Deutsch).",
-        "en": "English (Englisch)."
+        "KEEP": "The new message names no language for the billet.",
+        "de": "It asks for German texts (auf Deutsch).",
+        "en": "It asks for English texts (auf Englisch)."
       }
     },
     "model": {
@@ -99,6 +127,14 @@
       },
       "library": "%s (%s), occasion: %s.",
       "unsupported": "An object is named, but none of those listed here, such as a unicorn or a car."
+    }
+  },
+  "messageLanguage": {
+    "instructions": "In which language is the message written?",
+    "criteria": {
+      "en": "English.",
+      "de": "German (Deutsch).",
+      "OTHER": "Another language, or it cannot be told, for example a single name or emoji."
     }
   }
 }

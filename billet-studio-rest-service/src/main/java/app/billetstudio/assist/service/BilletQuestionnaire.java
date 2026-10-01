@@ -49,6 +49,12 @@ public class BilletQuestionnaire {
     public static final List<String> QUESTIONS =
         List.of("template", "theme", "particles", "divider", "colorMode", "lang", "model");
 
+    /**
+     * The language a message is written in, asked on its own: inside the seven questions the model read English as
+     * German (AssistEval), alone it does not. Only the first describing message needs it.
+     */
+    static final String MESSAGE_LANGUAGE = "messageLanguage";
+
     /** Where a chat starts: what /billets/new does without any start params. */
     static final AssistBilletDto START = new AssistBilletDto(BLANK, TEMPLATE_DEFAULT, TEMPLATE_DEFAULT,
         TEMPLATE_DEFAULT, "auto", UI_LANGUAGE, TEMPLATE_DEFAULT);
@@ -155,10 +161,16 @@ public class BilletQuestionnaire {
         }
     }
 
-    /** A label a billet may hold: any but KEEP and NOT_SUPPORTED; for model also a slug, retired ones included. */
+    /**
+     * A label a billet may hold: any but KEEP and NOT_SUPPORTED; for model also a slug, retired ones included; for
+     * lang also the interface's language, which the model is never asked for.
+     */
     private boolean isOffered(String question, String label) {
         if (label.equals(KEEP) || label.equals(NOT_SUPPORTED)) {
             return false;
+        }
+        if (question.equals("lang") && label.equals(UI_LANGUAGE)) {
+            return true;
         }
         if (question.equals("model") && MODEL_SLUG.matcher(label).matches()) {
             return true;
@@ -182,6 +194,27 @@ public class BilletQuestionnaire {
         return mapper.writeValueAsString(state);
     }
 
+    /** The one-question questionnaire for the language a message is written in. */
+    public Questionnaire messageLanguageQuestionnaire() {
+        SequencedMap<String, ChoiceQuestion> questions = new LinkedHashMap<>();
+        JsonNode question = definition.path(MESSAGE_LANGUAGE);
+        questions.put(MESSAGE_LANGUAGE, new ChoiceQuestion(question.path("instructions").asString(), criteria(question)));
+        return new Questionnaire(questions);
+    }
+
+    /** The state of that questionnaire: the new message alone. */
+    public String messageState(List<AssistTurnDto> conversation) {
+        return mapper.writeValueAsString(mapper.createObjectNode().put("message", conversation.getLast().content()));
+    }
+
+    /**
+     * Whether the billet's language comes from the language the message is written in: no message named one and
+     * nothing has been offered yet, so this message is the first that describes the billet.
+     */
+    public static boolean needsMessageLanguage(@Nullable AssistBilletDto offered, Map<String, String> answers) {
+        return offered == null && KEEP.equals(answers.get("lang"));
+    }
+
     /** The billet offered last before the new message; null on the first message. */
     public static @Nullable AssistBilletDto offered(List<AssistTurnDto> conversation) {
         for (AssistTurnDto turn : conversation.reversed()) {
@@ -194,9 +227,11 @@ public class BilletQuestionnaire {
 
     /**
      * The answers on top of the billet offered so far. KEEP keeps a value, NOT_SUPPORTED keeps it too and says so; a
-     * message that is not about a billet at all changes nothing.
+     * message that is not about a billet at all changes nothing. A language no message names is the one the first
+     * describing message is written in ({@code written}, see needsMessageLanguage), else the interface's.
      */
-    public AssistReply merge(@Nullable AssistBilletDto offered, Map<String, String> answers) {
+    public AssistReply merge(@Nullable AssistBilletDto offered, Map<String, String> answers,
+        @Nullable String written) {
         AssistBilletDto base = offered != null ? offered : START;
         if (NOT_SUPPORTED.equals(answers.get("template"))) {
             return new AssistReply(base, List.of("OFF_TOPIC"));
@@ -205,7 +240,9 @@ public class BilletQuestionnaire {
         List<String> notes = new ArrayList<>();
         for (String question : QUESTIONS) {
             String answer = answers.get(question);
-            if (KEEP.equals(answer) || NOT_SUPPORTED.equals(answer)) {
+            if (question.equals("lang") && needsMessageLanguage(offered, answers)) {
+                merged.put(question, "de".equals(written) || "en".equals(written) ? written : UI_LANGUAGE);
+            } else if (KEEP.equals(answer) || NOT_SUPPORTED.equals(answer)) {
                 merged.put(question, value(base, question));
                 if (NOT_SUPPORTED.equals(answer)) {
                     notes.add(question.toUpperCase(Locale.ROOT) + "_NOT_SUPPORTED");

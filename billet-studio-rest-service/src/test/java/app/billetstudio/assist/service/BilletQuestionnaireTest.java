@@ -99,7 +99,7 @@ class BilletQuestionnaireTest {
     @Test
     void keep_holds_a_value_and_template_default_follows_a_new_template() {
         AssistReply reply = questionnaire.merge(BIRTHDAY,
-            answers("template", "weihnachten", "colorMode", "light", "model", "champagne-bottle"));
+            answers("template", "weihnachten", "colorMode", "light", "model", "champagne-bottle"), null);
 
         assertThat(reply.billet()).isEqualTo(new AssistBilletDto("weihnachten", "TEMPLATE_DEFAULT", "TEMPLATE_DEFAULT",
             "TEMPLATE_DEFAULT", "light", "UI_LANGUAGE", "champagne-bottle"));
@@ -109,16 +109,33 @@ class BilletQuestionnaireTest {
     @Test
     void an_unsupported_wish_keeps_its_value_says_so_and_the_other_answers_still_count() {
         AssistReply reply = questionnaire.merge(null,
-            answers("template", "BLANK", "colorMode", "dark", "model", "NOT_SUPPORTED", "particles", "NOT_SUPPORTED"));
+            answers("template", "BLANK", "colorMode", "dark", "model", "NOT_SUPPORTED"),
+            "OTHER");
 
         assertThat(reply.billet()).isEqualTo(new AssistBilletDto("BLANK", "TEMPLATE_DEFAULT", "TEMPLATE_DEFAULT",
             "TEMPLATE_DEFAULT", "dark", "UI_LANGUAGE", "TEMPLATE_DEFAULT"));
-        assertThat(reply.notes()).containsExactly("PARTICLES_NOT_SUPPORTED", "MODEL_NOT_SUPPORTED");
+        assertThat(reply.notes()).containsExactly("MODEL_NOT_SUPPORTED");
+    }
+
+    @Test
+    void the_language_named_counts_else_the_one_the_first_description_is_written_in() {
+        Map<String, String> birthday = answers("template", "geburtstag");
+        assertThat(BilletQuestionnaire.needsMessageLanguage(null, birthday)).isTrue();
+        assertThat(questionnaire.merge(null, birthday, "en").billet().lang()).isEqualTo("en");
+        assertThat(questionnaire.merge(null, birthday, "OTHER").billet().lang()).isEqualTo("UI_LANGUAGE");
+
+        AssistBilletDto english = questionnaire.merge(null, birthday, "en").billet();
+        Map<String, String> lighter = answers("colorMode", "light");
+        assertThat(BilletQuestionnaire.needsMessageLanguage(english, lighter)).isFalse();
+        assertThat(questionnaire.merge(english, lighter, null).billet().lang()).isEqualTo("en");
+        assertThat(questionnaire.merge(english, answers("lang", "de"), null).billet().lang()).isEqualTo("de");
+        assertThat(BilletQuestionnaire.needsMessageLanguage(null, answers("lang", "en"))).isFalse();
     }
 
     @Test
     void a_message_about_something_else_changes_nothing() {
-        AssistReply reply = questionnaire.merge(BIRTHDAY, answers("template", "NOT_SUPPORTED", "colorMode", "dark"));
+        AssistReply reply =
+            questionnaire.merge(BIRTHDAY, answers("template", "NOT_SUPPORTED", "colorMode", "dark"), null);
 
         assertThat(reply.billet()).isEqualTo(BIRTHDAY);
         assertThat(reply.notes()).containsExactly("OFF_TOPIC");
@@ -126,9 +143,9 @@ class BilletQuestionnaireTest {
 
     @Test
     void all_keep_is_the_blank_start_on_the_first_message_and_no_change_later() {
-        assertThat(questionnaire.merge(null, answers()))
+        assertThat(questionnaire.merge(null, answers(), null))
             .isEqualTo(new AssistReply(BilletQuestionnaire.START, List.of("NOTHING_RECOGNISED")));
-        assertThat(questionnaire.merge(BIRTHDAY, answers()))
+        assertThat(questionnaire.merge(BIRTHDAY, answers(), null))
             .isEqualTo(new AssistReply(BIRTHDAY, List.of("NO_CHANGE")));
     }
 }

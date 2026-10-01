@@ -19,6 +19,7 @@ import app.billetstudio.assist.dto.AssistReply;
 import app.billetstudio.assist.dto.AssistTurnDto;
 import app.billetstudio.assist.exception.AssistUnavailableException;
 import app.billetstudio.assist.ollama.OllamaQuestionnaireClient;
+import app.billetstudio.assist.questionnaire.Questionnaire;
 import app.billetstudio.assist.service.BilletQuestionnaire;
 import app.billetstudio.catalog.dto.ModelDefaultsDto;
 import app.billetstudio.catalog.dto.ModelDto;
@@ -27,6 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Measures the questionnaire against a real Ollama (docs/assist.md, "Measuring"): not part of the test run - the name
@@ -97,9 +100,9 @@ class AssistEval {
         conversation("a model the library lacks",
             turn("Eine Geburtstagskarte mit einem Einhorn", "template", "geburtstag", "model", "TEMPLATE_DEFAULT",
                 "notes", "MODEL_NOT_SUPPORTED")),
-        conversation("particles the app lacks",
+        conversation("particles the app lacks change nothing",
             turn("Eine Hochzeitskarte mit Sternschnuppen", "template", "hochzeit",
-                "notes", "PARTICLES_NOT_SUPPORTED")),
+                "particles", "TEMPLATE_DEFAULT", "notes", "")),
         conversation("written in English, no language named",
             turn("A birthday card for my brother", "template", "geburtstag", "lang", "en")),
         conversation("German sentence, English billet",
@@ -114,7 +117,18 @@ class AssistEval {
             turn("dunkel", "particles", "NONE", "colorMode", "dark")),
         conversation("gift instead of the template's model",
             turn("Valentinstag, aber mit einem Geschenk statt dem Herz", "template", "valentinstag",
-                "model", "gift-box")));
+                "model", "gift-box")),
+        conversation("an English start keeps English through German follow-ups until one names a language",
+            turn("A Christmas card for my grandma", "template", "weihnachten", "lang", "en"),
+            turn("lieber hell", "colorMode", "light", "lang", "en"),
+            turn("doch auf Deutsch", "lang", "de", "colorMode", "light")),
+        conversation("moods",
+            turn("Ein verspieltes, buntes Billet zum Kindergeburtstag", "template", "geburtstag",
+                "theme", "mint|peach|neon|lavender|TEMPLATE_DEFAULT"),
+            turn("doch eher schlicht und edel in Grau", "template", "geburtstag", "theme", "graphite|paper")),
+        conversation("christmas in purple without dividers, with snow",
+            turn("Weihnachten, aber in Lila, ohne Trenner und mit Schnee", "template", "weihnachten",
+                "theme", "lavender|aurora", "divider", "none", "particles", "snowflake|TEMPLATE_DEFAULT")));
 
     @Test
     void measure() throws Exception {
@@ -138,10 +152,15 @@ class AssistEval {
             for (Turn turn : evalCase.turns()) {
                 chat.add(new AssistTurnDto("user", turn.message(), null));
                 long started = System.nanoTime();
-                AssistReply reply;
+                AssistBilletDto offered = BilletQuestionnaire.offered(chat);
+                Map<String, String> answers;
+                String written = null;
                 try {
-                    reply = questionnaire.merge(BilletQuestionnaire.offered(chat),
-                        client.answer(questionnaire.questionnaire(LIBRARY), questionnaire.state(chat)));
+                    answers = client.answer(questionnaire.questionnaire(LIBRARY), questionnaire.state(chat));
+                    if (BilletQuestionnaire.needsMessageLanguage(offered, answers)) {
+                        written = client.answer(questionnaire.messageLanguageQuestionnaire(),
+                            questionnaire.messageState(chat)).get("messageLanguage");
+                    }
                 } catch (AssistUnavailableException e) {
                     failures.append("  ").append(evalCase.name()).append(" / ").append(turn.message())
                         .append(": no answer - ").append(e.getMessage()).append('\n');
@@ -149,6 +168,7 @@ class AssistEval {
                     break;
                 }
                 latencies.add((System.nanoTime() - started) / 1_000_000);
+                AssistReply reply = questionnaire.merge(offered, answers, written);
                 turns++;
                 boolean allRight = true;
                 for (Map.Entry<String, Set<String>> expected : turn.expected().entrySet()) {
@@ -161,7 +181,11 @@ class AssistEval {
                         allRight = false;
                         failures.append("  ").append(evalCase.name()).append(" / \"").append(turn.message())
                             .append("\": ").append(expected.getKey()).append(" = ").append(actual)
-                            .append(", expected ").append(expected.getValue()).append('\n');
+                            .append(", expected ").append(expected.getValue())
+                            .append("\n    the model's labels: ").append(answers).append(", written in ")
+                            .append(written).append("\n    its reasoning: ")
+                            .append(reasoning(mapper, questionnaire.questionnaire(LIBRARY), questionnaire.state(chat)))
+                            .append('\n');
                     }
                 }
                 correctTurns += allRight ? 1 : 0;
@@ -221,6 +245,30 @@ class AssistEval {
             }
         }
         return "? (" + MODEL + " not pulled)";
+    }
+
+    /**
+     * The reasoning the model wrote before a missed answer: the same request again (temperature 0), read here only -
+     * the client never passes it on.
+     */
+    private static String reasoning(JsonMapper mapper, Questionnaire questionnaire, String state) throws Exception {
+        ObjectNode body = mapper.createObjectNode().put("model", MODEL);
+        ArrayNode messages = body.putArray("messages");
+        messages.addObject().put("role", "system").put("content", questionnaire.systemPrompt());
+        messages.addObject().put("role", "user").put("content", questionnaire.userPrompt(state));
+        body.set("format", questionnaire.schema(mapper));
+        body.put("stream", false).put("keep_alive", "1h");
+        body.putObject("options").put("temperature", 0).put("num_ctx", 12288);
+        try (HttpClient http = HttpClient.newHttpClient()) {
+            HttpRequest request = HttpRequest.newBuilder(URI.create(URL + "/api/chat"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .timeout(Duration.ofSeconds(60))
+                .build();
+            String reply = http.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            String content = mapper.readTree(reply).path("message").path("content").asString("{}");
+            return mapper.readTree(content).path("reasoning").asString("?");
+        }
     }
 
     private static String get(String path) throws Exception {

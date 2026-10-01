@@ -36,7 +36,7 @@ it is the only list that changes (with the library, `tbl_models` active rows by 
 |---|---|
 | `template` | KEEP, valentinstag, geburtstag, weihnachten, hochzeit, muttertag, BLANK, NOT_SUPPORTED |
 | `theme` | KEEP, TEMPLATE_DEFAULT, the 16 theme ids |
-| `particles` | KEEP, TEMPLATE_DEFAULT, NONE, petal, snowflake, leaf, confetti, heart, NOT_SUPPORTED |
+| `particles` | KEEP, TEMPLATE_DEFAULT, NONE, petal, snowflake, leaf, confetti, heart |
 | `divider` | KEEP, TEMPLATE_DEFAULT, diamond, dot, heart, star, line, none |
 | `colorMode` | KEEP, auto, light, dark |
 | `lang` | KEEP, UI_LANGUAGE, de, en |
@@ -47,10 +47,14 @@ it is the only list that changes (with the library, `tbl_models` active rows by 
 - **BLANK**: an occasion no template is made for (farewell, baptism, thank-you …) or a blank start.
   **template NOT_SUPPORTED**: the message is not about a greeting card at all.
 - **NONE** switches the particles or the 3D scene off; divider `none` is a real style (no ornament).
-- **NOT_SUPPORTED** (particles, model): something is named that the app does not have.
+- **model NOT_SUPPORTED**: an object is named that the library does not have. Particles have no
+  such label: the measurement showed the model choosing it for messages about anything else.
 - **lang**: a language named for the billet counts; otherwise only the first description counts, by
   the language it is written in; later messages change it only by naming one. UI_LANGUAGE when
-  nothing tells.
+  nothing tells. The question `lang` asks only for a *named* language. The language a message is
+  *written* in is a second call with one question (`messageLanguage`: en, de, OTHER, the message
+  alone as state), made only when nothing has been offered yet and `lang` came back KEEP. Inside
+  the seven questions the model read English sentences as German; alone it does not.
 - Every description is **English with the German words in parentheses**, in one prompt for
   everybody: the question block is the same bytes for every user and both languages, so the prompt
   cache is never split. Theme options describe moods, never hex values. Template options also spell
@@ -83,7 +87,7 @@ it. Notes for the frontend (`ASSIST.NOTES.<code>`):
 | `OFF_TOPIC` | template NOT_SUPPORTED | none, the billet stays |
 | `NOTHING_RECOGNISED` | every answer KEEP on the first message | the blank start |
 | `NO_CHANGE` | every answer KEEP later | none, the billet stays |
-| `PARTICLES_NOT_SUPPORTED`, `MODEL_NOT_SUPPORTED` | that answer NOT_SUPPORTED | yes, with the old value |
+| `MODEL_NOT_SUPPORTED` | model NOT_SUPPORTED | yes, with the old model |
 
 ## Prompt rules (measured — change nothing without measuring again)
 
@@ -150,4 +154,24 @@ focus (or a question was sent).
 Answer quality is measured against a real Ollama, outside the normal test run (A5):
 `mvnw.cmd test -Dtest=AssistEval` with Ollama running. It prints the Ollama version, the model
 digest, the accuracy per question and the latency, over German and English sentences, follow-ups
-(KEEP), unsupported wishes and off-topic messages.
+(KEEP), unsupported wishes and off-topic messages. For every miss it prints the model's labels and
+its reasoning (a separate call; the eval is the only place that reads it).
+
+### Result (1 October 2026)
+
+Ollama 0.35.0, `qwen2.5:14b` (digest `7cdf5a01…`), RTX 5080, the model already loaded:
+**22 of 22 turns entirely right** (11 conversations, every question of every turn), latency median
+1.8 s, max 2.5 s per turn (the language call included).
+
+What the measurement changed, in the order it was found:
+
+| Miss | Cause | Fix |
+|---|---|---|
+| English sentences got `lang` de | one question for "named or written in" inside seven German-labelled ones | `lang` asks only for a named language; the written language is its own call (above) |
+| "in Lila", "edel in Grau" kept the template's theme | the theme question read like a palette picker | its instructions list mood and style words (elegant, cosy, playful, in grey …) and KEEP says "no words about colours, mood, style or feel"; TEMPLATE_DEFAULT only when the person asks for the template's look again |
+| "verspielt, bunt … Kindergeburtstag" chose the template by its colours | the template question competed with the theme | the template is chosen "by the occasion alone"; colours, mood, objects and particles are left to the other questions |
+| A described card was called off-topic | NOT_SUPPORTED read as "something the app cannot do" | its description: a message about a card, its occasion or its look is always about a greeting card |
+| Particles NOT_SUPPORTED for messages about colours or dividers | the label was a catch-all for any wish the particles question did not cover | label removed; an unknown particle wish keeps the particles (no note) |
+
+Not measured: the plan's comparison of the KEEP style against the demo's absolute style (every
+answer restates the whole billet). KEEP reached 22/22, so there was nothing to win.

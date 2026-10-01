@@ -204,8 +204,8 @@ AssistReply     { billet: AssistBilletDto, notes: string[] }
   label outside the questionnaire (KEEP and NOT_SUPPORTED included; for `model` any slug-shaped value
   is accepted) → 400 `VALIDATION_ERROR`.
 - `notes`: `OFF_TOPIC` (the message is not about a billet; `billet` unchanged), `NOTHING_RECOGNISED`
-  (first message, nothing recognised: the blank start), `NO_CHANGE`, `PARTICLES_NOT_SUPPORTED`,
-  `MODEL_NOT_SUPPORTED` (the value stays as it was).
+  (first message, nothing recognised: the blank start), `NO_CHANGE`, `MODEL_NOT_SUPPORTED`
+  (the model stays as it was).
 - `status`: READY = the model is loaded, IDLE = it is there but the first answer waits for it to load,
   OFFLINE = the model server does not answer or lacks the model, DISABLED = `app.assist.enabled` is
   false. Never loads the model; cached for 10 s.

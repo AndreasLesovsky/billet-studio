@@ -164,7 +164,6 @@
       "OFF_TOPIC": "I can't help with that. Describe the billet you want to start: occasion, mood, colours or a 3D motif.",
       "NOTHING_RECOGNISED": "I couldn't read anything specific from that, so it starts blank. Tell me the occasion, mood, colours or a motif.",
       "NO_CHANGE": "That doesn't change anything. Tell me what should be different.",
-      "PARTICLES_NOT_SUPPORTED": "Those particles don't exist, so the previous ones stay. Available are petals, snowflakes, leaves, confetti and hearts.",
       "MODEL_NOT_SUPPORTED": "That 3D motif isn't in the library, so the previous one stays. The editor shows every motif."
     },
     "STATUS": {
