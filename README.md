@@ -1,106 +1,109 @@
 # billet-studio
 
-> Web-Editor für digitale Billets – Angular 22 + Spring Boot 4 + MariaDB + three.js
+> Web editor for digital billets – Angular 22 + Spring Boot 4 + MariaDB + three.js
 
-billet-studio macht aus dem Muttertags-Billet (`muttertag_threejs`) einen Generator: Im Editor baust du Billets im selben Look – Hero, 3D-Modell, Divider, Absätze, Fun-Card, Note, Signatur und fallende Blütenblätter – mit eigenen Farben, Schriften, Abständen und Modellen.
+billet-studio turns the Mother's Day billet (`muttertag_threejs`) into a generator: in the editor you build billets with the same look – hero, 3D model, divider, paragraphs, fun card, note, signature and falling petals – with your own colours, fonts, spacing and models.
 
-- **Gast:** Billets werden im Browser gespeichert (localStorage).
-- **Eingeloggt:** Billets liegen in der Datenbank, mit Autosave, Liste und Übernahme der Gast-Billets.
-- **Teilen:** Eingeloggte User veröffentlichen ein Billet unter einem öffentlichen Link `/b/{shareToken}`. Der Link zeigt einen Snapshot; weiteres Bearbeiten ändert ihn erst beim nächsten Veröffentlichen.
-- Oberfläche auf Deutsch und Englisch in einem festen Design („Studio“, hell/dunkel nach System oder Wahl), Admin-Benutzerverwaltung.
-- 16 Themes als Designvorlagen fürs Billet (Farben, Schriften, Partikel): Sie gestalten nur das Billet in der Vorschau und auf der geteilten Seite, nie die Oberfläche.
+- **Guest:** billets are stored in the browser (localStorage).
+- **Signed in:** billets live in the database, with autosave, a list and the import of guest billets.
+- **Sharing:** signed-in users publish a billet under a public link `/b/{shareToken}`. The link shows a snapshot; further editing changes it only with the next publish.
+- UI in German and English in one fixed design ("Studio", light/dark by system or choice), admin user management.
+- 16 themes as design presets for the billet (colours, fonts, particles): they style only the billet in the preview and on the shared page, never the UI.
+- **Billet assistant (optional, agentic UI):** on the home page and in the template gallery you describe your billet in one sentence and refine it in a chat; a local language model (Ollama) only picks template, theme, 3D motif, particles, divider, appearance and language from fixed lists – you write the words yourself.
 
-Stack und Auth-Modul entsprechen CommerceX (Schwesterprojekt `../commerce-x`, dient nur als Vorlage und wird nicht verändert).
+Stack and auth module follow CommerceX (sister project `../commerce-x`, used as a reference only and never changed).
 
 ---
 
-## Tech-Stack
+## Tech stack
 
-| Schicht | Technik |
+| Layer | Technology |
 |---|---|
-| **Backend** | Spring Boot 4.0.7, Java 25, Spring Security, JWT (HS512) + gespeicherte Sessions, Spring Data JPA, Thymeleaf (Mails) |
-| **Frontend** | Angular 22 (zoneless, Signal Forms), TypeScript, ngx-translate, Angular CDK, three.js, bootstrap-icons (nur Icon-Font) |
-| **Datenbank** | MariaDB 10.4 (XAMPP), kompatibel mit MySQL 8.0.16+ |
-| **Tests** | Vitest (Frontend), JUnit 5 + Testcontainers (Backend), Playwright (e2e, Parität) |
+| **Backend** | Spring Boot 4.0.7, Java 25, Spring Security, JWT (HS512) + stored sessions, Spring Data JPA, Thymeleaf (mails) |
+| **Frontend** | Angular 22 (zoneless, Signal Forms), TypeScript, ngx-translate, Angular CDK, three.js, bootstrap-icons (icon font only) |
+| **Database** | MariaDB 10.4 (XAMPP), compatible with MySQL 8.0.16+ |
+| **Assistant** | Ollama with `qwen2.5:14b` (local, optional), called directly by the backend |
+| **Tests** | Vitest (frontend), JUnit 5 + Testcontainers (backend), Playwright (e2e, parity) |
 | **Assets** | `tools/asset-pipeline`: glTF-Transform (meshopt + WebP), sharp, Playwright |
 
 ---
 
-## Ordnerstruktur
+## Folder structure
 
 ```
 billet-studio/
-├── billet-studio-frontend/       Angular-App
+├── billet-studio-frontend/       Angular app
 │   ├── src/app/
-│   │   ├── core/                 Services, Interceptors, Guards, Stores, DTOs (core/models)
-│   │   ├── features/             Seiten (home, templates, auth, account, admin, editor, billets, public-billet …)
-│   │   ├── shared/               wiederverwendbare Komponenten, Direktiven
-│   │   ├── layout/               App-Shell, schlichtes Layout
-│   │   └── billet/               Renderer (Editor-Vorschau und öffentliche Seite = dieselbe Ansicht)
-│   ├── public/models/            GLBs + Vorschaubilder (Ausgabe der Asset-Pipeline)
-│   ├── public/hero/              3D-Hero der Startseite: Story, Texturen, Geschenke, Poster (Pipeline-Ausgabe)
-│   └── e2e/                      Playwright-Tests (gemockt, Parität, axe, echtes Backend)
-├── billet-studio-rest-service/   Spring Boot, Paket app.billetstudio (auth, shared, catalog, billet)
-├── sql/                          schema.sql, Seeds, migrations/ – spielst du selbst ein
-├── docs/                         API-Vertrag, Billet-Dokument, Hero-Story-Vertrag, Muttertag-Referenzdokument
-├── tools/asset-pipeline/         Skripte für GLBs, Vorschaubilder, Schriften, seed_models.sql, Hero-Assets
-├── tools/blender/hero/           Blender-Python-Skripte der Hero-Story (headless), Roh-Export
-├── docker-compose.e2e.yml        Wegwerf-MariaDB für die e2e-Tests mit echtem Backend
-├── CLAUDE.md                     Entwicklungsstandards
+│   │   ├── core/                 services, interceptors, guards, stores, DTOs (core/models)
+│   │   ├── features/             pages (home, templates, auth, account, admin, editor, billets, public-billet …)
+│   │   ├── shared/               reusable components, directives (incl. billet-assistant)
+│   │   ├── layout/               app shell, bare layout
+│   │   └── billet/               renderer (editor preview and public page = the same view)
+│   ├── public/models/            GLBs + previews (asset pipeline output)
+│   ├── public/hero/              the home page's 3D hero: story, textures, gifts, posters (pipeline output)
+│   └── e2e/                      Playwright tests (mocked, parity, axe, real backend)
+├── billet-studio-rest-service/   Spring Boot, package app.billetstudio (auth, shared, catalog, billet, assist)
+├── sql/                          schema.sql, seeds, migrations/ – you run them yourself
+├── docs/                         API contract, billet document, hero story contract, assistant questionnaire, Mother's Day reference document
+├── tools/asset-pipeline/         scripts for GLBs, previews, fonts, seed_models.sql, hero assets
+├── tools/blender/hero/           Blender Python scripts of the hero story (headless), raw export
+├── docker-compose.e2e.yml        throwaway MariaDB for the e2e tests against the real backend
+├── CLAUDE.md                     development standards
 ├── README.md
-└── .env.example                  Vorlage für .env.local / .env.production
+└── .env.example                  template for .env.local / .env.production
 ```
 
 ---
 
-## Voraussetzungen
+## Prerequisites
 
 - **Java 25** (JDK)
-- **Node.js 26** (mit npm)
-- **XAMPP** mit MariaDB (lokale Datenbank)
-- **Docker** – nicht für den Betrieb, aber für die Backend-Tests (Testcontainers startet eine Wegwerf-MariaDB) und die e2e-Tests mit echtem Backend
-- Optional: **Blender** und die Asset-Pipeline (eigenes `npm install` in `tools/asset-pipeline/`), nur für neue oder geänderte 3D-Modelle
+- **Node.js 26** (with npm)
+- **XAMPP** with MariaDB (local database)
+- **Docker** – not for running the app, but for the backend tests (Testcontainers starts a throwaway MariaDB) and the e2e tests against the real backend
+- Optional: **Ollama** with `qwen2.5:14b` for the billet assistant (see "Billet assistant")
+- Optional: **Blender** and the asset pipeline (its own `npm install` in `tools/asset-pipeline/`), only for new or changed 3D models
 
 ---
 
-## Lokaler Start
+## Local start
 
-### 1. Datenbank
+### 1. Database
 
-Die Datenbank verwaltest du selbst; das Backend legt keine Tabellen an (`ddl-auto: none`). Details in [sql/README.md](sql/README.md).
+You manage the database yourself; the backend creates no tables (`ddl-auto: none`). Details in [sql/README.md](sql/README.md).
 
-**Neue Datenbank** (Reihenfolge):
+**New database** (in this order):
 
 1. `CREATE DATABASE db_billet_studio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 2. `sql/schema.sql`
 3. `sql/seed_roles.sql`
 4. `sql/seed_models.sql`
 
-Die Migrationen in `sql/migrations/` brauchst du dann nicht: `schema.sql` und die Seeds enthalten sie schon.
+You then don't need the migrations in `sql/migrations/`: `schema.sql` and the seeds already contain them.
 
-**Bestehende Datenbank:** nur die Migrationen einspielen, die neuer sind als deine Datenbank, in Datumsreihenfolge (der Dateiname beginnt mit dem Datum). Jede Datei sagt im Kopf, wofür sie ist und ob sie vor dem Start eines neuen Backends laufen muss. Stand heute:
+**Existing database:** run only the migrations newer than your database, in date order (the file name starts with the date). Each file says in its header what it is for and whether it must run before a new backend starts. As of today:
 
-| Datei | Inhalt |
+| File | Content |
 |---|---|
-| `2026-09-25_model-defaults-cake-globe-champagne.sql` | Katalog: neue Standardwerte für Torte und Schneekugel, neu gebaute Champagnerflasche |
-| `2026-09-26_billet_theme_column.sql` | `tbl_billets.theme` für die Farbfelder in „Meine Billets“, befüllt aus den vorhandenen Billets. **Vor** dem Start des neuen Backends einspielen – ohne die Spalte schlägt jede Billet-Anfrage fehl (`Unknown column 'theme'`). |
+| `2026-09-25_model-defaults-cake-globe-champagne.sql` | Catalog: new defaults for cake and snow globe, rebuilt champagne bottle |
+| `2026-09-26_billet_theme_column.sql` | `tbl_billets.theme` for the colour swatches in "Meine Billets" (My billets), filled from the existing billets. Run it **before** starting the new backend – without the column every billet request fails (`Unknown column 'theme'`). |
 
-Beide sind wiederholbar (ein zweiter Lauf ändert nichts).
+Both can be run twice (a second run changes nothing).
 
-### 2. Konfiguration
+### 2. Configuration
 
 ```bash
 cp .env.example .env.local
 ```
 
-`.env.local` liegt im Repo-Root und ist gitignored; das Backend liest sie beim Start. Lokal anpassen:
+`.env.local` lives in the repository root and is gitignored; the backend reads it at startup. Adjust locally:
 
-- `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` – deine MariaDB (XAMPP: `root`, Passwort leer).
-- `JWT_SECRET` – mindestens 64 Byte, z. B. `openssl rand -hex 32`.
-- `ROOT_EMAIL`, `ROOT_PASSWORD` – der Root-Admin, den das Backend beim ersten Start anlegt.
-- Alles andere passt für den lokalen Start. `MAIL_ENABLED=false`: Mails werden nicht verschickt, der Passwort-Reset-Link steht dann im Backend-Log. `MODELS_BASE_URL=http://localhost:4200/`: die 3D-Modelle kommen aus der Angular-App.
+- `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` – your MariaDB (XAMPP: `root`, empty password).
+- `JWT_SECRET` – at least 64 bytes, e.g. `openssl rand -hex 32`.
+- `ROOT_EMAIL`, `ROOT_PASSWORD` – the root admin the backend creates on its first start.
+- Everything else fits a local start. `MAIL_ENABLED=false`: no mails are sent, the password reset link is written to the backend log instead. `MODELS_BASE_URL=http://localhost:4200/`: the 3D models come from the Angular app. `ASSIST_ENABLED=false`: no billet assistant (see "Billet assistant").
 
-Das Frontend liest keine `.env`-Datei: Seine Standardwerte (API auf `http://localhost:8080/v1/`) stecken im Build, eine Installation kann sie über `public/env.js` (`window.__env`) überschreiben.
+The frontend reads no `.env` file: its defaults (API at `http://localhost:8080/v1/`) are part of the build; an installation can override them through `public/env.js` (`window.__env`).
 
 ### 3. Backend
 
@@ -109,7 +112,7 @@ cd billet-studio-rest-service
 ./mvnw spring-boot:run          # Windows: mvnw.cmd spring-boot:run
 ```
 
-Läuft auf http://localhost:8080, Swagger-UI unter http://localhost:8080/swagger-ui.html (solange `SWAGGER_ENABLED=true`). Beim Start wird der Root-Admin aus `ROOT_EMAIL` / `ROOT_PASSWORD` angelegt.
+Runs on http://localhost:8080, Swagger UI at http://localhost:8080/swagger-ui.html (while `SWAGGER_ENABLED=true`). At startup the root admin from `ROOT_EMAIL` / `ROOT_PASSWORD` is created.
 
 ### 4. Frontend
 
@@ -119,226 +122,320 @@ npm install
 npm start
 ```
 
-Läuft auf http://localhost:4200. Ohne Anmeldung arbeitest du als Gast (Billets im Browser); mit Konto (Registrierung oder Root-Admin) liegen sie in der Datenbank.
+Runs on http://localhost:4200. Without signing in you work as a guest (billets in the browser); with an account (registration or the root admin) they live in the database.
 
-### Tests und Build
+### Tests and build
 
 ```bash
-# Backend: Unit- und Integrationstests (Docker muss laufen; die ITs starten eine Wegwerf-MariaDB)
+# Backend: unit and integration tests (Docker must be running; the ITs start a throwaway MariaDB)
 cd billet-studio-rest-service
 ./mvnw test                     # Windows: mvnw.cmd test
-./mvnw -DskipTests package      # das JAR, das die e2e-Tests mit echtem Backend starten
+./mvnw -DskipTests package      # the JAR the e2e tests against the real backend start
 
 # Frontend
 cd billet-studio-frontend
-npm test -- --no-watch          # Vitest; Exit-Code prüfen, nicht nur "passed"
-npm run build                   # Produktions-Build mit Bundle-Budgets
-npm run e2e                     # Playwright mit gemocktem Backend, ohne Docker (inkl. Parität und axe)
-npm run e2e:parity              # nur der Paritätstest gegen die Muttertags-Karte
-npx fallow audit                # toter Code, Duplikate, Komplexität
+npm test -- --no-watch          # Vitest; check the exit code, not just "passed"
+npm run build                   # production build with bundle budgets
+npm run e2e                     # Playwright against a mocked backend, no Docker (incl. parity and axe)
+npm run e2e:parity              # only the parity test against the Mother's Day card
+npx fallow audit                # dead code, duplication, complexity
 ```
 
-- Die Integrationstests laufen nur mit Docker wirklich: Im Log steht dann „Found Docker environment“, und kein `*IT` ist übersprungen (`Skipped: 0`). Deine Datenbank benutzen sie nie.
-- `mvnw test` und `package` schreiben nach `target/`; ein laufendes `spring-boot:run` startet dabei per devtools neu.
-- `npm run e2e` startet `ng serve` auf Port 4320 ohne Watch und HMR (Änderungen während eines Laufs gelten erst im nächsten) und die Momentaufnahme der Muttertags-Karte auf 4321. Die Tests beantworten jede API-Anfrage selbst; Backend und Datenbank werden nicht gebraucht.
-- `e2e/a11y.spec.ts` prüft jede Seite und jeden Dialog mit axe (WCAG 2.0/2.1 A und AA); bewusste Ausnahmen stehen dort mit Begründung. Der Paritätstest vergleicht das Muttertags-Billet pixelgenau mit der Live-Karte (390×844 und 1280×800, hell und dunkel, ≤ 1 %); er lädt deren Schriften von Google Fonts und braucht dafür Netz.
+- The integration tests only really run with Docker: the log then says "Found Docker environment", and no `*IT` is skipped (`Skipped: 0`). They never use your database.
+- `mvnw test` and `package` write to `target/`; a running `spring-boot:run` restarts through devtools meanwhile.
+- `npm run e2e` starts `ng serve` on port 4320 without watch and HMR (changes during a run apply only to the next one) and the snapshot of the Mother's Day card on 4321. The tests answer every API request themselves; no backend and no database are needed.
+- `e2e/a11y.spec.ts` checks every page and dialog with axe (WCAG 2.0/2.1 A and AA); deliberate exceptions are listed there with their reason. The parity test compares the Mother's Day billet pixel by pixel with the live card (390×844 and 1280×800, light and dark, ≤ 1 %); it loads the card's fonts from Google Fonts and therefore needs the network.
+- No test ever reaches your Ollama: every test context switches the assistant off, and the e2e specs answer `/v1/assist` themselves. Only the measurement `AssistEval` asks a real Ollama on purpose (see "Billet assistant").
 
-### E2E-Tests mit echtem Backend
+### E2E tests against the real backend
 
-Die Konto-Abläufe (Registrierung, Autosave mit Konflikt, Teilen-Link, Übernahme eines Gast-Billets, Löschen) laufen gegen das echte Backend und eine Wegwerf-Datenbank. Docker muss laufen.
+The account flows (registration, autosave with a conflict, share link, import of a guest billet, deletion) run against the real backend and a throwaway database. Docker must be running.
 
 ```bash
 cd billet-studio-frontend
-npm run e2e:backend             # startet die e2e-Datenbank und die Tests
-npm run e2e:down                # e2e-Datenbank wieder entfernen
+npm run e2e:backend             # starts the e2e database and the tests
+npm run e2e:down                # removes the e2e database again
 ```
 
-- `e2e:backend` startet per [docker-compose.e2e.yml](docker-compose.e2e.yml) eine MariaDB 10.11 auf Port 3307 (`db_billet_studio_e2e`, aus `sql/schema.sql` + Seeds, Daten nur im RAM), dann das gebaute Backend-JAR auf Port 8081 und `ng serve` auf Port 4320. Deine Entwicklungsumgebung (4200, 8080, `db_billet_studio`) läuft ungestört weiter und wird nie angesprochen.
-- Die Tests starten das JAR aus `billet-studio-rest-service/target`, nicht `spring-boot:run`. Ist es älter als die Backend-Quellen, bricht der Lauf mit einem Hinweis ab; dann neu bauen: `mvnw.cmd -DskipTests package` (sonst `./mvnw`) in `billet-studio-rest-service`. Ein laufendes `spring-boot:run` kann dabei per devtools neu starten.
-- Die Datenbank bleibt zwischen den Läufen stehen (jeder Test registriert ein eigenes Konto), `e2e:down` verwirft sie. Nach einer Schemaänderung also erst `e2e:down`: Die e2e-Datenbank entsteht nur beim Start aus `schema.sql` und den Seeds. Port 3307 nutzt auch der CommerceX-e2e-Stack, also nicht beide gleichzeitig.
-- Backend-Logs der Läufe: `billet-studio-frontend/e2e/artifacts/backend/logs/`.
+- `e2e:backend` starts a MariaDB 10.11 on port 3307 via [docker-compose.e2e.yml](docker-compose.e2e.yml) (`db_billet_studio_e2e`, built from `sql/schema.sql` + seeds, data in RAM only), then the built backend JAR on port 8081 and `ng serve` on port 4320. Your development environment (4200, 8080, `db_billet_studio`) keeps running undisturbed and is never touched.
+- The tests start the JAR from `billet-studio-rest-service/target`, not `spring-boot:run`. If it is older than the backend sources, the run stops with a hint; rebuild it then: `mvnw.cmd -DskipTests package` (otherwise `./mvnw`) in `billet-studio-rest-service`. A running `spring-boot:run` may restart through devtools meanwhile.
+- The database stays between runs (each test registers its own account); `e2e:down` discards it. After a schema change run `e2e:down` first: the e2e database is built only at its start, from `schema.sql` and the seeds. The CommerceX e2e stack uses port 3307 too, so not both at the same time.
+- Backend logs of the runs: `billet-studio-frontend/e2e/artifacts/backend/logs/`.
 
 ---
 
-## Asset-Pipeline
+## Billet assistant (agentic UI)
 
-3D-Modelle, ihre Vorschaubilder, `sql/seed_models.sql` und die Schriften entstehen nur mit den Skripten in [tools/asset-pipeline/](tools/asset-pipeline/README.md) – nie von Hand kopiert oder bearbeitet. Die Quellordner (`digital-card-template/`, `muttertag_threejs/`, Schriftquellen) liest die Pipeline nur.
+"Beschreib dein Billet in einem Satz" (Describe your billet in one sentence) on the home page and in the template gallery: a chat that answers each message with a billet to start. You write, for example, "Eine Geburtstagskarte für meinen Bruder, eher schick als bunt, mit Sektflasche statt Torte, im Dunkelmodus und auf Englisch" (a birthday card for my brother, more elegant than colourful, with a champagne bottle instead of a cake, in dark mode and in English). The app answers with an offer – a picture of the look, what it starts with and "Billet anlegen" (Create billet). Every follow-up ("lieber hell" – rather light, "ohne Konfetti" – without confetti) changes the offer. If the model is not available, the template gallery works as always.
+
+### How it works
+
+- **The model writes no text and no UI.** It only answers a typed questionnaire: seven choice questions with fixed labels (template, theme, particles, divider, colour mode, language, 3D model). Every sentence the user sees comes from the i18n files; every billet is built by the regular start link `/billets/new?template=…&theme=…&model=…`.
+- **The backend owns the questionnaire.** The browser sends only the chat (at most 10 entries); the backend builds the prompt, asks Ollama, checks that every answer is one of the offered labels and merges the labels into the next offer (`KEEP` keeps a value, `TEMPLATE_DEFAULT` follows the template, `NOT_SUPPORTED` keeps it and says so). The endpoint therefore is no open LLM proxy for guests.
+- **The technique** is the questionnaire of Manfred Steyer's [jev-demo](https://github.com/manfredsteyer/jev-demo) (TypeSafe's Jev "System One" and its local stand-in for Ollama, `server/src/local-jev/`). billet-studio ports that stand-in to Java: Spring talks to Ollama itself, there is no Node service in between.
+- **Measured prompt rules** (kept exactly as in the demo): the real question names as JSON keys, the questions before the state (so the unchanging part stays in Ollama's prompt cache), a short `reasoning` field first (max. 300 characters), a JSON schema with one `enum` per question, `temperature 0`, `num_ctx 12288`. Every option is described in English with the German words in parentheses, in one prompt for both UI languages.
+- **Privacy:** the user's messages and the model's reasoning are never logged and never returned; only the labels leave the backend.
+- Contract, labels, merge rules and how to add a theme or template: [docs/assist.md](docs/assist.md). Endpoints: [docs/api-contract.md](docs/api-contract.md), section "Billet assistant".
+
+### 1. Install Ollama and the model
+
+1. Install Ollama from https://ollama.com (Windows: the installer adds the Ollama app and the `ollama` command).
+2. Pull the model once (about 9 GB; it needs a GPU with roughly 16 GB of VRAM to answer in about a second – on a smaller GPU try `qwen2.5:7b` and set `ASSIST_MODEL` accordingly):
+
+   ```bash
+   ollama pull qwen2.5:14b
+   ollama list                     # shows qwen2.5:14b
+   ```
+
+### 2. Start Ollama
+
+The backend talks to the Ollama **server** on http://127.0.0.1:11434. Start it one way only:
+
+- **The Ollama app (Windows, recommended):** start "Ollama" from the start menu. The server runs in the background as long as the app runs (llama icon in the system tray, also when its window is closed). Quit it from the tray icon.
+- **Or in a terminal:** `ollama serve` – the server runs until you press Ctrl+C. Only when the app is not running, or the port is already taken.
+
+Check that it answers:
+
+```bash
+curl http://127.0.0.1:11434/api/version     # {"version":"…"}
+ollama ps                                    # the models currently loaded into memory (empty right after the start)
+```
+
+Recommended setting: `OLLAMA_NUM_PARALLEL=1` (Windows: a user environment variable, then quit Ollama from the tray and start it again). The assistant answers one question at a time anyway, and the GPU works through requests one by one.
+
+Leave the app's setting "Expose Ollama to the network" off: Ollama has no authentication, and only the backend on the same machine needs to reach it.
+
+**What is "Claude Code" in the Ollama app?** The app's *Apps* page (also `ollama launch <name>` in a terminal, e.g. `ollama launch claude`) starts other tools – Claude Code, Codex, OpenCode, Cline, Copilot CLI, Qwen Code and more – so that they use an Ollama model instead of their own cloud model. billet-studio uses none of them: its backend calls the Ollama server's API directly. You don't need to choose anything there.
+
+### 3. Switch the assistant on
+
+In `.env.local` (repository root):
+
+```properties
+ASSIST_ENABLED=true
+```
+
+Restart the backend (`.env.local` is read only at startup). The defaults fit a local Ollama; override them in `.env.local` only if needed:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ASSIST_ENABLED` | `false` | `false`: the assistant does not appear at all |
+| `ASSIST_URL` | `http://127.0.0.1:11434` | the Ollama server (keep it reachable from the backend only) |
+| `ASSIST_MODEL` | `qwen2.5:14b` | the model to ask (pulled beforehand) |
+| `ASSIST_KEEP_ALIVE` | `1h` | how long Ollama keeps the model in GPU memory after the last answer |
+| `ASSIST_TIMEOUT` | `20s` | one answer; also the longest a question waits for a free slot (then 429) |
+| `ASSIST_LOAD_TIMEOUT` | `120s` | how long a question waits for the model to load (the load itself goes on) |
+| `ASSIST_WARM_UP` | `false` | `true`: load the model when the backend starts |
+| `ASSIST_RATE_LIMIT` / `ASSIST_RATE_LIMIT_WINDOW` | `20` / `10m` | questions per client IP within the window |
+
+None of these values is a secret. The variables `TYPESAFE_API_KEY`, `TYPESAFE_BASE_URL` and `OLLAMA_MODEL` of the jev-demo are not used here.
+
+### 4. Use it
+
+Open http://localhost:4200 (the section below the hero) or http://localhost:4200/templates.
+
+- **Before you type**, the box shows the assistant's state (`GET /v1/assist/status`, read-only, cached for 10 s): no box when it is switched off, "gerade nicht erreichbar" (not available right now) when Ollama does not answer or lacks the model, a note that the first answer takes longer when the model is not loaded yet.
+- **The model goes into GPU memory only when someone clicks into the input field** (`POST /v1/assist/warm-up`), never on a page visit – so a visit to the home page does not occupy the GPU, e.g. while gaming. It stays loaded for `ASSIST_KEEP_ALIVE` after the last answer; `ollama stop qwen2.5:14b` frees the memory at once.
+- Enter sends, Shift+Enter starts a new line. The examples below the field fill it in.
+- A message without an answer stays in the chat with its reason and "Erneut versuchen" (Try again).
+
+### Troubleshooting
+
+| You see | Cause | Fix |
+|---|---|---|
+| No assistant box | `ASSIST_ENABLED` is not `true`, or the backend was not restarted | set it in `.env.local`, restart the backend |
+| "Der Assistent ist gerade nicht erreichbar" | Ollama does not run, or the model is missing (backend log: `Ollama does not have qwen2.5:14b`) | start Ollama, `ollama pull qwen2.5:14b`; the box asks again every 30 s and when you focus the field |
+| The first answer takes long | the model is being loaded into GPU memory | wait, or set `ASSIST_WARM_UP=true` |
+| "Zu viele Anfragen" (Too many requests) | another answer is still running, or the rate limit per IP | send again in a moment |
+| Answers do not fit | the questionnaire's descriptions | measure (below) and adjust `assist/billet-questionnaire.json` |
+
+### Measuring the answers
+
+With Ollama running:
+
+```bash
+cd billet-studio-rest-service
+mvnw.cmd test -Dtest=AssistEval     # ./mvnw elsewhere
+```
+
+`AssistEval` runs German and English sentences, follow-ups, unsupported wishes and off-topic messages through the real questionnaire, client and merge, and prints the Ollama version, the model digest, the hit rate per question and the latency. It is not part of `mvnw test` and skips itself when no Ollama answers. `ASSIST_EVAL_URL` and `ASSIST_EVAL_MODEL` override the defaults.
+
+---
+
+## Asset pipeline
+
+3D models, their previews, `sql/seed_models.sql` and the fonts are made only by the scripts in [tools/asset-pipeline/](tools/asset-pipeline/README.md) – never copied or edited by hand. The pipeline only reads the source folders (`digital-card-template/`, `muttertag_threejs/`, font sources).
 
 ```bash
 cd tools/asset-pipeline
 npm install
-npx playwright install chromium   # einmalig, für die Vorschaubilder
-npm run models                    # GLBs optimieren → Vorschaubilder → seed_models.sql
-npm run fonts                     # Schriften neu bauen
+npx playwright install chromium   # once, for the previews
+npm run models                    # optimise GLBs → previews → seed_models.sql
+npm run fonts                     # rebuild the fonts
 ```
 
-- Ausgabe: `billet-studio-frontend/public/models/<slug>.v<n>.glb` und `public/models/previews/<slug>.v<n>.webp` (meshopt + WebP-Texturen, max. 2048 px, ≤ 6 MB, Blumenstrauß ≤ 8 MB).
-- Ändert sich der Inhalt eines Modells, steigt `v<n>` (die Dateien werden ein Jahr lang `immutable` gecacht). Jede Katalogänderung bringt zusätzlich eine datierte Migration mit nur den geänderten Zeilen mit, damit eine bestehende Datenbank nie die ganze Seed-Datei braucht.
-- Slugs bleiben für immer: Billets verweisen auf sie.
-- Ein neues Modell aus Blender: Checkliste in [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md), Abschnitt „Neues Blender-Modell hinzufügen“.
+- Output: `billet-studio-frontend/public/models/<slug>.v<n>.glb` and `public/models/previews/<slug>.v<n>.webp` (meshopt + WebP textures, max. 2048 px, ≤ 6 MB, flower bouquet ≤ 8 MB).
+- When a model's content changes, `v<n>` goes up (the files are cached `immutable` for a year). Every catalog change also ships a dated migration with only the changed rows, so an existing database never needs the whole seed file.
+- Slugs stay forever: billets refer to them.
+- A new model from Blender: checklist in [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md), section on adding a new Blender model.
 
 ---
 
 ## Hero
 
-Die Startseite spielt eine kurze 3D-Story: Eine Valentinstagskarte klappt auf, ein schlagendes Herz
-springt heraus, ein Handy empfängt den Link, die Karte gleitet ins Display und wird zum echten Billet;
-danach wechselt das Handy durch die Anlässe. Vertrag zwischen Blender und Laufzeit:
-[docs/hero-story.md](docs/hero-story.md); Laufzeit: `billet-studio-frontend/src/app/features/home/hero-story/`.
+The home page plays a short 3D story: a Valentine's Day card opens, a beating heart pops out, a phone receives the link, the card glides into the display and becomes the real billet; then the phone cycles through the occasions. Contract between Blender and the runtime: [docs/hero-story.md](docs/hero-story.md); runtime: `billet-studio-frontend/src/app/features/home/hero-story/`.
 
-Alles unter `public/hero/` entsteht per Skript, mit Inhalts-Hash im Dateinamen. Neu bauen, in dieser
-Reihenfolge (jeder Schritt braucht die vorigen; nur, was sich geändert hat, und ab dort alles danach):
+Everything under `public/hero/` is made by scripts, with a content hash in the file name. Rebuild in this order (each step needs the previous ones; only what changed, and everything after it):
 
 ```bat
 set B="C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup -P tools\blender\hero\build.py --
-%B% --stage bake --render         & rem Blender: Story, Schatten-Bakes, Prüfbilder
-%B% --stage export                & rem tools/blender/hero/export/hero-story.glb (eingecheckt)
+%B% --stage bake --render         & rem Blender: story, shadow bakes, check renders
+%B% --stage export                & rem tools/blender/hero/export/hero-story.glb (committed)
 cd tools\asset-pipeline
-npm run hero:story                & rem optimieren + prüfen → public/hero/story.<hash>.glb
-npm run hero:story-check          & rem optional: in three.js gegen Blenders Positionen
-npm run hero:capture              & rem Druck-, Display-, Sperr- und Nachrichten-Texturen
-npm run hero:gifts                & rem leichte Geschenke
-npm run hero:posters              & rem Start- und End-Poster aus dem Canvas der Laufzeit
+npm run hero:story                & rem optimise + verify → public/hero/story.<hash>.glb
+npm run hero:story-check          & rem optional: in three.js against Blender's positions
+npm run hero:capture              & rem print, display, lock and message textures
+npm run hero:gifts                & rem light gifts
+npm run hero:posters              & rem start and end posters from the runtime's canvas
 ```
 
-- Jeder erzeugende Schritt endet mit `hero:assets`, das die Asset-Tabellen der Laufzeit
-  (`hero-assets.generated.ts`, `hero-home.generated.ts`) neu schreibt.
-- `hero:capture` und `hero:posters` starten `ng serve` auf Port **4330**, wenn dort nichts antwortet,
-  und beenden nur, was sie selbst gestartet haben. `hero:posters` nimmt mit `HERO_APP_URL`
-  (z. B. `set HERO_APP_URL=http://localhost:4200`) einen laufenden Dev-Server.
-- Einzelheiten: [tools/blender/hero/README.md](tools/blender/hero/README.md) und
-  [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md).
+- Every generating step ends with `hero:assets`, which rewrites the runtime's asset tables (`hero-assets.generated.ts`, `hero-home.generated.ts`).
+- `hero:capture` and `hero:posters` start `ng serve` on port **4330** when nothing answers there, and stop only what they started themselves. `hero:posters` takes a running dev server with `HERO_APP_URL` (e.g. `set HERO_APP_URL=http://localhost:4200`).
+- Details: [tools/blender/hero/README.md](tools/blender/hero/README.md) and [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md).
 
 ---
 
-## Modelle vom Backend ausliefern
+## Serving the models from the backend
 
-Heute liefert die Angular-App die 3D-Modelle mit aus (`billet-studio-frontend/public/models/`: die GLBs und `previews/` mit den WebP-Vorschaubildern). `tbl_models` speichert nur relative Pfade (`models/<slug>.v<n>.glb`, `models/previews/<slug>.v<n>.webp`), und das Backend macht daraus mit `MODELS_BASE_URL` die absoluten URLs, die Editor und `/b/:token` laden. Später liegen die Dateien auf dem Server neben dem Spring-Boot-Backend. Der Umzug heißt: Dateien kopieren, zwei Werte setzen – **keine Datenbankänderung, kein SQL**.
+Today the Angular app ships the 3D models (`billet-studio-frontend/public/models/`: the GLBs and `previews/` with the WebP previews). `tbl_models` stores only relative paths (`models/<slug>.v<n>.glb`, `models/previews/<slug>.v<n>.webp`), and the backend turns them into the absolute URLs editor and `/b/:token` load, using `MODELS_BASE_URL`. Later the files live on the server next to the Spring Boot backend. Moving them means: copy the files, set two values – **no database change, no SQL**.
 
-1. **Dateien kopieren.** Den Inhalt von `billet-studio-frontend/public/models/` (alle `*.glb` und den Ordner `previews/`) in ein eigenes Verzeichnis auf dem Server kopieren, z. B.:
+1. **Copy the files.** Copy the content of `billet-studio-frontend/public/models/` (all `*.glb` and the `previews/` folder) into a directory of its own on the server, e.g.:
 
    ```bash
    rsync -a billet-studio-frontend/public/models/ USER@HOST:/srv/billet-studio/models/
    ```
 
-   Danach liegt dort z. B. `/srv/billet-studio/models/flower-bouquet.v1.glb` und `/srv/billet-studio/models/previews/flower-bouquet.v1.webp`.
-2. **`MODELS_DIRECTORY`** in `.env.production` auf genau dieses Verzeichnis setzen, als absoluten Pfad (ein relativer hängt vom Arbeitsverzeichnis des Backends ab):
+   Afterwards it holds e.g. `/srv/billet-studio/models/flower-bouquet.v1.glb` and `/srv/billet-studio/models/previews/flower-bouquet.v1.webp`.
+2. **Set `MODELS_DIRECTORY`** in `.env.production` to exactly that directory, as an absolute path (a relative one depends on the backend's working directory):
 
    ```properties
    MODELS_DIRECTORY=/srv/billet-studio/models
    ```
 
-3. **`MODELS_BASE_URL`** auf `/files/` des API-Hosts setzen, mit Schrägstrich am Ende:
+3. **Set `MODELS_BASE_URL`** to `/files/` of the API host, with a trailing slash:
 
    ```properties
    MODELS_BASE_URL=https://api.example.com/files/
    ```
 
-   Aus `models/flower-bouquet.v1.glb` wird so `https://api.example.com/files/models/flower-bouquet.v1.glb`.
-4. **Backend neu starten und prüfen:**
+   `models/flower-bouquet.v1.glb` thus becomes `https://api.example.com/files/models/flower-bouquet.v1.glb`.
+4. **Restart the backend and check:**
 
    ```bash
-   # GET, nur die Header ausgeben (curl -I schickt HEAD, das Backend erlaubt hier nur GET)
+   # GET, print only the headers (curl -I sends HEAD; the backend allows only GET here)
    curl -s -D - -o /dev/null https://api.example.com/files/models/flower-bouquet.v1.glb
-   curl -s https://api.example.com/v1/models      # fileUrl / previewUrl zeigen jetzt auf /files/models/
+   curl -s https://api.example.com/v1/models      # fileUrl / previewUrl now point to /files/models/
    ```
 
-   Erwartet: `200`, `Content-Type: model/gltf-binary`, `Cache-Control: max-age=31536000, public, immutable`. Antwortet jede Datei mit `404`, stimmt das Verzeichnis nicht; das Backend-Log meldet dann beim Start `app.models.directory … is not a directory`.
-5. **Im Browser** ein Billet mit 3D-Modell öffnen (Editor und `/b/:token`): Die GLBs kommen jetzt vom API-Host. Das Frontend muss dafür nicht neu gebaut werden.
+   Expected: `200`, `Content-Type: model/gltf-binary`, `Cache-Control: max-age=31536000, public, immutable`. If every file answers `404`, the directory is wrong; the backend log then reports `app.models.directory … is not a directory` at startup.
+5. **In the browser** open a billet with a 3D model (editor and `/b/:token`): the GLBs now come from the API host. The frontend does not need a new build for this.
 
-Was das Backend dabei tut (`WebConfig`):
+What the backend does (`WebConfig`):
 
-- Es liefert `GET /files/models/**` nur, solange `MODELS_DIRECTORY` gesetzt ist; leer (Standard) antwortet der Pfad mit `404`.
-- Aus dem Verzeichnis gehen nur `.glb` und `.webp` hinaus, alles andere ist `404`; Pfade mit `..` (auch kodiert) lehnt es mit `400` ab. Trotzdem gehört nur der Modell-Ordner dorthin, nie ein übergeordnetes Verzeichnis.
-- Die Dateien sind öffentlich (ohne Login) und ein Jahr lang `immutable` cachebar: Jede inhaltliche Änderung an einem Modell bekommt eine neue Version im Dateinamen (`.v1` → `.v2`, `version` im Manifest der Asset-Pipeline), eine URL ändert also nie ihren Inhalt.
-- CORS gilt für dieselben Origins wie die API (`CORS_ALLOWED_ORIGINS`): three.js lädt die GLBs per `fetch` vom API-Host, das braucht den `Access-Control-Allow-Origin`-Header. Die Vorschaubilder sind normale `<img>` und brauchen keinen.
+- It serves `GET /files/models/**` only while `MODELS_DIRECTORY` is set; empty (the default), the path answers `404`.
+- Only `.glb` and `.webp` leave the directory, everything else is `404`; paths with `..` (also encoded) are refused with `400`. Still, only the model folder belongs there, never a parent directory.
+- The files are public (no login) and cacheable `immutable` for a year: every content change of a model gets a new version in the file name (`.v1` → `.v2`, `version` in the asset pipeline's manifest), so a URL never changes its content.
+- CORS applies to the same origins as the API (`CORS_ALLOWED_ORIGINS`): three.js loads the GLBs with `fetch` from the API host, which needs the `Access-Control-Allow-Origin` header. The previews are plain `<img>` and need none.
 
-Zurück zur Auslieferung über die Angular-App: `MODELS_BASE_URL` wieder auf die Frontend-URL setzen, `MODELS_DIRECTORY` leeren, Backend neu starten.
+Back to serving through the Angular app: set `MODELS_BASE_URL` to the frontend URL again, empty `MODELS_DIRECTORY`, restart the backend.
 
-`public/models/` bleibt im Repo, auch nach dem Umzug: Es ist die Ausgabe der Asset-Pipeline, die Quelle für jede Kopie auf den Server, und die e2e-Tests und Entwickler-Seiten laden daraus.
+`public/models/` stays in the repository after the move too: it is the asset pipeline's output, the source of every copy to the server, and the e2e tests and developer pages load from it.
 
-**Lokal ausprobieren** (optional): in `.env.local`
+**Try it locally** (optional): in `.env.local`
 
 ```properties
 MODELS_DIRECTORY=../billet-studio-frontend/public/models
 MODELS_BASE_URL=http://localhost:8080/files/
 ```
 
-(relativ zu `billet-studio-rest-service/`, wo `mvnw` läuft), Backend neu starten – die Modelle kommen dann von Port 8080.
+(relative to `billet-studio-rest-service/`, where `mvnw` runs), restart the backend – the models then come from port 8080.
 
-### Neue oder geänderte Modelle
+### New or changed models
 
-Ein Modell aus Blender exportieren und durch die Pipeline schicken: Checkliste und Befehle in [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md), Abschnitt „Neues Blender-Modell hinzufügen“ (GLB-Export mit angewendeten Transformationen, Texturen ≤ 2048 px, keine Draco-Kompression, Credit im Copyright-Feld, dann `npm run models`).
+Export a model from Blender and run it through the pipeline: checklist and commands in [tools/asset-pipeline/README.md](tools/asset-pipeline/README.md), section on adding a new Blender model (GLB export with applied transforms, textures ≤ 2048 px, no Draco compression, credit in the copyright field, then `npm run models`).
 
-Solange das Backend die Modelle ausliefert, ist die Reihenfolge danach wichtig:
+While the backend serves the models, the order afterwards matters:
 
-1. Neue Dateien (`<slug>.v<n>.glb` und `previews/<slug>.v<n>.webp`) nach `MODELS_DIRECTORY` kopieren – zuerst, sonst zeigt der Katalog auf eine Datei, die es noch nicht gibt.
-2. Dann die SQL-Datei einspielen (neue Datenbank: `sql/seed_models.sql`, bestehende: die datierte Migration in `sql/migrations/`).
-3. Alte Versionen können liegen bleiben; löschen erst, wenn kein Katalogeintrag mehr auf sie zeigt.
+1. Copy the new files (`<slug>.v<n>.glb` and `previews/<slug>.v<n>.webp`) to `MODELS_DIRECTORY` – first, or the catalog points at a file that does not exist yet.
+2. Then run the SQL file (new database: `sql/seed_models.sql`, existing one: the dated migration in `sql/migrations/`).
+3. Old versions may stay; delete them only when no catalog row points at them anymore.
 
 ---
 
-## Produktion: nginx
+## Production: nginx
 
-Hinweise für die nginx-Konfiguration vor Frontend und Backend. `add_header` in einem `location`-Block ersetzt **alle** `add_header` des `server`-Blocks – die Sicherheits-Header (z. B. `X-Content-Type-Options`, `Referrer-Policy`) in solchen Blöcken wiederholen oder per `include` einbinden.
+Notes for the nginx configuration in front of frontend and backend. `add_header` in a `location` block replaces **all** `add_header` of the `server` block – repeat the security headers (e.g. `X-Content-Type-Options`, `Referrer-Policy`) in such blocks or pull them in with `include`.
 
-**Frontend-Host** (die gebaute Angular-App):
+**Frontend host** (the built Angular app):
 
 ```nginx
-# Modelle, solange sie mit der App ausgeliefert werden. Die Dateinamen sind versioniert (.v<n>).
+# Models, while they ship with the app. The file names are versioned (.v<n>).
 location ^~ /models/ {
     types { model/gltf-binary glb; image/webp webp; }
     add_header Cache-Control "public, max-age=31536000, immutable" always;
     gzip off;
-    # brotli off;   # nur mit geladenem brotli-Modul
+    # brotli off;   # only with the brotli module loaded
 }
 
-# 3D-Hero der Startseite: jeder Dateiname trägt einen Inhalts-Hash, eine URL ändert nie ihren Inhalt.
+# The home page's 3D hero: every file name carries a content hash, a URL never changes its content.
 location ^~ /hero/ {
     types { model/gltf-binary glb; image/webp webp; }
     add_header Cache-Control "public, max-age=31536000, immutable" always;
     gzip off;
-    # brotli off;   # nur mit geladenem brotli-Modul
+    # brotli off;   # only with the brotli module loaded
 }
 
-# Geteilte Billets sind private Grüße: nicht indexieren. Die Seite setzt zusätzlich <meta name="robots">,
-# das sehen aber nur Crawler, die JavaScript ausführen.
+# Shared billets are private greetings: do not index them. The page also sets <meta name="robots">,
+# but only crawlers that run JavaScript see it.
 location ^~ /b/ {
     add_header X-Robots-Tag "noindex" always;
     try_files $uri /index.html;
 }
 ```
 
-**API-Host** (Proxy auf das Backend): Für `/files/models/` braucht es keinen eigenen Block – `Content-Type`, `Cache-Control` und CORS setzt das Backend selbst, nginx reicht sie durch. `X-Robots-Tag: noindex` für `/v1/public/**` setzt das Backend ebenfalls.
+**API host** (proxy to the backend): `/files/models/` needs no block of its own – the backend sets `Content-Type`, `Cache-Control` and CORS itself, nginx passes them through. The backend also sets `X-Robots-Tag: noindex` for `/v1/public/**`.
 
-**Keine Kompression für `.glb` und `.webp`:** Beide sind schon komprimiert (WebP-Bilder und -Texturen, meshopt-Geometrie); gzip oder brotli im laufenden Betrieb kostet CPU und bringt kaum etwas. `gzip_types` / `brotli_types` also auf Text beschränken und weder `model/gltf-binary`, `image/webp` noch `*` aufnehmen, z. B.:
+**No compression for `.glb` and `.webp`:** both are compressed already (WebP images and textures, meshopt geometry); gzip or brotli at runtime costs CPU and gains next to nothing. Limit `gzip_types` / `brotli_types` to text and add neither `model/gltf-binary`, `image/webp` nor `*`, e.g.:
 
 ```nginx
 gzip on;
 gzip_types text/plain text/css application/json application/javascript image/svg+xml;
 ```
 
+**Billet assistant in production:** leave `ASSIST_ENABLED=false` unless a model server is part of the deployment, reachable from the backend only (Ollama has no authentication).
+
 ---
 
 ## Roadmap
 
-Jede Phase wird umgesetzt, geprüft und dann lokal committet.
+Each phase is implemented, verified and then committed.
 
-| Phase | Inhalt | Stand |
+| Phase | Content | Status |
 |---|---|---|
-| **P0** Scaffold | Git-Repo, Root-Dateien, `sql/`, Backend-Gerüst (Maven Wrapper, `pom.xml`, `application.yml`), Angular-App (zoneless, Vitest, strikte tsconfig) | erledigt |
-| **P1** Backend-Auth | Auth-Modul aus CommerceX portiert und entkoppelt: Registrierung, Login, Sessions, Passwort-Reset, Konto-Deaktivierung (30 Tage), Avatar, Root-Admin, Admin-Benutzerverwaltung, Mails | erledigt |
-| **P2** Katalog + Billets | `tbl_models`-Katalog, Billet-CRUD mit Optimistic Lock, Veröffentlichen/Zurückziehen, Gast-Import, öffentlicher Endpunkt | erledigt |
-| **P3** Frontend-Fundament | Token-/Theme-System mit Generator, eigene CSS-Komponenten, Auth-Port (Interceptors, Guards, Stores), Login/Registrierung/Konto/Admin, i18n DE/EN | erledigt |
-| **P4** Asset-Pipeline | GLBs optimieren (meshopt + WebP), Vorschaubilder rendern, `seed_models.sql` generieren, Schriften zusammenführen und lokal als woff2 ablegen | erledigt |
-| **P5** Renderer | Billet-Dokument + Migration, Mini-Markup, Paletten, Partikel, 3D-Szene, Vorlagen (Muttertag 1:1, Valentinstag, Geburtstag, Weihnachten, Hochzeit), öffentliche Seite `/b/:token`, Paritätstest gegen das Original | erledigt |
-| **P6** Editor (Gast) | Editor mit Undo/Redo, Panels für Inhalt, Design, Abstände, 3D und Partikel, eigene Picker (Farbe, Schrift, Modell, Emoji), Speicherung im Browser | erledigt |
-| **P7** Server-Speicherung | Autosave mit Konflikterkennung, Billet-Liste, Import der Gast-Billets, Teilen-Dialog (veröffentlichen, aktualisieren, zurückziehen), e2e gegen das echte Backend (Docker Compose) | erledigt |
-| **P8** Härtung + Doku | fallow-Audit, Bundle-Budgets (three.js nur im Lazy-Chunk), axe-Prüfung aller Seiten und Dialoge (`e2e/a11y.spec.ts`), stabile parallele e2e-Läufe, Sicherheitsdurchsicht, Theme-Farbfelder in „Meine Billets“ (`tbl_billets.theme`), Toasts unten und über Dialogen, Modelle optional vom Backend ausliefern (`MODELS_DIRECTORY`) mit Runbook, nginx-Hinweise, Blender-Export-Checkliste, README/CLAUDE.md | erledigt (Lighthouse offen) |
-| **Hero-Story** | 3D-Story im Home-Hero: Valentinstag als Paradebeispiel, Texturen aus dem echten Renderer, Karte, Handy und Choreografie per Blender-Python (headless) mit Bakes und Export, struktur-erhaltende Optimierung, leichte Geschenke, Laufzeit mit Kapiteln, Pause/Replay, Ruhezustand mit Anlass-Wechsel und Drehen, Start-/End-Poster aus dem Canvas, reduzierte Bewegung / Datensparmodus / ohne WebGL, LCP-Messung, `e2e/home.spec.ts` | erledigt |
+| **P0** Scaffold | Git repository, root files, `sql/`, backend skeleton (Maven wrapper, `pom.xml`, `application.yml`), Angular app (zoneless, Vitest, strict tsconfig) | done |
+| **P1** Backend auth | Auth module ported from CommerceX and decoupled: registration, login, sessions, password reset, account deactivation (30 days), avatar, root admin, admin user management, mails | done |
+| **P2** Catalog + billets | `tbl_models` catalog, billet CRUD with optimistic locking, publish/unpublish, guest import, public endpoint | done |
+| **P3** Frontend foundation | Token/theme system with generator, own CSS components, auth port (interceptors, guards, stores), login/registration/account/admin, i18n DE/EN | done |
+| **P4** Asset pipeline | Optimise GLBs (meshopt + WebP), render previews, generate `seed_models.sql`, merge fonts and store them locally as woff2 | done |
+| **P5** Renderer | Billet document + migration, mini markup, palettes, particles, 3D scene, templates (Mother's Day 1:1, Valentine's Day, birthday, Christmas, wedding), public page `/b/:token`, parity test against the original | done |
+| **P6** Editor (guest) | Editor with undo/redo, panels for content, design, spacing, 3D and particles, own pickers (colour, font, model, emoji), storage in the browser | done |
+| **P7** Server storage | Autosave with conflict detection, billet list, import of guest billets, share dialog (publish, update, unpublish), e2e against the real backend (Docker Compose) | done |
+| **P8** Hardening + docs | fallow audit, bundle budgets (three.js only in the lazy chunk), axe checks of every page and dialog (`e2e/a11y.spec.ts`), stable parallel e2e runs, security review, theme swatches in "Meine Billets" (`tbl_billets.theme`), toasts at the bottom and above dialogs, models optionally served by the backend (`MODELS_DIRECTORY`) with runbook, nginx notes, Blender export checklist, README/CLAUDE.md | done (Lighthouse open) |
+| **Hero story** | 3D story in the home hero: Valentine's Day as the showcase, textures from the real renderer, card, phone and choreography in Blender Python (headless) with bakes and export, structure-preserving optimisation, light gifts, runtime with chapters, pause/replay, idle state with occasion changes and rotation, start/end posters from the canvas, reduced motion / data saver / no WebGL, LCP measurement, `e2e/home.spec.ts` | done |
+| **Assistant** | A billet from one sentence: start params for `/billets/new` (A1), package `assist` with a Java port of the jev questionnaire and an Ollama client, status/warm-up/question endpoints (A2), chat on the home page and in the gallery with an offer widget (A3), docs (A4), measurement against Ollama (A5) | A1–A4 implemented, A5 open |
 
 ---
 
 ## Git
 
-Remote: `origin` = https://github.com/AndreasLesovsky/billet-studio, Branch `main`. Nach jeder geprüften Phase (Tests und Build grün, deine Abnahme) entsteht ein Commit, der nach `origin main` gepusht wird – nie per Force-Push, keine weiteren Branches.
+Remote: `origin` = https://github.com/AndreasLesovsky/billet-studio, branch `main`. After each verified phase (tests and build green, your acceptance) a commit is made and pushed to `origin main` – never force-pushed, no other branches.

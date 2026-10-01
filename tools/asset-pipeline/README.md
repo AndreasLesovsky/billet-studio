@@ -1,111 +1,111 @@
-# Asset-Pipeline
+# Asset pipeline
 
-Erzeugt alles, was billet-studio an Binär-Assets ausliefert, und die dazugehörige Seed-Datei:
+Produces every binary asset billet-studio ships, and the seed file that goes with them:
 
-| Ausgabe | Erzeugt von |
+| Output | Produced by |
 |---|---|
 | `billet-studio-frontend/public/models/<slug>.v<n>.glb` | `models/optimize-models.mjs` |
 | `billet-studio-frontend/public/models/previews/<slug>.v<n>.webp` | `models/render-previews.mjs` |
 | `sql/seed_models.sql` | `models/generate-seed-models.mjs` |
-| `billet-studio-frontend/public/fonts/**`, Font-Katalog | `fonts/merge-fonts.mjs` |
+| `billet-studio-frontend/public/fonts/**`, font catalog | `fonts/merge-fonts.mjs` |
 | `billet-studio-frontend/public/hero/textures/<name>.<hash>.webp`, `hero/hero-captures.json` | `hero/capture-hero.mjs` |
 | `billet-studio-frontend/public/hero/gifts/<slug>.<hash>.glb`, `hero/hero-gifts.json` | `hero/build-hero-gifts.mjs` |
 | `billet-studio-frontend/public/hero/story.<hash>.glb`, `hero/hero-story.json` | `hero/optimize-hero-story.mjs` |
 | `billet-studio-frontend/public/hero/posters/<name>.<hash>.webp`, `hero/hero-posters.json` | `hero/capture-hero-posters.mjs` |
 | `hero-assets.generated.ts`, `hero-home.generated.ts` (in `src/app/features/home/hero-story/`) | `hero/generate-hero-assets.mjs` |
 
-Diese Dateien werden **nie von Hand** kopiert oder bearbeitet. Wer etwas ändern will, ändert das Manifest
-(oder das Skript) und lässt die Pipeline erneut laufen.
+These files are **never copied or edited by hand**. To change something, change the manifest
+(or the script) and run the pipeline again.
 
-## Einrichtung
+## Setup
 
 ```bash
 cd tools/asset-pipeline
 npm install
-npx playwright install chromium   # nur für die Vorschaubilder, einmalig
+npx playwright install chromium   # only for the preview images, once
 ```
 
-Node 22 oder neuer. `node_modules/` ist per `.gitignore` ausgeschlossen, `package-lock.json` wird eingecheckt.
+Node 22 or newer. `node_modules/` is excluded via `.gitignore`; `package-lock.json` is committed.
 
-## Befehle
+## Commands
 
-| Befehl | Wirkung |
+| Command | Effect |
 |---|---|
-| `npm run models` | alles für Modelle: optimieren → Vorschaubilder → `seed_models.sql` |
-| `npm run models:optimize` | GLBs optimieren (überspringt Modelle, deren Ausgabe aktuell ist) |
-| `npm run models:previews` | WebP-Vorschaubilder rendern (headless Chromium, SwiftShader) |
-| `npm run models:seed` | `sql/seed_models.sql` neu schreiben |
-| `npm run models:compare` | Qualitätsprüfung: Quelle und optimiertes Modell gleich rendern und vergleichen (siehe unten) |
-| `npm run hero:capture` | Texturen des 3D-Heros aus dem echten Renderer aufnehmen, danach `hero:assets` (siehe unten) |
-| `npm run hero:gifts` | leichte Geschenk-Modelle für den 3D-Hero der Startseite bauen, danach `hero:assets` (siehe unten) |
-| `npm run hero:compare` | leichte Hero-Geschenke neben der Katalog-Version rendern (`hero/.captures/gifts-compare.png`) |
-| `npm run hero:story` | den Blender-Export der Hero-Story optimieren, prüfen und veröffentlichen, danach `hero:assets` (siehe unten) |
-| `npm run hero:story-verify` | nur prüfen: veröffentlichte Story gegen Vertrag und Roh-Export |
-| `npm run hero:story-check` | die veröffentlichte Story in three.js wie die Laufzeit abspielen (`hero/.captures/story-check.png`) |
-| `npm run hero:posters` | Start- und End-Poster des Heros aus dem Canvas der Laufzeit aufnehmen, danach `hero:assets` (siehe unten) |
-| `npm run hero:assets` | nur die Asset-Tabellen der Laufzeit aus den Hero-Manifesten neu schreiben |
-| `npm run fonts` | Fonts neu bauen (`fonts/merge-fonts.mjs`) |
-| `npm run fonts:check` | nur prüfen, ob die Font-Ausgaben vollständig sind (kein Netz, keine Schreibzugriffe) |
+| `npm run models` | everything for models: optimize → preview images → `seed_models.sql` |
+| `npm run models:optimize` | optimize GLBs (skips models whose output is up to date) |
+| `npm run models:previews` | render WebP preview images (headless Chromium, SwiftShader) |
+| `npm run models:seed` | rewrite `sql/seed_models.sql` |
+| `npm run models:compare` | quality check: render the source and the optimized model identically and compare them (see below) |
+| `npm run hero:capture` | capture the 3D hero's textures from the real renderer, then `hero:assets` (see below) |
+| `npm run hero:gifts` | build light gift models for the home page's 3D hero, then `hero:assets` (see below) |
+| `npm run hero:compare` | render the light hero gifts next to the catalog version (`hero/.captures/gifts-compare.png`) |
+| `npm run hero:story` | optimize, verify and publish the Blender export of the hero story, then `hero:assets` (see below) |
+| `npm run hero:story-verify` | verify only: the published story against the contract and the raw export |
+| `npm run hero:story-check` | play the published story in three.js the way the runtime does (`hero/.captures/story-check.png`) |
+| `npm run hero:posters` | capture the hero's start and end posters from the runtime's canvas, then `hero:assets` (see below) |
+| `npm run hero:assets` | only rewrite the runtime's asset tables from the hero manifests |
+| `npm run fonts` | rebuild the fonts (`fonts/merge-fonts.mjs`) |
+| `npm run fonts:check` | only check whether the font outputs are complete (no network, no writes) |
 
-Optionen für die Modell-Skripte, z. B. `npm run models:optimize -- --force --only=gift-box`:
+Options for the model scripts, e.g. `npm run models:optimize -- --force --only=gift-box`:
 
-- `--force` baut auch aktuelle Ausgaben neu.
-- `--only=slug-a,slug-b` beschränkt den Lauf auf einzelne Modelle.
+- `--force` also rebuilds outputs that are up to date.
+- `--only=slug-a,slug-b` limits the run to individual models.
 
-`models:optimize` gibt am Ende eine Tabelle aus (Quelle MB → Ausgabe MB, Vertices, Texturen, größte
-Textur, Draw Calls, Animationen) und endet mit Exit-Code 1, wenn ein Modell sein Größenlimit reißt, eine
-Animation verloren geht oder eine Erweiterung der Quelle (z. B. `KHR_materials_unlit`,
-`KHR_materials_emissive_strength`) fehlt.
+`models:optimize` prints a table at the end (source MB → output MB, vertices, textures, largest
+texture, draw calls, animations) and exits with code 1 when a model breaks its size limit, an
+animation is lost or an extension of the source (e.g. `KHR_materials_unlit`,
+`KHR_materials_emissive_strength`) is missing.
 
-## Quellen bleiben unangetastet
+## Sources stay untouched
 
-Die Pipeline **liest** nur aus den Quellordnern und schreibt ausschließlich in dieses Repository:
+The pipeline only **reads** from the source folders and writes exclusively into this repository:
 
-- `digital-card-template/models` – die GLB-Originale (Pfad `sourceDir` im Manifest, überschreibbar mit
-  der Umgebungsvariable `BILLET_MODELS_SOURCE_DIR`)
-- `muttertag_threejs/` – Referenz des Blumenstraußes (identisch mit `flower_bouquet.glb` oben)
-- `Basisrezept/fonts`, `commerce-x/.../public/fonts` – Font-Quellen
+- `digital-card-template/models` – the GLB originals (path `sourceDir` in the manifest, can be
+  overridden with the environment variable `BILLET_MODELS_SOURCE_DIR`)
+- `muttertag_threejs/` – reference for the flower bouquet (identical to `flower_bouquet.glb` above)
+- `Basisrezept/fonts`, `commerce-x/.../public/fonts` – font sources
 
-Nichts in diesen Ordnern wird verschoben, umbenannt, gelöscht oder überschrieben.
+Nothing in these folders is moved, renamed, deleted or overwritten.
 
-## Was die Optimierung macht
+## What the optimization does
 
-Pro Manifest-Eintrag (glTF-Transform, programmatisch): `dedup` → `instance` (ab 5 gleichen Meshes,
-z. B. Weihnachtsbaum) → `flatten` → `join` → `weld` → optional `simplify` → `resample` (verlustfrei, nur
-Animationen) → `prune` → Texturen auf `maxTextureSize` verkleinern und als **WebP** (Qualität
-`textureQuality`, Standard 88) speichern → **meshopt**-Kompression (`EXT_meshopt_compression` +
-`KHR_mesh_quantization`). Animationen und Material-Erweiterungen bleiben erhalten und werden nach dem
-Schreiben geprüft. Die Credits (`asset.extras`) bleiben in der Datei.
+Per manifest entry (glTF-Transform, programmatic): `dedup` → `instance` (from 5 identical meshes,
+e.g. the Christmas tree) → `flatten` → `join` → `weld` → optionally `simplify` → `resample` (lossless,
+animations only) → `prune` → shrink textures to `maxTextureSize` and save them as **WebP** (quality
+`textureQuality`, default 88) → **meshopt** compression (`EXT_meshopt_compression` +
+`KHR_mesh_quantization`). Animations and material extensions are preserved and checked after
+writing. The credits (`asset.extras`) stay in the file.
 
-Verlustbehaftetes WebP speichert Farbe mit halber Auflösung (4:2:0). Bei Normal-Maps, die in Rot/Grün
-eine Richtung speichern, glättet das feine Reliefs (zerknitterte Folie, gehämmertes Glas). Mit
-`"losslessNormals": true` werden Normal-Maps verlustfrei gespeichert (Datei deutlich größer). Heute
-gesetzt für `champagne-bottle` (0,35 → 1,88 MB) und `christmas-baubles` (0,76 → 4,70 MB).
+Lossy WebP stores color at half resolution (4:2:0). For normal maps, which store a direction in
+red/green, this smooths out fine relief (crumpled foil, hammered glass). With
+`"losslessNormals": true`, normal maps are stored losslessly (noticeably larger file). Currently
+set for `champagne-bottle` (0.35 → 1.88 MB) and `christmas-baubles` (0.76 → 4.70 MB).
 
-Grenzen: max. 2048 px pro Textur, **≤ 6 MB pro Modell, Blumenstrauß ≤ 8 MB** (`sizeLimitMB`).
-Reißt ein Modell das Limit, im Manifest `maxTextureSize` verkleinern (2048 → 1024) und neu laufen lassen.
-Vereinfachung der Geometrie (`simplify`) ist standardmäßig aus und wird für animierte Modelle oder
-Modelle mit wenigen Vertices ignoriert.
+Limits: max. 2048 px per texture, **≤ 6 MB per model, flower bouquet ≤ 8 MB** (`sizeLimitMB`).
+If a model breaks its limit, lower `maxTextureSize` in the manifest (2048 → 1024) and run it again.
+Geometry simplification (`simplify`) is off by default and is ignored for animated models or
+models with few vertices.
 
-Die Ausgabe gilt als aktuell, wenn sie neuer als die Quelle ist und mit denselben Einstellungen gebaut
-wurde (Hash in `asset.extras.billetStudioPipeline`). Vorschaubilder gelten als aktuell, wenn sie neuer
-als GLB, Manifest, `preview.html` und Render-Skript sind.
+An output counts as up to date when it is newer than its source and was built with the same settings
+(hash in `asset.extras.billetStudioPipeline`). Preview images count as up to date when they are newer
+than the GLB, the manifest, `preview.html` and the render script.
 
-## Neues Blender-Modell hinzufügen
+## Adding a new Blender model
 
-1. **In Blender vorbereiten**
-   - Transformationen anwenden (Objekt → Anwenden → Alle Transformationen), Ursprung sinnvoll setzen.
-   - Texturen höchstens 2048 × 2048 px; Materialien als Principled BSDF (andere Shader überlebt der
-     glTF-Export nicht).
-   - Animationen als Actions/NLA anlegen, wenn das Modell animiert sein soll.
-2. **Exportieren**: Datei → Exportieren → glTF 2.0, Format **glTF Binary (.glb)**, „+Y Up“ an,
-   „Apply Modifiers“ an, **keine** Draco-Kompression (die Pipeline komprimiert mit meshopt).
-   Credit: das Feld „Copyright“ im Export-Dialog ausfüllen (landet in `asset.copyright`, z. B.
-   „Osterei by Andreas (CC-BY-4.0)“). Sketchfab-Downloads bringen ihre Credits schon in
-   `asset.extras` mit (`title`, `author`, `license`, `source`); daraus wird
-   `<title> by <author> (<license>) <source>` (max. 255 Zeichen). Ohne beides bleibt `credit` NULL.
-3. **Datei ablegen** im Quellordner (`sourceDir` im Manifest, heute `digital-card-template/models`).
-4. **Manifest-Eintrag** in `models/models.manifest.json` ergänzen:
+1. **Prepare in Blender**
+   - Apply transforms (Object → Apply → All Transforms) and set a sensible origin.
+   - Textures at most 2048 × 2048 px; materials as Principled BSDF (other shaders do not survive
+     the glTF export).
+   - Create animations as Actions/NLA if the model is meant to be animated.
+2. **Export**: File → Export → glTF 2.0, format **glTF Binary (.glb)**, "+Y Up" on,
+   "Apply Modifiers" on, **no** Draco compression (the pipeline compresses with meshopt).
+   Credit: fill in the "Copyright" field in the export dialog (it ends up in `asset.copyright`, e.g.
+   "Osterei by Andreas (CC-BY-4.0)"). Sketchfab downloads already bring their credits in
+   `asset.extras` (`title`, `author`, `license`, `source`); these become
+   `<title> by <author> (<license>) <source>` (max. 255 characters). Without either, `credit` stays NULL.
+3. **Place the file** in the source folder (`sourceDir` in the manifest, currently `digital-card-template/models`).
+4. **Add a manifest entry** to `models/models.manifest.json`:
 
    ```json
    {
@@ -122,171 +122,171 @@ als GLB, Manifest, `preview.html` und Render-Skript sind.
    }
    ```
 
-   - `slug`: klein, mit Bindestrichen, max. 60 Zeichen. **Nie umbenennen**, Billets speichern ihn.
-   - `version`: bei jeder inhaltlichen Änderung am Modell erhöhen (`v1` → `v2`, Cache-Busting). Die alte
-     Datei bleibt liegen, bis sie bewusst gelöscht wird (die Pipeline listet sie als „nicht im Manifest“).
-   - `maxTextureSize`: 2048 für große Hauptmodelle, 1024 für kleine Requisiten oder winzige Texturen.
-   - `scene`: Standard-Szene im Editor (Werte wie im Billet-Dokument). `fitSize` 0 < x ≤ 5.
-   - Optional: `sizeLimitMB`, `previewRotationY` (Drehung nur fürs Vorschaubild, Standard −0,35 rad),
-     `simplify` (`{ "ratio": 0.5, "error": 0.001 }`), `excludeMaterials` (Primitive mit diesen
-     Materialnamen werden entfernt, z. B. Deko-Schneeflocken, die das Auto-Fit sprengen),
-     `losslessNormals` (Normal-Maps verlustfrei, wenn `models:compare` sichtbaren Verlust zeigt),
-     `opaqueMaterials` (diese Materialien werden deckend: `alphaMode` OPAQUE, Alpha 1 – für ein
-     BLEND-Material, das nicht durchsichtig sein soll; über der transparenten Canvas scheint sonst die
-     Seite durch und bei doppelseitigen Materialien die Rückseite, z. B. ein gespiegeltes Etikett.
-     Heute `champagne-bottle`, Material `Glass`).
-5. **Pipeline laufen lassen**: `npm run models` (optimieren → Vorschaubild → `sql/seed_models.sql`).
-   Tabelle prüfen, Vorschaubild in `public/models/previews/` ansehen.
-6. **Datenbank**: `sql/seed_models.sql` spielst **du** ein (phpMyAdmin oder
-   `mysql -u root -p db_billet_studio < sql/seed_models.sql`). Die Datei ist idempotent und kann
-   jederzeit erneut eingespielt werden. Claude führt nie SQL aus.
+   - `slug`: lowercase, with hyphens, max. 60 characters. **Never rename it**: billets store it.
+   - `version`: increase it with every change to the model's content (`v1` → `v2`, cache busting). The
+     old file stays until it is deliberately deleted (the pipeline lists it as "not in the manifest").
+   - `maxTextureSize`: 2048 for large main models, 1024 for small props or tiny textures.
+   - `scene`: the default scene in the editor (values as in the billet document). `fitSize` 0 < x ≤ 5.
+   - Optional: `sizeLimitMB`, `previewRotationY` (rotation for the preview image only, default −0.35 rad),
+     `simplify` (`{ "ratio": 0.5, "error": 0.001 }`), `excludeMaterials` (primitives with these
+     material names are removed, e.g. decorative snowflakes that break the auto-fit),
+     `losslessNormals` (lossless normal maps when `models:compare` shows a visible loss),
+     `opaqueMaterials` (these materials become opaque: `alphaMode` OPAQUE, alpha 1 – for a
+     BLEND material that is not meant to be see-through; otherwise the page shows through the
+     transparent canvas, and with double-sided materials the back face does, e.g. a mirrored label.
+     Currently `champagne-bottle`, material `Glass`).
+5. **Run the pipeline**: `npm run models` (optimize → preview image → `sql/seed_models.sql`).
+   Check the table and look at the preview image in `public/models/previews/`.
+6. **Database**: **you** import `sql/seed_models.sql` (phpMyAdmin or
+   `mysql -u root -p db_billet_studio < sql/seed_models.sql`). The file is idempotent and can be
+   imported again at any time. Claude never runs SQL.
 
-## Hero-Texturen
+## Hero textures
 
-`npm run hero:capture` (`hero/capture-hero.mjs`) nimmt Druck (vorn, innen), Display-Seiten aller
-Vorlagen, Sperrbildschirm und Nachricht mit dem **echten Renderer** auf: die Dev-Route
-`/dev/hero-capture/:kind` zeichnet sie mit `BilletView` in fester CSS-Größe, Playwright fotografiert
-sie (DPR 2, Druck 2,5), je Sprache × Farbmodus (Druck nur hell). Die Seite wartet, bis jede Schrift
-wirklich geladen ist, es wird also nie eine Ersatzschrift eingebacken.
+`npm run hero:capture` (`hero/capture-hero.mjs`) captures the print (front, inside), the display pages
+of all templates, the lock screen and the message with the **real renderer**: the dev route
+`/dev/hero-capture/:kind` draws them with `BilletView` at a fixed CSS size, and Playwright photographs
+them (DPR 2, print 2.5), per language × color mode (print light only). The page waits until every font
+is really loaded, so a fallback font is never baked in.
 
-- Ausgabe: `public/hero/textures/<name>.<8 Zeichen Inhalts-Hash>.webp` (veraltete werden gelöscht),
-  `hero/hero-captures.json` (mit dem normierten 3D-Bereich jeder Display-Seite), verlustfreie PNGs,
-  Kontaktbogen und 1:1-Textausschnitt in `hero/.captures/` (gitignored). Exit-Code 1 und nichts
-  geschrieben, wenn eine Aufnahme scheitert oder der 3D-Bereich hell und dunkel verschieden liegt.
+- Output: `public/hero/textures/<name>.<8-character content hash>.webp` (stale ones are deleted),
+  `hero/hero-captures.json` (with the normalized 3D area of each display page), lossless PNGs, a
+  contact sheet and a 1:1 text crop in `hero/.captures/` (gitignored). Exit code 1 and nothing
+  written when a capture fails or the 3D area lies in a different place in light and dark.
 
-## Hero-Poster
+## Hero posters
 
-`npm run hero:posters` (`hero/capture-hero-posters.mjs`) liest die Poster aus dem Canvas der
-Laufzeit selbst (`/dev/hero?capture&t=0|end`, `preserveDrawingBuffer`, `toDataURL`): ein Poster ist
-genau das Bild, mit dem der Canvas einblendet, transparent um die Story herum. 512 CSS-px bei DPR 2 =
-1024 px, WebP mit Alpha (Qualität 82, Alpha 90). Eine Chromium-Seite, die Aufnahmen nacheinander
+`npm run hero:posters` (`hero/capture-hero-posters.mjs`) reads the posters from the runtime's own
+canvas (`/dev/hero?capture&t=0|end`, `preserveDrawingBuffer`, `toDataURL`): a poster is exactly
+the image the canvas fades in with, transparent around the story. 512 CSS px at DPR 2 =
+1024 px, WebP with alpha (quality 82, alpha 90). One Chromium page, the captures one after another
 (WebGL in SwiftShader).
 
-- Start-Poster (t = 0, nur die Karte) je Sprache, End-Poster (Ruhezustand, das Display folgt dem
-  Farbmodus) je Sprache × Farbmodus.
-- Ausgabe: `public/hero/posters/<name>.<8 Zeichen Inhalts-Hash>.webp` (veraltete werden gelöscht),
-  `hero/hero-posters.json`, verlustfreie `hero/.captures/poster-<name>.png`. Exit-Code 1 und nichts
-  geschrieben, wenn die Bühne nicht bereit wird, kein WebGL hat oder der Canvas nicht 1024 px misst.
-- Nach jeder Änderung an Story, Texturen oder Geschenken zuletzt laufen lassen, sonst passt ein
-  Poster nicht mehr zu seinem Bild.
+- Start poster (t = 0, the card only) per language, end poster (resting state, the display follows
+  the color mode) per language × color mode.
+- Output: `public/hero/posters/<name>.<8-character content hash>.webp` (stale ones are deleted),
+  `hero/hero-posters.json`, lossless `hero/.captures/poster-<name>.png`. Exit code 1 and nothing
+  written when the stage does not become ready, has no WebGL or the canvas does not measure 1024 px.
+- Run it last after every change to the story, textures or gifts, otherwise a poster no longer
+  matches its image.
 
-## Server der Hero-Aufnahmen
+## Hero capture server
 
-`hero:capture` und `hero:posters` brauchen die laufende App (Dev-Routen gibt es nur in `ng serve`).
-Beide nehmen Port **4330** (nicht 4200 des Entwicklers, nicht die e2e-Ports 4320/4321) und starten dort
-selbst `ng serve`, wenn nichts antwortet, und beenden nur, was sie gestartet haben
-(`hero/lib/app-server.mjs`). `hero:posters` nimmt mit `HERO_APP_URL` einen schon laufenden Server,
-z. B. `set HERO_APP_URL=http://localhost:4200` (Windows) vor `npm run hero:posters`. Jede
-`/v1`-Anfrage beantwortet die Aufnahme selbst mit 401 (Gast); kein Backend wird angesprochen.
+`hero:capture` and `hero:posters` need the running app (dev routes exist only in `ng serve`).
+Both use port **4330** (not the developer's 4200, not the e2e ports 4320/4321), start `ng serve`
+there themselves when nothing answers, and stop only what they started
+(`hero/lib/app-server.mjs`). With `HERO_APP_URL`, `hero:posters` uses a server that is already running,
+e.g. `set HERO_APP_URL=http://localhost:4200` (Windows) before `npm run hero:posters`. The capture
+answers every `/v1` request itself with 401 (guest); no backend is contacted.
 
-## Hero-Geschenke
+## Hero gifts
 
-Der 3D-Hero der Startseite zeigt pro Anlass ein Geschenk mit etwa 150–300 CSS-px (DPR 2). Dafür baut
-`npm run hero:gifts` leichte Fassungen der fünf Katalog-Modelle, **aus den Quell-GLBs** (nicht aus
-`public/models`, sonst würden die Texturen zweimal verlustbehaftet kodiert) mit derselben
-Transform-Liste wie der Katalog (`models/lib/optimize.mjs`):
+The home page's 3D hero shows one gift per occasion at about 150–300 CSS px (DPR 2). For this,
+`npm run hero:gifts` builds light versions of the five catalog models, **from the source GLBs** (not
+from `public/models`, or the textures would be lossily encoded twice), with the same
+transform list as the catalog (`models/lib/optimize.mjs`):
 
-- `hero/hero.manifest.json`: `templateId` → Katalog-`slug`, pro Geschenk `sizeLimitKB` und die
-  Abweichungen vom Katalog: `maxTextureSize`, `textureQuality`, `losslessNormals`, `simplify`
-  (`ratio`, `error`, optional `flags` für meshoptimizer, z. B. `Permissive`, und `keepMaterials`:
-  Materialien, deren Primitive unvereinfacht bleiben, etwa die dünnen Stiele des Straußes),
-  `normalTextureSize` (Größe der verlustfreien Normal-Maps) und `stripUnlitNormals` (entfernt `NORMAL`
-  bei `KHR_materials_unlit`-Materialien; erst damit lassen sich Scans wie Torte und Strauß vereinfachen).
-  Quelle, `excludeMaterials`, `opaqueMaterials`, Credit und Szenen-Standardwerte kommen aus
-  `models/models.manifest.json`. Animierte Modelle werden nie vereinfacht (das schlagende Herz bleibt
-  eine unveränderte Kopie der Katalog-Einstellungen). Die Schneekugel wird nicht vereinfacht: ihr
-  Toon-Umriss ist eine invertierte Hülle mit derselben Topologie wie das Innere; getrennt vereinfacht
-  passen beide nicht mehr zusammen (dunkle Flocken, schwarzer Kamin).
-- Ausgabe: `public/hero/gifts/<slug>.<8 Zeichen Inhalts-Hash>.glb` (veraltete Hashes werden gelöscht)
-  und `hero/hero-gifts.json` (Datei, Bytes, Dreiecke, Texturen, Animations-Clips, Credit,
-  Szenen-Standardwerte). Nichts davon landet in `seed_models.sql`.
-- Exit-Code 1 und **nichts geschrieben**, wenn ein Geschenk sein `sizeLimitKB` reißt oder `verify()`
-  scheitert (verlorene Animation oder Erweiterung).
+- `hero/hero.manifest.json`: `templateId` → catalog `slug`, per gift `sizeLimitKB` and the
+  deviations from the catalog: `maxTextureSize`, `textureQuality`, `losslessNormals`, `simplify`
+  (`ratio`, `error`, optional `flags` for meshoptimizer, e.g. `Permissive`, and `keepMaterials`:
+  materials whose primitives stay unsimplified, such as the bouquet's thin stems),
+  `normalTextureSize` (size of the lossless normal maps) and `stripUnlitNormals` (removes `NORMAL`
+  from `KHR_materials_unlit` materials; only this makes scans such as the cake and the bouquet simplifiable).
+  The source, `excludeMaterials`, `opaqueMaterials`, the credit and the scene defaults come from
+  `models/models.manifest.json`. Animated models are never simplified (the beating heart stays
+  an unchanged copy of the catalog settings). The snow globe is not simplified: its toon outline
+  is an inverted hull with the same topology as the inside; simplified separately, the two no longer
+  fit together (dark flakes, black chimney).
+- Output: `public/hero/gifts/<slug>.<8-character content hash>.glb` (stale hashes are deleted)
+  and `hero/hero-gifts.json` (file, bytes, triangles, textures, animation clips, credit,
+  scene defaults). None of it ends up in `seed_models.sql`.
+- Exit code 1 and **nothing written** when a gift breaks its `sizeLimitKB` or `verify()`
+  fails (a lost animation or extension).
 
-`npm run hero:compare` rendert jedes leichte Geschenk neben der Katalog-Version mit `models/preview.html`
-bei 320 CSS-px × DPR 2, in vier gleichmäßig verteilten Drehwinkeln (der Hero dreht das Geschenk), und
-schreibt `hero/.captures/gifts-compare.png` (pro Geschenk der schlechteste Winkel: Katalog | leicht |
-Differenz, mit Dateigrößen) plus `gifts-compare-<slug>.png` mit allen vier Winkeln. Nach jeder Änderung
-am Manifest ansehen.
+`npm run hero:compare` renders each light gift next to the catalog version with `models/preview.html`
+at 320 CSS px × DPR 2, at four evenly spaced rotation angles (the hero rotates the gift), and
+writes `hero/.captures/gifts-compare.png` (per gift the worst angle: catalog | light |
+difference, with file sizes) plus `gifts-compare-<slug>.png` with all four angles. Look at it after
+every change to the manifest.
 
-## Hero-Story
+## Hero story
 
-Die 3D-Story der Startseite (Vertrag: `docs/hero-story.md`) baut Blender per Skript
-(`tools/blender/hero/`, `--stage export`) und legt den Roh-Export eingecheckt unter
-`tools/blender/hero/export/hero-story.glb` ab. Die Pipeline läuft danach ohne Blender:
+The home page's 3D story (contract: `docs/hero-story.md`) is built by Blender from scripts
+(`tools/blender/hero/`, `--stage export`), which store the committed raw export at
+`tools/blender/hero/export/hero-story.glb`. From there on, the pipeline runs without Blender:
 
-- `npm run hero:story` (`hero/optimize-hero-story.mjs`): eine **struktur-erhaltende** Kette, nicht die
-  Katalog-Kette: `dedup` nur für Accessoren, Meshes und Texturen (Materialien findet die Laufzeit über
-  ihre Namen), `weld`, `resample` (Toleranz 1e-5), 16 × 16-Platzhalter in den Slots, die die Laufzeit
-  ersetzt (`M_Print_Front`, `M_Print_Inside` Grundfarbe, `M_Screen` Emission), `BLEND` auf
-  `M_Shadow_*`, WebP pro Slot (Papier-Normal-Map 256 px, Handy-AO 512 px, Schatten 256 px), `prune`
-  mit `keepLeaves` / `keepAttributes` / `keepExtras` / `keepSolidTextures` (leere Knoten wie `Cam`,
-  `Fx_*`, `GiftSlot` bleiben), meshopt Stufe `medium` (Positionen 14, Normalen 10, UVs 12 Bit;
-  Animationsdaten verlustfrei). **Kein** `flatten`, `join`, `instance` oder `simplify`. `quantize`
-  hängt das Mesh eines animierten Knotens (die Schatten-Patches der Karte drehen mit ihr) an einen
-  Kindknoten, der `<Knoten>_Mesh` heißt.
-- Geprüft wird vor dem Schreiben (`hero/verify-hero-story.mjs`): `extras.heroStory` wie `parseStoryMeta`
-  der Laufzeit, Pflicht-Knoten, genau ein Clip `Story` mit der Story-Dauer, jede `Shadow_<Name>` mit
-  `M_Shadow_<Name>` (BLEND), die Platzhalter, `TEXCOORD_0/1` wo Materialien sie lesen, keine
-  `KHR_materials_*`-Erweiterung (three.js würde auf `MeshPhysicalMaterial` wechseln), der Skin von
-  `Card_Spine` (`Spine_00`..`Spine_16`), die Dock-Extras, der Khronos-Validator (0 Fehler), **≤ 600 KB**
-  und die Posen: an Stützstellen alle 0,25 s die Weltmatrizen der animierten Knoten und die
-  Welt-Bounding-Boxen aller Meshes (Karte nach dem Skinning) gegen den Roh-Export, **≤ 0,2 mm**; am Ende
-  des Clips ist `GiftSlot` gleich `Phone_ScreenDock`.
-- Ausgabe: `public/hero/story.<8 Zeichen Inhalts-Hash>.glb` (alte Hashes werden gelöscht) und
-  `hero/hero-story.json` (Datei, Bytes, Dreiecke, geparste Story-Meta, Knoten, Texturen, Prüfwerte).
-  Danach schreibt `hero:assets` die Asset-Tabelle der Laufzeit neu. Exit-Code 1 und nichts geschrieben,
-  wenn eine Prüfung scheitert.
-- `npm run hero:story-check` (`hero/check-story.mjs` + `hero/story-check.html`): spielt die
-  veröffentlichte Story in headless Chromium so ab wie die Laufzeit (Kamera aus `Cam` / `CamTarget` mit
-  dem Story-FOV, pausierter Clip auf die Zeit gesetzt, Drucktexturen, einfacher unbeleuchteter
-  Bildschirm: Sperrbildschirm mit dem Nachrichten-Banner (`Fx_Notif`, Größe aus der Aufnahme wie im
-  Bildschirm-Shader der Laufzeit) → Billet, Karten- und Schatten-Fx, das leichte Herz unter `GiftSlot`
-  per `fitTransform` mit seinem Clip auf der Story-Zeit, RoomEnvironment und die Lichter der
-  Laufzeit; Tone-Mapping ACES als Standard der Prüfseite, die Laufzeit nutzt Neutral: mit
-  `--tone-mapping=neutral` zeigt die Prüfseite deren Farben), rendert in einer einzigen Seite dieselben Zeitpunkte wie der Blender-Kontaktbogen (alle
-  0,5 s) nach `hero/.captures/story-check.png` und die Vollbild-Zeitpunkte (0 / 2,4 / 4,6 / 7,2 / 8,8 /
-  10 s) als `story-check-t<t>.png` und vergleicht die Positionen der Knoten und die Fx-Werte mit Blenders
-  Referenz (`tools/blender/hero/.renders/story/checks.json`, Toleranz 0,5 mm). Für Licht-Versuche:
-  `npm run hero:story-check -- --hero-exposure=0.8 --tone-mapping=neutral` (eigene Dateinamen).
+- `npm run hero:story` (`hero/optimize-hero-story.mjs`): a **structure-preserving** chain, not the
+  catalog chain: `dedup` only for accessors, meshes and textures (the runtime finds materials by
+  their names), `weld`, `resample` (tolerance 1e-5), 16 × 16 placeholders in the slots the runtime
+  replaces (`M_Print_Front`, `M_Print_Inside` base color, `M_Screen` emission), `BLEND` on
+  `M_Shadow_*`, WebP per slot (paper normal map 256 px, phone AO 512 px, shadows 256 px), `prune`
+  with `keepLeaves` / `keepAttributes` / `keepExtras` / `keepSolidTextures` (empty nodes such as `Cam`,
+  `Fx_*`, `GiftSlot` stay), meshopt level `medium` (positions 14, normals 10, UVs 12 bits;
+  animation data lossless). **No** `flatten`, `join`, `instance` or `simplify`. `quantize`
+  moves the mesh of an animated node (the card's shadow patches rotate with it) to a child node
+  named `<Node>_Mesh`.
+- Checked before writing (`hero/verify-hero-story.mjs`): `extras.heroStory` as the runtime's
+  `parseStoryMeta` reads it, the required nodes, exactly one clip `Story` with the story duration, every
+  `Shadow_<Name>` with `M_Shadow_<Name>` (BLEND), the placeholders, `TEXCOORD_0/1` where materials read
+  them, no `KHR_materials_*` extension (three.js would switch to `MeshPhysicalMaterial`), the skin of
+  `Card_Spine` (`Spine_00`..`Spine_16`), the dock extras, the Khronos validator (0 errors), **≤ 600 KB**
+  and the poses: at sample points every 0.25 s, the world matrices of the animated nodes and the
+  world bounding boxes of all meshes (the card after skinning) against the raw export, **≤ 0.2 mm**; at
+  the end of the clip, `GiftSlot` equals `Phone_ScreenDock`.
+- Output: `public/hero/story.<8-character content hash>.glb` (old hashes are deleted) and
+  `hero/hero-story.json` (file, bytes, triangles, parsed story meta, nodes, textures, check values).
+  Then `hero:assets` rewrites the runtime's asset table. Exit code 1 and nothing written
+  when a check fails.
+- `npm run hero:story-check` (`hero/check-story.mjs` + `hero/story-check.html`): plays the
+  published story in headless Chromium the way the runtime does (camera from `Cam` / `CamTarget` with
+  the story FOV, the paused clip set to the time, print textures, a simple unlit
+  screen: lock screen with the message banner (`Fx_Notif`, size from the capture as in the runtime's
+  screen shader) → billet, card and shadow Fx, the light heart under `GiftSlot`
+  via `fitTransform` with its clip at the story time, RoomEnvironment and the runtime's lights;
+  ACES tone mapping as the check page's default, while the runtime uses Neutral: with
+  `--tone-mapping=neutral` the check page shows its colors), renders in one single page the same points in time as the Blender contact sheet (every
+  0.5 s) to `hero/.captures/story-check.png` and the full-frame points in time (0 / 2.4 / 4.6 / 7.2 / 8.8 /
+  10 s) as `story-check-t<t>.png`, and compares the node positions and the Fx values with Blender's
+  reference (`tools/blender/hero/.renders/story/checks.json`, tolerance 0.5 mm). For lighting experiments:
+  `npm run hero:story-check -- --hero-exposure=0.8 --tone-mapping=neutral` (separate file names).
 
-## Hero-Asset-Tabellen
+## Hero asset tables
 
-`npm run hero:assets` (`hero/generate-hero-assets.mjs`) schreibt aus `hero-captures.json`,
-`hero-gifts.json`, `hero-story.json` und `hero-posters.json` die beiden Tabellen der Laufzeit:
-`hero-assets.generated.ts` (alles; nur der Lazy-Chunk des Heros importiert sie) und
-`hero-home.generated.ts` (was die Startseite vor dem Chunk braucht: Story-URL, Poster, Credits).
-Ohne `hero-story.json` zeigt der Hero kein 3D, ohne `hero-posters.json` einen Platzhalter statt
-Poster. Exit-Code 1 und nichts geschrieben, wenn ein Manifest unvollständig ist oder eine Datei
-nennt, die nicht in `public/` liegt. Alle erzeugenden Hero-Skripte rufen es am Ende auf.
+`npm run hero:assets` (`hero/generate-hero-assets.mjs`) writes the runtime's two tables from
+`hero-captures.json`, `hero-gifts.json`, `hero-story.json` and `hero-posters.json`:
+`hero-assets.generated.ts` (everything; only the hero's lazy chunk imports it) and
+`hero-home.generated.ts` (what the home page needs before the chunk: story URL, posters, credits).
+Without `hero-story.json` the hero shows no 3D; without `hero-posters.json`, a placeholder instead of
+the posters. Exit code 1 and nothing written when a manifest is incomplete or names a file
+that is not in `public/`. Every generating hero script calls it at the end.
 
 ## Fonts
 
-`npm run fonts` ruft `fonts/merge-fonts.mjs` auf. Das Skript führt die lokalen Font-Ordner zusammen,
-lädt die im Font-Manifest genannten Google-Fonts-Familien als woff2 (latin + latin-ext) und schreibt
-`public/fonts/`, den Font-Katalog und die Vorschauseite. `npm run fonts:check` prüft nur die vorhandenen
-Ausgaben. Details stehen im Kopf von `fonts/merge-fonts.mjs` und in `fonts/fonts.manifest.json`.
+`npm run fonts` calls `fonts/merge-fonts.mjs`. The script merges the local font folders, downloads
+the Google Fonts families named in the font manifest as woff2 (latin + latin-ext) and writes
+`public/fonts/`, the font catalog and the preview page. `npm run fonts:check` only checks the existing
+outputs. Details are in the header of `fonts/merge-fonts.mjs` and in `fonts/fonts.manifest.json`.
 
-## Vorschau-Renderer
+## Preview renderer
 
-`models/preview.html` ist eine eigenständige three.js-Seite mit dem Look der Billet-Szene
-(ACES-Filmic, Belichtung pro Modell, RoomEnvironment, dieselben drei Lichter, Kamera fov 42 auf
-`(0, cameraHeight, cameraDistance)`, Auto-Fit über die Bounding Box). `render-previews.mjs` startet dafür
-einen lokalen Mini-Server (nur `127.0.0.1`), rendert jedes **optimierte** Modell in headless Chromium mit
-doppelter Auflösung und speichert es als 512 × 512-WebP mit transparentem Hintergrund.
+`models/preview.html` is a standalone three.js page with the look of the billet scene
+(ACES Filmic, exposure per model, RoomEnvironment, the same three lights, camera fov 42 at
+`(0, cameraHeight, cameraDistance)`, auto-fit via the bounding box). For it, `render-previews.mjs` starts
+a local mini server (`127.0.0.1` only), renders each **optimized** model in headless Chromium at
+double resolution and saves it as a 512 × 512 WebP with a transparent background.
 
-## Qualitätsvergleich
+## Quality comparison
 
-`npm run models:compare` (optional `-- --only=slug`) rendert für jedes Modell die **Quelle** und das
-**optimierte** GLB mit denselben Einstellungen wie das Vorschaubild. Das optimierte Modell nutzt dabei
-die Bounding Box der Quelle, damit beide Bilder pixelgenau übereinanderliegen. Ausgabe in `.compare/`
-(per `.gitignore` ausgeschlossen, `public/` bleibt unberührt):
+`npm run models:compare` (optionally `-- --only=slug`) renders the **source** and the **optimized**
+GLB of each model with the same settings as the preview image. The optimized model uses the
+source's bounding box, so that both images line up pixel for pixel. Output in `.compare/`
+(excluded via `.gitignore`; `public/` stays untouched):
 
-- `.compare/<slug>.png`: Quelle | optimiert | Differenz (rot, 6-fach verstärkt)
-- `.compare/report.json` und eine Tabelle: mittlere Abweichung, Anteil stark abweichender Pixel
-  (ein Kanal > 8/255, bezogen auf die Modellfläche), Änderung der Silhouette und „fit drift“ (wie weit
-  das Auto-Fit des optimierten Modells vom Original abweicht).
+- `.compare/<slug>.png`: source | optimized | difference (red, amplified 6×)
+- `.compare/report.json` and a table: mean deviation, share of strongly deviating pixels
+  (one channel > 8/255, relative to the model's area), change of the silhouette and "fit drift" (how far
+  the optimized model's auto-fit deviates from the original's).
 
-Modelle über 3 % stark abweichender Pixel oder 1 % Drift werden mit `CHECK` markiert. Das heißt nur
-„ansehen“: Detailreiche Texturen (Backstein, Kuchenstreusel) weichen durch WebP und Verkleinerung
-immer etwas ab, ohne sichtbar schlechter zu sein.
+Models above 3 % strongly deviating pixels or 1 % drift are marked `CHECK`. That only means
+"take a look": detailed textures (brickwork, cake crumble) always deviate a little through WebP and
+downscaling, without looking visibly worse.

@@ -36,6 +36,7 @@ plus the billet-specific sections (themes, renderer, three.js, database, asset p
 24. [Code comments](#24-code-comments)
 25. [Git](#25-git)
 26. [Code quality checklist](#26-code-quality-checklist)
+27. [Billet assistant](#27-billet-assistant)
 
 ---
 
@@ -51,7 +52,8 @@ billet-studio/
 │   ├── src/app/features/home/hero-story/  the home page's 3D story: stage, chapters, controller,
 │   │                              timeline/framing (pure), lazy hero chunk (hero-bundle.ts →
 │   │                              hero-stage.ts), generated asset tables (docs/hero-story.md)
-│   ├── src/app/shared/            reusable components / directives
+│   ├── src/app/shared/            reusable components / directives (billet-assistant: the billet
+│   │                              assistant's chat on home and in the gallery, section 27)
 │   ├── src/app/layout/            app-shell, bare layout
 │   ├── src/app/billet/            the renderer: document, migration, markup, palette, view, particles, scene
 │   ├── src/styles/                token + CSS component layer (the only place colors are applied)
@@ -61,10 +63,12 @@ billet-studio/
 │   ├── public/hero/               story GLB, textures, light gifts, posters (hero pipeline output,
 │   │                              content-hashed names)
 │   └── e2e/                       Playwright: mocked suite, parity, axe, backend suite (section 21)
-├── billet-studio-rest-service/    Spring Boot 4, package app.billetstudio: auth/, shared/, catalog/, billet/
+├── billet-studio-rest-service/    Spring Boot 4, package app.billetstudio: auth/, shared/, catalog/, billet/,
+│                                  assist/ (the billet assistant's questionnaire and Ollama client)
 ├── sql/                           schema.sql, seed_*.sql, migrations/ - the USER runs them
 ├── docs/                          api-contract.md, billet-document.md, hero-story.md (Blender ↔ runtime
-│                                  contract of the hero), fixtures/ (Muttertag document)
+│                                  contract of the hero), assist.md (the assistant's questionnaire),
+│                                  fixtures/ (Muttertag document)
 ├── tools/asset-pipeline/          own package.json; generates models, previews, fonts, seed_models.sql,
 │                                  and the hero's assets (hero/)
 ├── tools/blender/hero/            Blender Python scripts (headless CLI) that build the hero story;
@@ -92,6 +96,9 @@ Read-only sources outside the repo (never modify anything there):
   skeleton from the component's own resource for its data, a pending button for an action. No
   component reads the global `isLoading`.
 - DE and EN i18n files always have identical keys.
+- **The billet assistant's model only picks labels** of the backend's questionnaire: it writes no
+  text the user sees and no UI, and neither the user's messages nor its reasoning are logged
+  (section 27).
 - **No unnecessary tests** (user rule, section 21): a test guards behaviour that can realistically
   break and would hurt; when in doubt, leave it out and say so.
 - **The user's dev stack is his** (frontend 4200, backend 8080, `db_billet_studio` on 3306): never
@@ -647,16 +654,19 @@ UPPER_SNAKE `errorCode` (`MODULE_ERROR_TYPE`: `BILLET_NOT_FOUND`, `BILLET_LIMIT_
 
 **Frontend interceptors (registered in `app.config.ts`):**
 - `errorInterceptor` catches every HTTP error, reads `errorCode`, calls
-  `messageStore.addMessage('error', errorCode, status)` (red toast), handles 401 via
-  `authApi.handleExpiredSession()`, then rethrows.
+  `messageStore.addMessage('error', errorCode, status)` (red toast), then rethrows. It skips a 401
+  on a request that carried a token (`refreshTokenInterceptor` has renewed and retried it, or ended
+  the session with its own toast), status 0, `SKIP_ERROR_TOAST` and the codes a request lists in
+  `ANSWERED_INLINE`.
 - `loadingInterceptor` owns the global activity bar under the site header (after 300 ms, visible
   ≥ 400 ms) through `isLoading`, which only `LoadingBar` reads. **The interceptor owns the policy;
   callers never set a flag.** A request that must not drive the bar (e.g. the editor's autosave,
   which shows its own save status) is excluded by a rule in the interceptor (`SKIP_LOADING`, set in
   the `*-api.ts` method), never at the call site.
-- `authTokenInterceptor`, `refreshTokenInterceptor`, `sessionCookieInterceptor` as ported.
+- `authTokenInterceptor`, `refreshTokenInterceptor` (a 401 on a request with a token → one renewal
+  through `AuthApi`, then one retry), `sessionCookieInterceptor` as ported.
 
-**Interceptor DI deadlock rule - CRITICAL:** `errorInterceptor` injects `AuthApi`. Nothing `AuthApi`
+**Interceptor DI deadlock rule - CRITICAL:** `refreshTokenInterceptor` injects `AuthApi`. Nothing `AuthApi`
 injects (directly or transitively) may inject `LanguageService` or `TranslateService`:
 `LanguageService` calls `TranslateService.use()` in its constructor, which fires an HTTP request
 through the interceptor again → deadlock (no translations, an endless activity bar).
@@ -689,7 +699,7 @@ shows its failures inline (the share dialog, the editor's save status) needs non
 
 - Package `app.billetstudio`: `auth/` (ported), `shared/` (ApiError, ApiException,
   GlobalExceptionHandler, SecureTokens, WebConfig, OpenApiConfig, grid), `catalog/` (tbl_models),
-  `billet/`.
+  `billet/`, `assist/` (the billet assistant, section 27).
 - Request/response DTOs are Java records with Jakarta validation. The billet document is parsed by
   `BilletDocumentCodec` (Jackson 3 `JsonMapper`): unknown fields are dropped, output is normalized
   (so "changed since publish" is a string compare).
@@ -975,7 +985,8 @@ Three kinds of waiting, each with its own indicator and its own source (user dec
   has no preview, never as a loading placeholder.
 - Local data (guest billets in localStorage) needs no skeleton.
 - A local indicator the product needs by design (the editor's save status, the 3D model loading in
-  the scene area) replaces the bar for its requests via `SKIP_LOADING` (section 13).
+  the scene area, the billet assistant's "thinking" message and status line) replaces the bar for
+  its requests via `SKIP_LOADING` (section 13).
 - Pending button: `[disabled]="!canSave()"` (with `!saving()` inside), `[attr.aria-busy]="saving()"`,
   label `{{ (saving() ? 'COMMON.PENDING.SAVING' : 'X.SAVE') | translate }}` (a `computed` when the
   keys themselves vary); `ui-btn` swaps the leading icon for a spinner. A dialog that runs the action
@@ -1149,6 +1160,45 @@ Before a phase is committed:
 
 ---
 
+## 27. Billet assistant
+
+"Describe your billet in one sentence" on the home page and in the template gallery
+(`shared/components/billet-assistant`, backend `assist/`). Contract: `docs/assist.md`.
+
+- **The model only picks labels.** A local Ollama answers the backend's questionnaire (seven choice
+  questions, `assist/billet-questionnaire.json`); every text the user sees is i18n, every billet is
+  built by the start-link code (`billet/billet-start.ts`, `/billets/new?template=…&theme=…`). Never
+  show, return or store model text; never let the client send questions (the endpoint must not
+  become an open LLM proxy for guests).
+- **The backend owns the questionnaire** and the merge (KEEP, TEMPLATE_DEFAULT, NOT_SUPPORTED →
+  notes). Its labels mirror the frontend's ids; `AssistOptionsParityTest` reads `themes.json`,
+  `templates.ts`, `templates/*.ts` and `billet-document.ts`, so a new theme or template needs its
+  description (English with the German words in parentheses) in the same commit.
+- **Prompt rules are measured** (ported 1:1 from jev-demo's local stand-in, pinned by
+  `QuestionnaireTest` / `OllamaQuestionnaireClientTest`): the system text word for word, questions
+  before the state, real question names as JSON keys, `reasoning` first (maxLength 300), an enum per
+  question, temperature 0, num_ctx 12288, one prompt for both languages. Schema, request and state are
+  built as Jackson trees (records would be sorted alphabetically). Change none of it without running
+  `AssistEval` again. No question asks for an exact number or an order; amounts are relative steps.
+- **Privacy:** never log the user's messages or the model's reasoning (the backend logs
+  `app.billetstudio` at DEBUG into a file); only labels leave the service.
+- **The GPU:** the status probe never loads the model; it loads when someone focuses the input
+  (`POST /v1/assist/warm-up`), or at startup only with `ASSIST_WARM_UP=true`. One answer at a time.
+- **Frontend:** a chat window like an LLM chat (welcome with suggestion pills that send at once,
+  bubbles, typing dots, a composer with a round send button). A message is never validated at the
+  user: an empty one cannot be sent, the length bound is the textarea's `maxlength`. The assistant
+  renders nothing while its status is unknown, failed or DISABLED (a
+  deliberate exception to "disabled, not hidden": the feature is not in this deployment); OFFLINE
+  says so before anything is typed, with Send `aria-disabled` (never natively disabled for that
+  reason). Its requests use `SKIP_ERROR_TOAST` + `SKIP_LOADING`: the chat shows every failure under
+  the message (with a retry) and its own "thinking". The chat belongs to whoever wrote it
+  (`AssistConversationStore`, a `computed` on the user, no `effect`).
+- **Tests:** every test context pins `app.assist.enabled=false` (MariaDbITBase, ServletContainerTest,
+  ModelFilesTest, any new `@SpringBootTest`), so no test reaches a developer's Ollama; the e2e mocks
+  answer the status DISABLED unless a spec installs `mockAssistant`.
+
+---
+
 ## Design system reference
 
 The `--ui-*` layer in one place. Live preview: the `UiKit` page (`features/dev/ui-kit`, route
@@ -1208,15 +1258,16 @@ stale `billet-studio.theme` key from earlier builds is ignored).
   `FormValueControl<string>` - `[formField]="billetForm.theme"` or standalone `[(value)]`; `disabled`
   input, optional `mode` input (`ColorMode`, default: the site's `resolvedMode()`; the design panel
   passes the palette the preview shows), `touch` output on focus-out, `focus()`. Native radio group
-  (fieldset + legend `THEME_PICKER.LABEL`). Each card is a **mini billet of `billetPresetFor(id)`**
-  in `mode`: the preset's page background, a hero band in `accentSoft` with "Aa" in the title face
+  (fieldset + legend `THEME_PICKER.LABEL`). Each card is an `app-preset-card`
+  (`shared/components/preset-card`, inputs `themeId`, `mode`; also the billet assistant's offer), a
+  **mini billet of `billetPresetFor(id)`** in `mode`: the preset's page background, a hero band in `accentSoft` with "Aa" in the title face
   (ink) and a sample word in the titleAccent face and `accent`, a body line in the body face and
   `inkSoft`, and four dots in the first `particleColors`. Those colours and fonts are preset data,
   bound inline (font stacks from `billet/typography.ts`); the card's outline, selection ring and
   name are Studio. The card is `aria-hidden` (a picture of the preset; the radio is named by the
   Studio label), so its sample word's contrast (preset `accent` on `accentSoft`, ≥ 3:1) is an
-  accepted exception in `e2e/a11y.spec.ts`. An unknown value shows the default theme checked
-  without writing back.
+  accepted exception in `e2e/a11y.spec.ts` (target `app-preset-card`). An unknown value shows the
+  default theme checked without writing back.
 - `ColorModeMenu` (`app-color-mode-menu`): the header's icon button + CDK menu of
   `menuitemradio` items (i18n `COLOR_MODE.*`).
 - Billet presets: every theme in `themes.json` carries a `billet` block (`light`/`dark`
@@ -1392,8 +1443,19 @@ uses `-ink` on `-soft`.
   A new toolbar control gets a place in every tier (the row, "More", the sheet); `editor-skeleton`
   mirrors the row.
 - **Theme picker:** `ui-theme-option` / `__frame` / `__name` / `__check` (the option's Studio
-  chrome: label, selection ring, name) and `ui-theme-card` (the outline of a card's mini billet;
-  everything inside it is preset data bound inline), used by `app-theme-picker`.
+  chrome: label, selection ring, name) and `ui-theme-card` (the outline of a card's mini billet, on
+  `app-preset-card`; everything inside it is preset data bound inline), used by `app-theme-picker`
+  and the billet assistant's offer.
+- **Chat window** (`components/_chat.scss`, the billet assistant), laid out like an LLM chat:
+  `ui-chat-window` (fixed height, + `__header`, `__title`, `__status` with `--ready | --idle |
+  --offline` dot, `__scroll` = the focusable `role="log"`, `__footer`, `__notice`), `ui-chat-avatar`,
+  `ui-chat-welcome` (+ `__title __text`) with `ui-chat-suggestions` > `ui-chat-suggestion` pills,
+  `ui-chat` (the message list) > `ui-chat__message--user` (accent-tinted bubble on the end side,
+  typed line breaks kept) | `ui-chat__message--assistant` (avatar + `ui-chat__body`, no bubble) |
+  `ui-chat__error` (under an unanswered message, with its retry) | `ui-chat__typing` (three dots),
+  `ui-chat-card` (the offer in an answer: `__media` with the preset card and the model thumb,
+  `__body`, `__title` + `__subtitle`, `__chips` of `ui-badge`s), and `ui-chat-composer` (rounded
+  field drawing the focus) > `__input` (auto-growing textarea) + `__send` (round icon button).
 
 Use a class as-is; a missing variant is added to `src/styles/components/`, never as colour in
 component SCSS.
