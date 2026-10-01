@@ -16,7 +16,7 @@ import {
   matchesAssetDefaults,
   withAsset,
   withAssetDefaults,
-} from './asset-defaults';
+} from '../../../../billet/asset-defaults';
 
 type StageKey = (typeof ASSET_DEFAULT_KEYS)[number];
 

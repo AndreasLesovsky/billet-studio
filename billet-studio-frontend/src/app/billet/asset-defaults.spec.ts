@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { createDocument } from '../../../../billet/billet-document';
-import type { ModelAssetDto } from '../../../../core/models/models';
+import type { ModelAssetDto } from '../core/models/models';
+import { createDocument } from './billet-document';
 import { matchesAssetDefaults, withAsset } from './asset-defaults';
 
 const cake: ModelAssetDto = {

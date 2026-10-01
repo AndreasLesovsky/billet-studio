@@ -1,4 +1,4 @@
-import type { ModelDefaultsDto } from '../../core/models/models';
+import type { ModelAssetDto, ModelDefaultsDto } from '../../core/models/models';
 import type { ThemeId } from '../../core/theme/theme-registry.generated';
 import type {
   BilletBlock,
@@ -100,6 +100,19 @@ const SCENE_ARIA_LABEL: Record<SceneModelSlug, Record<BilletLang, string>> = {
     en: '3D champagne bottle, drag to rotate',
   },
 };
+
+/** The scene's label for a library model: the templates' wording, else the same pattern. */
+export function sceneAriaLabel(
+  asset: Pick<ModelAssetDto, 'slug' | 'nameDe' | 'nameEn'>,
+  lang: BilletLang,
+): string {
+  if (Object.hasOwn(SCENE_ARIA_LABEL, asset.slug)) {
+    return SCENE_ARIA_LABEL[asset.slug as SceneModelSlug][lang];
+  }
+  return lang === 'de'
+    ? `3D ${asset.nameDe}, interaktiv drehbar`
+    : `3D ${asset.nameEn}, drag to rotate`;
+}
 
 /** The live card's separator (' &nbsp;·&nbsp; '): a space and a no-break space on each side. */
 export const SEPARATOR = ' \u00a0·\u00a0 ';

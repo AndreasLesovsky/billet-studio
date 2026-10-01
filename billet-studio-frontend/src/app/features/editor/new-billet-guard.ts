@@ -1,10 +1,17 @@
 import { inject } from '@angular/core';
 import { Router, type CanActivateFn } from '@angular/router';
 
-import { createDocument, type BilletDocument, type BilletLang } from '../../billet/billet-document';
-import { TEMPLATE_IDS, type TemplateId } from '../../billet/templates/templates';
+import type { BilletLang } from '../../billet/billet-document';
+import {
+  needsLibrary,
+  parseStartParams,
+  startDocument,
+  type StartParams,
+} from '../../billet/billet-start';
 import { hasSession } from '../../core/guards/session-check';
+import type { ModelAssetDto } from '../../core/models/models';
 import { AccessToken } from '../../core/services/access-token';
+import { AssetCatalogApi } from '../../core/services/asset-catalog-api';
 import { AuthApi } from '../../core/services/auth-api';
 import { LanguageService } from '../../core/services/language-service';
 import {
@@ -14,27 +21,26 @@ import {
 } from '../../core/services/local-billet-store';
 import { MessageStore } from '../../core/stores/message-store';
 
-const isTemplateId = (value: string | null): value is TemplateId =>
-  TEMPLATE_IDS.some((id) => id === value);
-
 /**
- * The document /billets/new?template=<id> starts with: the template's in `lang`, or a blank one
- * without a known template.
+ * The document /billets/new starts with (guest and account alike). The library is read only for a
+ * model param; when it cannot be read the template keeps its own model.
  */
-export function startDocument(
-  template: string | null,
-  lang: BilletLang,
-): { document: BilletDocument; templateId: TemplateId | null } {
-  const templateId = isTemplateId(template) ? template : null;
-  return { document: createDocument({ lang, templateId: templateId ?? undefined }), templateId };
+export async function buildStartDocument(
+  params: StartParams,
+  uiLang: BilletLang,
+  catalog: AssetCatalogApi,
+): Promise<ReturnType<typeof startDocument>> {
+  let library: readonly ModelAssetDto[] = [];
+  if (needsLibrary(params)) library = await catalog.list().catch(() => []);
+  return startDocument(params, uiLang, library);
 }
 
 /**
- * /billets/new?template=<id>. A signed-in user goes on to the page that creates the billet in the
- * account (NewBillet). A guest's billet is stored on this device right here - the template's in
- * the current interface language - and the guard redirects into its editor; a guard's redirect
- * never puts /billets/new into the history, so Back does not create another one. When the billet
- * cannot be stored the toast says why and the list is where to make room.
+ * /billets/new?template=<id>&… (StartParams). A signed-in user goes on to the page that creates the
+ * billet in the account (NewBillet). A guest's billet is stored on this device right here - in the
+ * interface language unless the link names one - and the guard redirects into its editor; a
+ * guard's redirect never puts /billets/new into the history, so Back does not create another one.
+ * When the billet cannot be stored the toast says why and the list is where to make room.
  */
 export const newBilletGuard: CanActivateFn = async (route) => {
   // Every inject() before the first await: the injection context ends there.
@@ -42,12 +48,14 @@ export const newBilletGuard: CanActivateFn = async (route) => {
   const auth = inject(AuthApi);
   const accessToken = inject(AccessToken);
   const store = inject(LocalBilletStore);
+  const catalog = inject(AssetCatalogApi);
   const messages = inject(MessageStore);
   const lang = inject(LanguageService).currentLang();
 
   if (await hasSession(auth, accessToken)) return true;
 
-  const { document, templateId } = startDocument(route.queryParamMap.get('template'), lang);
+  const params = parseStartParams(route.queryParamMap);
+  const { document, templateId } = await buildStartDocument(params, lang, catalog);
   try {
     const localId = store.create(document, templateId);
     return router.createUrlTree(['/billets/local', localId, 'edit']);

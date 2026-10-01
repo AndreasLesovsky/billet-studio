@@ -1,5 +1,5 @@
-import type { BilletDocument } from '../../../../billet/billet-document';
-import type { ModelAssetDto, ModelDefaultsDto } from '../../../../core/models/models';
+import type { ModelAssetDto, ModelDefaultsDto } from '../core/models/models';
+import type { BilletDocument } from './billet-document';
 
 /** The scene fields a catalog model brings its own values for (tbl_models defaults). */
 export const ASSET_DEFAULT_KEYS = [

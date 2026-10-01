@@ -7,10 +7,12 @@ import {
   type RouterStateSnapshot,
   type UrlTree,
 } from '@angular/router';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 import { createDocument } from '../../billet/billet-document';
+import type { ModelAssetDto } from '../../core/models/models';
 import { AccessToken } from '../../core/services/access-token';
+import { AssetCatalogApi } from '../../core/services/asset-catalog-api';
 import { AuthApi } from '../../core/services/auth-api';
 import { LanguageService } from '../../core/services/language-service';
 import { LocalBilletStore, MAX_LOCAL_BILLETS } from '../../core/services/local-billet-store';
@@ -29,10 +31,14 @@ describe('newBilletGuard', () => {
   let store: LocalBilletStore;
   let messages: MockMessageStore;
   let auth: MockAuthApi;
+  let list: Mock<() => Promise<readonly ModelAssetDto[]>>;
 
-  async function open(template?: string): Promise<string | true> {
+  async function open(
+    template?: string,
+    more: Record<string, string> = {},
+  ): Promise<string | true> {
     const route = {
-      queryParamMap: convertToParamMap(template === undefined ? {} : { template }),
+      queryParamMap: convertToParamMap(template === undefined ? more : { template, ...more }),
     } as ActivatedRouteSnapshot;
     const result = await TestBed.runInInjectionContext(() =>
       newBilletGuard(route, {} as RouterStateSnapshot),
@@ -47,6 +53,7 @@ describe('newBilletGuard', () => {
     localStorage.clear();
     messages = createMockMessageStore();
     auth = createMockAuthApi();
+    list = vi.fn(async () => []);
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -54,6 +61,7 @@ describe('newBilletGuard', () => {
         { provide: MessageStore, useValue: messages },
         { provide: AuthApi, useValue: auth },
         { provide: AccessToken, useValue: createMockAccessToken() },
+        { provide: AssetCatalogApi, useValue: { list } },
       ],
     });
     store = TestBed.inject(LocalBilletStore);
@@ -77,6 +85,48 @@ describe('newBilletGuard', () => {
       blocks: [],
     });
     expect(store.list()[0].templateId).toBeNull();
+  });
+
+  it('stores the start link: theme, a library model and the colour mode', async () => {
+    list.mockResolvedValue([
+      {
+        slug: 'gift-box',
+        nameDe: 'Geschenk',
+        nameEn: 'Gift box',
+        occasion: 'general',
+        fileUrl: 'models/gift-box.v1.glb',
+        previewUrl: 'models/previews/gift-box.v1.webp',
+        fileSizeBytes: 1,
+        credit: null,
+        active: true,
+        defaults: {
+          fitSize: 1.3,
+          yOffset: -0.08,
+          exposure: 0.6,
+          cameraDistance: 2.8,
+          cameraHeight: 0.1,
+          autoRotateSpeed: 0.45,
+        },
+      },
+    ]);
+
+    const localId = editorOf(
+      await open('geburtstag', { theme: 'midnight', model: 'gift-box', colorMode: 'dark' }),
+    );
+
+    expect(store.load(localId)).toMatchObject({
+      theme: 'midnight',
+      colorMode: 'dark',
+      scene: { modelSlug: 'gift-box', ariaLabel: '3D Gift box, drag to rotate' },
+    });
+  });
+
+  it('keeps the template model when the library cannot be read', async () => {
+    list.mockRejectedValue(new Error('offline'));
+
+    const localId = editorOf(await open('geburtstag', { model: 'gift-box' }));
+
+    expect(store.load(localId)?.scene.modelSlug).toBe('birthday-cake');
   });
 
   it('when the device is full, says so and shows the list instead', async () => {

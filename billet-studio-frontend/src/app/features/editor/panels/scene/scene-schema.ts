@@ -2,7 +2,7 @@ import { max, maxLength, min, schema } from '@angular/forms/signals';
 
 import type { BilletDocument } from '../../../../billet/billet-document';
 import { NUMBER_LIMITS, TEXT_LIMITS } from '../../../../billet/billet-limits';
-import { ASSET_DEFAULT_KEYS } from './asset-defaults';
+import { ASSET_DEFAULT_KEYS } from '../../../../billet/asset-defaults';
 
 /**
  * Rules for the fields the scene panel binds (the stage settings, hint and label), bounds from
