@@ -1,0 +1,66 @@
+<ol class="ui-chat">
+  @for (entry of conversation.entries(); track entry.id) {
+    @if (entry.kind === 'user') {
+      <li class="ui-chat__message--user">
+        <span class="ui-visually-hidden">{{ 'ASSIST.YOU' | translate }}: </span>{{ entry.text }}
+      </li>
+      @if (entry.failedCode) {
+        <li class="ui-chat__error">
+          <i
+            class="bi bi-exclamation-circle"
+            aria-hidden="true"
+          ></i>
+          {{ 'MESSAGES.ERROR.' + entry.failedCode | translate }}
+          <button
+            type="button"
+            class="ui-btn ui-btn--ghost ui-btn--sm"
+            [disabled]="conversation.asking() || retryDisabled()"
+            (click)="retry.emit(entry.id)"
+          >
+            <i
+              class="bi bi-arrow-clockwise"
+              aria-hidden="true"
+            ></i>
+            {{ 'COMMON.RETRY' | translate }}
+          </button>
+        </li>
+      }
+    } @else {
+      <li class="ui-chat__message--assistant">
+        <span
+          class="ui-chat-avatar"
+          aria-hidden="true"
+          ><i class="bi bi-stars"></i
+        ></span>
+        <div class="ui-chat__body">
+          <span class="ui-visually-hidden">{{ 'ASSIST.ASSISTANT' | translate }}: </span>
+          @for (note of entry.notes; track note) {
+            <p>{{ 'ASSIST.NOTES.' + note | translate }}</p>
+          }
+          @if (entry.billet) {
+            <app-assist-offer
+              [billet]="entry.billet"
+              [library]="library()"
+              [libraryPending]="libraryPending()"
+            />
+          }
+        </div>
+      </li>
+    }
+  }
+  @if (conversation.asking()) {
+    <li class="ui-chat__message--assistant">
+      <span
+        class="ui-chat-avatar"
+        aria-hidden="true"
+        ><i class="bi bi-stars"></i
+      ></span>
+      <span
+        class="ui-chat__typing"
+        aria-hidden="true"
+        ><span></span><span></span><span></span
+      ></span>
+      <span class="ui-visually-hidden">{{ 'ASSIST.THINKING' | translate }}</span>
+    </li>
+  }
+</ol>

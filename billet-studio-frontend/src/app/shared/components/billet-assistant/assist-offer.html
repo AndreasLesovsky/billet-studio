@@ -1,0 +1,61 @@
+<p>{{ 'ASSIST.OFFER' | translate }}</p>
+<div class="ui-chat-card">
+  <div
+    class="ui-chat-card__media"
+    aria-hidden="true"
+  >
+    <app-preset-card
+      [themeId]="themeId()"
+      [mode]="mode()"
+    />
+    @if (preview().shown) {
+      <app-asset-thumb
+        [src]="preview().src"
+        [pending]="libraryPending()"
+        [emoji]="preview().emoji"
+      />
+    }
+  </div>
+  <div class="ui-chat-card__body">
+    <p class="ui-chat-card__title">
+      {{ title().templateKey | translate }}
+      <span class="ui-chat-card__subtitle"
+        >· {{ 'ASSIST.CHOICE.THEME' | translate }} {{ title().themeKey | translate }}</span
+      >
+    </p>
+    <ul
+      class="ui-chat-card__chips"
+      [attr.aria-label]="'ASSIST.CHOICES' | translate"
+    >
+      @for (chip of chips(); track chip.labelKey) {
+        <li
+          class="ui-badge"
+          [title]="chip.labelKey | translate"
+        >
+          <i
+            class="bi"
+            [class]="chip.icon"
+            aria-hidden="true"
+          ></i>
+          <span class="ui-visually-hidden">{{ chip.labelKey | translate }}: </span>
+          @if (chip.valueKey) {
+            {{ chip.valueKey | translate }}
+          } @else {
+            {{ chip.text }}
+          }
+        </li>
+      }
+    </ul>
+    <a
+      class="ui-btn ui-btn--primary ui-btn--block"
+      routerLink="/billets/new"
+      [queryParams]="query()"
+    >
+      <i
+        class="bi bi-plus-lg"
+        aria-hidden="true"
+      ></i>
+      {{ 'ASSIST.CREATE' | translate }}
+    </a>
+  </div>
+</div>

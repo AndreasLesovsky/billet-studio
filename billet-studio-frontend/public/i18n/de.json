@@ -26,7 +26,9 @@
       "TAKING_OVER": "Übernimmt …",
       "DUPLICATING": "Dupliziert …",
       "PUBLISHING": "Wird veröffentlicht …",
-      "UNPUBLISHING": "Wird zurückgezogen …"
+      "UNPUBLISHING": "Wird zurückgezogen …",
+      "THINKING": "Denkt nach …",
+      "STARTING": "Startet …"
     },
     "NO_RESULTS": "Keine Ergebnisse gefunden.",
     "YES": "Ja",
@@ -132,6 +134,51 @@
     "CHAPTER_SHARE_TEXT": "Wer den Link öffnet, sieht dein Billet direkt im Browser.",
     "TEMPLATES_TITLE": "Starte mit einer Vorlage",
     "TEMPLATES_ALL": "Alle Vorlagen"
+  },
+  "ASSIST": {
+    "TITLE": "Billet-Assistent",
+    "LABEL": "Dein Wunsch",
+    "PLACEHOLDER": "Beschreib dein Billet …",
+    "SEND": "Senden",
+    "EXAMPLES": "Beispiele",
+    "EXAMPLE_1": "Eine Geburtstagskarte für meinen Bruder, eher schick als bunt, mit Sektflasche statt Torte",
+    "EXAMPLE_2": "Weihnachtsgrüße an die Familie, gemütlich und warm, im Dunkelmodus",
+    "EXAMPLE_3": "Ein Dankeschön für meine Kollegin, ruhig und ohne 3D-Motiv, auf Englisch",
+    "LOG": "Gespräch mit dem Assistenten",
+    "YOU": "Du",
+    "ASSISTANT": "Assistent",
+    "THINKING": "Der Assistent denkt nach …",
+    "OFFER": "So könnte dein Billet beginnen:",
+    "CREATE": "Billet anlegen",
+    "RESTART": "Neu beginnen",
+    "BLANK": "Leeres Billet",
+    "CHOICE": {
+      "THEME": "Farbwelt",
+      "MODEL": "3D-Motiv",
+      "PARTICLES": "Partikel",
+      "DIVIDER": "Trenner",
+      "MODE": "Darstellung",
+      "LANGUAGE": "Sprache"
+    },
+    "NOTES": {
+      "OFF_TOPIC": "Dabei kann ich nicht helfen. Beschreib mir das Billet, das du beginnen möchtest: Anlass, Stimmung, Farben oder ein 3D-Motiv.",
+      "NOTHING_RECOGNISED": "Daraus habe ich nichts Bestimmtes herausgelesen, darum beginnt es leer. Nenn mir Anlass, Stimmung, Farben oder ein Motiv.",
+      "NO_CHANGE": "Daran ändert sich nichts. Sag mir, was anders werden soll.",
+      "PARTICLES_NOT_SUPPORTED": "Diese Partikel gibt es nicht, es bleibt bei den bisherigen. Möglich sind Blütenblätter, Schneeflocken, Blätter, Konfetti und Herzen.",
+      "MODEL_NOT_SUPPORTED": "Dieses 3D-Motiv gibt es nicht in der Bibliothek, es bleibt beim bisherigen. Alle Motive findest du im Editor."
+    },
+    "STATUS": {
+      "READY": "Bereit",
+      "IDLE": "Schläft noch: Die erste Antwort dauert etwas länger.",
+      "OFFLINE": "Gerade nicht erreichbar"
+    },
+    "WELCOME_TITLE": "Wie soll dein Billet aussehen?",
+    "WELCOME_TEXT": "Beschreib es in einem Satz: Anlass, Stimmung, Farben, ein 3D-Motiv. Ich suche dir Vorlage und Gestaltung heraus, deine Worte schreibst du danach selbst.",
+    "NOTICE": "Enter sendet, Umschalt + Enter beginnt eine neue Zeile. Der Assistent wählt nur Vorlage und Gestaltung.",
+    "OFFLINE": "Der Assistent ist gerade nicht erreichbar. Wähl eine Vorlage aus oder schau später wieder vorbei.",
+    "CHOICES": "Womit es beginnt",
+    "NO_MODEL": "Kein 3D-Motiv",
+    "NO_PARTICLES": "Keine Partikel"
   },
   "HERO": {
     "STAGE_LABEL": "Animation: vom Billet zum geteilten Link",
@@ -708,6 +755,10 @@
     "SECTION_NAVIGATION": "Navigation",
     "SECTION_OVERLAYS": "Dialoge, Menü, Popover und Tooltip",
     "SECTION_TAB_FIT": "Tab-Leiste, die in ihre Breite passt",
+    "SECTION_CHAT": "Chat",
+    "CHAT_USER": "Eine Geburtstagskarte, eher schick als bunt",
+    "CHAT_ASSISTANT": "So könnte dein Billet beginnen:",
+    "CHAT_FOLLOW_UP": "lieber hell",
     "SECTION_TABLE": "Tabelle",
     "SECTION_CARDS": "Karten",
     "HEADING_SAMPLE": "Ein Billet für jeden Anlass",

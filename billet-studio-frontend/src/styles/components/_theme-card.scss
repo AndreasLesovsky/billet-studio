@@ -1,5 +1,5 @@
 // Theme-picker option, all Studio: the label, the selection frame, the name and the card's outline.
-// Inside the card, app-theme-picker draws a mini billet of the theme's preset; its colours and fonts
+// Inside the card, app-preset-card draws a mini billet of the theme's preset; its colours and fonts
 // are preset data, bound inline, never --ui-* tokens.
 
 .ui-theme-option {
@@ -61,7 +61,8 @@
     }
 }
 
-// The mini billet's outline; its background is the preset's page colour, bound inline.
+// The mini billet's outline (app-preset-card); its background is the preset's page colour, bound
+// inline. Outside a theme option it keeps the large radius.
 .ui-theme-card {
     position: relative;
     display: flex;
@@ -69,7 +70,7 @@
     aspect-ratio: 4 / 3;
     overflow: hidden;
     border: 1px solid var(--ui-border);
-    border-radius: var(--_card-radius);
+    border-radius: var(--_card-radius, var(--ui-radius-lg));
     box-shadow: var(--ui-shadow-sm);
     transition:
         transform var(--ui-duration-base) var(--ui-ease),

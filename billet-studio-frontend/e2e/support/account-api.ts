@@ -1,6 +1,12 @@
 import type { Page, Route } from '@playwright/test';
 
-import { apiError, CORS_HEADERS, MODEL_CATALOG, modelLibraryAnswer } from './guest-api';
+import {
+  apiError,
+  assistAnswer,
+  CORS_HEADERS,
+  MODEL_CATALOG,
+  modelLibraryAnswer,
+} from './guest-api';
 
 type BilletDocument = {
   title: string;
@@ -54,7 +60,7 @@ export class AccountBackend {
     const request = route.request();
     const method = request.method();
     const path = new URL(request.url()).pathname;
-    const models = modelLibraryAnswer(method, path);
+    const models = modelLibraryAnswer(method, path) ?? assistAnswer(method, path);
     const body: unknown = request.postDataJSON();
     if (path.startsWith('/v1/billets')) this.requests.push(`${method} ${path}`);
 
@@ -73,6 +79,8 @@ export class AccountBackend {
         return [200, USER];
       case 'GET /v1/billets':
         return [200, this.list()];
+      case 'POST /v1/billets':
+        return [201, this.detail(this.create((body as { document: BilletDocument }).document))];
       case 'POST /v1/billets/import':
         return [201, this.import(body as { documents: BilletDocument[] })];
     }

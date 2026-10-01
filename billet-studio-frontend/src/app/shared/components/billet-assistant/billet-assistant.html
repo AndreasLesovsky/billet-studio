@@ -1,0 +1,146 @@
+@if (shown()) {
+  <section
+    class="ui-chat-window"
+    aria-labelledby="billet-assistant-title"
+  >
+    <header class="ui-chat-window__header">
+      <span
+        class="ui-chat-avatar"
+        aria-hidden="true"
+        ><i class="bi bi-stars"></i
+      ></span>
+      <div class="billet-assistant__heading">
+        <h2
+          id="billet-assistant-title"
+          class="ui-chat-window__title"
+        >
+          {{ 'ASSIST.TITLE' | translate }}
+        </h2>
+        <p
+          class="ui-chat-window__status"
+          [class.ui-chat-window__status--ready]="statusKey() === 'READY'"
+          [class.ui-chat-window__status--idle]="statusKey() === 'IDLE'"
+          [class.ui-chat-window__status--offline]="statusKey() === 'OFFLINE'"
+        >
+          {{ 'ASSIST.STATUS.' + statusKey() | translate }}
+        </p>
+      </div>
+      <button
+        type="button"
+        class="ui-btn ui-btn--ghost ui-btn--icon"
+        [attr.aria-label]="'ASSIST.RESTART' | translate"
+        [title]="'ASSIST.RESTART' | translate"
+        [disabled]="conversation.entries().length === 0 || conversation.asking()"
+        (click)="restart()"
+      >
+        <i
+          class="bi bi-arrow-counterclockwise"
+          aria-hidden="true"
+        ></i>
+      </button>
+    </header>
+
+    <div
+      #scroll
+      class="ui-chat-window__scroll"
+      role="log"
+      tabindex="0"
+      [attr.aria-label]="'ASSIST.LOG' | translate"
+    >
+      @if (conversation.entries().length === 0) {
+        <div class="ui-chat-welcome">
+          <span
+            class="ui-chat-avatar billet-assistant__welcome-avatar"
+            aria-hidden="true"
+            ><i class="bi bi-stars"></i
+          ></span>
+          <p class="ui-chat-welcome__title">{{ 'ASSIST.WELCOME_TITLE' | translate }}</p>
+          <p class="ui-chat-welcome__text">{{ 'ASSIST.WELCOME_TEXT' | translate }}</p>
+          <div
+            class="ui-chat-suggestions"
+            role="group"
+            [attr.aria-label]="'ASSIST.EXAMPLES' | translate"
+          >
+            @for (key of examples; track key) {
+              <button
+                type="button"
+                class="ui-chat-suggestion"
+                [disabled]="offline() || conversation.asking()"
+                (click)="useExample(key)"
+              >
+                {{ key | translate }}
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <app-assist-log
+          [library]="library()"
+          [libraryPending]="libraryPending()"
+          [retryDisabled]="offline()"
+          (retry)="retry($event)"
+        />
+      }
+    </div>
+
+    <div class="ui-chat-window__footer">
+      @if (offline()) {
+        <p
+          id="billet-assistant-offline"
+          class="ui-alert ui-alert--info"
+        >
+          <i
+            class="bi bi-moon-stars"
+            aria-hidden="true"
+          ></i>
+          <span>{{ 'ASSIST.OFFLINE' | translate }}</span>
+        </p>
+      }
+      <form
+        novalidate
+        (submit)="onSubmit($event)"
+      >
+        <div class="ui-chat-composer">
+          <label
+            class="ui-visually-hidden"
+            for="billet-assistant-message"
+            >{{ 'ASSIST.LABEL' | translate }}</label
+          >
+          <textarea
+            #messageInput
+            id="billet-assistant-message"
+            class="ui-chat-composer__input"
+            rows="1"
+            aria-describedby="billet-assistant-notice"
+            [placeholder]="'ASSIST.PLACEHOLDER' | translate"
+            [formField]="assistantForm.message"
+            (focus)="onFocus()"
+            (keydown.enter)="onEnter($event)"
+          ></textarea>
+          <button
+            type="submit"
+            class="ui-btn ui-btn--primary ui-btn--icon ui-chat-composer__send"
+            [attr.aria-label]="sendLabel() | translate"
+            [title]="sendLabel() | translate"
+            [disabled]="blank() || conversation.asking()"
+            [attr.aria-disabled]="offline() || null"
+            [attr.aria-describedby]="offline() ? 'billet-assistant-offline' : null"
+            [attr.aria-busy]="conversation.asking()"
+          >
+            <i
+              class="bi bi-arrow-up"
+              aria-hidden="true"
+            ></i>
+          </button>
+          <app-field-error [field]="assistantForm.message" />
+        </div>
+      </form>
+      <p
+        id="billet-assistant-notice"
+        class="ui-chat-window__notice"
+      >
+        {{ 'ASSIST.NOTICE' | translate }}
+      </p>
+    </div>
+  </section>
+}

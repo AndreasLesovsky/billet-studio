@@ -129,3 +129,8 @@
         display: grid;
     }
 }
+
+// The chat sample keeps its content's height instead of the window's fixed one.
+.kit__chat {
+    block-size: auto;
+}

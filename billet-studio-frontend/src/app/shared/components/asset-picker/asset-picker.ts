@@ -13,27 +13,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import type { ModelAssetDto } from '../../../core/models/models';
 import { LanguageService } from '../../../core/services/language-service';
+import { FALLBACK_EMOJI, occasionMeta } from '../../../core/utils/model-occasions';
 import { AssetThumb } from '../asset-thumb/asset-thumb';
-
-interface OccasionMeta {
-  readonly labelKey: string;
-  readonly emoji: string;
-}
-
-/** The occasions of tbl_models; an occasion missing here still filters, under its raw key. */
-const OCCASIONS: Readonly<Record<string, OccasionMeta>> = {
-  mothers_day: { labelKey: 'CONTROLS.ASSET.OCCASION.MOTHERS_DAY', emoji: '💐' },
-  valentines: { labelKey: 'CONTROLS.ASSET.OCCASION.VALENTINES', emoji: '❤️' },
-  birthday: { labelKey: 'CONTROLS.ASSET.OCCASION.BIRTHDAY', emoji: '🎂' },
-  celebration: { labelKey: 'CONTROLS.ASSET.OCCASION.CELEBRATION', emoji: '🥂' },
-  christmas: { labelKey: 'CONTROLS.ASSET.OCCASION.CHRISTMAS', emoji: '🎄' },
-  general: { labelKey: 'CONTROLS.ASSET.OCCASION.GENERAL', emoji: '🎁' },
-};
-
-const FALLBACK_EMOJI = '✨';
-
-const occasionMeta = (key: string): OccasionMeta | null =>
-  Object.hasOwn(OCCASIONS, key) ? OCCASIONS[key] : null;
 
 // Radio names must be unique per instance, or two pickers on one page share one group.
 let nextPickerId = 0;

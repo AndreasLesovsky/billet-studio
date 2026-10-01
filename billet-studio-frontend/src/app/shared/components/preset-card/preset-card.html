@@ -1,0 +1,28 @@
+<span
+  class="preset-card__hero"
+  [style.background-color]="card().hero"
+>
+  <span
+    class="preset-card__line"
+    [style]="card().title"
+    >Aa</span
+  >
+  <span
+    class="preset-card__line"
+    [style]="card().titleAccent"
+    >{{ 'THEME_PICKER.SAMPLE_ACCENT' | translate }}</span
+  >
+</span>
+<span
+  class="preset-card__line preset-card__body"
+  [style]="card().body"
+  >{{ 'THEME_PICKER.SAMPLE_BODY' | translate }}</span
+>
+<span class="preset-card__particles">
+  @for (color of card().particles; track $index) {
+    <span
+      class="preset-card__dot"
+      [style.background-color]="color"
+    ></span>
+  }
+</span>

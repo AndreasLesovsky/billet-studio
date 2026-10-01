@@ -26,7 +26,9 @@
       "TAKING_OVER": "Moving…",
       "DUPLICATING": "Duplicating…",
       "PUBLISHING": "Publishing…",
-      "UNPUBLISHING": "Unpublishing…"
+      "UNPUBLISHING": "Unpublishing…",
+      "THINKING": "Thinking …",
+      "STARTING": "Starting …"
     },
     "NO_RESULTS": "No results found.",
     "YES": "Yes",
@@ -132,6 +134,51 @@
     "CHAPTER_SHARE_TEXT": "Whoever opens the link sees your billet right in the browser.",
     "TEMPLATES_TITLE": "Start from a template",
     "TEMPLATES_ALL": "All templates"
+  },
+  "ASSIST": {
+    "TITLE": "Billet assistant",
+    "LABEL": "Your idea",
+    "PLACEHOLDER": "Describe your billet …",
+    "SEND": "Send",
+    "EXAMPLES": "Examples",
+    "EXAMPLE_1": "A birthday card for my brother, more elegant than colourful, with a champagne bottle instead of a cake",
+    "EXAMPLE_2": "Christmas greetings to the family, cosy and warm, in dark mode",
+    "EXAMPLE_3": "A thank-you for my colleague, calm and without a 3D motif, in German",
+    "LOG": "Conversation with the assistant",
+    "YOU": "You",
+    "ASSISTANT": "Assistant",
+    "THINKING": "The assistant is thinking …",
+    "OFFER": "Your billet could start like this:",
+    "CREATE": "Create billet",
+    "RESTART": "Start over",
+    "BLANK": "Blank billet",
+    "CHOICE": {
+      "THEME": "Colour scheme",
+      "MODEL": "3D motif",
+      "PARTICLES": "Particles",
+      "DIVIDER": "Divider",
+      "MODE": "Appearance",
+      "LANGUAGE": "Language"
+    },
+    "NOTES": {
+      "OFF_TOPIC": "I can't help with that. Describe the billet you want to start: occasion, mood, colours or a 3D motif.",
+      "NOTHING_RECOGNISED": "I couldn't read anything specific from that, so it starts blank. Tell me the occasion, mood, colours or a motif.",
+      "NO_CHANGE": "That doesn't change anything. Tell me what should be different.",
+      "PARTICLES_NOT_SUPPORTED": "Those particles don't exist, so the previous ones stay. Available are petals, snowflakes, leaves, confetti and hearts.",
+      "MODEL_NOT_SUPPORTED": "That 3D motif isn't in the library, so the previous one stays. The editor shows every motif."
+    },
+    "STATUS": {
+      "READY": "Ready",
+      "IDLE": "Still asleep: the first answer takes a little longer.",
+      "OFFLINE": "Not available right now"
+    },
+    "WELCOME_TITLE": "What should your billet look like?",
+    "WELCOME_TEXT": "Describe it in one sentence: occasion, mood, colours, a 3D motif. I pick a template and a look for you; you write your own words afterwards.",
+    "NOTICE": "Enter sends, Shift + Enter starts a new line. The assistant only picks the template and the look.",
+    "OFFLINE": "The assistant is not available right now. Pick a template instead or come back later.",
+    "CHOICES": "What it starts with",
+    "NO_MODEL": "No 3D motif",
+    "NO_PARTICLES": "No particles"
   },
   "HERO": {
     "STAGE_LABEL": "Animation: from billet to shared link",
@@ -708,6 +755,10 @@
     "SECTION_NAVIGATION": "Navigation",
     "SECTION_OVERLAYS": "Dialogs, menu, popover and tooltip",
     "SECTION_TAB_FIT": "Tab row that fits its width",
+    "SECTION_CHAT": "Chat",
+    "CHAT_USER": "A birthday card, more elegant than colourful",
+    "CHAT_ASSISTANT": "Your billet could start like this:",
+    "CHAT_FOLLOW_UP": "rather light",
     "SECTION_TABLE": "Table",
     "SECTION_CARDS": "Cards",
     "HEADING_SAMPLE": "A billet for every occasion",

@@ -17,6 +17,10 @@
       </p>
     </header>
 
+    @defer (on idle) {
+      <app-billet-assistant />
+    }
+
     <ul
       class="ui-grid template-gallery__grid"
       role="list"

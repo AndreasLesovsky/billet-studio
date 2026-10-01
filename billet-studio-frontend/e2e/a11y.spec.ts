@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
 import { AccountBackend } from './support/account-api';
+import { mockAssistant } from './support/assist-api';
 import { mockBilletApi, PARITY_DOCUMENT, publicBillet } from './support/billet-api';
 import { mockGuestApi } from './support/guest-api';
 import { withoutWebGl } from './support/scene';
@@ -32,12 +33,12 @@ interface Accepted {
 const ACCEPTED: readonly Accepted[] = [
   {
     rule: 'color-contrast',
-    target: '.ui-theme-card',
+    target: 'app-preset-card',
     reason:
-      'A theme card is a picture of its billet preset (aria-hidden; the radio is named by the ' +
-      "card's Studio label). Its sample word is the preset's accent on accentSoft, held at >= 3:1 " +
-      "like the hero label it shows (rose: the live card's 3.7:1, a user decision). WCAG 1.4.3 " +
-      'exempts text that is pure decoration or part of a picture.',
+      'A theme card (app-preset-card) is a picture of its billet preset (aria-hidden; the radio ' +
+      "or the assistant's offer names it in Studio). Its sample word is the preset's accent on " +
+      "accentSoft, held at >= 3:1 like the hero label it shows (rose: the live card's 3.7:1, a " +
+      'user decision). WCAG 1.4.3 exempts text that is pure decoration or part of a picture.',
   },
 ];
 
@@ -123,6 +124,40 @@ test.describe('accessibility', () => {
         await expectAccessible(page, path);
       });
     }
+
+    test('/templates with the billet assistant offline', async ({ page }) => {
+      await mockAssistant(page, 'OFFLINE');
+      await page.goto('/templates');
+      await expect(page.getByText('Der Assistent ist gerade nicht erreichbar.')).toBeVisible();
+      await expectAccessible(page, 'assistant offline');
+    });
+
+    test('/templates with a chat: an offer and a message without an answer', async ({ page }) => {
+      await mockAssistant(page, 'READY', [
+        {
+          billet: {
+            template: 'geburtstag',
+            theme: 'midnight',
+            particles: 'NONE',
+            divider: 'TEMPLATE_DEFAULT',
+            colorMode: 'dark',
+            lang: 'UI_LANGUAGE',
+            model: 'champagne-bottle',
+          },
+          notes: ['MODEL_NOT_SUPPORTED'],
+        },
+        null,
+      ]);
+      await page.goto('/templates');
+      const message = page.getByRole('textbox', { name: 'Dein Wunsch' });
+      await message.fill('Geburtstag, schick, mit Einhorn');
+      await message.press('Enter');
+      await expect(page.getByRole('link', { name: 'Billet anlegen', exact: true })).toBeVisible();
+      await message.fill('lieber hell');
+      await message.press('Enter');
+      await expect(page.getByRole('button', { name: 'Erneut versuchen' })).toBeVisible();
+      await expectAccessible(page, 'assistant chat');
+    });
 
     test('the header menus open', async ({ page }) => {
       await page.goto('/');

@@ -1,0 +1,6 @@
+// Layout only; the card's look is .ui-chat-card (src/styles/components/_chat.scss).
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+}

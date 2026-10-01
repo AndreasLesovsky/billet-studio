@@ -120,13 +120,24 @@ export function modelLibraryAnswer(method: string, path: string): object | undef
 }
 
 /**
- * Stands in for the backend of a visitor who is not signed in: the model library answers, every
- * other /v1 request is 401 (the refresh on startup included), so the app runs as a guest.
+ * The billet assistant as a deployment without it answers (DISABLED: the page shows no assistant),
+ * or undefined when the request is not for it. assist.spec.ts routes /v1/assist itself.
+ */
+export function assistAnswer(method: string, path: string): object | undefined {
+  return method === 'GET' && path === '/v1/assist/status' ? { status: 'DISABLED' } : undefined;
+}
+
+/**
+ * Stands in for the backend of a visitor who is not signed in: the model library answers, the
+ * assistant is switched off, every other /v1 request is 401 (the refresh on startup included), so
+ * the app runs as a guest.
  */
 export async function mockGuestApi(page: Page): Promise<void> {
   await page.route('**/v1/**', async (route) => {
     const request = route.request();
-    const models = modelLibraryAnswer(request.method(), new URL(request.url()).pathname);
+    const path = new URL(request.url()).pathname;
+    const models =
+      modelLibraryAnswer(request.method(), path) ?? assistAnswer(request.method(), path);
     if (models) {
       await route.fulfill({ json: models, headers: CORS_HEADERS });
     } else {

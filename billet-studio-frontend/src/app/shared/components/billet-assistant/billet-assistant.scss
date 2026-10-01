@@ -1,0 +1,20 @@
+// Layout only; the chat window's look is src/styles/components/_chat.scss.
+:host {
+    display: block;
+}
+
+// Nothing to show (switched off, status unknown): no box, so the page's flex gap closes too.
+:host:empty {
+    display: none;
+}
+
+.billet-assistant__heading {
+    flex: 1;
+    min-inline-size: 0;
+}
+
+.billet-assistant__welcome-avatar {
+    inline-size: 3rem;
+    block-size: 3rem;
+    font-size: 1.5rem;
+}

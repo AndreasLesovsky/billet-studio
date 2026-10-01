@@ -717,6 +717,101 @@
         </div>
       </section>
 
+      <!-- Chat (the billet assistant) -->
+      <section
+        class="ui-stack ui-stack--sm"
+        aria-labelledby="kit-chat"
+      >
+        <h3
+          id="kit-chat"
+          class="kit__section-title"
+        >
+          {{ 'UI_KIT.SECTION_CHAT' | translate }}
+        </h3>
+        <div class="ui-chat-window kit__chat">
+          <div class="ui-chat-window__header">
+            <span
+              class="ui-chat-avatar"
+              aria-hidden="true"
+              ><i class="bi bi-stars"></i
+            ></span>
+            <div>
+              <p class="ui-chat-window__title">{{ 'ASSIST.TITLE' | translate }}</p>
+              <p class="ui-chat-window__status ui-chat-window__status--ready">
+                {{ 'ASSIST.STATUS.READY' | translate }}
+              </p>
+            </div>
+          </div>
+          <div class="ui-chat-window__scroll">
+            <ol class="ui-chat">
+              <li class="ui-chat__message--user">{{ 'UI_KIT.CHAT_USER' | translate }}</li>
+              <li class="ui-chat__message--assistant">
+                <span
+                  class="ui-chat-avatar"
+                  aria-hidden="true"
+                  ><i class="bi bi-stars"></i
+                ></span>
+                <div class="ui-chat__body">{{ 'UI_KIT.CHAT_ASSISTANT' | translate }}</div>
+              </li>
+              <li class="ui-chat__message--user">{{ 'UI_KIT.CHAT_FOLLOW_UP' | translate }}</li>
+              <li class="ui-chat__error">
+                <i
+                  class="bi bi-exclamation-circle"
+                  aria-hidden="true"
+                ></i>
+                {{ 'MESSAGES.ERROR.ASSIST_UNAVAILABLE' | translate }}
+              </li>
+              <li class="ui-chat__message--assistant">
+                <span
+                  class="ui-chat-avatar"
+                  aria-hidden="true"
+                  ><i class="bi bi-stars"></i
+                ></span>
+                <span
+                  class="ui-chat__typing"
+                  aria-hidden="true"
+                  ><span></span><span></span><span></span
+                ></span>
+              </li>
+            </ol>
+          </div>
+          <div class="ui-chat-window__footer">
+            <div class="ui-chat-composer">
+              <label
+                class="ui-visually-hidden"
+                for="kit-chat-input"
+                >{{ 'ASSIST.LABEL' | translate }}</label
+              >
+              <textarea
+                id="kit-chat-input"
+                class="ui-chat-composer__input"
+                rows="1"
+                [placeholder]="'ASSIST.PLACEHOLDER' | translate"
+              ></textarea>
+              <button
+                type="button"
+                class="ui-btn ui-btn--primary ui-btn--icon ui-chat-composer__send"
+                [attr.aria-label]="'ASSIST.SEND' | translate"
+              >
+                <i
+                  class="bi bi-arrow-up"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
+            <div class="ui-chat-suggestions">
+              <button
+                type="button"
+                class="ui-chat-suggestion"
+              >
+                {{ 'ASSIST.EXAMPLE_2' | translate }}
+              </button>
+            </div>
+            <p class="ui-chat-window__notice">{{ 'ASSIST.NOTICE' | translate }}</p>
+          </div>
+        </div>
+      </section>
+
       <!-- Table -->
       <section
         class="ui-stack ui-stack--sm"
