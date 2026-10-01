@@ -53,6 +53,7 @@ import tools.jackson.databind.json.JsonMapper;
     // The database is unreachable on purpose; its indicator would report exactly that.
     "management.health.db.enabled=false",
     "app.mail.enabled=false",
+    "app.assist.enabled=false",
     "app.rate-limit.enabled=false",
     "app.security.enforce-strong-secrets=false",
     "app.jwt.secret=servlet-container-test-only-0123456789abcdef0123456789abcdef0123456789",

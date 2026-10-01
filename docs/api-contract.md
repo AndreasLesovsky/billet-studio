@@ -21,6 +21,7 @@ Codes (frontend has one `MESSAGES.ERROR.<CODE>` key per code, de + en):
 Billet codes (phase P2): `BILLET_NOT_FOUND` 404, `BILLET_LIMIT_REACHED` 409,
 `BILLET_MODIFIED_ELSEWHERE` 409, `UNSUPPORTED_SCHEMA_VERSION` 400, `UNKNOWN_MODEL` 400,
 `MODEL_NOT_FOUND` 404.
+Assistant codes (phase A2): `ASSIST_UNAVAILABLE` 503.
 
 No account-state enumeration: login answers every failure (unknown email, wrong password, locked,
 deactivated past grace) with the identical 401 `UNAUTHORIZED` body; forgot-password always 200.
@@ -183,3 +184,37 @@ reactivating the account (login within the grace period, an admin unlock) restor
 their tokens. Deleting the account deletes its billets.
 
 Rate limit 120/min per IP. Response header `X-Robots-Tag: noindex`.
+
+## Billet assistant — `/v1/assist` (public), phase A2
+
+The questionnaire, its labels and the prompt rules are in [assist.md](assist.md). The model only picks
+labels; every text the user sees comes from the frontend's i18n.
+
+```
+AssistStatus    READY | IDLE | OFFLINE | DISABLED
+AssistStatusDto { status: AssistStatus }
+AssistBilletDto { template, theme, particles, divider, colorMode, lang, model }   (labels, see assist.md)
+AssistTurnDto   { role: 'user' | 'assistant', content: string | null, billet: AssistBilletDto | null }
+AssistRequest   { conversation: AssistTurnDto[] }                                  (1..10, oldest first)
+AssistReply     { billet: AssistBilletDto, notes: string[] }
+```
+
+- A user entry holds `content` (1..300 characters, no control characters but `\n`) and no `billet`; an
+  assistant entry holds a `billet` and no `content`; the last entry is the user's new message. A billet
+  label outside the questionnaire (KEEP and NOT_SUPPORTED included; for `model` any slug-shaped value
+  is accepted) → 400 `VALIDATION_ERROR`.
+- `notes`: `OFF_TOPIC` (the message is not about a billet; `billet` unchanged), `NOTHING_RECOGNISED`
+  (first message, nothing recognised: the blank start), `NO_CHANGE`, `PARTICLES_NOT_SUPPORTED`,
+  `MODEL_NOT_SUPPORTED` (the value stays as it was).
+- `status`: READY = the model is loaded, IDLE = it is there but the first answer waits for it to load,
+  OFFLINE = the model server does not answer or lacks the model, DISABLED = `app.assist.enabled` is
+  false. Never loads the model; cached for 10 s.
+
+| Method | Path | Body | Response |
+|---|---|---|---|
+| GET | `/status` | — | 200 `AssistStatusDto` (`Cache-Control: no-store`) |
+| POST | `/warm-up` | — | 202; starts loading the model (no-op while DISABLED) |
+| POST | `` | `AssistRequest` | 200 `AssistReply`; 503 `ASSIST_UNAVAILABLE` (switched off, model server down, too slow, unusable answer); 429 `RATE_LIMIT_EXCEEDED` when another answer still runs after `app.assist.timeout` |
+
+Rate limits (per IP): status 120/min, warm-up 20/h, questions `app.assist.rate-limit` (default 20 per
+10 min). A stale bearer token is ignored, as on the other public routes.

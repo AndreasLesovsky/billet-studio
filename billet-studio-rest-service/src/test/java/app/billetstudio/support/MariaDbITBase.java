@@ -19,8 +19,8 @@ import org.testcontainers.mariadb.MariaDBContainer;
  * Base of every integration test: the shared Testcontainers MariaDB (schema.sql + role and model seeds) and a
  * configuration that cannot leak into anything real. Self-skips without Docker.
  *
- * The fixed properties pin everything a developer's .env.local could otherwise feed into the context (root
- * account, secrets, mail, DDL, cookie flag, billet limits, model base URL). They are @TestPropertySource and not
+ * The fixed properties pin everything a developer's .env.local could otherwise feed into the context (root account,
+ * secrets, mail, the assistant, DDL, cookie flag, billet limits, model base URL). They are @TestPropertySource and not
  * dynamic properties on purpose: a subclass can override them with its own @TestPropertySource, while dynamic
  * properties would always win. The billet cap is low so a test reaches it in a few requests without a context of its
  * own. The document cap is low too: with control characters refused, a character of text is at most three bytes of
@@ -34,6 +34,7 @@ import org.testcontainers.mariadb.MariaDBContainer;
     "spring.jpa.hibernate.ddl-auto=none",
     "spring.jpa.show-sql=false",
     "app.mail.enabled=false",
+    "app.assist.enabled=false",
     "app.rate-limit.enabled=false",
     "app.security.enforce-strong-secrets=false",
     "app.jwt.secret=" + MariaDbITBase.JWT_SECRET,

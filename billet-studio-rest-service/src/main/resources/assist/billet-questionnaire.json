@@ -1,0 +1,104 @@
+{
+  "preamble": "`conversation` is a chat in which a person describes the billet they want to start, a digital greeting card; the last entry is the new message. `billet` in an assistant entry is the start configuration offered so far.",
+  "questions": {
+    "template": {
+      "instructions": "Which template should the billet start from? Answer KEEP unless the new message names an occasion or asks for a different template.",
+      "criteria": {
+        "KEEP": "The new message names no occasion and does not ask for a different template.",
+        "valentinstag": "Valentine's Day, love for a partner or sweetheart (Valentinstag, Liebe).",
+        "geburtstag": "A birthday (Geburtstag).",
+        "weihnachten": "Christmas, the holidays, winter greetings (Weihnachten, Feiertage).",
+        "hochzeit": "A wedding or a wedding anniversary (Hochzeit, Hochzeitstag).",
+        "muttertag": "Mother's Day, thanks to a mother (Muttertag).",
+        "BLANK": "A greeting card for an occasion none of these templates is made for, such as a farewell, a baptism, a thank-you, get well soon or Easter, or a blank start (andere Anlässe, leeres Billet).",
+        "NOT_SUPPORTED": "The new message is not about a greeting card at all: a question, small talk or a different task."
+      },
+      "defaultLooks": {
+        "valentinstag": { "theme": "sakura", "model": "beating-heart", "particles": "heart", "divider": "heart" },
+        "geburtstag": { "theme": "peach", "model": "birthday-cake", "particles": "confetti", "divider": "star" },
+        "weihnachten": { "theme": "midnight", "model": "snow-globe", "particles": "snowflake", "divider": "star" },
+        "hochzeit": { "theme": "dune", "model": "champagne-bottle", "particles": "petal", "divider": "diamond" },
+        "muttertag": { "theme": "rose", "model": "flower-bouquet", "particles": "petal", "divider": "diamond" },
+        "BLANK": { "theme": "rose", "model": "flower-bouquet", "particles": "petal", "divider": "diamond" }
+      }
+    },
+    "theme": {
+      "instructions": "Which design theme fits the look the conversation asks for? Light or dark does not count here, that is `colorMode`. Answer KEEP unless the new message says something about colours, mood or style. TEMPLATE_DEFAULT is the template's own theme.",
+      "criteria": {
+        "KEEP": "The new message says nothing about colours, mood or style.",
+        "TEMPLATE_DEFAULT": "The look the template comes with.",
+        "rose": "Cream with dusty rose and a classic serif; tender, heartfelt, classic (Creme und Altrosé; zärtlich, herzlich, klassisch).",
+        "sage": "Soft sage green; calm, natural, gentle (Salbeigrün; ruhig, natürlich, sanft).",
+        "midnight": "Night blue with gold and fine lettering; elegant, festive, chic (Nachtblau mit Gold; elegant, festlich, schick).",
+        "paper": "Old paper with dark red ink and a book serif; understated, literary, timeless (altes Papier mit dunkelroter Tinte; schlicht, literarisch, zeitlos).",
+        "lavender": "Lilac and violet; dreamy, soft, light (Flieder und Violett; verträumt, sanft, leicht).",
+        "ocean": "Sea blue and turquoise; fresh, clear, airy, modern (Meeresblau und Türkis; frisch, klar, luftig, modern).",
+        "terracotta": "Burnt orange and clay; warm, earthy, Mediterranean (Terrakotta und gebranntes Orange; warm, erdig, mediterran).",
+        "graphite": "Grey with steel blue; sober, minimalist, businesslike (Grau und Stahlblau; sachlich, minimalistisch, geschäftlich).",
+        "mint": "Mint and teal with rounded letters; fresh, cheerful, friendly (Minze und Petrol; frisch, fröhlich, freundlich).",
+        "peach": "Peach and coral with a bold headline; sunny, cheerful, playful (Pfirsich und Koralle; sonnig, fröhlich, verspielt).",
+        "aurora": "Violet and cyan like the northern lights; magical, modern (Violett und Cyan wie Polarlicht; magisch, modern).",
+        "espresso": "Coffee browns with a strong narrow headline; cosy, warm, relaxed (Kaffeebraun; gemütlich, warm, entspannt).",
+        "sakura": "Cherry-blossom pink with an elegant script; romantic, delicate (Kirschblütenrosa; romantisch, zart).",
+        "forest": "Deep forest green; natural, grounded, outdoorsy (Waldgrün; naturverbunden, bodenständig).",
+        "dune": "Sand and ochre gold; warm, refined, elegant (Sand und Ockergold; warm, edel, elegant).",
+        "neon": "Hot pink and electric cyan with loud display letters; party, very colourful, bold (Neonpink und Cyan; Party, knallbunt, laut)."
+      }
+    },
+    "particles": {
+      "instructions": "Which particles should float over the billet? Answer KEEP unless the new message mentions particles or something floating or falling. TEMPLATE_DEFAULT is the template's own particles.",
+      "criteria": {
+        "KEEP": "The new message says nothing about particles.",
+        "TEMPLATE_DEFAULT": "The particles the template comes with.",
+        "NONE": "No particles at all, for a calm billet (keine Partikel).",
+        "petal": "Flower petals (Blütenblätter).",
+        "snowflake": "Snowflakes (Schneeflocken).",
+        "leaf": "Leaves (Blätter, Laub).",
+        "confetti": "Confetti (Konfetti).",
+        "heart": "Little floating hearts (Herzchen).",
+        "NOT_SUPPORTED": "Particles are named, but none of those listed here, such as stars or bubbles."
+      }
+    },
+    "divider": {
+      "instructions": "Which ornament should separate the sections of the billet? Answer KEEP unless the new message mentions dividers, separators or ornaments. TEMPLATE_DEFAULT is the template's own divider.",
+      "criteria": {
+        "KEEP": "The new message says nothing about dividers or ornaments.",
+        "TEMPLATE_DEFAULT": "The divider the template comes with.",
+        "diamond": "A small diamond (Raute).",
+        "dot": "Dots (Punkte).",
+        "heart": "A small heart (Herz).",
+        "star": "A small star (Stern).",
+        "line": "A plain line (Linie).",
+        "none": "No ornament at all (kein Trenner)."
+      }
+    },
+    "colorMode": {
+      "instructions": "Should the billet be shown light or dark? Answer KEEP unless the new message asks for light or dark.",
+      "criteria": {
+        "KEEP": "The new message says nothing about light or dark.",
+        "auto": "Light or dark as the viewer's device is set (automatisch).",
+        "light": "A light page (hell, Hellmodus).",
+        "dark": "A dark page, dark mode (dunkel, Dunkelmodus)."
+      }
+    },
+    "lang": {
+      "instructions": "In which language should the texts of the billet be? A language named for the billet always counts. Otherwise only the first message that describes the billet counts, by the language it is written in; later messages change the language only when they name one. Answer KEEP unless the new message decides the language this way.",
+      "criteria": {
+        "KEEP": "The new message does not decide the language.",
+        "UI_LANGUAGE": "The language cannot be told: none is named, and the description is written in neither German nor English.",
+        "de": "German (Deutsch).",
+        "en": "English (Englisch)."
+      }
+    },
+    "model": {
+      "instructions": "Which 3D model should the billet show? Answer KEEP unless the new message names an object, a gift or a motif to show, or asks for none. TEMPLATE_DEFAULT is the template's own model.",
+      "criteria": {
+        "KEEP": "The new message names no object to show.",
+        "TEMPLATE_DEFAULT": "The model the template comes with.",
+        "NONE": "No 3D model at all (kein 3D-Motiv)."
+      },
+      "library": "%s (%s), occasion: %s.",
+      "unsupported": "An object is named, but none of those listed here, such as a unicorn or a car."
+    }
+  }
+}

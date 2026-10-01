@@ -172,6 +172,24 @@ app:
     max-per-user: ${BILLET_MAX_PER_USER:50}
     # Upper bound for one serialized billet document (draft or published snapshot).
     max-document-bytes: ${BILLET_MAX_DOCUMENT_BYTES:262144}
+  assist:
+    # The billet assistant (docs/assist.md): a local Ollama answers its questionnaire. Off unless switched on;
+    # Ollama has no authentication, so ASSIST_URL must only be reachable from this backend.
+    enabled: ${ASSIST_ENABLED:false}
+    url: ${ASSIST_URL:http://127.0.0.1:11434}
+    model: "${ASSIST_MODEL:qwen2.5:14b}"
+    # How long Ollama keeps the model in (GPU) memory after the last answer.
+    keep-alive: ${ASSIST_KEEP_ALIVE:1h}
+    # One answer, and the longest a request waits for a free slot (429 after it).
+    timeout: ${ASSIST_TIMEOUT:20s}
+    # How long a request waits for the model to load; the load itself goes on (up to 300 s).
+    load-timeout: ${ASSIST_LOAD_TIMEOUT:120s}
+    # Load the model at startup. Off: it loads when someone focuses the assistant's input.
+    warm-up: ${ASSIST_WARM_UP:false}
+    rate-limit:
+      # Questions per client IP within the window.
+      limit: ${ASSIST_RATE_LIMIT:20}
+      window: ${ASSIST_RATE_LIMIT_WINDOW:10m}
   models:
     # tbl_models stores relative file paths (models/<slug>.v<n>.glb); the API resolves them against
     # this base. Moving the files never needs SQL, only these two values (README "Modelle vom Backend

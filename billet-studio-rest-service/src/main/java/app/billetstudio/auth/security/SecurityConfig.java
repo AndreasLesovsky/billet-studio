@@ -83,9 +83,10 @@ public class SecurityConfig {
                 // Everything under /v1/auth authorises itself: login by credentials, refresh and logout by
                 // the refresh cookie. None of them may require a working access token.
                 .requestMatchers("/v1/auth/**").permitAll()
-                // Anonymous reads; JwtAuthenticationFilter.isAnonymousRead skips the token for exactly these.
+                // Anonymous routes; JwtAuthenticationFilter.isAnonymousRoute skips the token for exactly these.
                 .requestMatchers("/v1/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/models/**").permitAll()
+                .requestMatchers("/v1/assist", "/v1/assist/**").permitAll()
                 .requestMatchers("/v1/billets/**").authenticated()
                 // Denies before the controller is reached; @PreAuthorize on UserController is the second gate.
                 .requestMatchers("/v1/users/**").hasRole("ADMIN")

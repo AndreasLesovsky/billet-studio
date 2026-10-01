@@ -54,7 +54,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiError> handleApiException(ApiException ex) {
         String detail = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
-        if (ex.getStatus().is5xxServerError()) {
+        // 503 is an optional service that is down (the assistant's model server), not a fault of this one.
+        if (ex.getStatus().is5xxServerError() && ex.getStatus() != HttpStatus.SERVICE_UNAVAILABLE) {
             log.error("{} ({}): {}", ex.getErrorCode(), ex.getStatus().value(), detail, ex);
         } else {
             log.warn("{} ({}): {}", ex.getErrorCode(), ex.getStatus().value(), detail);

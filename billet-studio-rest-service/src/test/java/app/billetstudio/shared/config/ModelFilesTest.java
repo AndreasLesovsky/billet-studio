@@ -35,6 +35,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     "spring.mail.host=127.0.0.1",
     "spring.mail.port=1",
     "app.mail.enabled=false",
+    "app.assist.enabled=false",
     "app.security.enforce-strong-secrets=false",
     "app.upload.directory=target/model-files-test/uploads",
     "app.log.directory=target/model-files-test/logs",

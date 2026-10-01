@@ -839,6 +839,7 @@
       "UNSUPPORTED_SCHEMA_VERSION": "This billet comes from a different version. Please reload the page.",
       "UNKNOWN_MODEL": "The selected 3D model does not exist.",
       "MODEL_NOT_FOUND": "3D model not found.",
+      "ASSIST_UNAVAILABLE": "The assistant is not available right now. Pick a template or try again in a moment.",
       "SESSION_EXPIRED": "Your session has expired. Please log in again.",
       "UNKNOWN_ERROR": "An unknown error occurred.",
       "SERVER_UNREACHABLE": "No connection to the server. Please check your internet connection and try again.",

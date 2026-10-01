@@ -839,6 +839,7 @@
       "UNSUPPORTED_SCHEMA_VERSION": "Dieses Billet stammt aus einer anderen Version. Bitte lade die Seite neu.",
       "UNKNOWN_MODEL": "Das gewählte 3D-Modell gibt es nicht.",
       "MODEL_NOT_FOUND": "3D-Modell nicht gefunden.",
+      "ASSIST_UNAVAILABLE": "Der Assistent ist gerade nicht erreichbar. Wähl eine Vorlage aus oder versuch es gleich noch einmal.",
       "SESSION_EXPIRED": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
       "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
       "SERVER_UNREACHABLE": "Keine Verbindung zum Server. Prüfe deine Internetverbindung und versuch es noch einmal.",

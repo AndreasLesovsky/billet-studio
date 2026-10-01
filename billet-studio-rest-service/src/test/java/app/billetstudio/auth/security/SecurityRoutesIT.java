@@ -24,11 +24,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * SecurityConfig decides for every URL whether it needs a login and whether it needs ADMIN, and a mistake there is a
  * silent hole - the endpoint keeps working, it just answers to the wrong people.
  *
- * The tables below are the intent, written out: /v1/auth/**, /v1/public/**, GET /v1/models/**, /uploads/**,
- * GET /files/models/** and the health check are public; /v1/users/** is ADMIN; everything else needs a login. They
- * assert the CLASSIFICATION of each rule group, not what the handler returns: "denied" is 401/403, everything else
- * (200, 204, 400, 404, 405) counts as "reached", because whether a controller then likes the request is not this
- * file's business.
+ * The tables below are the intent, written out: /v1/auth/**, /v1/public/**, GET /v1/models/**, /v1/assist/**,
+ * /uploads/**, GET /files/models/** and the health check are public; /v1/users/** is ADMIN; everything else needs a
+ * login. They assert the CLASSIFICATION of each rule group, not what the handler returns: "denied" is 401/403,
+ * everything else (200, 204, 400, 404, 405) counts as "reached", because whether a controller then likes the request is
+ * not this file's business.
  */
 @Testcontainers(disabledWithoutDocker = true)
 class SecurityRoutesIT extends WebITBase {
@@ -72,6 +72,9 @@ class SecurityRoutesIT extends WebITBase {
         "GET,    /v1/public/billets/aaaaaaaaaaaaaaaaaaaaaa",
         "GET,    /v1/models",
         "GET,    /v1/models/bouquet",
+        "GET,    /v1/assist/status",
+        "POST,   /v1/assist/warm-up",
+        "POST,   /v1/assist",
         "GET,    /uploads/avatars/nothing.webp",
         "GET,    /files/models/nothing.v1.glb",
         "GET,    /actuator/health",
@@ -85,16 +88,20 @@ class SecurityRoutesIT extends WebITBase {
     }
 
     /**
-     * The anonymous reads never look at the Authorization header: a stale token the SPA still holds must not turn a
-     * shared link or the model library into a 401 (JwtAuthenticationFilter.isAnonymousRead mirrors the rules above).
+     * The anonymous routes never look at the Authorization header: a stale token the SPA still holds must not turn a
+     * shared link, the model library or the assistant into a 401 (JwtAuthenticationFilter.isAnonymousRoute mirrors
+     * the rules above).
      */
     @ParameterizedTest(name = "public despite a broken token: {0} {1}")
     @CsvSource({
         "GET, /v1/public/billets/aaaaaaaaaaaaaaaaaaaaaa",
         "GET, /v1/models",
-        "GET, /v1/models/bouquet"
+        "GET, /v1/models/bouquet",
+        "GET, /v1/assist/status",
+        "POST, /v1/assist/warm-up",
+        "POST, /v1/assist"
     })
-    void anonymousReads_ignoreABrokenToken(String method, String path) throws Exception {
+    void anonymousRoutes_ignoreABrokenToken(String method, String path) throws Exception {
         int status = status(request(method, path), "not.a.valid-token");
         assertThat(isDenied(status))
             .withFailMessage("%s %s must ignore a broken token but answered %d", method, path, status)
