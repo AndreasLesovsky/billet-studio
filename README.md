@@ -418,7 +418,9 @@ gzip_types text/plain text/css application/json application/javascript image/svg
 
 ## Roadmap
 
-Each phase is implemented, verified and then committed.
+Each phase is implemented, verified and then committed. What billet-studio promises (the hero's
+"Deine Worte, mit einem Geschenk in 3D."), the phases ahead and the open decisions:
+[docs/roadmap.md](docs/roadmap.md).
 
 | Phase | Content | Status |
 |---|---|---|
@@ -433,6 +435,10 @@ Each phase is implemented, verified and then committed.
 | **P8** Hardening + docs | fallow audit, bundle budgets (three.js only in the lazy chunk), axe checks of every page and dialog (`e2e/a11y.spec.ts`), stable parallel e2e runs, security review, theme swatches in "Meine Billets" (`tbl_billets.theme`), toasts at the bottom and above dialogs, models optionally served by the backend (`MODELS_DIRECTORY`) with runbook, nginx notes, Blender export checklist, README/CLAUDE.md | done (Lighthouse open) |
 | **Hero story** | 3D story in the home hero: Valentine's Day as the showcase, textures from the real renderer, card, phone and choreography in Blender Python (headless) with bakes and export, structure-preserving optimisation, light gifts, runtime with chapters, pause/replay, idle state with occasion changes and rotation, start/end posters from the canvas, reduced motion / data saver / no WebGL, LCP measurement, `e2e/home.spec.ts` | done |
 | **Assistant** | A billet from one sentence: start params for `/billets/new` (A1), package `assist` with a Java port of the jev questionnaire and an Ollama client, status/warm-up/question endpoints (A2), chat on the home page and in the gallery with an offer widget (A3), docs (A4), measurement against Ollama (A5) | A1–A5 implemented (22/22 measured turns right) |
+| **Phase 1** Assistant v2 | A finished billet from one sentence: text quality measured first (local models vs Claude), blueprints with text slots, text drafts from the sender's own facts, refining in the chat | planned |
+| **Phase 2** Model factory | Own 3D library in one house style: parametric Blender families replace the Sketchfab models, metadata for search and the assistant, library UX for hundreds of models | planned |
+| **Phase 3** Recipient + editor | Link preview, envelope moment, personalised 3D gifts, own photos, opening date, reply | planned |
+| **Phase 4** Product readiness | Target group, freemium model, hosting and cost, legal, hero polish, Lighthouse | open |
 
 ---
 
