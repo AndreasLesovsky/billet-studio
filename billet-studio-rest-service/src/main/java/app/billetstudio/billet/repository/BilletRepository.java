@@ -8,6 +8,8 @@ import app.billetstudio.billet.entity.Billet;
 
 import jakarta.persistence.LockModeType;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -40,6 +42,23 @@ public interface BilletRepository extends JpaRepository<Billet, Long> {
         + "ELSE true END) "
         + "FROM Billet b WHERE b.user.id = :userId ORDER BY b.updatedAt DESC, b.id DESC")
     List<BilletSummaryRow> findSummariesByUserId(@Param("userId") Long userId);
+
+    /** The admin overview's filter; shared by its row and count query. */
+    String ADMIN_FILTER = "(:likePattern IS NULL OR LOWER(b.title) LIKE :likePattern ESCAPE '!' "
+        + "OR LOWER(u.name) LIKE :likePattern ESCAPE '!' OR LOWER(u.email) LIKE :likePattern ESCAPE '!') "
+        + "AND (:published IS NULL OR (:published = true AND b.publishedAt IS NOT NULL) "
+        + "OR (:published = false AND b.publishedAt IS NULL))";
+
+    /**
+     * The admin overview across every user, without loading either document. likePattern is lowercased and escaped
+     * with '!' (see AdminBilletService), or null for no text filter; published null means drafts and published.
+     */
+    @Query(value = "SELECT new app.billetstudio.billet.repository.AdminBilletRow(b.id, b.title, b.theme, "
+        + "b.modelSlug, b.shareToken, b.publishedAt, b.createdAt, b.updatedAt, u.id, u.name, u.email, u.active) "
+        + "FROM Billet b JOIN b.user u WHERE " + ADMIN_FILTER,
+        countQuery = "SELECT COUNT(b) FROM Billet b JOIN b.user u WHERE " + ADMIN_FILTER)
+    Page<AdminBilletRow> searchAdmin(@Param("likePattern") String likePattern, @Param("published") Boolean published,
+        Pageable pageable);
 
     /**
      * Public link: published, and only while the owner's account is active - an admin lock or a self-deactivation

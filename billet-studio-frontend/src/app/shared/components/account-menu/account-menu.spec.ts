@@ -39,9 +39,9 @@ describe('AccountMenu', () => {
     expect(items()[0].textContent).toContain('anna@example.com');
   });
 
-  it('offers an admin the user management as well', async () => {
+  it('offers an admin the user management and the billet overview as well', async () => {
     await openAs(testUser({ role: 'ROLE_ADMIN' }));
 
-    expect(links()).toEqual(['/account', '/admin/users', null]);
+    expect(links()).toEqual(['/account', '/admin/users', '/admin/billets', null]);
   });
 });

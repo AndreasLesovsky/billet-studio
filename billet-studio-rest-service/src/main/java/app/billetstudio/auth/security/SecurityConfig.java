@@ -88,8 +88,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/v1/models/**").permitAll()
                 .requestMatchers("/v1/assist", "/v1/assist/**").permitAll()
                 .requestMatchers("/v1/billets/**").authenticated()
-                // Denies before the controller is reached; @PreAuthorize on UserController is the second gate.
+                // Deny before the controller is reached; @PreAuthorize on the controllers is the second gate.
                 .requestMatchers("/v1/users/**").hasRole("ADMIN")
+                .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .build();

@@ -2,6 +2,7 @@
 // import some DTOs from here and others by file path, and the split is invisible until a build fails.
 export * from './accountDto';
 export * from './accountUpdateDto';
+export * from './adminBilletDto';
 export * from './apiError';
 export * from './app-message';
 export * from './assistBilletDto';

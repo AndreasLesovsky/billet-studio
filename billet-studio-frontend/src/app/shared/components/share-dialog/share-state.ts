@@ -69,7 +69,7 @@ export interface ShareState {
 }
 
 /** The share link, built by the frontend (docs/api-contract.md). */
-function shareLink(token: string, origin: string = frontendUrl): string {
+export function shareLink(token: string, origin: string = frontendUrl): string {
   return `${origin.replace(/\/+$/, '')}/b/${encodeURIComponent(token)}`;
 }
 

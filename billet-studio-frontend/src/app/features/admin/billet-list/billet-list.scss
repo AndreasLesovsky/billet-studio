@@ -1,0 +1,47 @@
+// Layout only; every visual comes from the ui-* classes.
+@use '../../../../styles/breakpoints' as bp;
+
+.billet-list__filters {
+    display: grid;
+    gap: var(--ui-space-4);
+
+    @include bp.up(sm) {
+        grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem);
+        align-items: end;
+    }
+}
+
+.billet-list__sort {
+    margin-inline: calc(var(--ui-space-2) * -1);
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+}
+
+.billet-list__owner {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ui-space-1);
+}
+
+.billet-list__empty {
+    padding-block: var(--ui-space-8);
+    text-align: center;
+}
+
+.billet-list__pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+}
+
+.billet-list__page {
+    @include bp.down(sm) {
+        flex-basis: 100%;
+        order: -1;
+        text-align: center;
+    }
+}

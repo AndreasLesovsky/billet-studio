@@ -169,6 +169,13 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'admin/billets',
+        canActivate: [requireRole('ROLE_ADMIN')],
+        loadComponent: () =>
+          import('./features/admin/billet-list/billet-list').then((m) => m.BilletList),
+        data: { breadcrumb: 'BREADCRUMB.ADMIN_BILLETS' },
+      },
       ...devRoutes,
       {
         path: '**',

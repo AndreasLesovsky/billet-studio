@@ -104,6 +104,25 @@ Avatar files are served from `/uploads/avatars/...` (public, relative URL in `av
 
 Protected (root) accounts refuse update/toggle/delete with 403 `ROOT_USER_PROTECTED`.
 
+## Billets (admin) — `/v1/admin/billets` (ROLE_ADMIN)
+
+A read-only overview of every user's billets. There is no detail or write endpoint: the overview shows who
+created what and which links are shared, never a billet's document.
+
+| Method | Path | Body / Query | Response |
+|---|---|---|---|
+| GET | `` | `?page=0&size=20&q=&published=&sort=updatedAt,desc` (`q` matches the title or the owner's name or email, `published` = true/false/empty; sort fields `title`, `owner`, `createdAt`, `updatedAt`, `publishedAt`) | 200 `PageDto<AdminBilletDto>` |
+
+```
+AdminBilletDto  { id, title, theme: string | null, modelSlug: string | null, published: boolean,
+                  shareToken: string | null, publishedAt: string | null, createdAt, updatedAt,
+                  owner: { id, name, email, active: boolean } }
+```
+
+- `shareToken` is set only while the billet is published (a draft keeps its token for the next publish but
+  has no public page). The frontend builds the link as for the share dialog.
+- `owner.active = false`: the owner's shared pages are offline (see the public endpoint).
+
 ## Billets, models, public — phase P2
 
 `BilletDocument` is defined in [billet-document.md](billet-document.md).

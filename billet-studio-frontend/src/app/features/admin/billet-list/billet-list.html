@@ -1,0 +1,198 @@
+<div class="ui-container">
+  <div class="ui-page">
+    <header class="ui-page__header">
+      <div class="ui-stack ui-stack--sm">
+        <h1 class="ui-page__title">{{ 'ADMIN_BILLETS.TITLE' | translate }}</h1>
+        <p class="ui-page__lead">{{ 'ADMIN_BILLETS.LEAD' | translate }}</p>
+      </div>
+    </header>
+
+    <form
+      class="billet-list__filters"
+      role="search"
+      novalidate
+      (submit)="onFilterSubmit($event)"
+    >
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="billet-list-search"
+          >{{ 'ADMIN_BILLETS.SEARCH_LABEL' | translate }}</label
+        >
+        <input
+          id="billet-list-search"
+          class="ui-input"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          [placeholder]="'ADMIN_BILLETS.SEARCH_PLACEHOLDER' | translate"
+          [formField]="filterForm.q"
+          (input)="onSearchInput()"
+        />
+      </div>
+      <div class="ui-field">
+        <label
+          class="ui-label"
+          for="billet-list-status"
+          >{{ 'ADMIN_BILLETS.FILTER_STATUS' | translate }}</label
+        >
+        <select
+          id="billet-list-status"
+          class="ui-select"
+          [formField]="filterForm.published"
+          (change)="onStatusChange()"
+        >
+          <option value="">{{ 'ADMIN_BILLETS.FILTER_ALL' | translate }}</option>
+          <option value="true">{{ 'ADMIN_BILLETS.FILTER_PUBLISHED' | translate }}</option>
+          <option value="false">{{ 'ADMIN_BILLETS.FILTER_DRAFT' | translate }}</option>
+        </select>
+      </div>
+    </form>
+
+    @if (shown(); as shown) {
+      <div class="ui-stack">
+        <p
+          class="ui-hint"
+          aria-live="polite"
+        >
+          {{ 'ADMIN_BILLETS.TOTAL' | translate: { count: shown.totalRows } }}
+        </p>
+
+        <div class="ui-table-wrap">
+          <table
+            class="ui-table"
+            [attr.aria-busy]="billets.isLoading()"
+          >
+            <caption class="ui-visually-hidden">
+              {{
+                'ADMIN_BILLETS.TITLE' | translate
+              }}
+            </caption>
+            <thead>
+              <tr>
+                @for (column of columns; track column.label) {
+                  @if (column.field; as field) {
+                    <th
+                      scope="col"
+                      [attr.aria-sort]="ariaSort(field)"
+                    >
+                      <button
+                        type="button"
+                        class="ui-btn ui-btn--ghost ui-btn--sm billet-list__sort"
+                        [attr.aria-label]="
+                          'ADMIN_BILLETS.SORT_BY'
+                            | translate: { column: (column.label | translate) }
+                        "
+                        (click)="sortBy(field)"
+                      >
+                        {{ column.label | translate }}
+                        <i
+                          class="bi"
+                          [class]="sortIcon(field)"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                    </th>
+                  } @else {
+                    <th scope="col">{{ column.label | translate }}</th>
+                  }
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (billet of shown.rows; track billet.id) {
+                <tr>
+                  <td>{{ billet.title }}</td>
+                  <td>
+                    <span class="billet-list__owner">
+                      <span>{{ billet.owner.name }}</span>
+                      <span class="ui-hint">{{ billet.owner.email }}</span>
+                    </span>
+                  </td>
+                  <td><app-billet-status [billet]="billet" /></td>
+                  <td><app-billet-link [billet]="billet" /></td>
+                  <td class="ui-table__num">
+                    {{ billet.updatedAt | date: 'mediumDate' : undefined : locale() }}
+                  </td>
+                  <td class="ui-table__num">
+                    {{ billet.createdAt | date: 'mediumDate' : undefined : locale() }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td
+                    class="billet-list__empty"
+                    [attr.colspan]="columns.length"
+                  >
+                    {{ 'ADMIN_BILLETS.EMPTY' | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <nav
+          class="billet-list__pager"
+          [attr.aria-label]="'COMMON.PAGINATION' | translate"
+        >
+          <button
+            type="button"
+            class="ui-btn ui-btn--neutral ui-btn--sm"
+            [disabled]="!hasPrevious()"
+            (click)="previousPage()"
+          >
+            <i
+              class="bi bi-chevron-left"
+              aria-hidden="true"
+            ></i>
+            {{ 'COMMON.PREVIOUS_PAGE' | translate }}
+          </button>
+          <span class="ui-hint billet-list__page">{{
+            'COMMON.PAGE_OF' | translate: { page: pageNumber(), pages: pageCount() }
+          }}</span>
+          <button
+            type="button"
+            class="ui-btn ui-btn--neutral ui-btn--sm"
+            [disabled]="!hasNext()"
+            (click)="nextPage()"
+          >
+            {{ 'COMMON.NEXT_PAGE' | translate }}
+            <i
+              class="bi bi-chevron-right"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </nav>
+      </div>
+    } @else if (failed()) {
+      <div
+        class="ui-alert ui-alert--danger"
+        role="alert"
+      >
+        <i
+          class="bi bi-exclamation-octagon"
+          aria-hidden="true"
+        ></i>
+        <div class="ui-stack ui-stack--sm">
+          <p>{{ 'ADMIN_BILLETS.LOAD_FAILED' | translate }}</p>
+          <div>
+            <button
+              type="button"
+              class="ui-btn ui-btn--neutral ui-btn--sm"
+              (click)="retry()"
+            >
+              <i
+                class="bi bi-arrow-clockwise"
+                aria-hidden="true"
+              ></i>
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <app-billet-list-skeleton [columns]="columnLabels" />
+    }
+  </div>
+</div>
